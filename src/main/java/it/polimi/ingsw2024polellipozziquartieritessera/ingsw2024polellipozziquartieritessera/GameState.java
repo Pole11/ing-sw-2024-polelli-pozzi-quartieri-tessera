@@ -1,7 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera;
 
 public class GameState {
-    static GameState uniqueInstace;
+    static GameState uniqueInstance;
     private arrayList<Player> players; //2<players.size()<4
     private Player currentPlayer;
     private GamePhase currentGamePhase;
