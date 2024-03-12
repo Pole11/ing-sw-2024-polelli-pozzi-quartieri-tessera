@@ -24,12 +24,12 @@ In this section we will shortly explain how we structured the classes regarding 
 
 Here is a table that shows what all the types of cards have in common, so that it is easier to aggregate them into classes and subclasses.
 
-| Card | Has Corner (4) | Has Resource Corner (max 4) | Has Item Corner (max 1) | Has Points | Has Challenge | Has Resource Needed (max 5) | Has Back Resource |
-| --- | --- | --- | --- | --- | --- | --- | --- | 
-|Resource | x | x | x | x | | | x | 
-|Gold | x | | x | x | x | x | x |
-|Starter | x | x | | | | | x (max 3) |
-|Objective | | | | x | x | | |  
+| Card      | Has Corner (4) | Has Resource Corner (max 4) | Has Item Corner (max 1) | Has Points | Has Challenge | Has Resource Needed (max 5) | Has Back Resource |
+|-----------|----------------|-----------------------------|-------------------------|------------|---------------|-----------------------------|-------------------| 
+| Resource  | x              | x                           | x                       | x          |               |                             | x                 | 
+| Gold      | x              |                             | x                       | x          | x             | x                           | x                 |
+| Starter   | x              | x                           |                         |            |               |                             | x (max 3)         |
+| Objective |                |                             |                         | x          | x             |                             |                   |  
 
 The Cards are never discarded, they are always used for something. 
 
@@ -83,7 +83,7 @@ About element:
     - example of 3 animal: `element=[animal, animal, animal]`
     - example of 1 Quill and  2 Inkwell: `element = [Quill, Inkwell, Inkwell]` 
 
-Probably we should give an id to all of the cards so that we can render them with the right texture and we can track which one has been used or not.
+Probably we should give an id to all the cards so that we can render them with the right texture, and we can track which one has been used or not.
 
 `covered` is true only if is under another corner.
 
@@ -94,7 +94,7 @@ Order from top-left to bottom-left \[0-3\]
 32
 ```
 
-The arrays have a null value if the corner does not exists.
+The arrays have a null value if the corner do not exist.
 
 ## GameState 
 
@@ -108,7 +108,7 @@ Note that a **round** is made up by 4 **turns**.
 ## Enumerations
 
 We will use some enumerations to define our data types. 
-We cannot show all the association with the other classes because graphically it would too confusing. Just remind that these object are actually associated with the classes that make use of them.
+We cannot show all the association with the other classes because graphically it would be confused. Just remind that these object are actually associated with the classes that make use of them.
 
 ![enumerations](img/enumerations.svg)
 
