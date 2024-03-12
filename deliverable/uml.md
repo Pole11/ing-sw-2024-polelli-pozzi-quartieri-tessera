@@ -1,23 +1,4 @@
----
-title: "UML Codex Naturalis GC10"
-author: Riccardo Polelli, Filippo Pozzi, Federico Quartieri, Giacomo Tessera
-date: "2024"
-geometry: "left=1cm,right=1cm,top=2cm,bottom=2cm"
-output: pdf_document
-numbersections: true
-toc: true
-toc-title: "Indice"
-header-includes:
-    - \usepackage{multicol}
-    - \newcommand{\hideFromPandoc}[1]{#1}
-    - \hideFromPandoc{
-        \let\Begin\begin
-        \let\End\end}
----
-
-\newpage 
-
-# **M**odel 
+# Model 
 
 ## Card
 In this section we will shortly explain how we structured the classes regarding the various types of cards.
@@ -35,34 +16,30 @@ The Cards are never discarded, they are always used for something.
 
 ### Challenge
 
-\Begin{multicols}{2}
 #### Structure Challenge
 The structure challenge is only for objective cards.
 
-![structure](img/structure.png){ width=250px }  
-
+![structure](img/structure.png)
 
 #### Resource Challenge
 The resource challenge is only for objective cards. The type of resources needed in the objective cards can vary.
 
 In the objective cards is like this:
 
-![element-obj](img/element-obj.png){ width=250px }  
+![element-obj](img/element-obj.png)
 
 #### Item Challenge
 The item challenge is only for gold cards.
 
 In the gold cards is like this (the one on the top of the card):
 
-![element-gold](img/element-gold.png){ width=250px }    
+![element-gold](img/element-gold.png) 
 
 #### Coverage Challenge
 This challenge is only for gold cards.
 Is the one on the top of the card.
 
-![coverage](img/coverage.png){ width=250px }    
-
-\End{multicols}
+![coverage](img/coverage.png)   
 
 Here is the UML for both the Card and the Challenge:
 
@@ -101,9 +78,7 @@ The arrays have a null value if the corner do not exist.
 The first player in the data structure is the black one, something like `public Player blackPlayer() { return player[0] }`. 
 Note that a **round** is made up by 4 **turns**.
 
-![gamestate](img/gamestate.svg){ width=600px }
-
-\newpage
+![gamestate](img/gamestate.svg)
 
 ## Enumerations
 
@@ -112,15 +87,15 @@ We cannot show all the association with the other classes because graphically it
 
 ![enumerations](img/enumerations.svg)
 
-# **C**ontroller
+# Controller
 
 We started implementing the Controller while we are still studying how to implement the View, so it is still *wip*.
 
 In `placeCard` you can retrieve the infomation of a multiple corner placed card by checking in the method, you just need to place it on one single card, even if it will affect another card.
 
-![controller](img/controller.svg){ width=500px }
+![controller](img/controller.svg)
 
-# **View**
+# View
 
 *wip*
 
