@@ -1,4 +1,4 @@
-package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera;
+package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.tutorial;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
