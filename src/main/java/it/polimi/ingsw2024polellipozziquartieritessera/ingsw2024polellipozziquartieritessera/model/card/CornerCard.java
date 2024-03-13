@@ -5,7 +5,6 @@ public abstract class CornerCard extends Card {
     private Corner backCorners[] = new Corner[Config.N_CORNERS];
     private Resource centerBackResource[] = new Corner[Config.MAX_BACK_RESOURCES];
 
-
     public CornerCard[] getLinkedCards() {
         return new CornerCard[0];
     }
