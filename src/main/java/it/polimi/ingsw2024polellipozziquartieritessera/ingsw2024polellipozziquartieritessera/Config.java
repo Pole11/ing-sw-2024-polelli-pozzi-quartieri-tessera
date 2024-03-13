@@ -11,6 +11,13 @@ public class Config {
     public static final int MAX_UNCOVERED_RESOURCES = 4;
     public static final int MAX_CHAL_RESOURCE = 3;
     public static final int MAX_CHAL_ITEM = 3;
+
+    enum Color {
+        BLACK,
+        GREEN,
+        YELLOW,
+        RED
+    }
 }
 
 

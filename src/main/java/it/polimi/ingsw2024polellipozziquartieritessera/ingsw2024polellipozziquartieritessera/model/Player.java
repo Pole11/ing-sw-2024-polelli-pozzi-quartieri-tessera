@@ -1,7 +1,9 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import java.util.HashMap;
+
 
 public class Player {
     int points;
@@ -17,9 +19,9 @@ public class Player {
     public Player(String nickname, Color color){
         points = 0;
         this.nickname = nickname;
-        ObjectiveCard = null;
-        StarterCard = null;
-        Color = this.color;
+        objectiveCard = null;
+        starterCard = null;
+        this.color = color;
         resources = new HashMap<Resource, Integer>();
         items = new HashMap<Item, Integer>();
         board = new HashMap<Integer, Boolean>();

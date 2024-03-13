@@ -1,17 +1,16 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card;
 
-public abstract class CornerCard extends Card {
-    private Corner frontCorners[] = new Corner[Config.N_CORNERS];
-    private Corner backCorners[] = new Corner[Config.N_CORNERS];
-    private Resource centerBackResource[] = new Corner[Config.MAX_BACK_RESOURCES];
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 
-    public CornerCard(int id) {
-        this.id = id;
-        for (int i = 0; i < Config.N_CORNERS; i++) {
-            frontCorners[i] = new Corner(false, null, null, null); // al posto di questi false e null 
-            backCorners[i] = new Corner(false, null, null, null);  // metteremo dei dati passati 
-            centerBackResource[i] = new Corner(false, null, null, null); // da parametro, presi da file
-        }
+public abstract class CornerCard extends Card {
+    private final Corner[] frontCorners;
+    private final Corner backCorners[];
+    private final Resource centerBackResource[];
+    public CornerCard(int id, Corner[] frontCorners, Corner[] backCorners, Resource[] centerBackResource) {
+        super(id);
+        this.frontCorners = frontCorners;
+        this.backCorners =  backCorners;
+        this.centerBackResource = centerBackResource;
     }
 
 
@@ -28,8 +27,8 @@ public abstract class CornerCard extends Card {
         return new Resource[0];
     }
 
-    public Item getUncoveredItems(int side) {
-        return Item;
+    public Item[] getUncoveredItems(int side) {
+        return Item.INKWELL;
     }
 
 }

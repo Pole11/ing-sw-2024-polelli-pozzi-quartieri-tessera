@@ -1,5 +1,10 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card;
 
 public abstract class Card {
-    int id;
+    private final int id;
+
+    public Card(int id){
+        this.id = id;
+    }
+
 }

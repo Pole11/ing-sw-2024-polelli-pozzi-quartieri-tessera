@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import java.util.ArrayList;
 
 public class Board {
@@ -17,4 +18,6 @@ public class Board {
         goldDeck = new ArrayList<GoldCard>();
         resourceDeck  = new ArrayList<ResourceCard>();
     }
+
+    //non ho messo i metodi ancora
 }

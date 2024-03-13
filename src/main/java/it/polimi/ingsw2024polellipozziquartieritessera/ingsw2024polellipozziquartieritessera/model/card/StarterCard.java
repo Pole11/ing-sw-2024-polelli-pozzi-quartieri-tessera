@@ -1,7 +1,8 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card;
 
-public class StarterCard extends ColorCard {
-    public StarterCard(int id) {
-        super(id);
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+public class StarterCard extends CornerCard {
+    public StarterCard(int id, Corner[] frontCorners, Corner[] backCorners, Resource[] centerBackResource) {
+        super(id, frontCorners, backCorners, centerBackResource);
     }
 }

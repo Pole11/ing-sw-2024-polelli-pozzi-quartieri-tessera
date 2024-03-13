@@ -1,23 +1,27 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import java.util.HashMap;
 
 public class GameState {
 
-    private HashTable<Integer, Card> cardsMap;
-    private Board mainBoard;
-    private Player[] players; //player[0] is blackPlayer
+    private final HashMap<Integer, Card> cardsMap;
+    private final Board mainBoard;
+    private final Player[] players; //player[0] is blackPlayer
     private Player currentPlayer;
     private GamePhase currentGamePhase;
-    private GameTurn currentGameTurn;
+    private TurnPhase currentGameTurn;
 
-    public GameState(Board mainBoard){
-        cardsMap = new HashTable<Integer, Card>();
+    public GameState(Board mainBoard, HashMap cardsMap, Player[] players){
+        this.cardsMap = cardsMap;
         this.mainBoard = mainBoard;
-        players = new Player[Config.N_PLAYERS];
+        this.players = players;
         currentPlayer = players[0];
-        currentGamePhase = GamePhase.mainPhase;
+        currentGamePhase = GamePhase.MAINPHASE;
         currentGameTurn = null;
     }
+
+    //non ho messo i metodi ancora
+
 }
