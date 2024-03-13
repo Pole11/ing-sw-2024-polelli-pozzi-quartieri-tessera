@@ -1,13 +1,12 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card.ObjectiveCard;
-
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card.*;
 import java.util.ArrayList;
 
 public class Board {
-    private GoldCard[] sharedGoldCards;
-    private ResourceCard[] sharedResourceCard;
-    private ObjectiveCard[] sharedObjectiveCards;
+    private GoldCard[] sharedGoldCards; //2 gold cards shared between players
+    private ResourceCard[] sharedResourceCard; //2 resource cards shared between players
+    private ObjectiveCard[] sharedObjectiveCards; //2 objective cards shared between players
     private ArrayList<GoldCard> goldDeck;
     private ArrayList<ResourceCard> resourceDeck;
 
@@ -19,5 +18,3 @@ public class Board {
         resourceDeck  = new ArrayList<ResourceCard>();
     }
 }
-
-
