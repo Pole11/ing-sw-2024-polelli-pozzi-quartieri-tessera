@@ -9,6 +9,7 @@ public class GameState {
     private final HashMap<Integer, Card> cardsMap;
     private final Board mainBoard;
     private final Player[] players; //player[0] is blackPlayer
+    private final Chat chat;
     private Player currentPlayer;
     private GamePhase currentGamePhase;
     private TurnPhase currentGameTurn;

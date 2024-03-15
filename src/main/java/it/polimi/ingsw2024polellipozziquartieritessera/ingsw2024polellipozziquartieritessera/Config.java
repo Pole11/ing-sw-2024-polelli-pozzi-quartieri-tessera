@@ -11,6 +11,9 @@ public class Config {
     public static final int MAX_UNCOVERED_RESOURCES = 4;
     public static final int MAX_CHAL_RESOURCE = 3;
     public static final int MAX_CHAL_ITEM = 3;
+    public static final int MAX_UNCOVERED_ITEMS = 1;
+    public static final int MAX_TURN_TIME = 60;
+    public static final String GAME_STATE_PATH = "Game_state"
 
     enum Color {
         BLACK,
