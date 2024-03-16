@@ -4,13 +4,11 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 public abstract class CornerCard extends Card {
     private final Corner[] frontCorners;
-    private final Corner backCorners[];
-    private final Resource centerBackResource[];
-    public CornerCard(int id, Corner[] frontCorners, Corner[] backCorners, Resource[] centerBackResource) {
+    private final Corner[] backCorners;
+    public CornerCard(int id, Corner[] frontCorners, Corner[] backCorners) {
         super(id);
         this.frontCorners = frontCorners;
         this.backCorners =  backCorners;
-        this.centerBackResource = centerBackResource;
     }
 
 
@@ -27,7 +25,7 @@ public abstract class CornerCard extends Card {
         return new Resource[0];
     }
 
-    public Item[] getUncoveredItems(int side) {
+    public Item getUncoveredItem(int side) {
         return Item.INKWELL;
     }
 

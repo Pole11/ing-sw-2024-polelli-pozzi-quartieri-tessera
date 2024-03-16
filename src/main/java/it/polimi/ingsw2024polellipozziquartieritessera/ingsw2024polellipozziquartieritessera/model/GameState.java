@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 public class GameState {
 
-    private final HashMap<Integer, Card> cardsMap;
+    private final HashMap<Integer, Card> cardsMap; // map id and card
     private final Board mainBoard;
     private final Player[] players; //player[0] is blackPlayer
     private final Chat chat;
@@ -14,13 +14,14 @@ public class GameState {
     private GamePhase currentGamePhase;
     private TurnPhase currentGameTurn;
 
-    public GameState(Board mainBoard, HashMap cardsMap, Player[] players){
+    public GameState(HashMap cardsMap, Player[] players){
         this.cardsMap = cardsMap;
-        this.mainBoard = mainBoard;
+        this.mainBoard = new Board();
         this.players = players;
-        currentPlayer = players[0];
-        currentGamePhase = GamePhase.MAINPHASE;
-        currentGameTurn = null;
+        this.currentPlayer = players[0];
+        this.currentGamePhase = GamePhase.MAINPHASE;
+        this.currentGameTurn = null;
+        this.chat = new Chat();
     }
 
     //non ho messo i metodi ancora

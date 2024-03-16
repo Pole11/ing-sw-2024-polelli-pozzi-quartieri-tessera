@@ -9,8 +9,8 @@ public class GoldCard extends CornerCard {
     private final Resource[] resourceNeeded;
     private final int points;
 
-    public GoldCard(int id, Resource resourceType, Challenge challenge, Resource[] resourceNeeded, int points, Corner[] frontCorners, Corner[] backCorners, Resource[] centerBackResource) {
-        super(id, frontCorners, backCorners, centerBackResource);
+    public GoldCard(int id, Resource resourceType, Challenge challenge, Resource[] resourceNeeded, int points, Corner[] frontCorners, Corner[] backCorners) {
+        super(id, frontCorners, backCorners);
         this.resourceType = resourceType;
         this.challenge = challenge;
         this.resourceNeeded = resourceNeeded;

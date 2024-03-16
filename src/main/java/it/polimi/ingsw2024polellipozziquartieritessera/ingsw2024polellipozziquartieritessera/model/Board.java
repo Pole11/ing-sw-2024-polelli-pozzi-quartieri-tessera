@@ -5,9 +5,9 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.util.ArrayList;
 
 public class Board {
-    private GoldCard[] sharedGoldCards; //2 gold cards shared between players
-    private ResourceCard[] sharedResourceCard; //2 resource cards shared between players
-    private ObjectiveCard[] sharedObjectiveCards; //2 objective cards shared between players
+    private GoldCard[] sharedGoldCards; // 2 gold cards shared between players
+    private ResourceCard[] sharedResourceCard; // 2 resource cards shared between players
+    private ObjectiveCard[] sharedObjectiveCards; // 2 objective cards shared between players
     private ArrayList<GoldCard> goldDeck;
     private ArrayList<ResourceCard> resourceDeck;
 

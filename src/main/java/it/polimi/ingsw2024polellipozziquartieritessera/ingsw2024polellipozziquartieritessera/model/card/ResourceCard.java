@@ -5,8 +5,8 @@ public class ResourceCard extends CornerCard {
     private final Resource resourceType; //color of the card, determined by the major resourceType
     private final int points;
 
-    public ResourceCard(int id, Resource resourceType, int points, Corner[] frontCorners, Corner[] backCorners, Resource[] centerBackResource) {
-        super(id, frontCorners, backCorners, centerBackResource);
+    public ResourceCard(int id, Resource resourceType, int points, Corner[] frontCorners, Corner[] backCorners) {
+        super(id, frontCorners, backCorners);
         this.resourceType = resourceType;
         this.points = points;
     }
