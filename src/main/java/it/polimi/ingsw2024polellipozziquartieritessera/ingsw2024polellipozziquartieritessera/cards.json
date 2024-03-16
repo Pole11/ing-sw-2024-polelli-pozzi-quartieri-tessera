@@ -1,0 +1,46 @@
+{
+  "37" : {
+"Type" : "Resource",
+"Color" : "Insect",
+"FrontCorners" : ["Insect", "Plant", "Hidden", "Inkwell"],
+"BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
+"CentralBackResource" : ["Null"],
+"Point" : "0"
+},
+"38" : {
+"Type" : "Resource",
+"Color" : "Insect",
+"FrontCorners" : ["Insect", "Hidden", "Empty", "Empty"],
+"BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
+"CentralBackResource" : ["Null"],
+"Point" : "1"
+},
+"39" : {
+"Type" : "Resource",
+"Color" : "Insect",
+"FrontCorners" : ["Empty", "Empty", "Insect", "Hidden"],
+"BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
+"CentralBackResource" : ["Null"],
+"Point" : "1"
+},
+"40" : {
+"Type" : "Resource",
+"Color" : "Insect",
+"FrontCorners" : ["Hidden", "Insect", "Empty", "Empty"],
+"BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
+"CentralBackResource" : ["Null"],
+"Point" : "1"
+},
+
+
+"41" : {
+"Type" : "gold",
+"Color" : "Fungi",
+"FrontCorners" : ["Hidden", "Empty", "Quill", "Empty"],
+"BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
+"CentralBackResource" : ["Null"],
+"Challenge" : "",
+"ResourceNeeded" : ["Fungi", "Fungi", "Animal"],
+"Points" : "1"
+}
+}

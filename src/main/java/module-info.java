@@ -3,7 +3,7 @@ module it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
     requires javafx.fxml;
 
     requires org.controlsfx.controls;
-    requires java.json;
+    requires com.google.gson;
 
     opens it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera to javafx.fxml;
     exports it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera;
