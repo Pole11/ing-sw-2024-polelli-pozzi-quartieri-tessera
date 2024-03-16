@@ -27,6 +27,42 @@ public class Player {
         board = new HashMap<Integer, Boolean>();
         hand = new HashMap<Integer, Boolean>();
     }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public ObjectiveCard getObjectiveCard() {
+        return objectiveCard;
+    }
+
+    public StarterCard getStarterCard() {
+        return starterCard;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public HashMap<Resource, Integer> getResources() {
+        return resources;
+    }
+
+    public HashMap<Item, Integer> getItems() {
+        return items;
+    }
+
+    public HashMap<Integer, Boolean> getBoard() {
+        return board;
+    }
+
+    public HashMap<Integer, Boolean> getHand() {
+        return hand;
+    }
 }
 
 

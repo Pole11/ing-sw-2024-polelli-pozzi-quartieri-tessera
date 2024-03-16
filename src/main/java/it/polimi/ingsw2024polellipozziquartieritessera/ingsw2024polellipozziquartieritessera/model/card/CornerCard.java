@@ -11,7 +11,6 @@ public abstract class CornerCard extends Card {
         this.backCorners =  backCorners;
     }
 
-
     // l'interno del metodo è a caso, solo le signature sono giuste ora
     public CornerCard[] getLinkedCards() {
         return new CornerCard[0];

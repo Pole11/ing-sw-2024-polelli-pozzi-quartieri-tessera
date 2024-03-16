@@ -6,10 +6,9 @@ import org.junit.jupiter.api.Test;
 public class PlayerTest {
     @Test
     void playerTestConstructor() {
-        // TODO: iterate all the colors
-        // TODO: test with different nickname lengths
-        Color color = Color.GREEN;
-        //assertDoesNotThrow(() -> new Player("Pole", color));
-        assertAll(() -> new Player("Pole", color));
+        for (Color c : Color.values()){
+            // TODO: test with different nickname lengths
+            assertAll(() -> new Player("Nickname", c));
+        }
     }
 }
