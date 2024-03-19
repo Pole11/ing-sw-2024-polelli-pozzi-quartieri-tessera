@@ -11,13 +11,58 @@ public abstract class CornerCard extends Card {
         this.backCorners =  backCorners;
     }
 
-    // l'interno del metodo è a caso, solo le signature sono giuste ora
-    public CornerCard[] getLinkedCards() {
-        return new CornerCard[0];
+    public Corner[] getCorners() {
+        // corner array initialization
+        Corner[] corners = new Corner[8];
+        // counter initialization
+        int i = 0;
+
+        // adding front and back corners
+        for (Corner corner : frontCorners){
+            corners[i] = corner;
+            i++;
+        }
+        for (Corner corner : backCorners){
+            corners[i] = corner;
+            i++;
+        }
+
+        return corners;
     }
 
-    public CornerCard[] getUncoveredCorners() {
-        return new CornerCard[0];
+    // return the linked cards to this one
+    public CornerCard[] getLinkedCards() {
+        // card array initialization
+        CornerCard[] linked_cards = new CornerCard[4];
+        // counter initialization for the array index
+        int i = 0;
+
+        // front corners verification
+        for (Corner corner : this.getCorners()){
+            if (corner.getLinkedCorner() != null){
+                linked_cards[i] = corner.getCard();
+                i++;
+            }
+        }
+
+        return linked_cards;
+    }
+
+    public Corner[] getUncoveredCorners() {
+        // corner array initialization
+        Corner[] uncovered_corners = new Corner[4];
+
+        // counter initialization for the array index
+        int i = 0;
+
+        // front corners verification
+        for (Corner corner : this.getCorners()){
+            if (corner.getLinkedCorner() != null && !corner.getCovered()){
+                uncovered_corners[i] = corner;
+                i++;
+            }
+        }
+        return uncovered_corners;
     }
 
     public Resource[] getUncoveredResources(int side) {
@@ -27,5 +72,4 @@ public abstract class CornerCard extends Card {
     public Item getUncoveredItem(int side) {
         return Item.INKWELL;
     }
-
 }
