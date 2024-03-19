@@ -12,6 +12,11 @@ public class ObjectiveCard extends Card {
         this.points = points;
     }
 
+    // getter
+    public int getPoints() {
+        return points;
+    }
+
     public Challenge getChallenge() {
         return challenge;
     }

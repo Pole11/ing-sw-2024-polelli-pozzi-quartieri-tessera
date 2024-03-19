@@ -16,14 +16,9 @@ public class Corner {
         linkedCorner = null;
     }
 
-    // getters & setters
-
+    // getters
     public Boolean getCovered() {
         return covered;
-    }
-
-    public void setCovered(Boolean covered) {
-        this.covered = covered;
     }
 
     public Item getItem() {
@@ -32,6 +27,11 @@ public class Corner {
 
     public Resource getResource() {
         return resource;
+    }
+
+    // setter
+    public void setCovered(Boolean covered) {
+        this.covered = covered;
     }
 
     public void setLinkedCorner(Corner linkedCorner) {
