@@ -12,7 +12,7 @@ Here is a table that shows what all the types of cards have in common, so that i
 | Starter   | x              | x                           |                         |            |               |                             | x (max 3)         |
 | Objective |                |                             |                         | x          | x             |                             |                   |  
 
-The Cards are never discarded, they are always used for something. 
+The Cards are never discarded, they are always used for something.
 
 ### Challenge
 

@@ -19,5 +19,43 @@ public class Board {
         resourceDeck  = new ArrayList<ResourceCard>();
     }
 
-    //non ho messo i metodi ancora
+    public void setSharedGoldCards(GoldCard[] sharedGoldCards) {
+        this.sharedGoldCards = sharedGoldCards;
+    }
+
+    public void setSharedResourceCard(ResourceCard[] sharedResourceCard) {
+        this.sharedResourceCard = sharedResourceCard;
+    }
+
+    public void setSharedObjectiveCards(ObjectiveCard[] sharedObjectiveCards) {
+        this.sharedObjectiveCards = sharedObjectiveCards;
+    }
+
+    public void setGoldDeck(ArrayList<GoldCard> goldDeck) {
+        this.goldDeck = goldDeck;
+    }
+
+    public void setResourceDeck(ArrayList<ResourceCard> resourceDeck) {
+        this.resourceDeck = resourceDeck;
+    }
+
+    public GoldCard[] getSharedGoldCards() {
+        return sharedGoldCards;
+    }
+
+    public ResourceCard[] getSharedResourceCard() {
+        return sharedResourceCard;
+    }
+
+    public ObjectiveCard[] getSharedObjectiveCards() {
+        return sharedObjectiveCards;
+    }
+
+    public ArrayList<GoldCard> getGoldDeck() {
+        return goldDeck;
+    }
+
+    public ArrayList<ResourceCard> getResourceDeck() {
+        return resourceDeck;
+    }
 }

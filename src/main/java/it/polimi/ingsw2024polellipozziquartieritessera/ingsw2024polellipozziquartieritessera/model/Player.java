@@ -8,13 +8,13 @@ import java.util.HashMap;
 public class Player {
     int points;
     String nickname;
-    ObjectiveCard objectiveCard;
-    StarterCard starterCard;
+    ObjectiveCard objectiveCard; // it is the secret objective
+    StarterCard starterCard; // it is the most important card because it is used to create all the composition of the cards
     Color color;
     HashMap<Resource, Integer> resources;
     HashMap<Item, Integer> items;
-    HashMap<Integer, Boolean> board;
-    HashMap<Integer, Boolean> hand;
+    HashMap<Integer, Boolean> board; // true if the card is in the board of the player
+    HashMap<Integer, Boolean> hand; // true if the card id is in the hand of the player
 
     public Player(String nickname, Color color){
         points = 0;

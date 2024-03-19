@@ -11,7 +11,7 @@ public class GameState {
     private final Board mainBoard;
     private final Player[] players; //player[0] is blackPlayer
     private final Chat chat;
-    private Player currentPlayer;
+    private Player currentPlayer; // it is useless to have a reference, me may want to use an index
     private GamePhase currentGamePhase;
     private TurnPhase currentGameTurn;
 
@@ -25,13 +25,13 @@ public class GameState {
         this.chat = new Chat();
 
         if (!NicknameAndColorsAreValid()) {
-            throw new NotUniquePlayerException("While creating the GameState Object I encountered a problem regarding the creation of two players with the same nickname AND the same color");
+            throw new NotUniquePlayerException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname AND the same color");
         }
         if (!NicknamesAreValid()) {
-            throw new NotUniquePlayerNicknameException("While creating the GameState Object I encountered a problem regarding the creation of two players with the same nickname");
+            throw new NotUniquePlayerNicknameException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname");
         }
         if (!ColorsAreValid()) {
-            throw new NotUniquePlayerColorException("While creating the GameState Object I encountered a problem regarding the creation of two players with the same color");
+            throw new NotUniquePlayerColorException("While creating the GameState Object I encountered a problem regarding the creation of players with the same color");
         }
     }
 
