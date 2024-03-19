@@ -14,6 +14,7 @@ public class Config {
     public static final int MAX_UNCOVERED_ITEMS = 1;
     public static final int MAX_TURN_TIME = 60;
     public static final String GAME_STATE_PATH = "rescue/gamestate/";
+    public static final int MAX_HAND_CARDS = 3;
 
     public static final String CARD_JSON_PATH = "/src/main/java/it/polimi/ingsw2024polellipozziquartieritessera/ingsw2024polellipozziquartieritessera/cards.json";
 

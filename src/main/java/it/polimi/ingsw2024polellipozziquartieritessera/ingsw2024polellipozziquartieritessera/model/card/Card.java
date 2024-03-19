@@ -7,4 +7,7 @@ public abstract class Card {
         this.id = id;
     }
 
+    public int getId() {
+        return id;
+    }
 }

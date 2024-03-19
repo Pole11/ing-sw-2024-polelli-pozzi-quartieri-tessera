@@ -16,6 +16,23 @@ public class GoldCard extends CornerCard {
         this.resourceNeeded = resourceNeeded;
         this.points = points;
     }
+
+    public Resource getResourceType() {
+        return resourceType;
+    }
+
+    public Challenge getChallenge() {
+        return challenge;
+    }
+
+    public Resource[] getResourceNeeded() {
+        return resourceNeeded;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
     // l'interno del metodo è a caso, solo le signature sono giuste ora
     public Item[] getUncoveredItems(int side){
         return new Item[4];

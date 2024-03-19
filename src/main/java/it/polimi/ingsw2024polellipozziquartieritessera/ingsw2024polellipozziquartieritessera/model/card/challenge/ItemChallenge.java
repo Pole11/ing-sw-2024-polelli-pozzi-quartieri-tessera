@@ -8,4 +8,8 @@ public class ItemChallenge extends Challenge {
     public ItemChallenge(Item[] items){
         this.items = items;
     }
+
+    public Item[] getItems() {
+        return items;
+    }
 }

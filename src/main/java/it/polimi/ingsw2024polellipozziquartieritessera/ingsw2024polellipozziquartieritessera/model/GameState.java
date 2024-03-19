@@ -11,7 +11,7 @@ public class GameState {
     private final Board mainBoard;
     private final Player[] players; //player[0] is blackPlayer
     private final Chat chat;
-    private Player currentPlayer; // it is useless to have a reference, me may want to use an index
+    private int currentPlayerIndex;
     private GamePhase currentGamePhase;
     private TurnPhase currentGameTurn;
 
@@ -19,7 +19,7 @@ public class GameState {
         this.cardsMap = cardsMap;
         this.mainBoard = new Board();
         this.players = players;
-        this.currentPlayer = players[0];
+        this.currentPlayerIndex = 0;
         this.currentGamePhase = GamePhase.MAINPHASE;
         this.currentGameTurn = null;
         this.chat = new Chat();
@@ -69,5 +69,17 @@ public class GameState {
             }
         }
         return true;
+    }
+
+    public Board getMainBoard() {
+        return new Board();
+    }
+
+    public Player getCurrentPlayer() {
+        return this.getPlayers()[this.currentPlayerIndex];
+    }
+
+    public Player[] getPlayers() {
+        return this.players;
     }
 }
