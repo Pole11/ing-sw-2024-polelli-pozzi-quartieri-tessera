@@ -14,6 +14,7 @@ public class Controller {
     // - 2 shared gold card
     // - resource deck
     // - gold deck
+    // Refactor this method to use less duplicate code
     void drawSharedGold(GameState gameState, DrawType drawType) throws InvalidHandException {
         Board board = gameState.getMainBoard();
         Player currentPlayer = gameState.getCurrentPlayer();
@@ -28,10 +29,18 @@ public class Controller {
                 currentPlayer.getHand().put(goldCard.getId(), true);
                 break;
             case DrawType.SHAREDGOLD1:
+
                 break;
             case DrawType.SHAREDGOLD2:
                 break;
             case DrawType.DECKRESOURCE:
+                ArrayList<ResourceCard> sharedDeck = board.getResourceDeck();
+                ResourceCard resourceCard = sharedDeck.getLast();
+                sharedDeck.removeLast();
+                if (currentPlayer.getHand().values().stream().mapToInt(inHand -> (inHand ? 1 : 0)).sum() >= Config.MAX_HAND_CARDS - 1) {
+                    throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
+                }
+                currentPlayer.getHand().put(resourceCard.getId(), true);
                 break;
             case DrawType.SHAREDRESOURCE1:
                 break;
