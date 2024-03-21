@@ -52,7 +52,7 @@ public class Board {
     }
 
     public ArrayList<GoldCard> getGoldDeck() {
-        return goldDeck;
+        return this.goldDeck;
     }
 
     public ArrayList<ResourceCard> getResourceDeck() {
