@@ -4,7 +4,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 public enum ElementType implements ElementTypeInterface {
 
-    RESOURCE("Resource"), ITEM("Item");
+    RESOURCE("Resource"), ITEM("Item"), EMPTY("Empty");
     private final String type;
 
     private ElementType(final String type) {

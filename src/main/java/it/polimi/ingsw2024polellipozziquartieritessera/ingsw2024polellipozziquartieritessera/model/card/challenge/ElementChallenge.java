@@ -2,10 +2,10 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 
-public class ResourceChallenge {
-    private final Resource[] Resources;
+public class ElementChallenge {
+    private final Element[] elements;
 
-    public ResourceChallenge(Resource[] Resources){
-        this.Resources = Resources;
+    public ElementChallenge(Element[] elements){
+        this.elements = elements;
     }
 }

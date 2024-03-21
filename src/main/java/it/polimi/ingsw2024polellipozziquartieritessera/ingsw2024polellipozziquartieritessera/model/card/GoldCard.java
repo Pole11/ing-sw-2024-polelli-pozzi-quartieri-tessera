@@ -7,12 +7,13 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.util.ArrayList;
 
 public class GoldCard extends CornerCard {
-    private final Resource resourceType; //color of the card, determined by the major resourceType
-    private final Challenge challenge;
-    private final Resource[] resourceNeeded;
-    private final int points;
+    private final Element resourceType; // color of the card, determined by the major resourceType
+    private final Challenge challenge; // challenge related to this card (if null, points are gained when played)
+    private final Element[] resourceNeeded; // resource needed to place the card
+    private final int points; // value used to calculate the gain (if challenge is null, it is simply returned)
 
-    public GoldCard(int id, Resource resourceType, Challenge challenge, Resource[] resourceNeeded, int points, Corner[] frontCorners, Corner[] backCorners) {
+    // CONSTRUCTOR
+    public GoldCard(int id, Element resourceType, Challenge challenge, Element[] resourceNeeded, int points, Corner[] frontCorners, Corner[] backCorners) {
         super(id, frontCorners, backCorners);
         this.resourceType = resourceType;
         this.challenge = challenge;
@@ -20,8 +21,8 @@ public class GoldCard extends CornerCard {
         this.points = points;
     }
 
-    // getter
-    public Resource getResourceType() {
+    // GETTER
+    public Element getResourceType() {
         return resourceType;
     }
 
@@ -29,7 +30,7 @@ public class GoldCard extends CornerCard {
         return challenge;
     }
 
-    public Resource[] getResourceNeeded() {
+    public Element[] getResourceNeeded() {
         return resourceNeeded;
     }
 
@@ -37,44 +38,26 @@ public class GoldCard extends CornerCard {
         return points;
     }
 
-    // returns the resource visible on the side requested
-    public Resource[] getUncoveredResources(int front){
+    // METHODS
+    // returns the elements visible on the requested side
+    public Element[] getUncoveredElements(int isFront){
         // resource array initialization
-        ArrayList<Resource> uncoveredResources = new ArrayList<>();
+        ArrayList<Element> uncoveredElements = new ArrayList<>();
 
         // set center resource if the card is on the back side
-        if (front == 0){
-            uncoveredResources.add(this.resourceType);
+        if (isFront == 0){
+            uncoveredElements.add(this.resourceType);
         }
 
         // set all the corners resources if the card is on the front side
         else{
-            for (Corner corner : this.getUncoveredCorners(front)){
-                if(corner.getResource() != null){
-                    uncoveredResources.add(corner.getResource());
+            for (Corner corner : this.getUncoveredCorners(isFront)){
+                if(corner.getElement() != Element.EMPTY){
+                    uncoveredElements.add(corner.getElement());
                 }
             }
         }
 
-        return uncoveredResources.toArray(new Resource[uncoveredResources.size()]);
-    }
-
-    // returns the items visible on the side requested
-    public Item[] getUncoveredItems(int front){
-        // items array initialization
-        ArrayList<Item> uncoveredItems = new ArrayList<>();
-
-        // set all the corners items if the card is on the front side
-        if (front == 1){
-            for (Corner corner : this.getUncoveredCorners(front)){
-                if(corner.getItem() != null){
-                    uncoveredItems.add(corner.getItem());
-                }
-            }
-        }
-
-        // there is no need to verify for the back side because there are never items
-
-        return uncoveredItems.toArray(new Item[uncoveredItems.size()]);
+        return uncoveredElements.toArray(new Element[uncoveredElements.size()]);
     }
 }

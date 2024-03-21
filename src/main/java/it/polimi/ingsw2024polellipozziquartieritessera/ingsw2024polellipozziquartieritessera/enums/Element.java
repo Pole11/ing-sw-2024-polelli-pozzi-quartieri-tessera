@@ -7,7 +7,8 @@ public enum Element implements ElementTypeInterface {
     INKWELL(ElementType.ITEM),
     FUNGI(ElementType.RESOURCE),
     ANIMAL(ElementType.RESOURCE),
-    INSECT(ElementType.RESOURCE);
+    INSECT(ElementType.RESOURCE),
+    EMPTY(ElementType.EMPTY);
 
 
     private final ElementType type;

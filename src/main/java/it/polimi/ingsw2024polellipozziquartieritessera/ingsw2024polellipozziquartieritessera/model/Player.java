@@ -11,8 +11,7 @@ public class Player {
     ObjectiveCard objectiveCard; // it is the secret objective
     StarterCard starterCard; // it is the most important card because it is used to create all the composition of the cards
     Color color;
-    HashMap<Resource, Integer> resources;
-    HashMap<Item, Integer> items;
+    HashMap<Element, Integer> elements;
     HashMap<Integer, Boolean> board; // true if the card is in the board of the player
     HashMap<Integer, Boolean> hand; // true if the card id is in the hand of the player
 
@@ -22,8 +21,7 @@ public class Player {
         objectiveCard = null;
         starterCard = null;
         this.color = color;
-        resources = new HashMap<Resource, Integer>();
-        items = new HashMap<Item, Integer>();
+        elements = new HashMap<Element, Integer>();
         board = new HashMap<Integer, Boolean>();
         hand = new HashMap<Integer, Boolean>();
     }
@@ -48,12 +46,8 @@ public class Player {
         return color;
     }
 
-    public HashMap<Resource, Integer> getResources() {
-        return resources;
-    }
-
-    public HashMap<Item, Integer> getItems() {
-        return items;
+    public HashMap<Element, Integer> getResources() {
+        return elements;
     }
 
     public HashMap<Integer, Boolean> getBoard() {

@@ -7,34 +7,37 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class StarterCard extends CornerCard {
-    private final Resource[] centerResource;
-    public StarterCard(int id, Corner[] frontCorners, Corner[] backCorners, Resource[] centerResource) {
+    private final Element[] centerResource; // array of center resources in the front side
+
+    // CONSTRUCTOR
+    public StarterCard(int id, Corner[] frontCorners, Corner[] backCorners, Element[] centerResource) {
         super(id, frontCorners, backCorners);
         this.centerResource = centerResource;
     }
 
-    // getter
-    public Resource[] getCenterResource() {
+    // GETTER
+    public Element[] getCenterResource() {
         return centerResource;
     }
 
+    // METHODS
     // returns the resource visible on the side requested
-    public Resource[] getUncoveredResources(int front){
+    public Element[] getUncoveredElements(int isFront){
         // resource array initialization
-        ArrayList<Resource> uncoveredResources = new ArrayList<>();
+        ArrayList<Element> uncoveredResources = new ArrayList<>();
 
         // set corners resources
-        for (Corner corner : this.getUncoveredCorners(front)){
-            if(corner.getResource() != null){
-                uncoveredResources.add(corner.getResource());
+        for (Corner corner : this.getUncoveredCorners(isFront)){
+            if(corner.getElement() != null){
+                uncoveredResources.add(corner.getElement());
             }
         }
 
         // add center resources if on front side
-        if (front == 1){
+        if (isFront == 1){
             uncoveredResources.addAll(Arrays.asList(centerResource));
         }
 
-        return uncoveredResources.toArray(new Resource[uncoveredResources.size()]);
+        return uncoveredResources.toArray(new Element[uncoveredResources.size()]);
     }
 }
