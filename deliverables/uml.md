@@ -1,7 +1,85 @@
 # Model 
 
 ## Card
+
 In this section we will shortly explain how we structured the classes regarding the various types of cards.
+
+```mermaid
+classDiagram
+  class Card {
+    <<abstract>>
+    - id : int
+  }
+
+  class ObjectiveCard {
+    - challenge: Challenge
+    - points: int
+  }
+  Card <|-- ObjectiveCard
+
+  class CornerCard {
+    <<asbstract>>
+    - frontCorners[] : Corner[N_CORNERS]
+    - backCorners[]: Corner[N_CORNERS]
+    + getCorners() : Corner[]
+    + getLinkedCards() : Integer[]
+    + getUncoveredCorners(isFront : int) : Corner[N_CORNERS]
+    + ~abstract~getUncoveredElements(isFront : int) : Element[MAX_UNCOVERED_RESOURCES]
+  }
+  Card <|-- CornerCard
+
+  class Corner {
+    - covered : Boolean
+    - ~final~element : Element
+    - ~final~cardId : int
+    - linkedCorner : Corner
+
+  }
+  CornerCard "6..8" *-- "1" Corner
+
+  class ResourceCard {
+    - ~final~resourceType : Element
+    - ~final~points : int
+    + getUncoveredElement(isFront : int) : Element[]
+  }
+  CornerCard <|-- ResourceCard
+
+  class GoldCard {
+    - ~final~resourceType : Element
+    - ~final~challenge : Challenge
+    - ~final~resourceNeeded: Element[MAX_RES_NEEDED]
+    - ~final~points: int
+    + getUncoveredElements(isFront : int) : Element[]
+  }
+  CornerCard <|-- GoldCard
+
+  class StarterCard {
+    - ~final~centerResource : Element[]
+    + getUncoveredElement(isFront : int) : Element[]
+  }
+  CornerCard <|-- StarterCard
+
+  class Challenge {
+    <<abstract>>
+  }
+  ObjectiveCard "1" -- "0..1" Challenge
+  GoldCard "0..1" -- "0..12" Challenge
+
+  class StructureChallenge {
+    - configuration : int
+  }
+  Challenge <|-- StructureChallenge
+
+  class ElementChallenge {
+    - elements: Element[MAX_CHAL_RESUORCE]
+  }
+  Challenge <|-- ElementChallenge
+
+  class CoverageChallenge {
+
+  }
+  Challenge <|-- CoverageChallenge
+```
 
 Here is a table that shows what all the types of cards have in common, so that it is easier to aggregate them into classes and subclasses.
 
@@ -14,7 +92,33 @@ Here is a table that shows what all the types of cards have in common, so that i
 
 The Cards are never discarded, they are always used for something.
 
+### CornerCard
+
+Note that corner is `null` in the array the corners if is hidden.
+
+- `covered` true if there is another card on top
+- `element` is the element, can be the Resource or the Items in the corner. If it is empty the value is `Element.EMPTY`
+- `cardId` is the id of the card (card is the son of `CornerCard`)
+- `linkedCorner` if there is a card connected to it, it is a reference to that card, `null` if the corner is not connected to any card
+- `getUncoveredCorners` returns all the free corners (back and front)
+- `getUncoveredElement` returns all the elements (`Resource` and `Item`)
+
+#### GoldCard
+
+If the `challenge` attribute is `null` the points are gained automatically.
+The `ResourceType` is the type of resource and it is also used to identify the color.
+
+#### ResourceCard
+
+We will later add methods that will return the number of a specific resource/item on the corners of the card, they will all use `getUncoveredElement`. 
+
+### ObjectiveCard
+
+Note that the `Challenge` is the one you do in order to gain points and `Objective` is the type of card.
+
 ### Challenge
+
+This is the one you must do in order to gain points. It is used in `ObjectiveCard` and `GoldCard`. More details later.
 
 #### Structure Challenge
 The structure challenge is only for objective cards.
@@ -43,86 +147,6 @@ Is the one on the top of the card.
 
 Here is the UML for both the Card and the Challenge:
 
-```mermaid
-classDiagram
-  class Card {
-    <<abstract>>
-    - id : int
-  }
-
-  class ObjectiveCard {
-    - challenge: Challenge
-    - points: int
-    + getChallenge() : Challenge 
-  }
-  Card <|-- ObjectiveCard
-
-  class CornerCard {
-    <<asbstract>>
-    - frontCorners[] : Corner[N_CORNERS]
-    - backCorners[]: Corner[N_CORNERS]
-    - centerBackResource[] : Resource[MAX_BACK_RESOURCES]
-    + getLinkedCards() : CornerCard[N_CORNERS]
-    + getUncoveredCorners() : Corner[N_CORNERS]
-    + getUncoveredResources(side : int) : Resource[MAX_UNCOVERED_RESOURCES]
-  }
-  Card <|-- CornerCard
-
-  class Corner {
-    - covered : Boolean
-    - item : Item
-    - resource : Resource
-    - linkedCorner : Corner
-  }
-  CornerCard "6..8" *-- "1" Corner
-
-  class ResourceCard {
-    - color : Resource
-    - points : int
-    + getUncoveredItems(side : int) : Item
-  }
-  CornerCard <|-- ResourceCard
-
-  class GoldCard {
-    - color : Resource
-    - challenge : Challenge
-    - resourceNeeded: Resource[MAX_RES_NEEDED]
-    - points: int
-  }
-  CornerCard <|-- GoldCard
-
-  class StarterCard {
-
-  }
-  CornerCard <|-- StarterCard
-
-  class Challenge {
-    <<abstract>>
-  }
-  ObjectiveCard "1" -- "0..1" Challenge
-  GoldCard "0..1" -- "0..12" Challenge
-
-  class StructureChallenge {
-    - configuration : int  
-  }
-  Challenge <|-- StructureChallenge
-    
-  class ResourceChallenge {
-    - resource: Resource[MAX_CHAL_RESUORCE]  
-  }
-  Challenge <|-- ResourceChallenge
-
-  class ItemChallenge {
-    - item: Item[MAX_CHAL_ITEM]
-  }
-  Challenge <|-- ItemChallenge
-
-  class CoverageChallenge {
-
-  }
-  Challenge <|-- CoverageChallenge
-```
-
 `StructureChallenge` and `ElementChallenge` are used in `Objective`.  
 `GoldCoverageChallenge` and `ElementChallenge` are used in `GoldCard`.
 
@@ -137,10 +161,6 @@ About element:
 - In `obectiveCards`: 
     - example of 3 animal: `element=[animal, animal, animal]`
     - example of 1 Quill and  2 Inkwell: `element = [Quill, Inkwell, Inkwell]` 
-
-Probably we should give an id to all the cards so that we can render them with the right texture, and we can track which one has been used or not.
-
-`covered` is true only if is under another corner.
 
 Order from top-left to bottom-left \[0-3\]
 
@@ -276,184 +296,21 @@ classDiagram
 
 # Complete UML 
 
+# Temp
+
+## Card
+
+### Corner
+
+### CornerCard
+
 ```mermaid
 classDiagram
-  class GameState {
-    - cardsMap: HashMap< Integer, Card >
-    - mainBoard: Board
-    - players[]: Player[MAX_PLAYERS]
-    - currentPlayer: Player
-    - currentGamePhase: GamePhase
-    - currentGameTurn: GameTurn
-    + getMainBoard(): Board
-    + getPlayers(): Player[]: void
-    + getCurrentPlayer(): Player
-    + getBlackPlayer(): Player
-    + getCurrentGameTurn(): GameTurn
-    + getCurrentGamePhase(): GamePhase
-    + getCard(id: int): Card
-  }
-
-  class Player {
-    - nickname: String
-    - color: Color
-    - points: int
-    - resources: HashMap< Resource, int >
-    - items: HashMap< Item, int >
-    - objectiveCard: ObjectiveCard
-    - starterCard: StarterCard
-    - board: HashMap< Integer, bool >
-    - hand: HashMap< Integer, bool >
-    + flipCards(???) ???
-  }
-  GameState "2..4" o-- "1" Player
-  
-  class Board {
-    - sharedGoldCards[]: goldCard[N_SHARED_GOLDS]
-    - sharedResourceCard[2]: ResourceCard[N_SHARED_RESOURCES]
-    - sharedObjectiveCards[2]: OjectiveCard[N_SHARED_OBJECTIVES]
-    - goldDeck: ArrayList<GoldCard>
-    - resourceDeck: ArrayList<ResourceCard>
-    + getSharedGoldCard(int oneortwo): GoldCard
-    + getSharedResourceCard(int oneortwo): ResourceCard
-    + getResourceCard(): ResourceCard
-    + getGoldCard(): GoldCard
-    + fillSharedCardsGap(): void
-    + checkPlacement(Player player): bool
-  }
-  GameState <-- Board
-  
-  
   class Controller {
-    + drawCard(player: Player, card: Card): void
+    + drawCard(player: Player, card: Card) : void
     + placeCard(player: Player, placingCardId: int, tableCardId: int, int: configuration)
-    + flipCard(player: Player, cardId: int): void
+    + flipCard(player: Player, cardId: int) : void
     
     - getGameState()
   }
-  
-  class Config {
-    + MAX_PLAYERS: static final int = 4
-    + N_SHARED_GOLDS: static final int = 2
-    + N_SHARED_RESOURCES: static final int = 2
-    + N_SHARED_OBJECTIVES : static final int = 2
-    + N_CORNERS: static final int = 4
-    + MAX_BACK_RESOURCES: static final int = 3
-    + MAX_RES_NEEDED: static final int = 5
-    + MAX_UNCOVERED_RESOURCES: static final int = 4
-    + MAX_CHAL_RESOURCE: static final int = 3
-    + MAX_CHAL_ITEM: static final int = 3
-   }
-  
-  class Resource {
-    <<Enumeration>>
-    - Plant
-    - Animal
-    - Fungi
-    - Insect
-  }
-  
-  class Item {
-    <<Enumeration>>
-    - Quill
-    - Inkwell
-    - Manuscript
-  }
-  
-  class Color {
-    <<Enumeration>>
-    - Black
-    - Green
-    - Yellow
-    - Red
-  }
-  
-  class GamePhase {
-    <<Enumeration>>
-    - mainPhase
-    - endPhase
-   }
-  
-  class TurnPhase {
-    <<Enumeration>>
-    - PlacingPhase
-    - DrawPhase
-   }
-  
-  class Card {
-    <<abstract>>
-    - id: int
-  }
-  
-  class ObjectiveCard {
-  - challenge: Challenge
-  - points: int
-  + getChallenge(): Challenge
-  }
-  Card <|-- ObjectiveCard
-  
-  class CornerCard {
-    <<asbstract>>
-    - frontCorners[]: Corner[N_CORNERS]
-    - backCorners[]: Corner[N_CORNERS]
-    - centerBackResource[]: Resource[MAX_BACK_RESOURCES]
-    + getLinkedCards(): CornerCard[N_CORNERS]
-    + getUncoveredCorners(): Corner[N_CORNERS]
-    + getUncoveredResources(side: int): Resource[MAX_UNCOVERED_RESOURCES]
-  }
-  Card <|-- CornerCard
-  
-  class Corner {
-    - covered: Boolean
-    - item: Item
-    - resource: Resource
-    - linkedCorner: Corner
-   }
-  CornerCard "6..8" *-- "1" Corner
-  
-  class ResourceCard {
-    - color: Resource
-    - points: int
-    + getUncoveredItems(side: int): Item
-   }
-  CornerCard <|-- ResourceCard
-  
-  class GoldCard {
-    - color: Resource
-    - challenge: Challenge
-    - resourceNeeded: Resource[MAX_RES_NEEDED]
-    - points: int
-  }
-  CornerCard <|-- GoldCard
-  
-  class StarterCard { 
-  
-   }
-  CornerCard <|-- StarterCard
-  
-  class Challenge {
-    <<abstract>>
-  }
-  ObjectiveCard "1" -- "0..1" Challenge
-  GoldCard "0..1" -- "0..12" Challenge
-  
-  class StructureChallenge {
-    - configuration: int
-  }
-  Challenge <|-- StructureChallenge
-  
-  class ResourceChallenge {
-    - resource: Resource[MAX_CHAL_RESUORCE]
-  }
-  Challenge <|-- ResourceChallenge
-  
-  class ItemChallenge {
-    - item: Item[MAX_CHAL_ITEM]
-  }
-  Challenge <|-- ItemChallenge
-  
-  class CoverageChallenge { 
-  
-   }
-  Challenge <|-- CoverageChallenge
 ```
