@@ -28,14 +28,6 @@ public class Corner {
         return element;
     }
 
-    public Corner getLinkedCorner() {
-        return linkedCorner;
-    }
-
-    public int getCard() {
-        return cardId;
-    }
-
     // SETTER
     public void setCovered(Boolean covered) {
         this.covered = covered;
@@ -45,4 +37,13 @@ public class Corner {
         this.linkedCorner = linkedCorner;
     }
 
+    // return the corner linked to this one
+    public Corner getLinkedCorner() {
+        return linkedCorner;
+    }
+
+    // return the parent card of this corner
+    public int getCard() {
+        return cardId;
+    }
 }

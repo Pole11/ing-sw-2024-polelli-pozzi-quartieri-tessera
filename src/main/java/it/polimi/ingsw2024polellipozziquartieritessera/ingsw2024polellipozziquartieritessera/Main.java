@@ -5,10 +5,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.BufferedReader;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Resource;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card.*;
 
 
@@ -59,13 +61,21 @@ public class Main {
             if (card.get("Type").equals("Objective")){
                 //
             } else {
-                System.out.println(card.get("FrontCorner"));
-                Corner[] frontCorners = null;
-                Corner[] backCorners = null;
-                /*switch (card.get("Type")){
-                    case "Resource":
-                        cardsMap.put(id, new ResourceCard(id.intValue(), card.get("ResourceType"), card.get(("Points")), frontCorners, backCorners, centerBackResource)) );
-                }*/
+                Corner[] frontCorners = new Corner[Config.N_CORNERS];
+                Corner[] backCorners = new Corner[Config.N_CORNERS];
+
+                //for in frontCorners
+                for (int i = 0; i < Config.N_CORNERS; i++){
+                    String element = ((ArrayList) card.get("FrontCorners")).get(i).toString();
+                    // card.get("FrontCorners")).getClass() returns ArrayList so casting should be good
+                    if (element.equals("Empty")){
+                        frontCorners[i] = new Corner(null, id);
+                    } else if(element.equals("Hidden")) {
+                        frontCorners[i] = null;
+                    } else {
+                        frontCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id);
+                    }
+                }
             }
 
 

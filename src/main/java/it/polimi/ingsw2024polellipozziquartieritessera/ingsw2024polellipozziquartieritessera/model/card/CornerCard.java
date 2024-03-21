@@ -45,7 +45,7 @@ public abstract class CornerCard extends Card {
         // front corners verification
         for (Corner corner : this.getCorners()){
             if (corner.getLinkedCorner() != null){
-                linkedCards.add(corner.getCard());
+                //linkedCards.add(corner.getCard()); bisognerà usare cardsMap del gamestate
             }
         }
 
