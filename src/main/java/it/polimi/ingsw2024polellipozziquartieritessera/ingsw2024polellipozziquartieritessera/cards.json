@@ -58,7 +58,7 @@
   "9" : {
     "Type" : "Resource",
     "ResourceType" : "Fungi",
-    "FrontCorners" : ["Fungi", "HIdden", "Empty", "Empty"],
+    "FrontCorners" : ["Fungi", "Hidden", "Empty", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
     "Points" : "1"
   },
@@ -163,7 +163,7 @@
   "24" : {
     "Type" : "Resource",
     "ResourceType" : "Animal",
-    "FrontCorners" : ["Emplty", "Animal", "Animal", "Hidden"],
+    "FrontCorners" : ["Empty", "Animal", "Animal", "Hidden"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
     "Points" : "0"
   },
@@ -284,8 +284,8 @@
     "ResourceType" : "Fungi",
     "FrontCorners" : ["Hidden", "Empty", "Quill", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Quill"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Quill"],
     "ResourceNeeded" : ["Fungi", "Fungi", "Animal"],
     "Points" : "1"
   },
@@ -294,8 +294,8 @@
     "ResourceType" : "Fungi",
     "FrontCorners" : ["Empty", "Inkwell", "Empty", "Hidden"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Inkwell"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Inkwell"],
     "ResourceNeeded" : ["Fungi", "Fungi", "Plant"],
     "Points" : "1"
   },
@@ -304,8 +304,8 @@
     "ResourceType" : "Fungi",
     "FrontCorners" : ["Manuscript", "Empty", "Hidden", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Manuscript"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Manuscript"],
     "ResourceNeeded" : ["Fungi", "Fungi", "Insect"],
     "Points" : "1"
   },
@@ -315,7 +315,7 @@
     "ResourceType" : "Fungi",
     "FrontCorners" : ["Empty", "Empty", "Empty", "Hidden"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Fungi", "Fungi", "Fungi", "Animal"],
     "Points" : "2"
   },
@@ -324,7 +324,7 @@
     "ResourceType" : "Fungi",
     "FrontCorners" : ["Empty", "Empty", "Hidden", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Fungi", "Fungi", "Fungi", "Plant"],
     "Points" : "2"
   },
@@ -333,7 +333,7 @@
     "ResourceType" : "Fungi",
     "FrontCorners" : ["Empty", "Hidden", "Empty", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Fungi", "Fungi", "Fungi", "Insect"],
     "Points" : "2"
   },
@@ -378,8 +378,8 @@
     "ResourceType" : "Plant",
     "FrontCorners" : ["Quill", "Empty", "Hidden", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Quill"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Quill"],
     "ResourceNeeded" : ["Plant", "Plant", "Insect"],
     "Points" : "1"
   },
@@ -388,8 +388,8 @@
     "ResourceType" : "Plant",
     "FrontCorners" : ["Empty", "Manuscript", "Empty", "Hidden"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Manuscript"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Manuscript"],
     "ResourceNeeded" : ["Plant", "Plant", "Fungi"],
     "Points" : "1"
   },
@@ -398,8 +398,8 @@
     "ResourceType" : "Plant",
     "FrontCorners" : ["Empty", "Hidden", "Empty", "Inkwell"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Inkwell"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Inkwell"],
     "ResourceNeeded" : ["Plant", "Plant", "Animal"],
     "Points" : "1"
   },
@@ -408,7 +408,7 @@
     "ResourceType" : "Plant",
     "FrontCorners" : ["Hidden", "Empty", "Empty", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Plant", "Plant", "Plant", "Insect"],
     "Points" : "2"
   },
@@ -417,7 +417,7 @@
     "ResourceType" : "Plant",
     "FrontCorners" : ["Empty", "Empty", "Hidden", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Plant", "Plant", "Plant", "Animal"],
     "Points" : "2"
   },
@@ -426,7 +426,7 @@
     "ResourceType" : "Plant",
     "FrontCorners" : ["Empty", "Hidden", "Empty", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Plant", "Plant", "Plant", "Fungi"],
     "Points" : "2"
   },
@@ -471,8 +471,8 @@
     "ResourceType" : "Animal",
     "FrontCorners" : ["Inkwell", "Empty", "Hidden", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Inkwell"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Inkwell"],
     "ResourceNeeded" : ["Animal", "Animal", "Insect"],
     "Points" : "1"
   },
@@ -481,8 +481,8 @@
     "ResourceType" : "Animal",
     "FrontCorners" : ["Hidden", "Empty", "Manuscript", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Manuscript"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Manuscript"],
     "ResourceNeeded" : ["Animal", "Animal", "Plant"],
     "Points" : "1"
   },
@@ -491,8 +491,8 @@
     "ResourceType" : "Animal",
     "FrontCorners" : ["Empty", "Hidden", "Empty", "Quill"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Quill"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Quill"],
     "ResourceNeeded" : ["Animal", "Animal", "Fungi"],
     "Points" : "1"
   },
@@ -501,7 +501,7 @@
     "ResourceType" : "Animal",
     "FrontCorners" : ["Empty", "Empty", "Empty", "Hidden"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Animal", "Animal", "Animal", "Insect"],
     "Points" : "2"
   },
@@ -510,7 +510,7 @@
     "ResourceType" : "Animal",
     "FrontCorners" : ["Empty", "Hidden", "Empty", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Animal", "Animal", "Animal", "Fungi"],
     "Points" : "2"
   },
@@ -519,7 +519,7 @@
     "ResourceType" : "Animal",
     "FrontCorners" : ["Hidden", "Empty", "Empty", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Animal", "Animal", "Animal", "Plant"],
     "Points" : "2"
   },
@@ -564,8 +564,8 @@
     "ResourceType" : "Insect",
     "FrontCorners" : ["Empty", "Quill", "Empty", "Hidden"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Quill"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Quill"],
     "ResourceNeeded" : ["Insect", "Insect", "Plant"],
     "Points" : "1"
   },
@@ -574,8 +574,8 @@
     "ResourceType" : "Insect",
     "FrontCorners" : ["Empty", "Hidden", "Empty", "Manuscript"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Manuscript"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Manuscript"],
     "ResourceNeeded" : ["Insect", "Insect", "Animal"],
     "Points" : "1"
   },
@@ -584,8 +584,8 @@
     "ResourceType" : "Insect",
     "FrontCorners" : ["Hidden", "Empty", "Inkwell", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "Item",
-    "ChallengeItems" : ["Inkwell"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements" : ["Inkwell"],
     "ResourceNeeded" : ["Insect", "Insect", "Fungi"],
     "Points" : "1"
   },
@@ -594,7 +594,7 @@
     "ResourceType" : "Insect",
     "FrontCorners" : ["Empty", "Empty", "Empty", "Hidden"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Insect", "Insect", "Insect", "Animal"],
     "Points" : "2"
   },
@@ -603,7 +603,7 @@
     "ResourceType" : "Insect",
     "FrontCorners" : ["Empty", "Empty", "Hidden", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Insect", "Insect", "Insect", "Plant"],
     "Points" : "2"
   },
@@ -612,7 +612,7 @@
     "ResourceType" : "Insect",
     "FrontCorners" : ["Empty", "Hidden", "Empty", "Empty"],
     "BackCorners"  : ["Empty", "Empty", "Empty", "Empty"],
-    "ChallengeType" : "GoldCoverage",
+    "ChallengeType" : "CoverageChallenge",
     "ResourceNeeded" : ["Insect", "Insect", "Insect", "Fungi"],
     "Points" : "2"
   },
@@ -690,98 +690,98 @@
   },
   "87" : {
     "Type" : "Objective",
-    "ChallengeType" : "Structure",
-    "Structure" : ["Fungi", "Fungi", "Fungi", "", "", "", "", "", ""],
+    "ChallengeType" : "StructureChallenge",
+    "Structure" : ["Fungi", "Fungi", "Fungi", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"],
     "Points": "2"
   },
   "88" : {
     "Type" : "Objective",
-    "ChallengeType" : "Structure",
-    "Structure" : ["Plant", "", "", "Plant", "", "", "Plant", "", ""],
+    "ChallengeType" : "StructureChallenge",
+    "Structure" : ["Plant", "Empty", "Empty", "Plant", "Empty", "Empty", "Plant", "Empty", "Empty"],
     "Points": "2"
   },
   "89" : {
     "Type" : "Objective",
-    "ChallengeType" : "Structure",
-    "Structure" : ["Animal", "Animal", "Animal", "", "", "", "", "", ""],
+    "ChallengeType" : "StructureChallenge",
+    "Structure" : ["Animal", "Animal", "Animal", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"],
     "Points": "2"
   },
   "90" : {
     "Type" : "Objective",
-    "ChallengeType" : "Structure",
-    "Structure" : ["Insect", "", "", "Insect", "", "", "Insect", "", ""],
+    "ChallengeType" : "StructureChallenge",
+    "Structure" : ["Insect", "Empty", "Empty", "Insect", "Empty", "Empty", "Insect", "Empty", "Empty"],
     "Points": "2"
   },
   "91" : {
     "Type" : "Objective",
-    "ChallengeType" : "Structure",
-    "Structure" : ["", "Fungi", "", "Fungi", "", "", "Plant", "", ""],
+    "ChallengeType" : "StructureChallenge",
+    "Structure" : ["Empty", "Fungi", "Empty", "Fungi", "Empty", "Empty", "Plant", "Empty", "Empty"],
     "Points": "3"
   },
   "92" : {
     "Type" : "Objective",
-    "ChallengeType" : "Structure",
-    "Structure" : ["", "", "Plant", "Insect", "Plant", "", "", "", ""],
+    "ChallengeType" : "StructureChallenge",
+    "Structure" : ["Empty", "Empty", "Plant", "Insect", "Plant", "Empty", "Empty", "Empty", "Empty"],
     "Points": "3"
   },
   "93" : {
     "Type" : "Objective",
-    "ChallengeType" : "Structure",
-    "Structure" : ["", "Animal", "Fungi", "Animal", "", "", "", "", ""],
+    "ChallengeType" : "StructureChallenge",
+    "Structure" : ["Empty", "Animal", "Fungi", "Animal", "Empty", "Empty", "Empty", "Empty", "Empty"],
     "Points": "3"
   },
   "94" : {
     "Type" : "Objective",
-    "ChallengeType" : "Structure",
-    "Structure" : ["", "Animal", "", "", "Insect", "", "Insect", "", ""],
+    "ChallengeType" : "StructureChallenge",
+    "Structure" : ["Empty", "Animal", "Empty", "Empty", "Insect", "Empty", "Insect", "Empty", "Empty"],
     "Points": "3"
   },
   "95" : {
     "Type" : "Objective",
-    "ChallengeType" : "ResourceChallenge",
-    "ChallengeResources": ["Fungi","Fungi","Fungi"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements": ["Fungi","Fungi","Fungi"],
     "Points" : "2"
   },
   "96" : {
     "Type" : "Objective",
-    "ChallengeType" : "ResourceChallenge",
-    "ChallengeResources": ["Plant","Plant","Plant"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements": ["Plant","Plant","Plant"],
     "Points" : "2"
   },
   "97" : {
     "Type" : "Objective",
-    "ChallengeType" : "ResourceChallenge",
-    "ChallengeResources": ["Insect","Insect","Insect"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements": ["Insect","Insect","Insect"],
     "Points" : "2"
   },
   "98" : {
     "Type" : "Objective",
-    "ChallengeType" : "ResourceChallenge",
-    "ChallengeResources": ["Plant","Plant","Plant"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements": ["Plant","Plant","Plant"],
     "Points" : "2"
   },
   "99" : {
     "Type" : "Objective",
-    "ChallengeType" : "ItemChallenge",
-    "ChallengeResources": ["Inkwell","Quill","Manuscript"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements": ["Inkwell","Quill","Manuscript"],
     "Points" : "3"
   },
   "100" : {
     "Type" : "Objective",
-    "ChallengeType" : "ItemChallenge",
-    "ChallengeResources": ["Manuscript","Manuscript"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements": ["Manuscript","Manuscript"],
     "Points" : "2"
   },
   "101" : {
     "Type" : "Objective",
-    "ChallengeType" : "ItemChallenge",
-    "ChallengeResources": ["Inkwell","Inkwell"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements": ["Inkwell","Inkwell"],
     "Points" : "2"
   },
   "102" : {
     "Type" : "Objective",
-    "ChallengeType" : "ItemChallenge",
-    "ChallengeResources": ["Quill","Quill"],
+    "ChallengeType" : "ElementChallenge",
+    "ChallengeElements": ["Quill","Quill"],
     "Points" : "2"
   }
 }

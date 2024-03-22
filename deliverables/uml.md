@@ -66,7 +66,7 @@ classDiagram
   GoldCard "0..1" -- "0..12" Challenge
 
   class StructureChallenge {
-    - configuration : int
+    - configuration : Element
   }
   Challenge <|-- StructureChallenge
 

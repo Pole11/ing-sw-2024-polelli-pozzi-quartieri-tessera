@@ -1,20 +1,22 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card.challenge;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exception.WrongStructureConfigurationSizeException;
 
-public class StructureChallenge {
-    int[][] configuration;
+public class StructureChallenge extends Challenge{
+    Element[][] configuration;
 
-    public StructureChallenge(int[][] configuration) throws WrongStructureConfigurationSizeException {
+    public StructureChallenge(Element[][] configuration) throws WrongStructureConfigurationSizeException {
         this.configuration = configuration;
 
-        if (configuration.length != 3) {
+        if (configuration.length != Config.STRUCTURE_CONFIGURATION_N) {
             throw new WrongStructureConfigurationSizeException("The number of rows in the matrix is too big");
         }
 
-        if (configuration[0].length != 3 ||
-                    configuration[1].length != 3 ||
-                    configuration[2].length != 3) {
+        if (configuration[0].length != Config.STRUCTURE_CONFIGURATION_N ||
+                    configuration[1].length != Config.STRUCTURE_CONFIGURATION_N ||
+                    configuration[2].length != Config.STRUCTURE_CONFIGURATION_N) {
             throw new WrongStructureConfigurationSizeException("The number of cols in the matrix is too big");
         }
     }
