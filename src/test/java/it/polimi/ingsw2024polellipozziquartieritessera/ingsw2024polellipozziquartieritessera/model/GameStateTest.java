@@ -3,7 +3,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.HashMap;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exception.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import org.junit.jupiter.api.Test;
 public class GameStateTest {
     @Test

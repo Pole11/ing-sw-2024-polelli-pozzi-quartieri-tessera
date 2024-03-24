@@ -1,6 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import java.util.HashMap;
 
@@ -25,6 +25,7 @@ public class Player {
         board = new HashMap<Integer, Boolean>();
         hand = new HashMap<Integer, Boolean>();
     }
+    //GETTER
 
     public int getPoints() {
         return points;

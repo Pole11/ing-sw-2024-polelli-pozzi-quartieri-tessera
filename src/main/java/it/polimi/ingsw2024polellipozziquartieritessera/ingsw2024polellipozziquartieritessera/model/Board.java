@@ -1,6 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import java.util.ArrayList;
 
@@ -19,6 +19,7 @@ public class Board {
         resourceDeck  = new ArrayList<ResourceCard>();
     }
 
+    //SETTER
     public void setSharedGoldCards(GoldCard[] sharedGoldCards) {
         this.sharedGoldCards = sharedGoldCards;
     }
@@ -39,6 +40,9 @@ public class Board {
         this.resourceDeck = resourceDeck;
     }
 
+
+
+    //GETTER
     public GoldCard[] getSharedGoldCards() {
         return sharedGoldCards;
     }
@@ -52,10 +56,32 @@ public class Board {
     }
 
     public ArrayList<GoldCard> getGoldDeck() {
-        return this.goldDeck;
+        return goldDeck;
     }
 
     public ArrayList<ResourceCard> getResourceDeck() {
         return resourceDeck;
     }
+
+
+    //METHODS
+    /*
+    public GoldCard getSharedGoldCard(int pos) {
+
+    }
+    public ResourceCard getSharedResourceCard(int pos){
+
+    }
+    ResourceCard getFromResourceDeck(){
+
+    }
+    GoldCard getFromGoldDeck(){
+
+    }*/
+    void fillSharedCardsGap(){
+
+    }
+
+
+
 }

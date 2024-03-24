@@ -1,7 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exception.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.card.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import java.util.HashMap;
 
@@ -35,7 +35,7 @@ public class GameState {
         }
     }
 
-    public boolean NicknamesAreValid() {
+    private boolean NicknamesAreValid() {
         // check if players are unique (by nickname and color)
         for (int i = 0; i < players.length; i++) {
             for (int j = i+1; j < players.length; j++) {
@@ -47,7 +47,7 @@ public class GameState {
         return true;
     }
 
-    public boolean ColorsAreValid() {
+    private boolean ColorsAreValid() {
         // check if players are unique (by nickname and color)
         for (int i = 0; i < players.length; i++) {
             for (int j = i+1; j < players.length; j++) {
@@ -59,7 +59,7 @@ public class GameState {
         return true;
     }
 
-    public boolean NicknameAndColorsAreValid() {
+    private boolean NicknameAndColorsAreValid() {
         // check if players are unique (by nickname and color)
         for (int i = 0; i < players.length; i++) {
             for (int j = i+1; j < players.length; j++) {
