@@ -15,7 +15,8 @@ public class GameState {
     private GamePhase currentGamePhase;
     private TurnPhase currentGameTurn;
 
-    public GameState(HashMap cardsMap, Player[] players) throws NotUniquePlayerException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
+    // CONSTRUCTOR
+    public GameState(HashMap<Integer, Card> cardsMap, Player[] players) throws NotUniquePlayerException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
         this.cardsMap = cardsMap;
         this.mainBoard = new Board();
         this.players = players;
@@ -34,6 +35,8 @@ public class GameState {
             throw new NotUniquePlayerColorException("While creating the GameState Object I encountered a problem regarding the creation of players with the same color");
         }
     }
+
+    // TESTING
 
     private boolean NicknamesAreValid() {
         // check if players are unique (by nickname and color)
@@ -71,15 +74,74 @@ public class GameState {
         return true;
     }
 
-    public Board getMainBoard() {
-        return new Board();
+    // GETTER
+    public HashMap<Integer, Card> getCardsMap() {
+        return cardsMap;
     }
 
+    public Board getMainBoard() {
+        return mainBoard;
+    }
+
+    public Player[] getPlayers() {
+        return players;
+    }
+
+    public Chat getChat() {
+        return chat;
+    }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
+
+    public GamePhase getCurrentGamePhase() {
+        return currentGamePhase;
+    }
+
+    public TurnPhase getCurrentGameTurn() {
+        return currentGameTurn;
+    }
+
+    // SETTER
+    public void setCurrentPlayerIndex(int currentPlayerIndex) {
+        this.currentPlayerIndex = currentPlayerIndex;
+    }
+
+    public void setCurrentGamePhase(GamePhase currentGamePhase) {
+        this.currentGamePhase = currentGamePhase;
+    }
+
+    public void setCurrentGameTurn(TurnPhase currentGameTurn) {
+        this.currentGameTurn = currentGameTurn;
+    }
+
+    // METHODS
+    // return the current player
     public Player getCurrentPlayer() {
         return this.getPlayers()[this.currentPlayerIndex];
     }
 
-    public Player[] getPlayers() {
-        return this.players;
+    public Player getBlackPlayer(){
+        return this.players[0];
+    }
+
+    // returns the specific Card pointer given his id
+    public Card getCard(int id){
+        return this.getCardsMap().get(id);
+    }
+
+    // !!! to implement !!!
+    public boolean playersConnected(){
+        return true;
+    }
+
+    // !!! to implement !!!
+    public void saveGameState(){
+    }
+
+    // !!! optional !!!
+    public int getTurnTime(){
+        return 0;
     }
 }

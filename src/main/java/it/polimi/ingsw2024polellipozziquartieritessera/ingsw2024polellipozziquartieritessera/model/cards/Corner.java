@@ -8,7 +8,6 @@ public class Corner {
     private Boolean covered; //true if there is another card on top (false otherwise)
     private Corner linkedCorner; // the corner linked to this one (null if not exists)
 
-
     //corner is null in the array of corners if it is hidden
 
     //CONSTRUCTOR

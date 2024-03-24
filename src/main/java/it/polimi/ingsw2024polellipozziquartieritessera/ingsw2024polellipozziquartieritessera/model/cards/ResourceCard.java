@@ -24,6 +24,7 @@ public class ResourceCard extends CornerCard {
         return points;
     }
 
+    // METHODS
     // returns the resource visible on the side requested
     public ArrayList<Element> getUncoveredElements(int isFront){
         // resource array initialization

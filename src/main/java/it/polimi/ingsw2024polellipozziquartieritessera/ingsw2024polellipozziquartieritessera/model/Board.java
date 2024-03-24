@@ -6,17 +6,17 @@ import java.util.ArrayList;
 
 public class Board {
     private GoldCard[] sharedGoldCards; // 2 gold cards shared between players
-    private ResourceCard[] sharedResourceCard; // 2 resource cards shared between players
+    private ResourceCard[] sharedResourceCards; // 2 resource cards shared between players
     private ObjectiveCard[] sharedObjectiveCards; // 2 objective cards shared between players
     private ArrayList<GoldCard> goldDeck;
     private ArrayList<ResourceCard> resourceDeck;
 
     public Board(){
         sharedGoldCards = new GoldCard[Config.N_SHARED_GOLDS];
-        sharedResourceCard = new ResourceCard[Config.N_SHARED_RESOURCES];
+        sharedResourceCards = new ResourceCard[Config.N_SHARED_RESOURCES];
         sharedObjectiveCards = new ObjectiveCard[Config.N_SHARED_OBJECTIVES];
-        goldDeck = new ArrayList<GoldCard>();
-        resourceDeck  = new ArrayList<ResourceCard>();
+        goldDeck = new ArrayList<>();
+        resourceDeck  = new ArrayList<>();
     }
 
     //SETTER
@@ -25,7 +25,7 @@ public class Board {
     }
 
     public void setSharedResourceCard(ResourceCard[] sharedResourceCard) {
-        this.sharedResourceCard = sharedResourceCard;
+        this.sharedResourceCards = sharedResourceCard;
     }
 
     public void setSharedObjectiveCards(ObjectiveCard[] sharedObjectiveCards) {
@@ -40,15 +40,13 @@ public class Board {
         this.resourceDeck = resourceDeck;
     }
 
-
-
     //GETTER
     public GoldCard[] getSharedGoldCards() {
         return sharedGoldCards;
     }
 
     public ResourceCard[] getSharedResourceCard() {
-        return sharedResourceCard;
+        return sharedResourceCards;
     }
 
     public ObjectiveCard[] getSharedObjectiveCards() {
@@ -65,23 +63,57 @@ public class Board {
 
 
     //METHODS
-    /*
+    // returns the requested shared gold card
     public GoldCard getSharedGoldCard(int pos) {
-
+        return getSharedGoldCards()[pos-1]; // remember that pos is either 1 or 2
     }
+
+    // returns the requested shared resource card
     public ResourceCard getSharedResourceCard(int pos){
-
+        return getSharedResourceCard()[pos-1]; // remember that pos is either 1 or 2
     }
-    ResourceCard getFromResourceDeck(){
 
+    // !!! da implementare !!!
+    // !!! non so se sono da tenere o no, non so cosa devono fare !!!
+    public ResourceCard getFromResourceDeck(){
+        if (!resourceDeck.isEmpty()){
+            ResourceCard drawnCard = getResourceDeck().getFirst();
+            resourceDeck.removeFirst();
+            return drawnCard;
+        }
+        else{
+            return null;
+        }
     }
-    GoldCard getFromGoldDeck(){
-
-    }*/
+    public GoldCard getFromGoldDeck(){
+        if (!goldDeck.isEmpty()){
+            GoldCard drawnCard = getGoldDeck().getFirst();
+            goldDeck.removeFirst();
+            return drawnCard;
+        }
+        else{
+            return null;
+        }
+    }
     void fillSharedCardsGap(){
-
+        // verify if the shared cards have some gaps
+        for (int index = 0; index < Config.N_SHARED_RESOURCES; index++){
+            if (sharedResourceCards[index] == null){
+                ResourceCard newCard = getFromResourceDeck();
+                // verify deck is not empty
+                if (newCard != null){
+                    sharedResourceCards[index] = newCard;
+                }
+            }
+        }
+        for (int index = 0; index < Config.N_SHARED_GOLDS; index++){
+            if (sharedGoldCards[index] == null){
+                GoldCard newCard = getFromGoldDeck();
+                // verify deck is not empty
+                if (newCard != null){
+                    sharedGoldCards[index] = newCard;
+                }
+            }
+        }
     }
-
-
-
 }
