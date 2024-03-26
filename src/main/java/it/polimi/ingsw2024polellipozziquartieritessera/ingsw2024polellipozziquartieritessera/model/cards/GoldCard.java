@@ -8,11 +8,11 @@ import java.util.ArrayList;
 public class GoldCard extends CornerCard {
     private final Element resourceType; // color of the card, determined by the major resourceType
     private final Challenge challenge; // challenge related to this card (if null, points are gained when played)
-    private final Element[] resourceNeeded; // resource needed to place the card
+    private final ArrayList<Element> resourceNeeded; // resource needed to place the card
     private final int points; // value used to calculate the gain (if challenge is null, it is simply returned)
 
     // CONSTRUCTOR
-    public GoldCard(int id, Element resourceType, Challenge challenge, Element[] resourceNeeded, int points, Corner[] frontCorners, Corner[] backCorners) {
+    public GoldCard(int id, Element resourceType, Challenge challenge, ArrayList<Element> resourceNeeded, int points, Corner[] frontCorners, Corner[] backCorners) {
         super(id, frontCorners, backCorners);
         this.resourceType = resourceType;
         this.challenge = challenge;
@@ -29,7 +29,7 @@ public class GoldCard extends CornerCard {
         return challenge;
     }
 
-    public Element[] getResourceNeeded() {
+    public ArrayList<Element> getResourceNeeded() {
         return resourceNeeded;
     }
 
@@ -39,7 +39,7 @@ public class GoldCard extends CornerCard {
 
     // METHODS
     // returns the elements visible on the requested side
-    public Element[] getUncoveredElements(int isFront){
+    public ArrayList<Element> getUncoveredElements(int isFront){
         // resource array initialization
         ArrayList<Element> uncoveredElements = new ArrayList<>();
 
@@ -57,6 +57,6 @@ public class GoldCard extends CornerCard {
             }
         }
 
-        return uncoveredElements.toArray(new Element[uncoveredElements.size()]);
+        return uncoveredElements;
     }
 }

@@ -2,10 +2,13 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 
-public class ElementChallenge extends Challenge {
-    private final Element[] elements;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-    public ElementChallenge(Element[] elements){
+public class ElementChallenge extends Challenge {
+    private final ArrayList<Element> elements;
+
+    public ElementChallenge(ArrayList<Element> elements){
         this.elements = elements;
     }
 }

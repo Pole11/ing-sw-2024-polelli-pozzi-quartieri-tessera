@@ -25,7 +25,7 @@ public class ResourceCard extends CornerCard {
     }
 
     // returns the resource visible on the side requested
-    public Element[] getUncoveredElements(int isFront){
+    public ArrayList<Element> getUncoveredElements(int isFront){
         // resource array initialization
         ArrayList<Element> uncoveredElements = new ArrayList<>();
 
@@ -43,6 +43,6 @@ public class ResourceCard extends CornerCard {
             }
         }
 
-        return uncoveredElements.toArray(new Element[uncoveredElements.size()]);
+        return uncoveredElements;
     }
 }
