@@ -20,7 +20,7 @@ geometry:
 
 This section provides a concise overview of the class structure we implemented to represent the different card types.
 
-!["UML of Card"](img/card.svg)
+![UML of Card](img/card.svg)
 
 The following table summarizes the common attributes shared by all card types, facilitating their organization into classes and subclasses.
 
@@ -87,7 +87,7 @@ The `Element` refers to the `resourceType` of the card and the position is deter
 
 Order from top-left to bottom-left \[0-3\]
 
-![structure](./img/structure.png)
+![Example of Structure Challenge](./img/structure.png)
 
 #### Element Challenge
 
@@ -96,27 +96,29 @@ These tasks exhibit variability in the types of resources required.
 
 Here's a breakdown of how resources are typically handled within objective cards:
 
-![element-obj](./img/element-obj.png)
+![Example of Element Challenge in an Objective Card](./img/element-obj.png)
 
-![element-gold](img/element-gold.png)
+![Example of Element Challenge in an Gold Card](img/element-gold.png)
 
 #### Coverage Challenge
 
 This challenge is used exclusively for gold cards.
 The challenge defines a point-awarding task based on the quantity of specified `Elements` present on the player's board.
 
-![coverage](img/coverage.png) 
+![Example of Coverage Challenge](img/coverage.png) 
 
 Note that for the `GoldCoverageChallenge` the value of `points` is always 2.
 
 ## GameState 
+
+The `GameState` is the most important class. It is where all the information regarding the game are stored. In this section we will discuss some of its main features.
 
 The first player (index = 0) in the data structure is the Black player, `public Player getBlackPlayer() { return player[0] }`. 
 Note that a **round** is made up by 4 **turns**.
 
 The players order in game is defined by the order of the players in the `players[]` array.
 
-!["UML of GameState"](img/gamestate.svg)
+![UML of GameState](img/gamestate.svg)
 
 In the methods of the `Board` class, `pos` specify the position of the card (1 if it's the first, 2 if it's the second one)
 
@@ -126,7 +128,7 @@ This section details the enumerated data types we'll employ to represent various
 Due to graphical complexity, we won't illustrate all associations with other classes. 
 However, it's important to remember that these enumerations are indeed connected to the classes that utilize them for data definition.
 
-!["UML of Enums and Config"](img/enums.svg)
+![UML of Enums and Config](img/enums.svg)
 
 # Controller
 
@@ -135,22 +137,20 @@ However, it's important to remember that these enumerations are indeed connected
 - `getGameState` : this method provides a comprehensive overview of the current game state.
 - `flipCard` : this method flips the card currently held by the player. Subsequently, the placeCard method will utilize the flipped side for placement.
 
-!["UML of Controller"](img/controller.svg)
+![UML of Controller](img/controller.svg)
 
 # Exceptions
 
+While testing the constructors and some methods we noticed that defining some exceptions would have helped us a lot in managing problems. Here are some of the examples:
+
 - `InvalidHandException` (more than 3 cards in the hand)
-- `NotUniquePlayerColorException`
-- `NotUniquePlayerException`
-- `NotUniquePlayerNicknameException`
+- `NotUniquePlayerColorException` (two players have the same color)
+- `NotUniquePlayerNicknameException` (two players have the same nickname)
+- `NotUniquePlayerException` (two players have the same color and the same nickname)
 - `WrongStructureConfigurationSizeException` (structure is the one in challenge)
-
-# View
-
-*wip*
 
 # Complete UML
 
 (you can *zoom* it)
 
-!["Complete UML"](img/complete.svg)
+![Complete UML](img/complete.svg)
