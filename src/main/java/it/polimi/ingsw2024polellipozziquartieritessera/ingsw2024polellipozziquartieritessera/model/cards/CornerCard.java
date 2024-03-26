@@ -2,6 +2,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -27,18 +28,18 @@ public abstract class CornerCard extends Card {
 
     // METHODS
     // return all the corners of the card (back and front)
-    public Corner[] getCorners() {
+    public ArrayList<Corner> getCorners() {
         // corner array initialization
         ArrayList<Corner> corners = new ArrayList<>();
         // adding front and back corners
         corners.addAll(Arrays.asList(frontCorners));
         corners.addAll(Arrays.asList(backCorners));
 
-        return corners.toArray(new Corner[corners.size()]);
+        return corners;
     }
 
     // return the linked cards to this one
-    public Integer[] getLinkedCards() {
+    public ArrayList<Integer> getLinkedCards() {
         // card array initialization
         ArrayList<Integer> linkedCards = new ArrayList<Integer>();
 
@@ -49,11 +50,11 @@ public abstract class CornerCard extends Card {
             }
         }
 
-        return linkedCards.toArray(new Integer[linkedCards.size()]);
+        return linkedCards;
     }
 
     // return all uncovered corners of the card
-    public Corner[] getUncoveredCorners(int isFront) {
+    public ArrayList<Corner> getUncoveredCorners(int isFront) {
         // corner array initialization
         ArrayList<Corner> uncoveredCorners = new ArrayList<>();
 
@@ -73,9 +74,9 @@ public abstract class CornerCard extends Card {
             }
         }
 
-        return uncoveredCorners.toArray(new Corner[uncoveredCorners.size()]);
+        return uncoveredCorners;
     }
 
     // this method will be ovverrided by all the corner cards subclasses
-    public abstract Element[] getUncoveredElements(int isFront);
+    public abstract ArrayList<Element> getUncoveredElements(int isFront);
 }

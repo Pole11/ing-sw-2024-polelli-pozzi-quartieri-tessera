@@ -85,11 +85,11 @@ public class Main {
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
                     }
 
-                    challenge = new ElementChallenge(elements.toArray(new Element[elements.size()]));
+                    challenge = new ElementChallenge(elements);
                 } else if (card.get("ChallengeType").equals("StructureChallenge")){
-                    Element[][] configuration = new Element[Config.STRUCTURE_CONFIGURATION_N][Config.STRUCTURE_CONFIGURATION_N];
-                    for (int i = 0; i < Config.STRUCTURE_CONFIGURATION_N; i++){
-                        for (int j = 0; j < Config.STRUCTURE_CONFIGURATION_N; j++){
+                    Element[][] configuration = new Element[Config.N_STRUCTURE_CHALLENGE_CONFIGURATION][Config.N_STRUCTURE_CHALLENGE_CONFIGURATION];
+                    for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
+                        for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
                             configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(i+j).toString().toUpperCase() );
                         }
                     }
@@ -147,13 +147,13 @@ public class Main {
                     for (Object e : (ArrayList) card.get("ResourceNeeded")){
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
                     }
-                    cardsMap.put(id, new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements.toArray(new Element[elements.size()]), (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners));
+                    cardsMap.put(id, new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements, (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners));
                 } else if (card.get("Type").equals("Starter")){
                     ArrayList<Element> elements = new ArrayList<>();
                     for (Object e : (ArrayList) card.get("CenterResources")){
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
                     }
-                    cardsMap.put(id, new StarterCard(id, frontCorners, backCorners, elements.toArray(new Element[elements.size()])));
+                    cardsMap.put(id, new StarterCard(id, frontCorners, backCorners, elements));
                 }
 
 

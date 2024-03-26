@@ -13,7 +13,7 @@ public class Controller {
     // - resource deck
     // - gold deck
     // The side of the shared card is 1 by specific
-    void drawSharedGold(GameState gameState, DrawType drawType) throws InvalidHandException {
+    void drawCard(GameState gameState, DrawType drawType) throws InvalidHandException {
         Board board = gameState.getMainBoard();
         Player currentPlayer = gameState.getCurrentPlayer();
 
@@ -44,34 +44,38 @@ public class Controller {
         }
     }
 
-    void drawGoldFromDeck(Board board, Player currentPlayer) {
+    private void drawGoldFromDeck(Board board, Player currentPlayer) {
         GoldCard newGoldCard = board.getGoldDeck().getLast();
         board.getGoldDeck().removeLast();
         currentPlayer.getHand().put(newGoldCard.getId(), true);
     }
 
-    void drawGoldFromShared(Board board, Player currentPlayer, int index) {
+    private void drawGoldFromShared(Board board, Player currentPlayer, int index) {
         GoldCard[] goldCards = board.getSharedGoldCards();
         GoldCard newGoldCard = goldCards[index];
         currentPlayer.getHand().put(newGoldCard.getId(), true);
         goldCards[index] = board.getGoldDeck().getLast();
     }
 
-    void drawResourceFromDeck(Board board, Player currentPlayer) {
+    private void drawResourceFromDeck(Board board, Player currentPlayer) {
         ResourceCard newResourceCard = board.getResourceDeck().getLast();
         board.getResourceDeck().removeLast();
         currentPlayer.getHand().put(newResourceCard.getId(), true);
     }
 
-    void drawResourceFromShared(Board board, Player currentPlayer, int index) {
+    private void drawResourceFromShared(Board board, Player currentPlayer, int index) {
         ResourceCard[] resourceCards = board.getSharedResourceCard();
         ResourceCard newResourceCard = resourceCards[index];
         currentPlayer.getHand().put(newResourceCard.getId(), true);
         resourceCards[index] = board.getResourceDeck().getLast();
     }
 
-    void placeCard(GameState gameState, Player player, int placingCardId, int tableCardId, int configuration) {
+    public void placeCard(GameState gameState, Player player, int placingCardId, int tableCardId, int configuration) {}
 
-    }
+    public void flipCard(Player player, int cardId){}
+
+    public void openChat(){}
+
+    public void addMessage(Player player, String content){}
 
 }

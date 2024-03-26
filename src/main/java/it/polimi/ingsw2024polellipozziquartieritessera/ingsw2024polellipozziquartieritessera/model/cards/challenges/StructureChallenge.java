@@ -10,13 +10,13 @@ public class StructureChallenge extends Challenge{
     public StructureChallenge(Element[][] configuration) throws WrongStructureConfigurationSizeException {
         this.configuration = configuration;
 
-        if (configuration.length != Config.STRUCTURE_CONFIGURATION_N) {
+        if (configuration.length != Config.N_STRUCTURE_CHALLENGE_CONFIGURATION) {
             throw new WrongStructureConfigurationSizeException("The number of rows in the matrix is too big");
         }
 
-        if (configuration[0].length != Config.STRUCTURE_CONFIGURATION_N ||
-                    configuration[1].length != Config.STRUCTURE_CONFIGURATION_N ||
-                    configuration[2].length != Config.STRUCTURE_CONFIGURATION_N) {
+        if (configuration[0].length != Config.N_STRUCTURE_CHALLENGE_CONFIGURATION ||
+                    configuration[1].length != Config.N_STRUCTURE_CHALLENGE_CONFIGURATION ||
+                    configuration[2].length != Config.N_STRUCTURE_CHALLENGE_CONFIGURATION) {
             throw new WrongStructureConfigurationSizeException("The number of cols in the matrix is too big");
         }
     }

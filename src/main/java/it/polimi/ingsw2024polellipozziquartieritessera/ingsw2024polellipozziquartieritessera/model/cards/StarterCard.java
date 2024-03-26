@@ -6,22 +6,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class StarterCard extends CornerCard {
-    private final Element[] centerResource; // array of center resources in the front side
+    private final ArrayList<Element> centerResource; // array of center resources in the front side
 
     // CONSTRUCTOR
-    public StarterCard(int id, Corner[] frontCorners, Corner[] backCorners, Element[] centerResource) {
+    public StarterCard(int id, Corner[] frontCorners, Corner[] backCorners, ArrayList<Element> centerResource) {
         super(id, frontCorners, backCorners);
         this.centerResource = centerResource;
     }
 
     // GETTER
-    public Element[] getCenterResource() {
+    public ArrayList<Element> getCenterResource() {
         return centerResource;
     }
 
     // METHODS
     // returns the resource visible on the side requested
-    public Element[] getUncoveredElements(int isFront){
+    public ArrayList<Element> getUncoveredElements(int isFront){
         // resource array initialization
         ArrayList<Element> uncoveredResources = new ArrayList<>();
 
@@ -34,9 +34,9 @@ public class StarterCard extends CornerCard {
 
         // add center resources if on front side
         if (isFront == 1){
-            uncoveredResources.addAll(Arrays.asList(centerResource));
+            uncoveredResources.addAll(centerResource);
         }
 
-        return uncoveredResources.toArray(new Element[uncoveredResources.size()]);
+        return uncoveredResources;
     }
 }
