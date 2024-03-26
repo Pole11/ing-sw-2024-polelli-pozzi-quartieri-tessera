@@ -20,82 +20,7 @@ geometry:
 
 In this section we will shortly explain how we structured the classes regarding the various types of cards.
 
-```mermaid
-classDiagram
-  class Card {
-    <<abstract>>
-    - id : int
-  }
-
-  class ObjectiveCard {
-    - challenge: Challenge
-    - points: int
-  }
-  Card <|-- ObjectiveCard
-
-  class CornerCard {
-    <<asbstract>>
-    - frontCorners[] : Corner[N_CORNERS]
-    - backCorners[]: Corner[N_CORNERS]
-    + getCorners()  Corner[]
-    + getLinkedCards()  Integer[]
-    + getUncoveredCorners(isFront : int)  Corner[N_CORNERS]
-    + ~abstract~getUncoveredElements(isFront : int)  Element[MAX_UNCOVERED_RESOURCES]
-  }
-  Card <|-- CornerCard
-
-  class Corner {
-    - covered : Boolean
-    - ~final~element : Element
-    - ~final~cardId : int
-    - linkedCorner : Corner
-
-  }
-  CornerCard "6..8" *-- "1" Corner
-
-  class ResourceCard {
-    - ~final~resourceType : Element
-    - ~final~points : int
-    + getUncoveredElement(isFront : int)  Element[]
-  }
-  CornerCard <|-- ResourceCard
-
-  class GoldCard {
-    - ~final~resourceType : Element
-    - ~final~challenge : Challenge
-    - ~final~resourceNeeded: Element[MAX_RES_NEEDED]
-    - ~final~points: int
-    + getUncoveredElements(isFront : int)  Element[]
-  }
-  CornerCard <|-- GoldCard
-
-  class StarterCard {
-    - ~final~centerResource : Element[]
-    + getUncoveredElement(isFront : int)  Element[]
-  }
-  CornerCard <|-- StarterCard
-
-  class Challenge {
-    <<abstract>>
-  }
-  ObjectiveCard "1" <-- "0..1" Challenge
-  GoldCard "0..1" <-- "0..12" Challenge
-
-  class StructureChallenge {
-    - configuration : Element
-  }
-  Challenge <|-- StructureChallenge
-
-  class ElementChallenge {
-    - elements: Element[MAX_CHAL_RESUORCE]
-  }
-  Challenge <|-- ElementChallenge
-
-  class CoverageChallenge {
-
-  }
-  Challenge <|-- CoverageChallenge
-```
+!["UML of Card"](img/card.svg)
 
 Here is a table that shows what all the types of cards have in common, so that it is easier to aggregate them into classes and subclasses.
 
@@ -144,27 +69,27 @@ This is the one you must do in order to gain points. It is used in `ObjectiveCar
 #### Structure Challenge
 The structure challenge is only for objective cards.
 
-![structure](./img/structure.png){ width=400px }
+![structure](./img/structure.png)
 
 #### Resource Challenge
 The resource challenge is only for objective cards. The type of resources needed in the objective cards can vary.
 
 In the objective cards is like this:
 
-![element-obj](./img/element-obj.png){ width=400px }
+![element-obj](./img/element-obj.png)
 
 #### Item Challenge
 The item challenge is only for gold cards.
 
 In the gold cards is like this (the one on the top of the card):
 
-![element-gold](img/element-gold.png){ width=400px }
+![element-gold](img/element-gold.png)
 
 #### Coverage Challenge
 This challenge is only for gold cards.
 Is the one on the top of the card.
 
-![coverage](img/coverage.png){ width=400px }  
+![coverage](img/coverage.png) 
 
 Here is the UML for both the Card and the Challenge:
 
@@ -199,70 +124,7 @@ Note that a **round** is made up by 4 **turns**.
 
 The players order in game is defined by the order of the players in the array `players[]`.
 
-
-```mermaid
-classDiagram
-  class GameState {
-    - ~final~ cardsMap : HashMap< Integer,Card >
-    - ~final~ mainBoard : Board
-    - ~final~ players[] : Player[MAX_PLAYERS]
-    - ~final~ chat : Chat
-    - currentPlayerIndex : int 
-    - currentGamePhase : GamePhase
-    - currentGameTurn : GameTurn
-    + getMainBoard() Board
-    + getPlayers() Player[] : void
-    + getCurrentPlayer() Player
-    + getBlackPlayer() Player
-    + getCurrentGameTurn() GameTurn
-    + getCurrentGamePhase() GamePhase
-    + getCard(id : int) Card
-  }
-  
-  class Chat {
-      - messages : ArrayList<Message>
-      - lastId: int
-    + addMessage(player : Player, content : String) void
-  }
-
-  GameState <-- Chat
-
-  class Message {
-    - id : int
-    - author : Player
-    - dateTime : LocalDateTime
-    - content : String
-  }
-
-  Chat "0.." *-- "1" Message
-
-  class Player {
-    - nickname : String
-    - color : Color
-    - points : int
-    - elements : HashMap< Element, Integer >
-    - objectiveCard : ObjectiveCard
-    - starterCard : StarterCard
-    - board : HashMap< Integer, bool >
-    - hand : HashMap< Integer, bool >
-    + flipCards(id : Integer) void 
-  }
-   GameState "1" <-- "2..4" Player
-
-  class Board {
-    - sharedGoldCards[] : goldCard[N_SHARED_GOLDS]
-    - sharedResourceCard[] : ResourceCard[N_SHARED_RESOURCES]
-    - sharedObjectiveCards[] : OjectiveCard[N_SHARED_OBJECTIVES]
-    - goldDeck : ArrayList< GoldCard >
-    - resourceDeck : ArrayList< ResourceCard >
-    + getSharedGoldCard(pos : int) GoldCard
-    + getSharedResourceCard(pos : int) ResourceCard
-    + getFromResourceDeck() ResourceCard
-    + getFromGoldDeck() GoldCard
-    + fillSharedCardsGap() void
-  }  
-  GameState <-- Board
-```
+!["UML of GameState"](img/gamestate.svg)
 
 In the methods of Board class, `pos` means the position of the card (commonly 1 if it's the first, 2 if it's the second one)
 
@@ -271,82 +133,18 @@ In the methods of Board class, `pos` means the position of the card (commonly 1 
 We will use some enumerations to define our data types. 
 We cannot show all the association with the other classes because graphically it would be confused. Just remind that these object are actually associated with the classes that make use of them.
 
-```mermaid
-classDiagram
-
-class ElementTypeInterface {
-      <<interface>>
-      + getDisplayableType() String
- }
- 
- class ElementType {
-   <<Enumeration>>
-   - Resource = "Resource"
-   - Item = "Item"
-   - Empty = "Empty"
-   - ~final~ type : String
-   - ElementType(~final~ type : String)
-   + getDisplayableType() String
- }
- 
- class Element {
-   <<Enumeration>>
-   - Quill(ElementType.Item)
-   - Manuscript(ElementType.Item)
-   - Inkwell(ElementType.Item)
-   - Fungi(ElementType.Resource)
-   - Animal(ElementType.Resource)
-   - Insect(ElementType.Resource)
-   - Plant(ElementType.Resource)
-   - Empty(ElementType.Empty)
-   - Element(type : ElementType)
-   + getDisplayableType() String
- }
-
-  class Color {
-    <<Enumeration>>
-    - Black
-    - Green
-    - Yellow
-    - Red
-  }
-
-  class GamePhase {
-    <<Enumeration>>
-    - MainPhase
-    - EndPhase
-  }
-
-  class TurnPhase {
-    <<Enumeration>>
-    - PlacingPhase
-    - DrawPhase
-  }
-  ElementType <-- Element
-  ElementTypeInterface <.. ElementType
-  ElementTypeInterface <.. Element
-```
+!["UML of Enums and Config"](img/enums.svg)
 
 # Controller
 
 We started implementing the Controller while we are still studying how to implement the View, so it is still *wip*.
 
 - `drawCard` takes a card from the deck of cards, you can understand from which deck to draw based on the class of the `card` 
-- In `placeCard` you can retrieve the information of a multiple corner placed card by checking in the method, you just need to place it on one single card, even if it will affect another card.
+- In `placeCard` you can retrieve the information of a multiple corner placed card by checking in the method, you just need to place it on one single card, even if it will affect another card. The parameter `cornerTableIndex` is the corner of the card on the table to which the player is connecting the card.
 - `getGameState` is the method to get all the method game state information, we can later decide to subdivide it into multiple methods
 - `fliCard` is used to flip the card the player has in hand, then in `placeCard` it will be placed using the side that this method defines. It is implemented changing the value in the hash map
 
-```mermaid
-classDiagram
-
-  class Controller {
-    + drawCard(player: Player, card: Card)  void
-    + placeCard(player: Player, placingCardId: int, tableCardId: int, int: configuration)
-    + flipCard(player: Player, cardId: int) void
-
-    - getGameState()
-  }
-```
+!["UML of Controller"](img/controller.svg)
 
 # Exceptions
 
@@ -361,202 +159,7 @@ classDiagram
 *wip*
 
 # Complete UML
-```mermaid
-classDiagram
-  class Card {
-    <<abstract>>
-    - id : int
-  }
 
-  class ObjectiveCard {
-    - challenge: Challenge
-    - points: int
-  }
-  Card <|-- ObjectiveCard
+(you can *zoom* it)
 
-  class CornerCard {
-    <<asbstract>>
-    - frontCorners[] : Corner[N_CORNERS]
-    - backCorners[]: Corner[N_CORNERS]
-    + getCorners()  Corner[]
-    + getLinkedCards()  Integer[]
-    + getUncoveredCorners(isFront : int)  Corner[N_CORNERS]
-    + ~abstract~getUncoveredElements(isFront : int)  Element[MAX_UNCOVERED_RESOURCES]
-  }
-  Card <|-- CornerCard
-
-  class Corner {
-    - covered : Boolean
-    - ~final~element : Element
-    - ~final~cardId : int
-    - linkedCorner : Corner
-
-  }
-  CornerCard "6..8" *-- "1" Corner
-
-  class ResourceCard {
-    - ~final~resourceType : Element
-    - ~final~points : int
-    + getUncoveredElement(isFront : int)  Element[]
-  }
-  CornerCard <|-- ResourceCard
-
-  class GoldCard {
-    - ~final~resourceType : Element
-    - ~final~challenge : Challenge
-    - ~final~resourceNeeded: Element[MAX_RES_NEEDED]
-    - ~final~points: int
-    + getUncoveredElements(isFront : int)  Element[]
-  }
-  CornerCard <|-- GoldCard
-
-  class StarterCard {
-    - ~final~centerResource : Element[]
-    + getUncoveredElement(isFront : int)  Element[]
-  }
-  CornerCard <|-- StarterCard
-
-  class Challenge {
-    <<abstract>>
-  }
-  ObjectiveCard "1" <-- "0..1" Challenge
-  GoldCard "0..1" <-- "0..12" Challenge
-
-  class StructureChallenge {
-    - configuration : Element
-  }
-  Challenge <|-- StructureChallenge
-
-  class ElementChallenge {
-    - elements: Element[MAX_CHAL_RESUORCE]
-  }
-  Challenge <|-- ElementChallenge
-
-  class CoverageChallenge {
-
-  }
-  Challenge <|-- CoverageChallenge
-
-
-  class GameState {
-    - ~final~ cardsMap : HashMap< Integer,Card >
-    - ~final~ mainBoard : Board
-    - ~final~ players[] : Player[MAX_PLAYERS]
-    - ~final~ chat : Chat
-    - currentPlayerIndex : int 
-    - currentGamePhase : GamePhase
-    - currentGameTurn : GameTurn
-    + getMainBoard() Board
-    + getPlayers() Player[] : void
-    + getCurrentPlayer() Player
-    + getBlackPlayer() Player
-    + getCurrentGameTurn() GameTurn
-    + getCurrentGamePhase() GamePhase
-    + getCard(id : int) Card
-  }
-  
-  class Chat {
-      - messages : ArrayList<Message>
-      - lastId: int
-    + addMessage(player : Player, content : String) void
-  }
-
-  GameState <-- Chat
-
-  class Message {
-    - id : int
-    - author : Player
-    - dateTime : LocalDateTime
-    - content : String
-  }
-
-  Chat "0.." *-- "1" Message
-
-  class Player {
-    - nickname : String
-    - color : Color
-    - points : int
-    - elements : HashMap< Element, Integer >
-    - objectiveCard : ObjectiveCard
-    - starterCard : StarterCard
-    - board : HashMap< Integer, bool >
-    - hand : HashMap< Integer, bool >
-    + flipCards(id : Integer) void 
-  }
-  GameState "1" <-- "2..4" Player
-
-  class Board {
-    - sharedGoldCards[] : goldCard[N_SHARED_GOLDS]
-    - sharedResourceCard[] : ResourceCard[N_SHARED_RESOURCES]
-    - sharedObjectiveCards[] : OjectiveCard[N_SHARED_OBJECTIVES]
-    - goldDeck : ArrayList< GoldCard >
-    - resourceDeck : ArrayList< ResourceCard >
-    + getSharedGoldCard(pos : int) GoldCard
-    + getSharedResourceCard(pos : int) ResourceCard
-    + getFromResourceDeck() ResourceCard
-    + getFromGoldDeck() GoldCard
-    + fillSharedCardsGap() void
-  }  
-  GameState <-- Board
-
-
-class ElementTypeInterface {
-<<interface>>
-+ getDisplayableType() String
-}
-
-class ElementType {
-<<Enumeration>>
-- Resource = "Resource"
-- Item = "Item"
-- Empty = "Empty"
-- ~final~ type : String
-- ElementType(~final~ type : String)
-+ getDisplayableType() String
-}
-
-class Element {
-<<Enumeration>>
-- Quill(ElementType.Item)
-- Manuscript(ElementType.Item)
-- Inkwell(ElementType.Item)
-- Fungi(ElementType.Resource)
-- Animal(ElementType.Resource)
-- Insect(ElementType.Resource)
-- Plant(ElementType.Resource)
-- Empty(ElementType.Empty)
-- Element(type : ElementType)
-+ getDisplayableType() String
-}
-
-class Color {
-<<Enumeration>>
-- Black
-- Green
-- Yellow
-- Red
-}
-
-class GamePhase {
-<<Enumeration>>
-- MainPhase
-- EndPhase
-}
-
-class TurnPhase {
-<<Enumeration>>
-- PlacingPhase
-- DrawPhase
-}
-ElementType <-- Element
-ElementTypeInterface <.. ElementType
-ElementTypeInterface <.. Element
-
-class Controller {
-    + drawCard(player: Player, card: Card)  void
-    + placeCard(player: Player, placingCardId: int, tableCardId: int, int: configuration)
-    + flipCard(player: Player, cardId: int) void
-
-    - getGameState()
-  }
-```
+!["Complete UML"](img/complete.svg)
