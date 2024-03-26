@@ -18,11 +18,11 @@ geometry:
 
 ## Card
 
-In this section we will shortly explain how we structured the classes regarding the various types of cards.
+This section provides a concise overview of the class structure we implemented to represent the different card types.
 
 !["UML of Card"](img/card.svg)
 
-Here is a table that shows what all the types of cards have in common, so that it is easier to aggregate them into classes and subclasses.
+The following table summarizes the common attributes shared by all card types, facilitating their organization into classes and subclasses.
 
 | Card      | Has Corner (4) | Has Resource Corner (max 4) | Has Item Corner (max 1) | Has Points | Has Challenge | Has Resource Needed (max 5) | Has Back Resource |
 |-----------|----------------|-----------------------------|-------------------------|------------|---------------|-----------------------------|-------------------| 
@@ -31,118 +31,109 @@ Here is a table that shows what all the types of cards have in common, so that i
 | Starter   | x              | x                           |                         |            |               |                             | x (max 3)         |
 | Objective |                |                             |                         | x          | x             |                             |                   |  
 
-In the cards package (cards, corner, challenges) everything is final except covered and linkedCorner in Corner
+Within the "cards" package, all classes and interfaces are declared final except for `CoveredCorner` and `LinkedCorner` in the `Corner` class.
 
 ### CornerCard
 
-Note that corner is `null` in the array if the corner is hidden.
-The corner that is visible but with no element, is not null in the array and has `EMPTY` in element
+The array representation utilizes `null` to signify a hidden corner. 
+Conversely, a visible corner with no element present is included in the array and marked with `EMPTY`.
 
-- `covered` true if there is another card on top
-- `element` is the element, can be the Resource or the Items in the corner. If it is empty the value is `Element.EMPTY`
-- `cardId` is the id of the card (card is the son of `CornerCard`)
-- `linkedCorner` if there is a card connected to it, it is a reference to that card, `null` if the corner is not connected to any card
-- `getUncoveredCorners` returns all the free corners (back and front)
-- `getUncoveredElement` returns all the elements (`Resource` and `Item`)
+- `covered` : true if there is another card on top, else false
+- `element` : represents the content occupying this corner. It can be a `Resource` or an `Item`. If no element is present, the value is set to `Element.EMPTY`
+- `cardId` : identifies the card this corner belongs to
+- `linkedCorner` : points to another `CornerCard` if the two corners are connected. A `null` value signifies the corner isn't linked to any other card.
+- `getUncoveredCorners` : returns a list of all currently uncovered corners
+- `getUncoveredElement` : returns all the elements (`Resource` and `Item`) of all currently uncovered corners
 
-#### GoldCard
-
-If the `challenge` attribute is `null` the points are gained automatically.
-The `ResourceType` is the type of resource and it is also used to identify the color.
-
-#### ResourceCard
-
-We will later add methods that will return the number of a specific resource/item on the corners of the card, they will all use `getUncoveredElement`. 
-
-#### StarterCard
-
-In the front there are always 4 corners with all the elements, in the back the corners can be hidden or empty and there are `backResources`.
-
-### ObjectiveCard
-
-Note that the `Challenge` is the one you do in order to gain points and `Objective` is the type of card.
-
-### Challenge
-
-This is the one you must do in order to gain points. It is used in `ObjectiveCard` and `GoldCard`. More details later.
-
-#### Structure Challenge
-The structure challenge is only for objective cards.
-
-![structure](./img/structure.png)
-
-#### Resource Challenge
-The resource challenge is only for objective cards. The type of resources needed in the objective cards can vary.
-
-In the objective cards is like this:
-
-![element-obj](./img/element-obj.png)
-
-#### Item Challenge
-The item challenge is only for gold cards.
-
-In the gold cards is like this (the one on the top of the card):
-
-![element-gold](img/element-gold.png)
-
-#### Coverage Challenge
-This challenge is only for gold cards.
-Is the one on the top of the card.
-
-![coverage](img/coverage.png) 
-
-Here is the UML for both the Card and the Challenge:
-
-`StructureChallenge` and `ElementChallenge` are used in `Objective`.  
-`GoldCoverageChallenge` and `ElementChallenge` are used in `GoldCard`.
-
-Note that challenge can be null. `challenge` in the `GoldCard` is the challenge to do in order to do point. 
-Also note that for the `GoldCoverageChallenge` the value of `points` is always 2.
-
-The `configuration` is a 3x3 matrix of elements (resources actually), the element refers to the color of the card and the position is determined by the position in the matrix
-
-About element:
-
-- In `goldCards`, `Element.size() == 1`  
-- In `obectiveCards`: 
-    - example of 3 animal: `element=[animal, animal, animal]`
-    - example of 1 Quill and  2 Inkwell: `element = [Quill, Inkwell, Inkwell]` 
-
-Order from top-left to bottom-left \[0-3\]
+Corners order:
 
 ```
 01  
 32
 ```
 
-The arrays have a null value if the corner do not exist.
+#### GoldCard
+
+If the `challenge` attribute is `null`, points are awarded automatically when the card is played.
+The `ResourceType` defines the type of resource (also serves as the color identifier).
+
+#### ResourceCard
+
+The Resource Card are the only type of card that requires resources to be places.
+
+#### StarterCard
+
+The card's front side consistently features four corners, each containing an `Element`. 
+Conversely, the back side's corners can be hidden (represented by `null`) or empty (marked with `EMPTY`). 
+Additionally, the back side may include `backResources`, to represent resources specific to the back center.
+
+### ObjectiveCard
+
+A `Challenge` is a specific task a player must complete to earn points. 
+Conversely, `Objective` refers to the overall category or type the card belongs to.
+
+### Challenge
+
+The `Challenge` attribute represents a specific task a player must complete to acquire points. 
+It's employed within both `ObjectiveCard` and `GoldCard` classes. 
+Further details regarding Challenge functionality will be provided later.
+
+#### Structure Challenge
+
+The structure challenge is used only for objective cards.
+
+The `configuration` attribute is a 3x3 matrix of `Elements` (specifically Resources).
+The `Element` refers to the `resourceType` of the card and the position is determined by the position in the matrix.
+
+Order from top-left to bottom-left \[0-3\]
+
+![structure](./img/structure.png)
+
+#### Element Challenge
+
+`Objective` cards leverage the `Challenge` attribute to define tasks players must complete to earn points. 
+These tasks exhibit variability in the types of resources required. 
+
+Here's a breakdown of how resources are typically handled within objective cards:
+
+![element-obj](./img/element-obj.png)
+
+![element-gold](img/element-gold.png)
+
+#### Coverage Challenge
+
+This challenge is used exclusively for gold cards.
+The challenge defines a point-awarding task based on the quantity of specified `Elements` present on the player's board.
+
+![coverage](img/coverage.png) 
+
+Note that for the `GoldCoverageChallenge` the value of `points` is always 2.
 
 ## GameState 
 
-The first player in the data structure is the black one, `public Player getBlackPlayer() { return player[0] }`. 
+The first player (index = 0) in the data structure is the Black player, `public Player getBlackPlayer() { return player[0] }`. 
 Note that a **round** is made up by 4 **turns**.
 
-The players order in game is defined by the order of the players in the array `players[]`.
+The players order in game is defined by the order of the players in the `players[]` array.
 
 !["UML of GameState"](img/gamestate.svg)
 
-In the methods of Board class, `pos` means the position of the card (commonly 1 if it's the first, 2 if it's the second one)
+In the methods of the `Board` class, `pos` specify the position of the card (1 if it's the first, 2 if it's the second one)
 
 ## Enumerations
 
-We will use some enumerations to define our data types. 
-We cannot show all the association with the other classes because graphically it would be confused. Just remind that these object are actually associated with the classes that make use of them.
+This section details the enumerated data types we'll employ to represent various game concepts. 
+Due to graphical complexity, we won't illustrate all associations with other classes. 
+However, it's important to remember that these enumerations are indeed connected to the classes that utilize them for data definition.
 
 !["UML of Enums and Config"](img/enums.svg)
 
 # Controller
 
-We started implementing the Controller while we are still studying how to implement the View, so it is still *wip*.
-
-- `drawCard` takes a card from the deck of cards, you can understand from which deck to draw based on the class of the `card` 
-- In `placeCard` you can retrieve the information of a multiple corner placed card by checking in the method, you just need to place it on one single card, even if it will affect another card. The parameter `cornerTableIndex` is the corner of the card on the table to which the player is connecting the card.
-- `getGameState` is the method to get all the method game state information, we can later decide to subdivide it into multiple methods
-- `fliCard` is used to flip the card the player has in hand, then in `placeCard` it will be placed using the side that this method defines. It is implemented changing the value in the hash map
+- `drawCard` : this method retrieves a card from the appropriate deck based on the requesting card's class. For instance, if the requesting card belongs to the `ResourceCard` class, the method would draw from the resource deck.
+- `placeCard` : while a single card placement is required through this method, you can still gain information about any affected multi-corner cards by examining the method's return value. The `cornerTableIndex` parameter specifies the corner on the table where the player intends to connect the card.
+- `getGameState` : this method provides a comprehensive overview of the current game state.
+- `flipCard` : this method flips the card currently held by the player. Subsequently, the placeCard method will utilize the flipped side for placement.
 
 !["UML of Controller"](img/controller.svg)
 
