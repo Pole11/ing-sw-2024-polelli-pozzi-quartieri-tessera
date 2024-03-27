@@ -38,3 +38,5 @@ build/
 ### Mac OS ###
 .DS_Store
 
+deliverables/uml-export.md
+deliverables/gc10-uml.pdf

@@ -73,8 +73,6 @@ public class Board {
         return getSharedResourceCard()[pos-1]; // remember that pos is either 1 or 2
     }
 
-    // !!! da implementare !!!
-    // !!! non so se sono da tenere o no, non so cosa devono fare !!!
     public ResourceCard getFromResourceDeck(){
         if (!resourceDeck.isEmpty()){
             ResourceCard drawnCard = getResourceDeck().getLast();
