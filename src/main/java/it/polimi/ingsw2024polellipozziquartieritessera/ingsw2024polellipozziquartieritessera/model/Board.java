@@ -77,8 +77,8 @@ public class Board {
     // !!! non so se sono da tenere o no, non so cosa devono fare !!!
     public ResourceCard getFromResourceDeck(){
         if (!resourceDeck.isEmpty()){
-            ResourceCard drawnCard = getResourceDeck().getFirst();
-            resourceDeck.removeFirst();
+            ResourceCard drawnCard = getResourceDeck().getLast();
+            resourceDeck.removeLast();
             return drawnCard;
         }
         else{
@@ -87,15 +87,15 @@ public class Board {
     }
     public GoldCard getFromGoldDeck(){
         if (!goldDeck.isEmpty()){
-            GoldCard drawnCard = getGoldDeck().getFirst();
-            goldDeck.removeFirst();
+            GoldCard drawnCard = getGoldDeck().getLast();
+            goldDeck.removeLast();
             return drawnCard;
         }
         else{
             return null;
         }
     }
-    void fillSharedCardsGap(){
+    public void fillSharedCardsGap(){
         // verify if the shared cards have some gaps
         for (int index = 0; index < Config.N_SHARED_RESOURCES; index++){
             if (sharedResourceCards[index] == null){
