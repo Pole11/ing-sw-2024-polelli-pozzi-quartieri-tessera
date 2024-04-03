@@ -24,7 +24,7 @@ number-sections: true
 geometry:
 - top=20mm
 - left=20mm
----\n\n\\newpage'''
+---\n\n\\newpage\n'''
 
 def translate():
     # Get the content from in_file_path

@@ -1,19 +1,3 @@
----
-title: "GC10 UML"
-sub-title: "Peer Review Document"
-toc: true
-toc-title: Index
-author:
-- Riccardo Polelli
-- Filippo Pozzi
-- Federico Quartieri
-- Giacomo Tessera
-number-sections: true
-geometry:
-- top=20mm
-- left=20mm
----
-
 # Model 
 
 ## Card
@@ -45,7 +29,72 @@ Conversely, a visible corner with no element present is included in the array an
 - `getUncoveredCorners` : returns a list of all currently uncovered corners
 - `getUncoveredElement` : returns all the elements (`Resource` and `Item`) of all currently uncovered corners
 
-Corners order:
+
+#### GoldCard
+
+If the `challenge` attribute is `null` the points are gained automatically.
+The `ResourceType` is the type of resource and it is also used to identify the color.
+
+#### ResourceCard
+
+We will later add methods that will return the number of a specific resource/item on the corners of the card, they will all use `getUncoveredElement`. 
+
+#### StarterCard
+
+In the front there are always 4 corners with all the elements, in the back the corners can be hidden or empty and there are `backResources`.
+
+### ObjectiveCard
+
+Note that the `Challenge` is the one you do in order to gain points and `Objective` is the type of card.
+
+### Challenge
+
+This is the one you must do in order to gain points. It is used in `ObjectiveCard` and `GoldCard`. More details later.
+
+#### Structure Challenge
+The structure challenge is only for objective cards.
+
+![Example of Structure Challenge](./img/structure.png)
+
+#### Resource Challenge
+The resource challenge is only for objective cards. The type of resources needed in the objective cards can vary.
+
+In the objective cards is like this:
+
+![Example of Resource Challenge](./img/element-obj.png)
+
+#### Item Challenge
+The item challenge is only for gold cards.
+
+In the gold cards is like this (the one on the top of the card):
+
+![Example of Item Challenge](img/element-gold.png)
+
+#### Coverage Challenge
+This challenge is only for gold cards.
+Is the one on the top of the card.
+
+![Example of Coverage Challenge](img/coverage.png) 
+
+Here is the UML for both the Card and the Challenge:
+
+`StructureChallenge` and `ElementChallenge` are used in `Objective`.  
+`GoldCoverageChallenge` and `ElementChallenge` are used in `GoldCard`.
+
+Note that challenge can be null. `challenge` in the `GoldCard` is the challenge to do in order to do point. 
+Also note that for the `GoldCoverageChallenge` the value of `points` is always 2.
+
+The `configuration` is a 3x3 matrix of elements (resources actually), the element refers to the color of the card and the position is determined by the position in the matrix
+
+About element:
+
+- In `goldCards`, `Element.size() == 1`  
+- In `obectiveCards`: 
+    - example of 3 animal: `element=[animal, animal, animal]`
+    - example of 1 Quill and  2 Inkwell: `element = [Quill, Inkwell, Inkwell]` 
+
+Order from top-left to bottom-left \[0-3\]
+>>>>>>> Stashed changes
 
 ```
 01  
