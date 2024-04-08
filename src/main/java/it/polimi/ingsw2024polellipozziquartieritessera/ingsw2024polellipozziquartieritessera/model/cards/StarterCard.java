@@ -21,19 +21,19 @@ public class StarterCard extends CornerCard {
 
     // METHODS
     // returns the resource visible on the side requested
-    public ArrayList<Element> getUncoveredElements(int isFront){
+    public ArrayList<Element> getUncoveredElements(Side side){
         // resource array initialization
         ArrayList<Element> uncoveredResources = new ArrayList<>();
 
         // set corners resources
-        for (Corner corner : this.getUncoveredCorners(isFront)){
+        for (Corner corner : this.getUncoveredCorners(side)){
             if(corner.getElement() != null){
                 uncoveredResources.add(corner.getElement());
             }
         }
 
         // add center resources if on front side
-        if (isFront == 1){
+        if (side == Side.FRONT){
             uncoveredResources.addAll(centerResource);
         }
 

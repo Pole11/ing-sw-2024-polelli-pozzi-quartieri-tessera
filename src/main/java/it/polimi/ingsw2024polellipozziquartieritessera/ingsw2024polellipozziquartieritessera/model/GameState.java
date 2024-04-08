@@ -130,10 +130,19 @@ public class GameState {
     public Card getCard(int id){
         return this.getCardsMap().get(id);
     }
-
-    // !!! to implement !!!
-    public boolean playersConnected(){
-        return true;
+    public CornerCard getCornerCard(int id){
+        Card card = this.getCardsMap().get(id);
+        if (card instanceof CornerCard) {
+            return (CornerCard) card;
+        }
+        return null;
+    }
+    public ObjectiveCard getObjectiveCard(int id){
+        Card card = this.getCardsMap().get(id);
+        if (card instanceof ObjectiveCard) {
+            return (ObjectiveCard) card;
+        }
+        return null;
     }
 
     // !!! to implement !!!

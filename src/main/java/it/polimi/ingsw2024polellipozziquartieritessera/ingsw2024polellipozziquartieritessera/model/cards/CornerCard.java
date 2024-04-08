@@ -41,7 +41,7 @@ public abstract class CornerCard extends Card {
     // return the linked cards to this one
     public ArrayList<Integer> getLinkedCards() {
         // card array initialization
-        ArrayList<Integer> linkedCards = new ArrayList<Integer>();
+        ArrayList<Integer> linkedCards = new ArrayList<>();
 
         // front corners verification
         for (Corner corner : this.getCorners()){
@@ -54,12 +54,12 @@ public abstract class CornerCard extends Card {
     }
 
     // return all uncovered corners of the card
-    public ArrayList<Corner> getUncoveredCorners(int isFront) {
+    public ArrayList<Corner> getUncoveredCorners(Side side) {
         // corner array initialization
         ArrayList<Corner> uncoveredCorners = new ArrayList<>();
 
         // verification for each side
-        if (isFront == 0){
+        if (side == Side.BACK){
             for (Corner corner : backCorners){
                 if (corner != null && !corner.getCovered()){
                     uncoveredCorners.add(corner);
@@ -77,6 +77,7 @@ public abstract class CornerCard extends Card {
         return uncoveredCorners;
     }
 
+
     // this method will be ovverrided by all the corner cards subclasses
-    public abstract ArrayList<Element> getUncoveredElements(int isFront);
+    public abstract ArrayList<Element> getUncoveredElements(Side side);
 }

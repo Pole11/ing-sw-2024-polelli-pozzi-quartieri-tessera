@@ -57,11 +57,12 @@ public class Main {
     private static GameState populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
         HashMap cardsMap = createCardsMap();
         Player[] players = new Player[Config.MAX_PLAYERS];
+        GameState gs = new GameState(new HashMap<>(), players);
         //creazione momentanea dei player
-        players[0] = new Player("paolo", Color.RED);
-        players[1] = new Player("piergiorgio", Color.BLUE);
-        players[2] = new Player("fungiforme", Color.YELLOW);
-        players[3] = new Player("fulmicotone", Color.GREEN);
+        players[0] = new Player(gs,"paolo", Color.RED);
+        players[1] = new Player(gs,"piergiorgio", Color.BLUE);
+        players[2] = new Player(gs,"fungiforme", Color.YELLOW);
+        players[3] = new Player(gs,"fulmicotone", Color.GREEN);
         return new GameState(cardsMap, players);
     }
 

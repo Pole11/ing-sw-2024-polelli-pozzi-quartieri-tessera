@@ -17,7 +17,7 @@ public class Controller {
         Board board = gameState.getMainBoard();
         Player currentPlayer = gameState.getCurrentPlayer();
 
-        if (currentPlayer.getHand().values().stream().mapToInt(inHand -> (inHand ? 1 : 0)).sum() >= Config.MAX_HAND_CARDS - 1) {
+        if (currentPlayer.getHand().values().size() >= Config.MAX_HAND_CARDS - 1) {
             throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
         }
 
