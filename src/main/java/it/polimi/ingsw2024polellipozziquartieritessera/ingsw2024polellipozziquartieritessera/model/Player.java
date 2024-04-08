@@ -77,7 +77,8 @@ public class Player {
         if (cardChallenge instanceof StructureChallenge) {
             timesWon = getTimesWonStructure();
         } else if (cardChallenge instanceof ElementChallenge) {
-            timesWon = getTimesWonElement();
+            ArrayList<Element> elements = ((ElementChallenge) cardChallenge).getElements();
+            timesWon = getTimesWonElement(elements);
         }
 
         return Math.max(-1, timesWon * cardPoints);
