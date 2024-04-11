@@ -193,4 +193,21 @@ public class GameState {
         // fill the gap
         board.fillSharedCardsGap();
     }
+
+    public void setStarters() {
+        // for every player set his starters (you have access to every player from the array players)
+    }
+    public void setSecretsObjectiveChoice() {
+        // for every player set two objectives cards to choose from (maybe make the attribute an array)
+    }
+    public void setSharedGoldCards() {
+        // it's like fillSharedGaps, look at the draw from shared methods to take inspiration
+    }
+    public void setSharedResources() {
+
+    }
+    public void setHands() {
+        // popolate hands for every player
+    }
+
 }

@@ -21,9 +21,9 @@ public class Player {
     HashMap<Integer, Side> board;
     HashMap<Integer, Side> hand;
 
-    public Player(GameState gameState, String nickname, Color color){
+    public Player(String nickname, Color color){
         this.points = 0;
-        this.gameState = gameState;
+        this.gameState = null;
         this.nickname = nickname;
         this.objectiveCard = null;
         this.starterCard = null;
@@ -31,8 +31,9 @@ public class Player {
         this.board = new HashMap<Integer, Side>();
         this.hand = new HashMap<Integer, Side>();
     }
-    //GETTER
-
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
     public int getPoints() {
         return points;
     }
@@ -100,7 +101,7 @@ public class Player {
     };
 
     private int getTimesWonCoverage(GoldCard goldCard) {
-        return goldCard.getUncoveredCorners(Side.FRONT).stream().map(Corner::getLinkedCorner).mapToInt((Corner c) -> c == null ? 1 : 0).sum();
+        return goldCard.getUncoveredCorners(board.get(goldCard.getId())).stream().map(Corner::getLinkedCorner).mapToInt((Corner c) -> c == null ? 1 : 0).sum();
     }
 
     private int getTimesWonElement(ArrayList<Element> elements) {

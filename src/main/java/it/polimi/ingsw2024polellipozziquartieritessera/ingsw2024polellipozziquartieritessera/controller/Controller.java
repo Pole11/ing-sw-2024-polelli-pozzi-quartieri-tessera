@@ -6,6 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 
 public class Controller {
+    // probably we need an attribute for the game state
 
     // a player can draw a card from the
     // - 2 shared resources card
@@ -14,6 +15,7 @@ public class Controller {
     // - gold deck
     // The side of the shared card is 1 by specific
     void drawCard(GameState gameState, DrawType drawType) throws InvalidHandException {
+        // todo: change game phase and turn phase
         Board board = gameState.getMainBoard();
         Player currentPlayer = gameState.getCurrentPlayer();
 
@@ -44,7 +46,21 @@ public class Controller {
         }
     }
 
-    public void placeCard(GameState gameState, Player player, int placingCardId, int tableCardId, int configuration) {}
+    public void setSecretsObjective(GameState gameState) { // choose from one of the two objective shared cards
+
+    }
+
+    public void startGame(GameState gameState) {
+        gameState.setStarters(); // set the starters cards for every player
+        gameState.setSecretsObjectiveChoice(); // give every player two objective cards to choose from
+        gameState.setSharedGoldCards();
+        gameState.setSharedResources();
+        gameState.setHands();
+    }
+
+    public void placeCard(GameState gameState, Player player, int placingCardId, int tableCardId, int configuration) {
+        // todo: change game phase and turn phase
+    }
 
     public void flipCard(Player player, int cardId){}
 
