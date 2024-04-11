@@ -130,10 +130,19 @@ public class GameState {
     public Card getCard(int id){
         return this.getCardsMap().get(id);
     }
-
-    // !!! to implement !!!
-    public boolean playersConnected(){
-        return true;
+    public CornerCard getCornerCard(int id){
+        Card card = this.getCardsMap().get(id);
+        if (card instanceof CornerCard) {
+            return (CornerCard) card;
+        }
+        return null;
+    }
+    public ObjectiveCard getObjectiveCard(int id){
+        Card card = this.getCardsMap().get(id);
+        if (card instanceof ObjectiveCard) {
+            return (ObjectiveCard) card;
+        }
+        return null;
     }
 
     // !!! to implement !!!
@@ -143,5 +152,45 @@ public class GameState {
     // !!! optional !!!
     public int getTurnTime(){
         return 0;
+    }
+
+
+    public void drawGoldFromDeck(Board board, Player currentPlayer) {
+        /*GoldCard newGoldCard = board.getGoldDeck().getLast();
+        board.getGoldDeck().removeLast();
+        currentPlayer.getHand().put(newGoldCard.getId(), true);*/
+
+        // get new card
+        GoldCard newGoldCard = board.getFromGoldDeck();
+        // add card to player hand
+        currentPlayer.getHand().put(newGoldCard.getId(), Side.FRONT); // the front side is the default
+    }
+
+    public void drawGoldFromShared(Board board, Player currentPlayer, int index) {
+        /*GoldCard[] goldCards = board.getSharedGoldCards();
+        GoldCard newGoldCard = goldCards[index];
+        currentPlayer.getHand().put(newGoldCard.getId(), true);
+        goldCards[index] = board.getGoldDeck().getLast();*/
+
+        // get new gold card
+        GoldCard newGoldCard = board.getSharedGoldCard(index);
+        currentPlayer.getHand().put(newGoldCard.getId(), Side.FRONT);
+        // fill the gap
+        board.fillSharedCardsGap();
+    }
+
+    public void drawResourceFromDeck(Board board, Player currentPlayer) {
+        // get new card
+        ResourceCard newResourceCard = board.getFromResourceDeck();
+        // had card to player hand
+        currentPlayer.getHand().put(newResourceCard.getId(), Side.FRONT);
+    }
+
+    public void drawResourceFromShared(Board board, Player currentPlayer, int index) {
+        // get new resource card
+        ResourceCard newResourceCard = board.getSharedResourceCard(index);
+        currentPlayer.getHand().put(newResourceCard.getId(), Side.FRONT);
+        // fill the gap
+        board.fillSharedCardsGap();
     }
 }

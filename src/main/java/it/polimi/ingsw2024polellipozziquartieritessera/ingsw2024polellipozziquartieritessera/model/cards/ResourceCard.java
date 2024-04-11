@@ -26,18 +26,18 @@ public class ResourceCard extends CornerCard {
 
     // METHODS
     // returns the resource visible on the side requested
-    public ArrayList<Element> getUncoveredElements(int isFront){
+    public ArrayList<Element> getUncoveredElements(Side side){
         // resource array initialization
         ArrayList<Element> uncoveredElements = new ArrayList<>();
 
         // set center resource if the card is on the back side
-        if (isFront == 0){
+        if (side == Side.BACK){
             uncoveredElements.add(this.resourceType);
         }
 
         // set all the corners resources if the card is on the front side
         else{
-            for (Corner corner : this.getUncoveredCorners(isFront)){
+            for (Corner corner : this.getUncoveredCorners(side)){
                 if(corner.getElement() != Element.EMPTY){
                     uncoveredElements.add(corner.getElement());
                 }

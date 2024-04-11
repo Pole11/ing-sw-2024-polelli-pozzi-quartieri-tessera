@@ -9,6 +9,11 @@ public class ElementChallenge extends Challenge {
     private final ArrayList<Element> elements;
 
     public ElementChallenge(ArrayList<Element> elements){
+        // should we put a copy in here???
         this.elements = elements;
+    }
+
+    public ArrayList<Element> getElements() {
+        return this.elements;
     }
 }

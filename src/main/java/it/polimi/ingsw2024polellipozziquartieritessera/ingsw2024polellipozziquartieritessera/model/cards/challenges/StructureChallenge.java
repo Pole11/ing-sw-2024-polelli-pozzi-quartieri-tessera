@@ -3,6 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 
 public class StructureChallenge extends Challenge{
     private final Element[][] configuration;
@@ -20,4 +21,5 @@ public class StructureChallenge extends Challenge{
             throw new WrongStructureConfigurationSizeException("The number of cols in the matrix is too big");
         }
     }
+
 }
