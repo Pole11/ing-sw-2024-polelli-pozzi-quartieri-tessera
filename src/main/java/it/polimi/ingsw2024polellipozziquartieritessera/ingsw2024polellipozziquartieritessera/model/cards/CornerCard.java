@@ -38,6 +38,15 @@ public abstract class CornerCard extends Card {
         return corners;
     }
 
+    public Corner[] getCorners(Side side) {
+        if (side == Side.FRONT) {
+            return frontCorners;
+        }
+        else{
+            return backCorners;
+        }
+    }
+
     // return the linked cards to this one
     public ArrayList<Integer> getLinkedCards() {
         // card array initialization
@@ -46,10 +55,9 @@ public abstract class CornerCard extends Card {
         // front corners verification
         for (Corner corner : this.getCorners()){
             if (corner.getLinkedCorner() != null){
-                //linkedCards.add(corner.getCard()); bisognerà usare cardsMap del gamestate
+                linkedCards.add(corner.getCard());
             }
         }
-
         return linkedCards;
     }
 
