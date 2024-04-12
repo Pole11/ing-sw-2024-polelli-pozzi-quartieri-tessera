@@ -85,6 +85,9 @@ public abstract class CornerCard extends Card {
         return uncoveredCorners;
     }
 
+    // returns the element of the card (null if StarterCard)
+    public abstract Element getResourceType();
+
 
     // this method will be ovverrided by all the corner cards subclasses
     public abstract ArrayList<Element> getUncoveredElements(Side side);

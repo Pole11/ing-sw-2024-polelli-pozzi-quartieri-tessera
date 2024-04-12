@@ -6,6 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PlayerTest {
@@ -20,7 +21,7 @@ public class PlayerTest {
     @Test
     void getTimesWonCoverageTest() {
         Main main = new Main();
-        Player[] players = main.game.getPlayers();
+        ArrayList<Player> players = Main.gameState.getPlayers();
 
     }
 }

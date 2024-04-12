@@ -20,6 +20,11 @@ public class StarterCard extends CornerCard {
     }
 
     // METHODS
+    // return null (it needs to be implemented because it's an abstract method in CornerCard)
+    public Element getResourceType() {
+        return null;
+    }
+
     // returns the resource visible on the side requested
     public ArrayList<Element> getUncoveredElements(Side side){
         // resource array initialization

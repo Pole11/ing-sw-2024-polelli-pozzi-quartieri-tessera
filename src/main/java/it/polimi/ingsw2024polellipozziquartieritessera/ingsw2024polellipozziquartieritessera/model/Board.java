@@ -114,4 +114,8 @@ public class Board {
             }
         }
     }
+
+    public void shuffleCards() {
+
+    }
 }

@@ -8,6 +8,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 public class StructureChallenge extends Challenge{
     private final Element[][] configuration;
 
+    public Element[][] getConfiguration() {return configuration;}
+
     public StructureChallenge(Element[][] configuration) throws WrongStructureConfigurationSizeException {
         this.configuration = configuration;
 

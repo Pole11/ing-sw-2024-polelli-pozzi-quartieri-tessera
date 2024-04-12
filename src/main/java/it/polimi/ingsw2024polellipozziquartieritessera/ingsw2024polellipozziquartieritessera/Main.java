@@ -20,14 +20,13 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 
 public class Main {
-    public static GameState game;
-
+    public static GameState gameState=null;
     public static void main(String argv[]) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
         boolean store = existStore(); //FA persistance
         if (store){
             // takes data from store
         } else {
-            game = populate();
+            gameState = populate();
         }
     }
 
@@ -56,21 +55,14 @@ public class Main {
     }
 
     private static GameState populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
-        HashMap cardsMap = createCardsMap();
-        Player[] players = new Player[Config.MAX_PLAYERS];
-        //creazione momentanea dei player
-        players[0] = new Player("paolo", Color.RED);
-        players[1] = new Player("piergiorgio", Color.BLUE);
-        players[2] = new Player("fungiforme", Color.YELLOW);
-        players[3] = new Player("fulmicotone", Color.GREEN);
-
-        GameState gs = new GameState(cardsMap, players);
-
-        for (int i = 0; i < Config.MAX_PLAYERS; i++) {
-            players[i].setGameState(gs);
-        }
-
-        return gs;
+        HashMap cardsMap = createCardsMap(); //allocate and initialize all cards
+        ArrayList<Player> players = new ArrayList<Player>(); //allocate players
+        //creazione momentanea dei player, li prenderà dal controller
+        players.set(0, new Player("paolo", Color.RED));
+        players.set(1, new Player("piergiorgio", Color.BLUE));
+        players.set(2, new Player("fungiforme", Color.GREEN));
+        players.set(3, new Player("fulmicotone", Color.YELLOW));
+        return new GameState(cardsMap, players);
     }
 
     private static HashMap createCardsMap() throws IOException, WrongStructureConfigurationSizeException {
