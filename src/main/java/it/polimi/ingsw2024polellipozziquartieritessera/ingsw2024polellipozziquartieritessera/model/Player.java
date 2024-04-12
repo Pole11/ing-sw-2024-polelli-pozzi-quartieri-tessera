@@ -50,6 +50,18 @@ public class Player {
         return starterCard;
     }
 
+    public void setObjectiveCard(ObjectiveCard objectiveCard) {
+        this.objectiveCard = objectiveCard;
+    }
+
+    public void setStarterCard(StarterCard starterCard) {
+        this.starterCard = starterCard;
+    }
+
+    public void setHand(HashMap<Integer, Side> hand) {
+        this.hand = hand;
+    }
+
     public Color getColor() {
         return color;
     }

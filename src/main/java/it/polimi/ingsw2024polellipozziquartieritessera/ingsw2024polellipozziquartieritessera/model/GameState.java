@@ -1,5 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
@@ -196,6 +197,10 @@ public class GameState {
 
     public void setStarters() {
         // for every player set his starters (you have access to every player from the array players)
+        Player[] players = getPlayers();
+        for (int i = 0; i < getPlayers().length; i++) {
+            //players[i].setStarterCard();
+        }
     }
     public void setSecretsObjectiveChoice() {
         // for every player set two objectives cards to choose from (maybe make the attribute an array)

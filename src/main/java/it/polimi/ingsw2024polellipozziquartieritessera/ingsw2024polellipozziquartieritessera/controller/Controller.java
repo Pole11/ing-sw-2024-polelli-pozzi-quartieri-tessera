@@ -62,7 +62,7 @@ public class Controller {
         // todo: change game phase and turn phase
     }
 
-    public void flipCard(Player player, int cardId){}
+    public void flipCard(GameState gameState, Player player, int cardId){}
 
     public void openChat(){}
 
