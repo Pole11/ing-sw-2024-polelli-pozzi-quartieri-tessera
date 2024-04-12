@@ -22,6 +22,7 @@ public class Player {
     HashMap<Element, Integer> elements;
     HashMap<Integer, Side> board;
     HashMap<Integer, Side> hand;
+    ArrayList<ArrayList<Integer>> playerBoard;
 
     public Player(GameState gameState, String nickname, Color color){
         this.points = 0;
@@ -33,8 +34,8 @@ public class Player {
         this.board = new HashMap<Integer, Side>();
         this.hand = new HashMap<Integer, Side>();
     }
-    //GETTER
 
+    //GETTER
     public int getPoints() {
         return points;
     }
@@ -79,67 +80,73 @@ public class Player {
         return this.getHand().get(cardId);
     }
 
-    public int[][] getPlayerStructure(StarterCard starterCard) {
-
-        // Track all visited cards in the algorithm
-        ArrayList<CornerCard> visited = new ArrayList<>();
-
-        // Initial matrix with center card at (0, 0)
-        int size = 1;
-        int[][] matrix = new int[size][size];
-        matrix[0][0] = starterCard.getId();
-
-        return exploreConnectedCards(visited, starterCard, 0, 0, matrix);
+    public ArrayList<ArrayList<Integer>> getPlayerBoard() {
+        return playerBoard;
     }
 
-    private int[][] exploreConnectedCards(ArrayList<CornerCard> visited, CornerCard card, int row, int col, int[][] matrix) {
-        if (visited.contains(card)) {
-            return matrix;
-        }
-        visited.add(card);
-        matrix[row][col] = card.getId();
-        Side side = this.getBoardSide(card.getId());
-        Corner[] corners = card.getCorners(side);
+    // METHODS
 
-        // Explore connections in each direction
-        for (int i = 0; i < Config.N_CORNERS; i++) {
-            int newRow = row;
-            int newCol = col;
+    public void initializeBoard(){
+        // Iitialization of player board as a 1x1 with the StarterCard in the center
+        playerBoard = new ArrayList<>();
+        ArrayList<Integer> row = new ArrayList<>();
+        row.add(starterCard.getId());
+        playerBoard.add(row);
+    }
 
-            if (corners[i]!=null){
-                // up direction (up-left)
-                if (i==0 && corners[i].getLinkedCorner()!=null) {
-                    newRow--;
-                }
-                // right direction (up-right)
-                else if (i==1 && corners[i].getLinkedCorner()!=null) {
-                    newCol++;
-                }
-                // down direction (down-right)
-                else if (i==2 && corners[i].getLinkedCorner()!=null) {
-                    newRow++;
-                }
-                // left direction (down-left)
-                else if (i==3 && corners[i].getLinkedCorner()!=null) {
-                    newCol--;;
+    private void updateBoard(int newCard, int existingCard, int cornerPos){
+        int rowIndex = -1;
+        int colIndex = -1;
+
+        // Find the coordinates of the existing card on the board
+        for (int i = 0; i < playerBoard.size(); i++) {
+            ArrayList<Integer> row = playerBoard.get(i);
+            for (int j = 0; j < row.size(); j++) {
+                if (row.get(j) == existingCard) {
+                    rowIndex = i;
+                    colIndex = j;
                 }
             }
-
-            // Expand the matrix if needed to accommodate connections
-            if (newRow < 0 || newRow >= matrix.length || newCol < 0 || newCol >= matrix[0].length) {
-                int newSize = Math.max(matrix.length, Math.max(newRow + 1, row + 1));
-                newSize = Math.max(newSize, Math.max(newCol + 1, col + 1));
-                int[][] newMatrix = new int[newSize][newSize];
-                for (int j = 0; j < matrix.length; j++) {
-                    System.arraycopy(matrix[j], 0, newMatrix[j], 0, matrix[j].length);
-                }
-                matrix = newMatrix;
-            }
-
-            exploreConnectedCards(visited, gameState.getCornerCard(corners[i].getLinkedCorner().getCard()), newRow, newCol, matrix);
         }
 
-        return matrix;
+        // Define the position of the new card
+        switch(cornerPos){
+            case CornerPos.UPLEFT:
+                rowIndex++;
+            case CornerPos.UPRIGHT:
+                colIndex++;
+            case CornerPos.DOWNRIGHT:
+                rowIndex--;
+            case CornerPos.DOWNLEFT:
+                colIndex--;
+        }
+
+        // Check if the new position is outside the bounds of the current matrix
+        if (rowIndex < 0 || rowIndex >= playerBoard.size() || colIndex < 0 || colIndex >= playerBoard.get(rowIndex).size()) {
+            // Expand the matrix if necessary
+            expandBoard(rowIndex, colIndex);
+        }
+
+        // Place the new card at the specified position
+        playerBoard.get(rowIndex).set(colIndex, newCard);
+    }
+
+    private void expandBoard(int rowIndex, int colIndex){
+        // Expand the matrix to include the new position (remember that this supports only one update: row++/-- or col++/--)
+        // Expand rows if needed
+        if (rowIndex < 0) {
+            playerBoard.add(0, new ArrayList<>());
+        } else if (rowIndex >= playerBoard.size()) {
+            playerBoard.add(new ArrayList<>());
+        }
+        // Expand columns if needed
+        for (ArrayList<Integer> row : playerBoard) {
+            if (colIndex < 0) {
+                row.add(0, -1); // Adding -1 if there is no card
+            } else if (colIndex >= row.size()) {
+                row.add(-1); // Placeholder for empty cell
+            }
+        }
     }
 
     public int getCardPoints(ObjectiveCard objCard) {
