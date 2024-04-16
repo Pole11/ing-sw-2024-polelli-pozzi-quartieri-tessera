@@ -4,49 +4,80 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 
 import java.util.*;
 import java.util.stream.*;
 
 public class Player {
-    int points;
-    String nickname;
-    ObjectiveCard objectiveCard; // it is the secret objective
-    ObjectiveCard[] objectiveCardOptions; // it is the  array of the choice for secret objective
-    StarterCard starterCard; // it is the most important card because it is used to create all the composition of the cards
-    Color color;
-    HashMap<Element, Integer> elements;
-    ArrayList<ArrayList<Integer>> playerBoard;
-    HashMap<Integer, Side> placedCardsMap;
-    HashMap<Integer, Side> handCardsMap;
+    private final String nickname;
+    private Color color;
+    private final ArrayList<ArrayList<Integer>> playerBoard;
+    private final HashMap<Integer, Side> placedCardsMap;
+    private final HashMap<Integer, Side> handCardsMap;
+    private final HashMap<Integer, CornerCard> cornerCardsMap;
+
+    private int points;
+    private int objectivesWon;
+    private StarterCard starterCard; // it is the most important card because it is used to create all the composition of the cards
+    private ObjectiveCard objectiveCard; // it is the secret objective
+
+    //per ora objectiveCardOptions serve, poi secondo me si potrà rimuovere
+    private ObjectiveCard[] objectiveCardOptions; // it is the  array of the choice for secret objective
 
     public Player(String nickname, Color color){
         this.points = 0;
         this.nickname = nickname;
+        this.color = color;
+
         this.objectiveCard = null;
         this.starterCard = null;
-        this.color = color;
+        this.playerBoard = new ArrayList<>();
         this.placedCardsMap = new HashMap<Integer, Side>();
         this.handCardsMap = new HashMap<Integer, Side>();
+        this.cornerCardsMap = new HashMap<Integer, CornerCard>();
+        this.objectivesWon = 0;
     }
 
     //GETTER
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public Color getColor() {
+        return color;
+    }
 
     public int getPoints() {
         return points;
     }
 
-    public String getNickname() {
-        return nickname;
+    public StarterCard getStarterCard() {
+        return starterCard;
     }
 
     public ObjectiveCard getObjectiveCard() {
         return objectiveCard;
     }
 
-    public StarterCard getStarterCard() {
-        return starterCard;
+    public HashMap<Integer, Side> getPlacedCardsMap() {
+        return placedCardsMap;
     }
+
+    public HashMap<Integer, Side> getHandCardsMap() {
+        return handCardsMap;
+    }
+
+    public ArrayList<ArrayList<Integer>> getPlayerBoard() {
+        return playerBoard;
+    }
+
+    public int getObjectivesWon(){
+        return objectivesWon;
+    }
+
+    //SETTER
 
     public void setObjectiveCard(ObjectiveCard objectiveCard) {
         this.objectiveCard = objectiveCard;
@@ -54,77 +85,63 @@ public class Player {
 
     public void setStarterCard(StarterCard starterCard) {
         this.starterCard = starterCard;
-    }
-
-    public void setHand(HashMap<Integer, Side> hand) {
-        this.handCardsMap = hand;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public HashMap<Element, Integer> getResources() {
-        return elements;
-    }
-
-    public HashMap<Integer, Side> getBoard() {
-        return placedCardsMap;
-    }
-
-    public HashMap<Integer, Side> getHand() {
-        return handCardsMap;
-    }
-
-    public Side getBoardSide(int cardId) {
-        return this.getBoard().get(cardId);
-    }
-
-    public Side getHandSide(int cardId) {
-        return this.getHand().get(cardId);
-    }
-
-    public ArrayList<ArrayList<Integer>> getPlayerBoard() {
-        return playerBoard;
+        this.getPlacedCardsMap().put(this.getStarterCard().getId(), Side.FRONT); // also set the default side to FRONT
+        this.cornerCardsMap.put(starterCard.getId(), starterCard);
     }
 
     public void setSecretObjectiveCardOptions(ObjectiveCard[] objectiveCards) {
         this.objectiveCardOptions = objectiveCards;
     }
 
+    public void setColor(Color color){
+        this.color = color;
+    }
+
     public ObjectiveCard[] getObjectiveCardOptions() {
         return this.objectiveCardOptions;
     }
 
+    public void setPoints(int points) {
+        this.points = points;
+    }
 
     // METHODS
 
+    public void addPoints(int points) {
+        this.points += points;
+    }
+
     public ArrayList<Element> getAllElements() {
         ArrayList<Element> elements = new ArrayList<>();
-        getBoard().forEach((id, side) -> elements.addAll(Main.gameState.getCornerCard(id).getUncoveredElements(side)));
+        getPlacedCardsMap().forEach((id, side) -> elements.addAll(this.cornerCardsMap.get(id).getUncoveredElements(side)));
 
         return elements;
     }
 
-// -------------------Place Cards Map Managing-----------------
-
-    public void updateCardsMaps(int placingCardId, Side side){
-
+    public Side getBoardSide(int cardId) {
+        return this.getPlacedCardsMap().get(cardId);
     }
 
+    public Side getHandSide(int cardId) {
+        return this.getHandCardsMap().get(cardId);
+    }
 
+// -------------------Place Cards Map Managing-----------------
 
+    public void updateCardsMaps(int placingCardId, CornerCard placingCard, Side side){
+        placedCardsMap.put(placingCardId, side);
+        handCardsMap.remove(placingCardId);
+        cornerCardsMap.put(placingCardId, placingCard);
+    }
 
 // -------------------Board Matrix Managing-----------------------
 
     public void initializeBoard(){
-        // Iitialization of player board as a 1x1 with the StarterCard in the center
-        playerBoard = new ArrayList<>();
+        // Initialization of player board as a 1x1 with the StarterCard in the center
         ArrayList<Integer> row = new ArrayList<>();
         row.add(getStarterCard().getId());
         playerBoard.add(row);
     }
-
 
     public void updateBoard(int newCard, int existingCard, CornerPos existingCornerPos){
         int rowIndex = -1;
@@ -181,13 +198,9 @@ public class Player {
         }
     }
 
-
-
-
 // -----------------------Challenge Managing---------------------------------
 
-
-    public int getCardPoints(ObjectiveCard objCard) {
+    public int getCardPoints(ObjectiveCard objCard) throws WrongInstanceTypeException {
         Challenge cardChallenge = objCard.getChallenge();
         int cardPoints = objCard.getPoints();
         int timesWon = -1;
@@ -197,12 +210,18 @@ public class Player {
         } else if (cardChallenge instanceof ElementChallenge) {
             ArrayList<Element> elements = ((ElementChallenge) cardChallenge).getElements();
             timesWon = getTimesWonElement(elements);
+        } else {
+            throw new WrongInstanceTypeException("cardChallenge is neither a structure or a element challenge");
+        }
+        // update if challenge is completed at least one time
+        if (timesWon>0){
+            objectivesWon++;
         }
 
         return Math.max(-1, timesWon * cardPoints);
     };
 
-    public int getCardPoints(GoldCard goldCard) {
+    public int getCardPoints(GoldCard goldCard) throws WrongInstanceTypeException {
         Challenge cardChallenge = goldCard.getChallenge();
         int cardPoints = goldCard.getPoints();
         int timesWon = -1;
@@ -212,6 +231,8 @@ public class Player {
             timesWon = getTimesWonElement(elements);
         } else if (cardChallenge instanceof CoverageChallenge) {
             timesWon = getTimesWonCoverage(goldCard);
+        } else {
+            throw new WrongInstanceTypeException("cardChallenge is neither a structure or a element challenge");
         }
 
         return Math.max(-1, timesWon * cardPoints); // if timesWon is not changed, then return -1
@@ -233,30 +254,24 @@ public class Player {
                         e -> allElements.stream().filter(ae -> ae.equals(e)).count()  // Value mapper (count occurrences)
                 ));
         return counts.values().stream().reduce((a, b) -> a < b ? a : b).orElseThrow().intValue();
-
     }
-
-
 
     private int getTimesWonStructure(StructureChallenge challenge) {
         int rows = getPlayerBoard().size();
-        int cols = getPlayerBoard().get(0).size();
-        
+        int cols = getPlayerBoard().getFirst().size();
+
         // instantiate the element board and fill it with the cards elements on playerBoard
         Element[][] elementBoard = new Element[rows][cols];
         for (int i=0; i<rows; i++){
             for (int j=0; j<cols; j++){
                 int cardId = getPlayerBoard().get(i).get(j);
                 if (cardId != -1){
-                    elementBoard[i][j] = Main.gameState.getCornerCard(cardId).getResourceType();
+                    elementBoard[i][j] = this.cornerCardsMap.get(cardId).getResourceType();
                 } else{
                     elementBoard[i][j] = Element.EMPTY;
                 }
             }
         }
-
-        // Instantiate a specific matrix for the configuration (it has to adapt to the perfect side)
-        // getConfiguration() gives a 3x3 every time
 
         // instantiate the checkBoard
         int[][] checkBoard = new int[rows][cols];
@@ -264,23 +279,35 @@ public class Player {
         // verify the recurrences of the configuration (from up-left to down-right)
         int recurrences = 0;
 
-        // !!! I have to update from 3 to the length of the new sized configuration matrix
-        for (int i=0; i<rows-3; i++){
-            for (int j=0; j<cols-3; j++){
+        for (int i=0; i<rows; i++){
+            for (int j=0; j<cols; j++){
                 boolean isValidOccurrence = true;
-                for (int k = 0; k < 3 && isValidOccurrence; k++){
-                    for(int w = 0; w < 3 && isValidOccurrence; w++){
-                        if (challenge.getConfiguration()[k][w] != Element.EMPTY && elementBoard[i+k][j+w] != challenge.getConfiguration()[k][w] && checkBoard[i+k][j+w] == 0){
-                            isValidOccurrence = false;
+                for (int k = 0; k < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION && isValidOccurrence; k++){
+                    for(int w = 0; w < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION && isValidOccurrence; w++){
+                        if (challenge.getConfiguration()[k][w] != Element.EMPTY){
+                            // if we are outside bounds
+                            if (i+k >= rows || j+w >= cols) {
+                                isValidOccurrence = false;
+                            }
+                            // if the configuration is not matched
+                            else if(elementBoard[i+k][j+w] != challenge.getConfiguration()[k][w]){
+                                isValidOccurrence = false;
+                            }
+                            // if the elements are used more than one time
+                            else if(checkBoard[i+k][j+w] == 1){
+                                isValidOccurrence = false;
+                            }
                         }
                     }
                 }
                 if (isValidOccurrence){
                     // set in check board the used cards from 0 to 1
-                    for (int k = 0; k < 3; k++){
-                        for(int w = 0; w < 3; w++){
-                            if (elementBoard[i+k][j+w] != challenge.getConfiguration()[k][w] && checkBoard[i+k][j+w] == 0){
-                                isValidOccurrence = false;
+                    for (int k = 0; k < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; k++){
+                        for(int w = 0; w < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; w++){
+                            if (i+k<rows && j+w<cols){
+                                if (elementBoard[i+k][j+w] != Element.EMPTY) {
+                                    checkBoard[i + k][j + w] = 1;
+                                }
                             }
                         }
                     }
@@ -289,7 +316,7 @@ public class Player {
             }
         }
 
-        return 0;
+        return recurrences;
     }
 
 }

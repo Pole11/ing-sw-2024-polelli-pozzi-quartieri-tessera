@@ -4,121 +4,133 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Controller {
+    GameState gameState;
+
+    public Controller(GameState gameState) {
+        this.gameState = gameState;
+    }
+
     // a player can draw a card from the
     // - 2 shared resources card
     // - 2 shared gold card
     // - resource deck
     // - gold deck
     // The side of the shared card is 1 by specific
-    void drawCard(DrawType drawType) throws InvalidHandException {
-        Main.gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE); //dobbiamo valutare se si intende
-        // la fase che c'è dopo o da ora in poi
-        Main.gameState.setCurrentPlayerIndex((Main.gameState.getCurrentPlayerIndex() % Main.gameState.getPlayers().size() ) + 1);
-        Board board = Main.gameState.getMainBoard();
-        Player currentPlayer = Main.gameState.getCurrentPlayer();
 
-        if (currentPlayer.getHand().values().size() >= Config.MAX_HAND_CARDS - 1) {
+
+//-----------------to be left in controller---------------------
+
+    // startGame() *chiama initGame nel model
+    // chooseStarterSide() *riceve la scelta del side della starter
+    // chooseObjective() *riceve la scelta dell'obbiettivo
+    // chooseColor() *riceve la scelta del colore
+    // placeCard() *avverte il model del piazzamento della carta
+    // drawCard() *avverte il model del pescaggio di una carta
+    // flipCard() *avverte il model del flipping della carta
+    // ? sendMessage() *permette al model di salvare le informazioni del messaggio
+
+
+    public void startGame(){
+        this.gameState.startPhaseMethod();
+    }
+
+    public void chooseInitialStarteSide(int playerIndex, Side side){
+        gameState.setStarterSide(playerIndex, side);
+        gameState.chooseStarterSidePhase();
+    }
+
+    public void chooseInitialColor(int playerIndex, Color color){
+        gameState.setColor(playerIndex, color);
+        gameState.chooseColorPhase();
+    }
+
+    public void chooseInitialObjective(int playerIndex, int cardId) throws InvalidObjectiveCardException {
+        gameState.setSecretObjective(playerIndex, cardId);
+        gameState.chooseObjectivePhase();
+    }
+
+
+    //----------------place, draw, flip-----------------------
+
+    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws WrongInstanceTypeException {
+        Player player = gameState.getPlayerByIndex(playerIndex);
+        // check that the card is in the hand of the player
+        CornerPos placingCornerPos = switch (existingCornerPos) {
+            case CornerPos.UPLEFT -> CornerPos.DOWNRIGHT;
+            case CornerPos.UPRIGHT -> CornerPos.DOWNLEFT;
+            case CornerPos.DOWNLEFT -> CornerPos.UPRIGHT;
+            case CornerPos.DOWNRIGHT -> CornerPos.UPLEFT;
+        };
+        CornerCard placingCard = null;
+        player.updateBoard(placingCardId, tableCardId, existingCornerPos);
+        if (gameState.getCard(placingCardId) instanceof CornerCard ){
+            placingCard = (CornerCard) gameState.getCard(placingCardId);
+        } else {
+            throw new WrongInstanceTypeException("placing card is not a CornerCard");
+        }
+        player.updateCardsMaps(placingCardId, placingCard, side);
+        this.gameState.placeCard(player, placingCardId, tableCardId, existingCornerPos, placingCornerPos, side);
+        //place card must be runned at last because it needs the player already updated
+
+    }
+
+
+    void drawCard(DrawType drawType) throws InvalidHandException {
+        this.gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE); //dobbiamo valutare se si intende
+        // la fase che c'è dopo o da ora in poi
+        this.gameState.setCurrentPlayerIndex((this.gameState.getCurrentPlayerIndex() % this.gameState.getPlayers().size() ) + 1);
+        Board board = this.gameState.getMainBoard();
+        Player currentPlayer = this.gameState.getCurrentPlayer();
+
+        if (currentPlayer.getHandCardsMap().values().size() >= Config.MAX_HAND_CARDS - 1) {
             throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
         }
 
         switch(drawType) {
             case DrawType.DECKGOLD:
-                Main.gameState.drawGoldFromDeck(board, currentPlayer);
+                this.gameState.drawGoldFromDeck(board, currentPlayer);
                 break;
             case DrawType.SHAREDGOLD1:
-                Main.gameState.drawGoldFromShared(board, currentPlayer, 1);
+                this.gameState.drawGoldFromShared(board, currentPlayer, 1);
                 break;
             case DrawType.SHAREDGOLD2:
-                Main.gameState.drawGoldFromShared(board, currentPlayer, 2);
+                this.gameState.drawGoldFromShared(board, currentPlayer, 2);
                 break;
             case DrawType.DECKRESOURCE:
-                Main.gameState.drawResourceFromDeck(board, currentPlayer);
+                this.gameState.drawResourceFromDeck(board, currentPlayer);
                 break;
             case DrawType.SHAREDRESOURCE1:
-                Main.gameState.drawResourceFromShared(board, currentPlayer, 1);
+                this.gameState.drawResourceFromShared(board, currentPlayer, 1);
                 break;
             case DrawType.SHAREDRESOURCE2:
-                Main.gameState.drawResourceFromShared(board, currentPlayer, 2);
+                this.gameState.drawResourceFromShared(board, currentPlayer, 2);
                 break;
             default:
         }
     }
 
-    public void startGame() {
-        // populate in main already runned, after that and after that all players are in the game,
-        // they decide to start playing and this script begins
-        Main.gameState.setStarters(); // set the starters cards for every player
-        setSecretObjectiveOptions(); // give every player two objective cards to choose from
-        Main.gameState.setSharedGoldCards();
-        Main.gameState.setSharedResourceCards();
-        Main.gameState.setHands();
-    }
-
-    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) {
-        // check that the card is in the hand of the player
-        Main.gameState.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
-        CornerPos placingCornerPos = null;
-        switch (existingCornerPos){
-            case CornerPos.UPLEFT:
-                placingCornerPos = CornerPos.DOWNRIGHT;
-                break;
-            case CornerPos.UPRIGHT:
-                placingCornerPos = CornerPos.DOWNLEFT;
-                break;
-            case CornerPos.DOWNLEFT:
-                placingCornerPos = CornerPos.UPRIGHT;
-                break;
-            case CornerPos.DOWNRIGHT:
-                placingCornerPos = CornerPos.UPLEFT;
+    public void flipCard(int playerIndex, int cardId) {
+        Player player = gameState.getPlayerByIndex(playerIndex);
+        Side side;
+        if (player.getHandCardsMap().get(cardId).equals(Side.FRONT)){
+            side = Side.BACK;
+        } else {
+            side = Side.FRONT;
         }
-
-        Main.gameState.placeCard(player, placingCardId, tableCardId, existingCornerPos, placingCornerPos, side);
-        player.updateBoard(placingCardId, tableCardId, existingCornerPos);
-        player.updateCardsMaps(placingCardId, side);
-
-
+        player.getHandCardsMap().replace(cardId, side);
     }
 
-    public void flipCard(Player player, int cardId){}
+
 
     public void openChat(){}
 
     public void addMessage(Player player, String content){}
 
-    private void setSecretObjectiveOptions(){
-        // for every player set two objectives cards to choose from
-        ArrayList<Player> players = Main.gameState.getPlayers();
-        // get all the starters
-        ArrayList<ObjectiveCard> objectives = new ArrayList<>();
-
-        for (int i = 0; i < Main.gameState.getCardsMap().size(); i++) {
-            if (Main.gameState.getCardsMap().get(i) instanceof ObjectiveCard) {
-                objectives.add((ObjectiveCard) Main.gameState.getCardsMap().get(i));
-            }
-        }
-
-        Random rand = new Random();
-        int key = rand.nextInt(98);
-
-        // get 8 consequences cards from a random point (make it more random later maybe)
-        ObjectiveCard[] objectiveCards = new ObjectiveCard[2];
-        for (int i = 0; i < Main.gameState.getPlayers().size(); i++) {
-            objectiveCards[0] = objectives.get((key + i) % objectives.size());
-            objectiveCards[1] = objectives.get((key + i + Main.gameState.getPlayers().size()) % objectives.size());
-            // [..., ..., P1, P2, P3, P4, P1, P2, P3, P4, ...]
-            // [P2, P3, P4, ..., ..., ..., P1, P2, P3, P4, P1]
-
-            players.get(i).setSecretObjectiveCardOptions(objectiveCards);
-        }
-    }
-
-    public void setSecretObjective(Player player, ObjectiveCard objectiveCard) {
-        Main.gameState.setSecretObjective(player, objectiveCard);
-    }
 
 }

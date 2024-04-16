@@ -3,6 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Board {
     private GoldCard[] sharedGoldCards; // 2 gold cards shared between players
@@ -116,6 +117,19 @@ public class Board {
     }
 
     public void shuffleCards() {
+        Random randStream = new Random();
+        for (int i = 0; i < goldDeck.size(); i++) {
+            int j = i + randStream.nextInt(goldDeck.size()-i);
+            GoldCard temp = goldDeck.get(i);
+            goldDeck.set(i, goldDeck.get(j));
+            goldDeck.set(j, temp);
+        }
 
+        for (int i = 0; i < resourceDeck.size(); i++) {
+            int j = i + randStream.nextInt(resourceDeck.size()-i);
+            ResourceCard temp2 = resourceDeck.get(i);
+            resourceDeck.set(i, resourceDeck.get(j));
+            resourceDeck.set(j, temp2);
+        }
     }
 }

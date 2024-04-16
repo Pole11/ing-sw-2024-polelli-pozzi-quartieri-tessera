@@ -20,7 +20,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 
 public class Main {
-    public static GameState gameState=null;
+    private static GameState gameState=null;
+
     public static void main(String argv[]) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
         boolean store = existStore(); //FA persistance
         if (store){
@@ -58,14 +59,14 @@ public class Main {
         HashMap cardsMap = createCardsMap(); //allocate and initialize all cards
         ArrayList<Player> players = new ArrayList<Player>(); //allocate players
         //creazione momentanea dei player, li prenderà dal controller
-        players.set(0, new Player("paolo", Color.RED));
-        players.set(1, new Player("piergiorgio", Color.BLUE));
-        players.set(2, new Player("fungiforme", Color.GREEN));
-        players.set(3, new Player("fulmicotone", Color.YELLOW));
+        players.add(0, new Player("paolo", Color.RED));
+        players.add(1, new Player("piergiorgio", Color.BLUE));
+        players.add(2, new Player("fungiforme", Color.GREEN));
+        //players.set(3, new Player("fulmicotone", Color.YELLOW));
         return new GameState(cardsMap, players);
     }
 
-    private static HashMap createCardsMap() throws IOException, WrongStructureConfigurationSizeException {
+    public static HashMap createCardsMap() throws IOException, WrongStructureConfigurationSizeException {
         String filePath = new File("").getAbsolutePath();
         String jsonString = readJSON(filePath + Config.CARD_JSON_PATH);
         Gson gson = new Gson();
