@@ -39,7 +39,7 @@ public class PlayerTest {
 
                 try {
                     int goldCoverageCardId = 55;
-                    c.placeCard(0, goldCoverageCardId, player.getStarterCard().getId(), CornerPos.DOWNLEFT, Side.FRONT);
+                    c.placeCard(0, goldCoverageCardId, player.getStarterCard().getId(), CornerPos.UPRIGHT, Side.FRONT);
                     assertEquals(1, player.getCardPoints((GoldCard) gs.getCardsMap().get(goldCoverageCardId)));
                 } catch(WrongInstanceTypeException e) {
 

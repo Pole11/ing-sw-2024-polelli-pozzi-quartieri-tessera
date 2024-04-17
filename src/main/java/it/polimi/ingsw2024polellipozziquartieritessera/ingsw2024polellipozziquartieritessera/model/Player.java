@@ -162,12 +162,16 @@ public class Player {
         switch(existingCornerPos){
             case CornerPos.UPLEFT:
                 rowIndex++;
+                break;
             case CornerPos.UPRIGHT:
                 colIndex++;
+                break;
             case CornerPos.DOWNRIGHT:
                 rowIndex--;
+                break;
             case CornerPos.DOWNLEFT:
                 colIndex--;
+                break;
         }
 
         // Check if the new position is outside the bounds of the current matrix
@@ -184,7 +188,7 @@ public class Player {
         // Expand the matrix to include the new position (remember that this supports only one update: row++/-- or col++/--)
         // Expand rows if needed
         if (rowIndex < 0) {
-            playerBoard.add(0, new ArrayList<>());
+            playerBoard.add(1, new ArrayList<>());
         } else if (rowIndex >= playerBoard.size()) {
             playerBoard.add(new ArrayList<>());
         }

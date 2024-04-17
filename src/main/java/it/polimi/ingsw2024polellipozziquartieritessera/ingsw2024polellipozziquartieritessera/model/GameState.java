@@ -369,11 +369,20 @@ public class GameState {
 
         // Recursive call of the EndPhaseTurn
         else{
+            // TODO: 17/04/2024 network place methods
             // notify current player to place card (notify all changes)
             // wait
             this.setCurrentGameTurn(TurnPhase.DRAWPHASE);
-            // notify current player to draw a card (notify all changes)
-            //wait
+
+            if(this.getMainBoard().getGoldDeck().isEmpty() && this.getMainBoard().getResourceDeck().isEmpty() && this.getMainBoard().getSharedGoldCards().length == 0 && this.getMainBoard().getSharedResourceCard().length == 0){
+                ; //there are no card to be drawn, the game continues without drawing
+            }
+            else{
+                // TODO: 17/04/2024 network draw methods
+                // notify current player to draw a card (notify all changes)
+                //wait
+
+            }
 
             // play next turn
             // update current player
