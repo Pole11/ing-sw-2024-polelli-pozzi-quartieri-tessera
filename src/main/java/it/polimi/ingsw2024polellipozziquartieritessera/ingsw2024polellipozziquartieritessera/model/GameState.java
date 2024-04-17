@@ -26,13 +26,28 @@ public class GameState {
     // CONSTRUCTOR
     public GameState(HashMap<Integer, Card> cardsMap, ArrayList<Player> players) throws NotUniquePlayerException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
         this.cardsMap = cardsMap;
-        this.mainBoard = new Board();
+
         this.players = players;
         this.currentPlayerIndex = 0;
         this.currentGamePhase = GamePhase.MAINPHASE;
         this.currentGameTurn = null;
         this.chat = new Chat();
         this.isLastTurn = false;
+
+
+        // get all gold cards and resource cards
+        ArrayList<GoldCard> goldCardDeck = new ArrayList<>();
+        ArrayList<ResourceCard> resourceCardDeck = new ArrayList<>();
+        for (int i = 0; i < this.getCardsMap().size(); i++) {
+            if (this.getCardsMap().get(i) instanceof GoldCard) {
+                goldCardDeck.add((GoldCard) this.getCardsMap().get(i));
+            } else if (this.getCardsMap().get(i) instanceof ResourceCard) {
+                resourceCardDeck.add((ResourceCard) this.getCardsMap().get(i));
+            }
+        }
+
+        this.mainBoard = new Board(resourceCardDeck,goldCardDeck);
+
 
         if (!NicknameAndColorsAreValid()) {
             throw new NotUniquePlayerException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname AND the same color");
@@ -130,16 +145,6 @@ public class GameState {
 
     // METHODS
 
-    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side side){
-        Side tableSide = player.getBoardSide(tableCardId);
-        Corner placingCorner = ((CornerCard) cardsMap.get(placingCardId)).getCorners(side)[placingCornerPos.getCornerPosValue()];
-        Corner tableCorner = ((CornerCard) cardsMap.get(tableCardId)).getCorners(tableSide)[tableCornerPos.getCornerPosValue()];
-        placingCorner.setLinkedCorner(tableCorner);
-        tableCorner.setCovered(false);// is false at default anyway
-        tableCorner.setLinkedCorner(placingCorner);
-        tableCorner.setCovered(true);
-    }
-
     //------------ Starting Phases flow --------------------
 
     // I: start game / set phase
@@ -197,7 +202,7 @@ public class GameState {
             numberAnswered = 0;
             currentGamePhase = GamePhase.MAINPHASE;
             currentGameTurn = TurnPhase.PLACINGPHASE;
-            playTurn();
+            //playTurn();
         } else {
             // tell clients that they have to decide the objective
             // and that it is the turn of players[numberAnswered] to choose
@@ -210,7 +215,6 @@ public class GameState {
     // ma fa schifo
 
     //------------ Starting Phases setter --------------------
-
 
     public void setSharedGoldCards() {
         // it's like fillSharedGaps, look at the draw from shared methods to take inspiration
@@ -513,6 +517,17 @@ public class GameState {
         currentPlayer.getHandCardsMap().put(newResourceCard.getId(), Side.FRONT);
         // fill the gap
         board.fillSharedCardsGap();
+    }
+
+
+    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingSide){
+        Side tableSide = player.getBoardSide(tableCardId);
+        Corner placingCorner = ((CornerCard) cardsMap.get(placingCardId)).getCorners(placingSide)[placingCornerPos.getCornerPosValue()];
+        Corner tableCorner = ((CornerCard) cardsMap.get(tableCardId)).getCorners(tableSide)[tableCornerPos.getCornerPosValue()];
+        placingCorner.setLinkedCorner(tableCorner);
+        tableCorner.setCovered(false);// is false at default anyway
+        tableCorner.setLinkedCorner(placingCorner);
+        tableCorner.setCovered(true);
     }
 
 //------------ others --------------------

@@ -9,15 +9,15 @@ public class Board {
     private GoldCard[] sharedGoldCards; // 2 gold cards shared between players
     private ResourceCard[] sharedResourceCards; // 2 resource cards shared between players
     private ObjectiveCard[] sharedObjectiveCards; // 2 objective cards shared between players
-    private ArrayList<GoldCard> goldDeck;
-    private ArrayList<ResourceCard> resourceDeck;
+    private final ArrayList<GoldCard> goldDeck;
+    private final ArrayList<ResourceCard> resourceDeck;
 
-    public Board(){
+    public Board(ArrayList<ResourceCard> resourceCardDeck, ArrayList<GoldCard> goldCardDeck){
         sharedGoldCards = new GoldCard[Config.N_SHARED_GOLDS];
         sharedResourceCards = new ResourceCard[Config.N_SHARED_RESOURCES];
         sharedObjectiveCards = new ObjectiveCard[Config.N_SHARED_OBJECTIVES];
-        goldDeck = new ArrayList<>();
-        resourceDeck  = new ArrayList<>();
+        goldDeck = goldCardDeck;
+        resourceDeck  = resourceCardDeck;
     }
 
     //SETTER
@@ -31,14 +31,6 @@ public class Board {
 
     public void setSharedObjectiveCards(ObjectiveCard[] sharedObjectiveCards) {
         this.sharedObjectiveCards = sharedObjectiveCards;
-    }
-
-    public void setGoldDeck(ArrayList<GoldCard> goldDeck) {
-        this.goldDeck = goldDeck;
-    }
-
-    public void setResourceDeck(ArrayList<ResourceCard> resourceDeck) {
-        this.resourceDeck = resourceDeck;
     }
 
     //GETTER

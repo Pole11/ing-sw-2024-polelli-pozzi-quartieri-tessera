@@ -40,7 +40,7 @@ public class Controller {
         this.gameState.startPhaseMethod();
     }
 
-    public void chooseInitialStarteSide(int playerIndex, Side side){
+    public void chooseInitialStarterSide(int playerIndex, Side side){
         gameState.setStarterSide(playerIndex, side);
         gameState.chooseStarterSidePhase();
     }
@@ -114,6 +114,8 @@ public class Controller {
             default:
         }
     }
+
+
 
     public void flipCard(int playerIndex, int cardId) {
         Player player = gameState.getPlayerByIndex(playerIndex);

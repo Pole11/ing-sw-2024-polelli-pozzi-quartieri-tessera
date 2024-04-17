@@ -35,11 +35,11 @@ public class PlayerTest {
                 GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
                 Controller c = new Controller(gs);
                 c.startGame();
-                c.chooseInitialStarteSide(0, Side.FRONT);
+                c.chooseInitialStarterSide(0, Side.FRONT);
 
                 try {
                     int goldCoverageCardId = 55;
-                    c.placeCard(0, goldCoverageCardId, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
+                    c.placeCard(0, goldCoverageCardId, player.getStarterCard().getId(), CornerPos.DOWNLEFT, Side.FRONT);
                     assertEquals(1, player.getCardPoints((GoldCard) gs.getCardsMap().get(goldCoverageCardId)));
                 } catch(WrongInstanceTypeException e) {
 

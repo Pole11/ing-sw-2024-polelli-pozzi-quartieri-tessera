@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class BoardTest {
     @Test
     void boardTestMaxDeckSize() {
-        Board b = new Board();
+        //Board b = new Board();
         /*
         Create a GameState and then check if the size is realistic
         */
