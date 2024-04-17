@@ -25,7 +25,6 @@ public class PlayerTest {
     void getTimesWonCoverageTest() {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
-
         try { // create cards map
             HashMap<Integer, Card> cardsMap = main.createCardsMap();
 
@@ -39,10 +38,12 @@ public class PlayerTest {
 
                 try {
                     int goldCoverageCardId = 55;
-                    c.placeCard(0, goldCoverageCardId, player.getStarterCard().getId(), CornerPos.UPRIGHT, Side.FRONT);
-                    assertEquals(1, player.getCardPoints((GoldCard) gs.getCardsMap().get(goldCoverageCardId)));
+                    c.placeCard(0, goldCoverageCardId, player.getStarterCard().getId(), CornerPos.DOWNLEFT, Side.FRONT);
+                    assertEquals(2, player.getCardPoints((GoldCard) gs.getCardsMap().get(goldCoverageCardId)));
                 } catch(WrongInstanceTypeException e) {
 
+                } catch (WrongPlacingPositionException e) {
+                    throw new RuntimeException(e);
                 }
 
             } catch (NotUniquePlayerException e) {
@@ -59,3 +60,4 @@ public class PlayerTest {
         }
     }
 }
+

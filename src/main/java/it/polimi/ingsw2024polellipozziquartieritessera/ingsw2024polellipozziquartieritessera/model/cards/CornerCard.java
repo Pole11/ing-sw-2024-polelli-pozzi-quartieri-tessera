@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongInstanceTypeException;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -54,9 +55,7 @@ public abstract class CornerCard extends Card {
 
         // front corners verification
         for (Corner corner : this.getCorners()){
-            if (corner.getLinkedCorner() != null){
-                linkedCards.add(corner.getCard());
-            }
+            linkedCards.add(corner.getCard());
         }
         return linkedCards;
     }
@@ -69,14 +68,11 @@ public abstract class CornerCard extends Card {
         // verification for each side
         if (side == Side.BACK){
             for (Corner corner : backCorners){
-                if (corner != null && !corner.getCovered()){
-                    uncoveredCorners.add(corner);
-                }
+                uncoveredCorners.add(corner);
             }
-        }
-        else{
+        } else {
             for (Corner corner : frontCorners){
-                if (corner != null && !corner.getCovered()){
+                if (!corner.getCovered()){
                     uncoveredCorners.add(corner);
                 }
             }
@@ -86,7 +82,7 @@ public abstract class CornerCard extends Card {
     }
 
     // returns the element of the card (null if StarterCard)
-    public abstract Element getResourceType();
+    public abstract Element getResourceType() throws WrongInstanceTypeException;
 
 
     // this method will be ovverrided by all the corner cards subclasses

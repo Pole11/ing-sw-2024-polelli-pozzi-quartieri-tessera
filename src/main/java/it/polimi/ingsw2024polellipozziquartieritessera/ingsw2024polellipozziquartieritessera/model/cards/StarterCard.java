@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongInstanceTypeException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,8 +22,8 @@ public class StarterCard extends CornerCard {
 
     // METHODS
     // return null (it needs to be implemented because it's an abstract method in CornerCard)
-    public Element getResourceType() {
-        return null;
+    public Element getResourceType() throws WrongInstanceTypeException {
+        throw new WrongInstanceTypeException("called a method on starter card that is implemented only on Resource or Gold card");
     }
 
     // returns the resource visible on the side requested
@@ -32,7 +33,7 @@ public class StarterCard extends CornerCard {
 
         // set corners resources
         for (Corner corner : this.getUncoveredCorners(side)){
-            if(corner.getElement() != null){
+            if(corner.getElement() != Element.EMPTY){
                 uncoveredResources.add(corner.getElement());
             }
         }

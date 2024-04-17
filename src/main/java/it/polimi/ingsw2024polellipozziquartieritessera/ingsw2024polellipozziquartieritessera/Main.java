@@ -119,11 +119,12 @@ public class Main {
                     String element = ((ArrayList) card.get("FrontCorners")).get(i).toString();
                     // card.get("FrontCorners")).getClass() returns ArrayList so casting should be good
                     if (element.equals("Empty")){
-                        frontCorners[i] = new Corner(Element.EMPTY, id);
+                        //probably can be removed because it falls in the else clause, also in line 135
+                        frontCorners[i] = new Corner(Element.EMPTY, id, false);
                     } else if(element.equals("Hidden")) {
-                        frontCorners[i] = null;
+                        frontCorners[i] = new Corner(Element.EMPTY, id, true);;
                     } else {
-                        frontCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id);
+                        frontCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id, false);
                     }
                 }
 
@@ -132,11 +133,11 @@ public class Main {
                     String element = ((ArrayList) card.get("BackCorners")).get(i).toString();
                     // card.get("BackCorners")).getClass() returns ArrayList so casting should be good
                     if (element.equals("Empty")){
-                        backCorners[i] = new Corner(Element.EMPTY, id);
+                        backCorners[i] = new Corner(Element.EMPTY, id, false);
                     } else if(element.equals("Hidden")) {
-                        backCorners[i] = null;
+                        backCorners[i] = new Corner(Element.EMPTY, id, true);
                     } else {
-                        backCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id);
+                        backCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id, false);
                     }
                 }
 

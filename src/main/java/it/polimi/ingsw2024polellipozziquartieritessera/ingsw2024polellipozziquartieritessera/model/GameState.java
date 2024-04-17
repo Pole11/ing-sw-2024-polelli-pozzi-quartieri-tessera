@@ -529,12 +529,19 @@ public class GameState {
     }
 
 
-    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingSide){
+    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingSide) throws WrongPlacingPositionException {
         Side tableSide = player.getBoardSide(tableCardId);
         Corner placingCorner = ((CornerCard) cardsMap.get(placingCardId)).getCorners(placingSide)[placingCornerPos.getCornerPosValue()];
         Corner tableCorner = ((CornerCard) cardsMap.get(tableCardId)).getCorners(tableSide)[tableCornerPos.getCornerPosValue()];
+        if (placingCorner == null){
+            throw new WrongPlacingPositionException("placing corner is null");
+        }
+
+        if (tableCorner == null){
+            throw new WrongPlacingPositionException("table corner is null");
+        }
         placingCorner.setLinkedCorner(tableCorner);
-        tableCorner.setCovered(false);// is false at default anyway
+        placingCorner.setCovered(false);// is false at default anyway
         tableCorner.setLinkedCorner(placingCorner);
         tableCorner.setCovered(true);
     }

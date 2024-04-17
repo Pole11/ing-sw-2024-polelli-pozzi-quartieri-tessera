@@ -58,7 +58,7 @@ public class Controller {
 
     //----------------place, draw, flip-----------------------
 
-    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws WrongInstanceTypeException {
+    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws WrongInstanceTypeException, WrongPlacingPositionException {
         Player player = gameState.getPlayerByIndex(playerIndex);
         // check that the card is in the hand of the player
         CornerPos placingCornerPos = switch (existingCornerPos) {

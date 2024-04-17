@@ -161,23 +161,27 @@ public class Player {
         // Define the position of the new card
         switch(existingCornerPos){
             case CornerPos.UPLEFT:
-                rowIndex++;
+                rowIndex--;
                 break;
             case CornerPos.UPRIGHT:
                 colIndex++;
                 break;
             case CornerPos.DOWNRIGHT:
-                rowIndex--;
+                rowIndex++;
                 break;
             case CornerPos.DOWNLEFT:
                 colIndex--;
                 break;
         }
-
         // Check if the new position is outside the bounds of the current matrix
-        if (rowIndex < 0 || rowIndex >= playerBoard.size() || colIndex < 0 || colIndex >= playerBoard.get(rowIndex).size()) {
+        if (rowIndex < 0 || rowIndex >= playerBoard.size() || colIndex < 0 || colIndex >= playerBoard.getFirst().size()) {
             // Expand the matrix if necessary
             expandBoard(rowIndex, colIndex);
+            if (rowIndex < 0){
+                rowIndex ++;
+            } else if (colIndex<0){
+                colIndex ++;
+            }
         }
 
         // Place the new card at the specified position
@@ -187,10 +191,19 @@ public class Player {
     private void expandBoard(int rowIndex, int colIndex){
         // Expand the matrix to include the new position (remember that this supports only one update: row++/-- or col++/--)
         // Expand rows if needed
+        int rowDim = playerBoard.getFirst().size();
         if (rowIndex < 0) {
-            playerBoard.add(1, new ArrayList<>());
+            ArrayList<Integer> newRow = new ArrayList<>();
+            for (int i = 0; i < rowDim; i++) {
+                newRow.add(-1);
+            }
+            playerBoard.addFirst(newRow);
         } else if (rowIndex >= playerBoard.size()) {
-            playerBoard.add(new ArrayList<>());
+            ArrayList<Integer> newRow = new ArrayList<>();
+            for (int i = 0; i < rowDim; i++) {
+                newRow.add(-1);
+            }
+            playerBoard.add(newRow);
         }
         // Expand columns if needed
         for (ArrayList<Integer> row : playerBoard) {
@@ -245,8 +258,10 @@ public class Player {
 // ---------------------Get Times Won ----------------------------------
 
     private int getTimesWonCoverage(GoldCard goldCard) {
+        // TODO: check if right after removing the possibility of a corner to be null
         return goldCard.getUncoveredCorners(placedCardsMap.get(goldCard.getId())).stream().map(Corner::getLinkedCorner).mapToInt((Corner c) -> c == null ? 1 : 0).sum();
     }
+    //does not work
     // remember that placedCardsMap.get() returns the side of the card played
 
 
@@ -260,7 +275,7 @@ public class Player {
         return counts.values().stream().reduce((a, b) -> a < b ? a : b).orElseThrow().intValue();
     }
 
-    private int getTimesWonStructure(StructureChallenge challenge) {
+    private int getTimesWonStructure(StructureChallenge challenge) throws WrongInstanceTypeException {
         int rows = getPlayerBoard().size();
         int cols = getPlayerBoard().getFirst().size();
 
