@@ -25,7 +25,7 @@ public class Board {
         this.sharedGoldCards = sharedGoldCards;
     }
 
-    public void setSharedResourceCard(ResourceCard[] sharedResourceCard) {
+    public void setSharedResourceCards(ResourceCard[] sharedResourceCard) {
         this.sharedResourceCards = sharedResourceCard;
     }
 
@@ -38,7 +38,7 @@ public class Board {
         return sharedGoldCards;
     }
 
-    public ResourceCard[] getSharedResourceCard() {
+    public ResourceCard[] getSharedResourceCards() {
         return sharedResourceCards;
     }
 
@@ -63,7 +63,7 @@ public class Board {
 
     // returns the requested shared resource card
     public ResourceCard getSharedResourceCard(int pos){
-        return getSharedResourceCard()[pos-1]; // remember that pos is either 1 or 2
+        return getSharedResourceCards()[pos-1]; // remember that pos is either 1 or 2
     }
 
     public ResourceCard getFromResourceDeck(){

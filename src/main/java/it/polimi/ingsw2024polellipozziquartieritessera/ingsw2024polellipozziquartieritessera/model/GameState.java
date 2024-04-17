@@ -232,7 +232,7 @@ public class GameState {
 
         ResourceCard[] cards = {card1, card2};
 
-        mainBoard.setSharedResourceCard(cards);
+        mainBoard.setSharedResourceCards(cards);
     }
 
 
@@ -374,7 +374,7 @@ public class GameState {
             // wait
             this.setCurrentGameTurn(TurnPhase.DRAWPHASE);
 
-            if(this.getMainBoard().getGoldDeck().isEmpty() && this.getMainBoard().getResourceDeck().isEmpty() && this.getMainBoard().getSharedGoldCards().length == 0 && this.getMainBoard().getSharedResourceCard().length == 0){
+            if(this.getMainBoard().getGoldDeck().isEmpty() && this.getMainBoard().getResourceDeck().isEmpty() && this.getMainBoard().getSharedGoldCards().length == 0 && this.getMainBoard().getSharedResourceCards().length == 0){
                 ; //there are no card to be drawn, the game continues without drawing
             }
             else{

@@ -55,7 +55,7 @@ public class Main {
         return content;
     }
 
-    private static GameState populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
+    public static GameState populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
         HashMap cardsMap = createCardsMap(); //allocate and initialize all cards
         ArrayList<Player> players = new ArrayList<Player>(); //allocate players
         //creazione momentanea dei player, li prenderà dal controller
