@@ -258,10 +258,8 @@ public class Player {
 // ---------------------Get Times Won ----------------------------------
 
     private int getTimesWonCoverage(GoldCard goldCard) {
-        // TODO: check if right after removing the possibility of a corner to be null
-        return goldCard.getUncoveredCorners(placedCardsMap.get(goldCard.getId())).stream().map(Corner::getLinkedCorner).mapToInt((Corner c) -> c == null ? 1 : 0).sum();
+        return goldCard.getUncoveredCorners(placedCardsMap.get(goldCard.getId())).stream().map(Corner::getLinkedCorner).mapToInt((Corner c) -> c == null ? 0 : 1).sum();
     }
-    //does not work
     // remember that placedCardsMap.get() returns the side of the card played
 
 
