@@ -57,13 +57,43 @@ public class Board {
 
     //METHODS
     // returns the requested shared gold card
-    public GoldCard getSharedGoldCard(int pos) {
-        return getSharedGoldCards()[pos-1]; // remember that pos is either 1 or 2
+    public GoldCard drawSharedGoldCard(int pos) {
+        GoldCard[] sharedGolds = getSharedGoldCards();
+
+        // verify position is valid
+        if (pos < 1 || pos > sharedGolds.length) {
+            throw new IllegalArgumentException("Invalid position: " + pos);
+        }
+
+        // get the card
+        GoldCard drawnCard = sharedGolds[pos - 1];
+
+        // remove card from shared
+        sharedGolds[pos - 1] = null;
+        setSharedGoldCards(sharedGolds);
+
+        // return the specified card
+        return drawnCard;
     }
 
     // returns the requested shared resource card
-    public ResourceCard getSharedResourceCard(int pos){
-        return getSharedResourceCards()[pos-1]; // remember that pos is either 1 or 2
+    public ResourceCard drawSharedResourceCard(int pos) {
+        ResourceCard[] sharedResources = getSharedResourceCards();
+
+        // verify position is valid
+        if (pos < 1 || pos > sharedResources.length) {
+            throw new IllegalArgumentException("Invalid position: " + pos);
+        }
+
+        // get the specified card
+        ResourceCard drawnCard = sharedResources[pos - 1];
+
+        // remove card from shared
+        sharedResources[pos - 1] = null;
+        setSharedResourceCards(sharedResources);
+
+        // return the card
+        return drawnCard;
     }
 
     public ResourceCard getFromResourceDeck(){

@@ -53,9 +53,11 @@ public abstract class CornerCard extends Card {
         // card array initialization
         ArrayList<Integer> linkedCards = new ArrayList<>();
 
-        // front corners verification
+        // corners verification
         for (Corner corner : this.getCorners()){
-            linkedCards.add(corner.getCard());
+            if (corner.getLinkedCorner() != null){
+                linkedCards.add(corner.getLinkedCorner().getCard());
+            }
         }
         return linkedCards;
     }
@@ -68,9 +70,11 @@ public abstract class CornerCard extends Card {
         // verification for each side
         if (side == Side.BACK){
             for (Corner corner : backCorners){
-                uncoveredCorners.add(corner);
+                if (!corner.getCovered()){
+                    uncoveredCorners.add(corner);
+                }
             }
-        } else {
+        } else if (side == Side.FRONT) {
             for (Corner corner : frontCorners){
                 if (!corner.getCovered()){
                     uncoveredCorners.add(corner);
@@ -85,6 +89,6 @@ public abstract class CornerCard extends Card {
     public abstract Element getResourceType() throws WrongInstanceTypeException;
 
 
-    // this method will be ovverrided by all the corner cards subclasses
+    // this method will be overrided by all the corner cards subclasses
     public abstract ArrayList<Element> getUncoveredElements(Side side);
 }

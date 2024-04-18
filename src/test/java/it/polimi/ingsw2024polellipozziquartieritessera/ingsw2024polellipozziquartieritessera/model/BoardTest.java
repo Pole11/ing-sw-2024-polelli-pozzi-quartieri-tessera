@@ -13,8 +13,69 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BoardTest {
+    // ALL METHODS TESTED
+
+    @Test
+    void testGetterSetter(){
+        // setup
+        GameState g;
+        try {
+            g = Main.populate();
+        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
+                 NotUniquePlayerColorException | NotUniquePlayerException e) {
+            throw new RuntimeException(e);
+        }
+        Board b = g.getMainBoard();
+
+        b.setSharedObjectiveCards(b.getSharedObjectiveCards());
+    }
+
+    @Test
+    void testDrawSharedCards(){
+        // setup
+        GameState g;
+        try {
+            g = Main.populate();
+        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
+                 NotUniquePlayerColorException | NotUniquePlayerException e) {
+            throw new RuntimeException(e);
+        }
+        Board b = g.getMainBoard();
+        b.fillSharedCardsGap();
+
+        // get initial state
+        ResourceCard[] initialResourceCards = {b.getSharedResourceCards()[0], b.getSharedResourceCards()[1]};
+        GoldCard[] initialGoldCards = {b.getSharedGoldCards()[0], b.getSharedGoldCards()[1]};
+
+        // draw cards
+        ResourceCard drawnResourceCard1 = b.drawSharedResourceCard(1);
+        ResourceCard drawnResourceCard2 = b.drawSharedResourceCard(2);
+        GoldCard drawnGoldCard1 = b.drawSharedGoldCard(1);
+        GoldCard drawnGoldCard2 = b.drawSharedGoldCard(2);
+
+        // verify drawn cards not null
+        assertNotNull(drawnResourceCard1);
+        assertNotNull(drawnResourceCard2);
+        assertNotNull(drawnGoldCard1);
+        assertNotNull(drawnGoldCard2);
+
+        // verify drawn cards removed from the shared
+        assertNull(b.getSharedResourceCards()[0]);
+        assertNull(b.getSharedResourceCards()[1]);
+        assertNull(b.getSharedGoldCards()[0]);
+        assertNull(b.getSharedGoldCards()[1]);
+
+        // verify drawn cards in initial shared
+        assertArrayEquals(new ResourceCard[]{drawnResourceCard1, drawnResourceCard2}, initialResourceCards);
+        assertArrayEquals(new GoldCard[]{drawnGoldCard1, drawnGoldCard2}, initialGoldCards);
+
+        // test if launch exception
+        assertThrows(IllegalArgumentException.class, () -> b.drawSharedGoldCard(4));
+        assertThrows(IllegalArgumentException.class, () -> b.drawSharedResourceCard(4));
+    }
     @Test
     void testGetFromResourceDeck() {
         // setup

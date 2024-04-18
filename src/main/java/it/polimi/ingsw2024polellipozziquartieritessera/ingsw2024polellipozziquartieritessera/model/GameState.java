@@ -490,10 +490,6 @@ public class GameState {
 //--------------All draw cards called from controller------------------
 
     public void drawGoldFromDeck(Board board, Player currentPlayer) {
-        /*GoldCard newGoldCard = board.getGoldDeck().getLast();
-        board.getGoldDeck().removeLast();
-        currentPlayer.getHand().put(newGoldCard.getId(), true);*/
-
         // get new card
         GoldCard newGoldCard = board.getFromGoldDeck();
         // add card to player hand
@@ -501,13 +497,8 @@ public class GameState {
     }
 
     public void drawGoldFromShared(Board board, Player currentPlayer, int index) {
-        /*GoldCard[] goldCards = board.getSharedGoldCards();
-        GoldCard newGoldCard = goldCards[index];
-        currentPlayer.getHand().put(newGoldCard.getId(), true);
-        goldCards[index] = board.getGoldDeck().getLast();*/
-
         // get new gold card
-        GoldCard newGoldCard = board.getSharedGoldCard(index);
+        GoldCard newGoldCard = board.drawSharedGoldCard(index);
         currentPlayer.getHandCardsMap().put(newGoldCard.getId(), Side.FRONT);
         // fill the gap
         board.fillSharedCardsGap();
@@ -522,7 +513,7 @@ public class GameState {
 
     public void drawResourceFromShared(Board board, Player currentPlayer, int index) {
         // get new resource card
-        ResourceCard newResourceCard = board.getSharedResourceCard(index);
+        ResourceCard newResourceCard = board.drawSharedResourceCard(index);
         currentPlayer.getHandCardsMap().put(newResourceCard.getId(), Side.FRONT);
         // fill the gap
         board.fillSharedCardsGap();
