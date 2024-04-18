@@ -6,6 +6,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 
+import javax.smartcardio.CardNotPresentException;
+import java.sql.Array;
 import java.util.*;
 import java.util.stream.*;
 
@@ -128,10 +130,42 @@ public class Player {
 
 // -------------------Place Cards Map Managing-----------------
 
-    public void updateCardsMaps(int placingCardId, CornerCard placingCard, Side side){
-        placedCardsMap.put(placingCardId, side);
+    public void placeCard(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent {
+        Corner tableCorner = tableCard.getCorners(placedCardsMap.get(tableCardId))[tableCornerPos.getCornerPosValue()];
+        if (tableCorner.getLinkedCorner() != null ){
+            throw new CardAlreadyPresent("you cannot place a card here");
+        }
+
+        if (placingCard instanceof GoldCard){
+            ArrayList<Element> allPlayerElements = this.getAllElements();
+            Element[] allExistingElements = Element.values();
+            boolean cardIsPlaceable = true;
+
+            for (Element ele : allExistingElements) {
+                if (getElementOccurencies(allPlayerElements, ele) < getElementOccurencies(((GoldCard) placingCard).getResourceNeeded(), ele)) {
+                    cardIsPlaceable = false;
+                    break;
+                }
+            }
+
+            if (!cardIsPlaceable){
+                throw new GoldCardCannotBePlaced("You haven't the necessary resources to place the goldcard");
+            }
+        }
+        placedCardsMap.put(placingCardId, placingCardSide);
         handCardsMap.remove(placingCardId);
         cornerCardsMap.put(placingCardId, placingCard);
+        points += this.getCardPoints(placingCard);
+    }
+
+    public static int getElementOccurencies(ArrayList<Element> elements, Element targetElement) {
+        int count = 0;
+        for (Object element : elements) {
+            if (element != null && element.equals(targetElement)) {
+                count++;
+            }
+        }
+        return count;
     }
 
 // -------------------Board Matrix Managing-----------------------
@@ -217,7 +251,8 @@ public class Player {
 
 // -----------------------Challenge Managing---------------------------------
 
-    public int getCardPoints(ObjectiveCard objCard) throws WrongInstanceTypeException {
+    public int getCardPoints(ObjectiveCard objCard) throws WrongInstanceTypeException, CardNotPlacedException {
+        if (!placedCardsMap.containsKey(objCard.getId())) throw new CardNotPlacedException("The card is not placed");
         Challenge cardChallenge = objCard.getChallenge();
         int cardPoints = objCard.getPoints();
         int timesWon = -1;
@@ -238,10 +273,36 @@ public class Player {
         return Math.max(-1, timesWon * cardPoints);
     };
 
-    public int getCardPoints(GoldCard goldCard) throws WrongInstanceTypeException {
+    public int getCardPoints(CornerCard cornerCard) throws WrongInstanceTypeException, CardNotPlacedException {
+        if (cornerCard instanceof GoldCard){
+            return getCardPoints((GoldCard) cornerCard);
+        } else if (cornerCard instanceof ResourceCard)
+            return getCardPoints((ResourceCard) cornerCard);
+        else {
+            throw new WrongInstanceTypeException("CornerCard is neither a Gold or a Resource card");
+        }
+    }
+
+    public int getCardPoints(ResourceCard resourceCard) throws CardNotPlacedException {
+        Side side = null;
+        side = placedCardsMap.get(resourceCard.getId());
+        if (placedCardsMap.containsKey(resourceCard.getId())) {
+            side = placedCardsMap.get(resourceCard.getId());
+        } else {
+            throw new CardNotPlacedException("The card is not placed");
+        }
+        if (side == Side.FRONT){
+            return resourceCard.getPoints();
+        } else {
+            return 0;
+        }
+    }
+
+    public int getCardPoints(GoldCard goldCard) throws WrongInstanceTypeException, CardNotPlacedException {
+        if (!placedCardsMap.containsKey(goldCard.getId())) throw new CardNotPlacedException("The card is not placed");
         Challenge cardChallenge = goldCard.getChallenge();
         int cardPoints = goldCard.getPoints();
-        int timesWon = -1;
+        int timesWon = 0;
 
         if (cardChallenge instanceof ElementChallenge) {
             ArrayList<Element> elements = ((ElementChallenge) cardChallenge).getElements();
@@ -261,7 +322,6 @@ public class Player {
         return goldCard.getUncoveredCorners(placedCardsMap.get(goldCard.getId())).stream().map(Corner::getLinkedCorner).mapToInt((Corner c) -> c == null ? 0 : 1).sum();
     }
     // remember that placedCardsMap.get() returns the side of the card played
-
 
     private int getTimesWonElement(ArrayList<Element> elements) {
         ArrayList<Element> allElements = getAllElements();

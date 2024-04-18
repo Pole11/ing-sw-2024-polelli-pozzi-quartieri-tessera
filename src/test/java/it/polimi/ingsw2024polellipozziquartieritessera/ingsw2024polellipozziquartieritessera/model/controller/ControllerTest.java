@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class ControllerTest {
     @Test
-    void placeCard() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, WrongPlacingPositionException, WrongInstanceTypeException {
+    void placeCard() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent {
         GameState game = Main.populate();
         Controller controller = new Controller(game);
         controller.startGame();
@@ -22,6 +22,7 @@ public class ControllerTest {
         controller.placeCard(0, goldCoverageCardId, game.getPlayers().get(0).getStarterCard().getId(), CornerPos.UPRIGHT, Side.FRONT);
         controller.placeCard(0, goldCoverageCardId, game.getPlayers().get(0).getStarterCard().getId(), CornerPos.DOWNLEFT, Side.FRONT);
         controller.placeCard(0, goldCoverageCardId, game.getPlayers().get(0).getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.FRONT);
+        // placing different cards should throw an exception
 
     }
 }

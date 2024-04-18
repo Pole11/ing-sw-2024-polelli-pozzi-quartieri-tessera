@@ -17,6 +17,8 @@ public enum Element implements ElementTypeInterface {
         this.type = type;
     }
 
+    public ElementType getType() { return this.type; }
+
     public String getDisplayableType() {
         return type.getDisplayableType();
     }

@@ -58,24 +58,36 @@ public class Controller {
 
     //----------------place, draw, flip-----------------------
 
-    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws WrongInstanceTypeException, WrongPlacingPositionException {
+    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent {
         Player player = gameState.getPlayerByIndex(playerIndex);
         // check that the card is in the hand of the player
-        CornerPos placingCornerPos = switch (existingCornerPos) {
+        CornerPos placingCornerPos = switch (tableCornerPos) {
             case CornerPos.UPLEFT -> CornerPos.DOWNRIGHT;
             case CornerPos.UPRIGHT -> CornerPos.DOWNLEFT;
             case CornerPos.DOWNLEFT -> CornerPos.UPRIGHT;
             case CornerPos.DOWNRIGHT -> CornerPos.UPLEFT;
         };
+
+
         CornerCard placingCard = null;
-        player.updateBoard(placingCardId, tableCardId, existingCornerPos);
+        CornerCard tableCard = null;
+        player.updateBoard(placingCardId, tableCardId, tableCornerPos);
+
         if (gameState.getCard(placingCardId) instanceof CornerCard ){
             placingCard = (CornerCard) gameState.getCard(placingCardId);
         } else {
             throw new WrongInstanceTypeException("placing card is not a CornerCard");
         }
-        player.updateCardsMaps(placingCardId, placingCard, side);
-        this.gameState.placeCard(player, placingCardId, tableCardId, existingCornerPos, placingCornerPos, side);
+
+        if (gameState.getCard(tableCardId) instanceof CornerCard ){
+            tableCard = (CornerCard) gameState.getCard(tableCardId);
+        } else {
+            throw new WrongInstanceTypeException("placing card is not a CornerCard");
+        }
+
+
+        player.placeCard(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
+        this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
         //place card must be runned at last because it needs the player already updated
 
     }

@@ -5,7 +5,6 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.*;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +21,7 @@ public class PlayerTest {
     }
 
     @Test
-    void getTimesWonCoverageTest() {
+    void getCardPoints() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlaced, CardAlreadyPresent {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
         try { // create cards map
@@ -34,29 +33,44 @@ public class PlayerTest {
                 GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
                 Controller c = new Controller(gs);
                 c.startGame();
-                c.chooseInitialStarterSide(0, Side.FRONT);
+                c.chooseInitialStarterSide(0, Side.BACK);
 
                 try {
-                    int goldCoverageCardId = 55;
-                    c.placeCard(0, goldCoverageCardId, player.getStarterCard().getId(), CornerPos.DOWNLEFT, Side.FRONT);
-                    assertEquals(2, player.getCardPoints((GoldCard) gs.getCardsMap().get(goldCoverageCardId)));
+                    int ResourceCardId1 = 40;
+                    int ResourceCardId2 = 32;
+                    int GoldCard1 = 79;
+
+
+                    c.placeCard(0, ResourceCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
+                    assertEquals(1, player.getCardPoints((ResourceCard) gs.getCardsMap().get(ResourceCardId1)));
+
+                    c.placeCard(0, ResourceCardId2, ResourceCardId1, CornerPos.DOWNLEFT, Side.BACK);
+                    assertEquals(0, player.getCardPoints((ResourceCard) gs.getCardsMap().get(ResourceCardId2)));
+
+                    c.placeCard(0, GoldCard1, ResourceCardId2, CornerPos.DOWNLEFT, Side.FRONT);
+                    System.out.println(player.getCardPoints((GoldCard) gs.getCardsMap().get(GoldCard1)) );
+                    assertEquals(3, player.getCardPoints((GoldCard) gs.getCardsMap().get(GoldCard1)));
+
+
                 } catch(WrongInstanceTypeException e) {
 
                 } catch (WrongPlacingPositionException e) {
                     throw new RuntimeException(e);
+                } catch (CardNotPlacedException e) {
+                    throw new RuntimeException(e);
                 }
 
             } catch (NotUniquePlayerException e) {
-
+                throw new NotUniquePlayerException("Testing");
             } catch (NotUniquePlayerColorException e) {
-
+                throw new NotUniquePlayerColorException("Testing");
             } catch (NotUniquePlayerNicknameException e) {
-
+                throw new NotUniquePlayerNicknameException("Testing");
             }
         } catch (WrongStructureConfigurationSizeException e) {
-
+            throw new WrongStructureConfigurationSizeException("Testing");
         } catch (IOException e) {
-
+            throw new IOException();
         }
     }
 }

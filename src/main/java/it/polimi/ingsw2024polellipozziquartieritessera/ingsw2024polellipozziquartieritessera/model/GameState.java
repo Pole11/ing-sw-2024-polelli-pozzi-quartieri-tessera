@@ -155,9 +155,6 @@ public class GameState {
         deckInitPhase();
     }
 
-
-
-
     // II: initialize deck and shared cards / starter cards
     private void deckInitPhase(){
         this.getMainBoard().shuffleCards();
@@ -325,12 +322,9 @@ public class GameState {
         }
     }
 
-
-
-
     //-------------------Game Phase flow---------------------
 
-    private void playTurn(){
+    private void playTurn() throws CardNotPlacedException, WrongInstanceTypeException {
         // notify current player to place card (notify all changes)
         // wait
         this.setCurrentGameTurn(TurnPhase.DRAWPHASE);
@@ -354,7 +348,7 @@ public class GameState {
         }
     }
 
-    private void playEndTurn(){
+    private void playEndTurn() throws CardNotPlacedException, WrongInstanceTypeException {
         // BASE CASE:
         if (this.getPlayers().get(getCurrentPlayerIndex()) == this.getBlackPlayer()){
             if (isLastTurn) {
@@ -407,14 +401,10 @@ public class GameState {
         return this.getMainBoard().getGoldDeck().isEmpty();
     }
 
-    private void calculateFinalPoints() {
+    private void calculateFinalPoints() throws CardNotPlacedException, WrongInstanceTypeException {
         for (int i = 0; i < this.getPlayers().size(); i++) {
-            try {
-                int points = this.getPlayers().get(i).getCardPoints(this.getPlayers().get(i).getObjectiveCard());
-                this.getPlayers().get(i).addPoints(points);
-            } catch(WrongInstanceTypeException e) {
-
-            }
+            int points = this.getPlayers().get(i).getCardPoints(this.getPlayers().get(i).getObjectiveCard());
+            this.getPlayers().get(i).addPoints(points);
         }
     }
 
