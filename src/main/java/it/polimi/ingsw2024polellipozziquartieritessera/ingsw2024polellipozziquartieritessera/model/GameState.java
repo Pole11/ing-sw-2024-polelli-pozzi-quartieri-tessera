@@ -525,6 +525,60 @@ public class GameState {
         placingCorner.setCovered(false);// is false at default anyway
         tableCorner.setLinkedCorner(placingCorner);
         tableCorner.setCovered(true);
+
+        player.updateBoard(placingCardId, tableCardId, tableCornerPos);
+        // check if you are covering other cards
+        ArrayList<ArrayList<Integer>> playerBoard = player.getPlayerBoard();
+        for (Integer row = 0; row < playerBoard.size(); row++) {
+            for (Integer col = 0; col < playerBoard.get(row).size(); col++) {
+                if (playerBoard.get(row).get(col).equals(placingCardId)) { // if the card is the placing one
+                    // check if there is a card in the up left corner
+                    if (row > 0 && playerBoard.get(row - 1).get(col) != -1) { // -1 means empty
+                        int matrixCardId = playerBoard.get(row - 1).get(col);
+                        CornerCard matrixCard = (CornerCard) this.cardsMap.get(matrixCardId);
+                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.DOWNRIGHT.getCornerPosValue()];
+
+                        placingCorner.setLinkedCorner(matrixCorner);
+                        placingCorner.setCovered(false);// is false at default anyway
+                        matrixCorner.setLinkedCorner(placingCorner);
+                        matrixCorner.setCovered(true);
+                    }
+                    // check if there is a card in the up right corner
+                    if (col < playerBoard.get(row).size() - 1 && playerBoard.get(row).get(col + 1) != -1) { // -1 means empty
+                        int matrixCardId = playerBoard.get(row).get(col + 1);
+                        CornerCard matrixCard = (CornerCard) this.cardsMap.get(matrixCardId);
+                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.DOWNLEFT.getCornerPosValue()];
+
+                        placingCorner.setLinkedCorner(matrixCorner);
+                        placingCorner.setCovered(false);// is false at default anyway
+                        matrixCorner.setLinkedCorner(placingCorner);
+                        matrixCorner.setCovered(true);
+                    }
+                    // check if there is a card in the down right corner
+                    if (row < playerBoard.size() - 1 && playerBoard.get(row + 1).get(col) != -1) { // -1 means empty
+                        int matrixCardId = playerBoard.get(row + 1).get(col);
+                        CornerCard matrixCard = (CornerCard) this.cardsMap.get(matrixCardId);
+                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.UPLEFT.getCornerPosValue()];
+
+                        placingCorner.setLinkedCorner(matrixCorner);
+                        placingCorner.setCovered(false);// is false at default anyway
+                        matrixCorner.setLinkedCorner(placingCorner);
+                        matrixCorner.setCovered(true);
+                    }
+                    // check if there is a card in the down left corner
+                    if (col > 0 && playerBoard.get(row).get(col - 1) != -1) { // -1 means empty
+                        int matrixCardId = playerBoard.get(row).get(col - 1);
+                        CornerCard matrixCard = (CornerCard) this.cardsMap.get(matrixCardId);
+                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.UPRIGHT.getCornerPosValue()];
+
+                        placingCorner.setLinkedCorner(matrixCorner);
+                        placingCorner.setCovered(false);// is false at default anyway
+                        matrixCorner.setLinkedCorner(placingCorner);
+                        matrixCorner.setCovered(true);
+                    }
+                }
+            }
+        }
     }
 
 //------------ others --------------------

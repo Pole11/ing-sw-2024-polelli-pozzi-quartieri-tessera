@@ -106,6 +106,7 @@ public class Board {
             return null;
         }
     }
+
     public GoldCard getFromGoldDeck(){
         if (!goldDeck.isEmpty()){
             GoldCard drawnCard = getGoldDeck().getLast();
@@ -116,6 +117,7 @@ public class Board {
             return null;
         }
     }
+
     public void fillSharedCardsGap(){
         // verify if the shared cards have some gaps
         for (int index = 0; index < Config.N_SHARED_RESOURCES; index++){

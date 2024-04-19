@@ -88,8 +88,10 @@ public class Controller {
 
         player.placeCard(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
         this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
-        //place card must be runned at last because it needs the player already updated
+        // place card must be runned at last because it needs the player already updated
 
+        int newPoints = player.getPoints() + player.getCardPoints(placingCard);
+        player.setPoints(newPoints);
     }
 
 

@@ -21,57 +21,41 @@ public class PlayerTest {
     }
 
     @Test
-    void getCardPoints() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlaced, CardAlreadyPresent, CardNotPlacedException, WrongPlacingPositionException, WrongInstanceTypeException {
+    void getCardPointsTest() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlaced, CardAlreadyPresent, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
-        try { // create cards map
-            HashMap<Integer, Card> cardsMap = main.createCardsMap();
+        // create cards map
+        HashMap<Integer, Card> cardsMap = main.createCardsMap();
 
-            assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
+        assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
 
-            try { // create game state
-                GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
-                Controller c = new Controller(gs);
-                gs.getMainBoard().shuffleCards();
-                gs.setSharedGoldCards();
-                gs.setSharedResourceCards();
+        // create game state
+        GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
+        Controller c = new Controller(gs);
+        c.startGame();
+        c.chooseInitialStarterSide(0, Side.BACK);
 
-                player.setStarterCard( (StarterCard) gs.getCardsMap().get(83));
-                player.initializeBoard();
+        int ResourceCardId1 = 40;
+        int ResourceCardId2 = 32;
+        int ResourceCardId3 = 53;
+        int ResourceCardId4 = 18;
+        int GoldCard1 = 75;
 
-                gs.chooseStarterSidePhase();
+        c.placeCard(0, ResourceCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
+        assertEquals(0, player.getPoints());
 
-                c.chooseInitialStarterSide(0, Side.BACK);
+        c.placeCard(0, ResourceCardId2, ResourceCardId1, CornerPos.DOWNLEFT, Side.BACK);
+        assertEquals(0, player.getPoints());
 
+        c.placeCard(0, ResourceCardId3, ResourceCardId1, CornerPos.UPLEFT, Side.BACK);
+        assertEquals(0, player.getPoints());
 
-                int ResourceCardId1 = 40;
-                int ResourceCardId2 = 32;
-                int GoldCard1 = 79;
+        c.placeCard(0, ResourceCardId4, ResourceCardId3, CornerPos.UPRIGHT, Side.FRONT);
+        assertEquals(0, player.getPoints());
 
-                c.placeCard(0, ResourceCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
-                assertEquals(1, player.getCardPoints((ResourceCard) gs.getCardsMap().get(ResourceCardId1)));
+        c.placeCard(0, GoldCard1, ResourceCardId2, CornerPos.UPLEFT, Side.BACK);
+        assertEquals(4, player.getPoints());
 
-                c.placeCard(0, ResourceCardId2, ResourceCardId1, CornerPos.DOWNLEFT, Side.FRONT);
-                assertEquals(0, player.getCardPoints((ResourceCard) gs.getCardsMap().get(ResourceCardId2)));
-
-                c.placeCard(0, GoldCard1, ResourceCardId2, CornerPos.DOWNLEFT, Side.FRONT);
-                System.out.println(player.getCardPoints((GoldCard) gs.getCardsMap().get(GoldCard1)) );
-                assertEquals(1, player.getCardPoints((GoldCard) gs.getCardsMap().get(GoldCard1)));
-
-
-
-            } catch (NotUniquePlayerException e) {
-                throw new NotUniquePlayerException("Testing");
-            } catch (NotUniquePlayerColorException e) {
-                throw new NotUniquePlayerColorException("Testing");
-            } catch (NotUniquePlayerNicknameException e) {
-                throw new NotUniquePlayerNicknameException("Testing");
-            }
-        } catch (WrongStructureConfigurationSizeException e) {
-            throw new WrongStructureConfigurationSizeException("Testing");
-        } catch (IOException e) {
-            throw new IOException();
-        }
     }
 }
 

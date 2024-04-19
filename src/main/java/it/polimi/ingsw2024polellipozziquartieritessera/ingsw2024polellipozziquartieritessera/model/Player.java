@@ -132,11 +132,11 @@ public class Player {
 
     public void placeCard(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent {
         Corner tableCorner = tableCard.getCorners(placedCardsMap.get(tableCardId))[tableCornerPos.getCornerPosValue()];
-        if (tableCorner.getLinkedCorner() != null ){
+        if (tableCorner.getLinkedCorner() != null){
             throw new CardAlreadyPresent("you cannot place a card here");
         }
 
-        if (placingCard instanceof GoldCard){
+        if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)){
             ArrayList<Element> allPlayerElements = this.getAllElements();
             Element[] allExistingElements = Element.values();
             boolean cardIsPlaceable = true;
@@ -155,7 +155,6 @@ public class Player {
         placedCardsMap.put(placingCardId, placingCardSide);
         handCardsMap.remove(placingCardId);
         cornerCardsMap.put(placingCardId, placingCard);
-        points += this.getCardPoints(placingCard);
     }
 
     public static int getElementOccurencies(ArrayList<Element> elements, Element targetElement) {
@@ -274,6 +273,8 @@ public class Player {
     };
 
     public int getCardPoints(CornerCard cornerCard) throws WrongInstanceTypeException, CardNotPlacedException {
+        if (this.getBoardSide(cornerCard.getId()).equals(Side.BACK)) return 0;
+
         if (cornerCard instanceof GoldCard){
             return getCardPoints((GoldCard) cornerCard);
         } else if (cornerCard instanceof ResourceCard)
@@ -319,7 +320,18 @@ public class Player {
 // ---------------------Get Times Won ----------------------------------
 
     private int getTimesWonCoverage(GoldCard goldCard) {
-        return goldCard.getUncoveredCorners(placedCardsMap.get(goldCard.getId())).stream().map(Corner::getLinkedCorner).mapToInt((Corner c) -> c == null ? 0 : 1).sum();
+        ArrayList<Corner> uncoveredCorners = goldCard.getUncoveredCorners(placedCardsMap.get(goldCard.getId()));
+        // Stream<Corner> linkedCorners = uncoveredCorners.stream().map(Corner::getLinkedCorner);
+        // int times = linkedCorners.mapToInt((Corner c) -> c == null ? 0 : 1).sum();
+        int times = 0;
+        for (int i = 0; i < uncoveredCorners.size(); i++) {
+            Corner corner = uncoveredCorners.get(i);
+            Corner linkedCorner = corner.getLinkedCorner();
+            if (linkedCorner != null)
+                times++;
+        }
+
+        return times;
     }
     // remember that placedCardsMap.get() returns the side of the card played
 
