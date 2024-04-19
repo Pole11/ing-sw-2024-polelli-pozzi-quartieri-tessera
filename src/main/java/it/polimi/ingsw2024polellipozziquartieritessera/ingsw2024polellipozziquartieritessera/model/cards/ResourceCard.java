@@ -15,7 +15,7 @@ public class ResourceCard extends CornerCard {
         this.points = points;
     }
 
-    // GETTER
+    // GETTER.../ingsw2024polellipozziquartieritessera/model/cards/ObjectiveCardTest.java
     public Element getResourceType() {
         return resourceType;
     }

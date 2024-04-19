@@ -21,7 +21,7 @@ public class PlayerTest {
     }
 
     @Test
-    void getCardPoints() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlaced, CardAlreadyPresent {
+    void getCardPoints() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlaced, CardAlreadyPresent, CardNotPlacedException, WrongPlacingPositionException, WrongInstanceTypeException {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
         try { // create cards map
@@ -32,33 +32,33 @@ public class PlayerTest {
             try { // create game state
                 GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
                 Controller c = new Controller(gs);
-                c.startGame();
+                gs.getMainBoard().shuffleCards();
+                gs.setSharedGoldCards();
+                gs.setSharedResourceCards();
+
+                player.setStarterCard( (StarterCard) gs.getCardsMap().get(83));
+                player.initializeBoard();
+
+                gs.chooseStarterSidePhase();
+
                 c.chooseInitialStarterSide(0, Side.BACK);
 
-                try {
-                    int ResourceCardId1 = 40;
-                    int ResourceCardId2 = 32;
-                    int GoldCard1 = 79;
+
+                int ResourceCardId1 = 40;
+                int ResourceCardId2 = 32;
+                int GoldCard1 = 79;
+
+                c.placeCard(0, ResourceCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
+                assertEquals(1, player.getCardPoints((ResourceCard) gs.getCardsMap().get(ResourceCardId1)));
+
+                c.placeCard(0, ResourceCardId2, ResourceCardId1, CornerPos.DOWNLEFT, Side.FRONT);
+                assertEquals(0, player.getCardPoints((ResourceCard) gs.getCardsMap().get(ResourceCardId2)));
+
+                c.placeCard(0, GoldCard1, ResourceCardId2, CornerPos.DOWNLEFT, Side.FRONT);
+                System.out.println(player.getCardPoints((GoldCard) gs.getCardsMap().get(GoldCard1)) );
+                assertEquals(1, player.getCardPoints((GoldCard) gs.getCardsMap().get(GoldCard1)));
 
 
-                    c.placeCard(0, ResourceCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
-                    assertEquals(1, player.getCardPoints((ResourceCard) gs.getCardsMap().get(ResourceCardId1)));
-
-                    c.placeCard(0, ResourceCardId2, ResourceCardId1, CornerPos.DOWNLEFT, Side.BACK);
-                    assertEquals(0, player.getCardPoints((ResourceCard) gs.getCardsMap().get(ResourceCardId2)));
-
-                    c.placeCard(0, GoldCard1, ResourceCardId2, CornerPos.DOWNLEFT, Side.FRONT);
-                    System.out.println(player.getCardPoints((GoldCard) gs.getCardsMap().get(GoldCard1)) );
-                    assertEquals(3, player.getCardPoints((GoldCard) gs.getCardsMap().get(GoldCard1)));
-
-
-                } catch(WrongInstanceTypeException e) {
-
-                } catch (WrongPlacingPositionException e) {
-                    throw new RuntimeException(e);
-                } catch (CardNotPlacedException e) {
-                    throw new RuntimeException(e);
-                }
 
             } catch (NotUniquePlayerException e) {
                 throw new NotUniquePlayerException("Testing");
