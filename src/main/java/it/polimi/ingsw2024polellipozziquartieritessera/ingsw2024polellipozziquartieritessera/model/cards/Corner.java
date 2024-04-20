@@ -39,6 +39,10 @@ public class Corner {
         return cardId;
     }
 
+    public Boolean getHidden() {
+        return hidden;
+    }
+
     // SETTER
     public void setCovered(Boolean covered) {
         this.covered = covered;
@@ -47,4 +51,6 @@ public class Corner {
     public void setLinkedCorner(Corner linkedCorner) {
         this.linkedCorner = linkedCorner;
     }
+
+
 }

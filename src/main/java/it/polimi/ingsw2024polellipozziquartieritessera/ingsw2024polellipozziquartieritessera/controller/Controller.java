@@ -75,18 +75,21 @@ public class Controller {
 
         if (gameState.getCard(placingCardId) instanceof CornerCard ){
             placingCard = (CornerCard) gameState.getCard(placingCardId);
+            //player.getCornerCardsMap().put(placingCardId, (CornerCard) gameState.getCard(placingCardId));
+            //placingCard = player.getCornerCardsMap().get(placingCardId);
         } else {
             throw new WrongInstanceTypeException("placing card is not a CornerCard");
         }
 
         if (gameState.getCard(tableCardId) instanceof CornerCard ){
             tableCard = (CornerCard) gameState.getCard(tableCardId);
+            //player.getCornerCardsMap().put(placingCardId, (CornerCard) gameState.getCard(tableCardId));
+            //tableCard = player.getCornerCardsMap().get(tableCardId);
         } else {
-            throw new WrongInstanceTypeException("placing card is not a CornerCard");
+            throw new WrongInstanceTypeException("table card is not a CornerCard");
         }
 
-
-        player.placeCard(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
+        player.placeCard(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide); // we might pass the game state map
         this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
         // place card must be runned at last because it needs the player already updated
 
@@ -141,8 +144,6 @@ public class Controller {
         }
         player.getHandCardsMap().replace(cardId, side);
     }
-
-
 
     public void openChat(){}
 

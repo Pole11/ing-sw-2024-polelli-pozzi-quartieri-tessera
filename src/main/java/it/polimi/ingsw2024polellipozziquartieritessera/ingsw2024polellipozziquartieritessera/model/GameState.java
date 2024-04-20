@@ -250,7 +250,7 @@ public class GameState {
 
         for (int i = 0; i < getPlayers().size(); i++) {
             StarterCard starterCard = starters.get((key + i) % starters.size());
-            players.get(i).setStarterCard(starterCard);
+            players.get(i).setStarterCard(starterCard); // we might pass it the map of all the cards
             players.get(i).initializeBoard(); // add the starter card to the board of the player
         }
     }
@@ -354,7 +354,6 @@ public class GameState {
             if (isLastTurn) {
                 this.setCurrentGamePhase(GamePhase.FINALPHASE);
                 calculateFinalPoints();
-
             }
             else {
                 isLastTurn = true;
@@ -375,9 +374,7 @@ public class GameState {
                 // TODO: 17/04/2024 network draw methods
                 // notify current player to draw a card (notify all changes)
                 //wait
-
             }
-
             // play next turn
             // update current player
             this.setCurrentPlayerIndex((this.getCurrentPlayerIndex()+1) % this.getPlayers().size());
@@ -438,7 +435,6 @@ public class GameState {
             }
             winnerPlayerIndeces = winnerObjectives;
         }
-
         return(winnerPlayerIndeces);
     }
 
@@ -509,11 +505,12 @@ public class GameState {
         board.fillSharedCardsGap();
     }
 
-
-    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingSide) throws WrongPlacingPositionException {
+    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingCardSide) throws WrongPlacingPositionException {
         Side tableSide = player.getBoardSide(tableCardId);
-        Corner placingCorner = ((CornerCard) cardsMap.get(placingCardId)).getCorners(placingSide)[placingCornerPos.getCornerPosValue()];
-        Corner tableCorner = ((CornerCard) cardsMap.get(tableCardId)).getCorners(tableSide)[tableCornerPos.getCornerPosValue()];
+        CornerCard placingCard = (CornerCard) this.getCardsMap().get(placingCardId);
+        CornerCard tableCard = (CornerCard) this.getCardsMap().get(placingCardId);
+        Corner placingCorner = placingCard.getCorners(placingCardSide)[placingCornerPos.getCornerPosValue()];
+        Corner tableCorner = tableCard.getCorners(tableSide)[tableCornerPos.getCornerPosValue()];
         if (placingCorner == null){
             throw new WrongPlacingPositionException("placing corner is null");
         }
@@ -526,7 +523,16 @@ public class GameState {
         tableCorner.setLinkedCorner(placingCorner);
         tableCorner.setCovered(true);
 
-        player.updateBoard(placingCardId, tableCardId, tableCornerPos);
+        //player.updateBoard(placingCardId, tableCardId, tableCornerPos); // in theory it was already done
+
+        // update the allElements data structure
+        // !!! add elements of the placing card
+        for (Element ele : Element.values()) {
+            int currentOccurencies = player.getAllElements().get(ele);
+            int newOccurencies = Collections.frequency(placingCard.getUncoveredElements(placingCardSide), ele);
+            player.getAllElements().put(ele, currentOccurencies + newOccurencies);
+        }
+
         // check if you are covering other cards
         ArrayList<ArrayList<Integer>> playerBoard = player.getPlayerBoard();
         for (Integer row = 0; row < playerBoard.size(); row++) {
@@ -535,46 +541,66 @@ public class GameState {
                     // check if there is a card in the up left corner
                     if (row > 0 && playerBoard.get(row - 1).get(col) != -1) { // -1 means empty
                         int matrixCardId = playerBoard.get(row - 1).get(col);
-                        CornerCard matrixCard = (CornerCard) this.cardsMap.get(matrixCardId);
+                        CornerCard matrixCard = (CornerCard) this.getCardsMap().get(matrixCardId); // use the keys of player.placedCardsMap
                         Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.DOWNRIGHT.getCornerPosValue()];
 
                         placingCorner.setLinkedCorner(matrixCorner);
                         placingCorner.setCovered(false);// is false at default anyway
                         matrixCorner.setLinkedCorner(placingCorner);
                         matrixCorner.setCovered(true);
+
+                        // !!! remove elements of the table card that are covered
+                        Element cornerEle = matrixCorner.getElement();
+                        int currentOccurencies = player.getAllElements().get(cornerEle);
+                        player.getAllElements().put(cornerEle, currentOccurencies - 1);
                     }
                     // check if there is a card in the up right corner
                     if (col < playerBoard.get(row).size() - 1 && playerBoard.get(row).get(col + 1) != -1) { // -1 means empty
                         int matrixCardId = playerBoard.get(row).get(col + 1);
-                        CornerCard matrixCard = (CornerCard) this.cardsMap.get(matrixCardId);
+                        CornerCard matrixCard = (CornerCard) this.getCardsMap().get(matrixCardId);
                         Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.DOWNLEFT.getCornerPosValue()];
 
                         placingCorner.setLinkedCorner(matrixCorner);
                         placingCorner.setCovered(false);// is false at default anyway
                         matrixCorner.setLinkedCorner(placingCorner);
                         matrixCorner.setCovered(true);
+
+                        // !!! remove elements of the table card that are covered
+                        Element cornerEle = matrixCorner.getElement();
+                        int currentOccurencies = player.getAllElements().get(cornerEle);
+                        player.getAllElements().put(cornerEle, currentOccurencies - 1);
                     }
                     // check if there is a card in the down right corner
                     if (row < playerBoard.size() - 1 && playerBoard.get(row + 1).get(col) != -1) { // -1 means empty
                         int matrixCardId = playerBoard.get(row + 1).get(col);
-                        CornerCard matrixCard = (CornerCard) this.cardsMap.get(matrixCardId);
+                        CornerCard matrixCard = (CornerCard) this.getCardsMap().get(matrixCardId);
                         Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.UPLEFT.getCornerPosValue()];
 
                         placingCorner.setLinkedCorner(matrixCorner);
                         placingCorner.setCovered(false);// is false at default anyway
                         matrixCorner.setLinkedCorner(placingCorner);
                         matrixCorner.setCovered(true);
+
+                        // !!! remove elements of the table card that are covered
+                        Element cornerEle = matrixCorner.getElement();
+                        int currentOccurencies = player.getAllElements().get(cornerEle);
+                        player.getAllElements().put(cornerEle, currentOccurencies - 1);
                     }
                     // check if there is a card in the down left corner
                     if (col > 0 && playerBoard.get(row).get(col - 1) != -1) { // -1 means empty
                         int matrixCardId = playerBoard.get(row).get(col - 1);
-                        CornerCard matrixCard = (CornerCard) this.cardsMap.get(matrixCardId);
+                        CornerCard matrixCard = (CornerCard) this.getCardsMap().get(matrixCardId);
                         Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.UPRIGHT.getCornerPosValue()];
 
                         placingCorner.setLinkedCorner(matrixCorner);
                         placingCorner.setCovered(false);// is false at default anyway
                         matrixCorner.setLinkedCorner(placingCorner);
                         matrixCorner.setCovered(true);
+
+                        // !!! remove elements of the table card that are covered
+                        Element cornerEle = matrixCorner.getElement();
+                        int currentOccurencies = player.getAllElements().get(cornerEle);
+                        player.getAllElements().put(cornerEle, currentOccurencies - 1);
                     }
                 }
             }

@@ -6,8 +6,6 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 
-import javax.smartcardio.CardNotPresentException;
-import java.sql.Array;
 import java.util.*;
 import java.util.stream.*;
 
@@ -17,12 +15,14 @@ public class Player {
     private final ArrayList<ArrayList<Integer>> playerBoard;
     private final HashMap<Integer, Side> placedCardsMap;
     private final HashMap<Integer, Side> handCardsMap;
-    private final HashMap<Integer, CornerCard> cornerCardsMap;
 
     private int points;
     private int objectivesWon;
     private StarterCard starterCard; // it is the most important card because it is used to create all the composition of the cards
     private ObjectiveCard objectiveCard; // it is the secret objective
+
+    private final HashMap<Integer, Element> centerResource;
+    private final HashMap<Element, Integer> allElements;
 
     //per ora objectiveCardOptions serve, poi secondo me si potrà rimuovere
     private ObjectiveCard[] objectiveCardOptions; // it is the  array of the choice for secret objective
@@ -37,8 +37,9 @@ public class Player {
         this.playerBoard = new ArrayList<>();
         this.placedCardsMap = new HashMap<Integer, Side>();
         this.handCardsMap = new HashMap<Integer, Side>();
-        this.cornerCardsMap = new HashMap<Integer, CornerCard>();
         this.objectivesWon = 0;
+        this.centerResource = new HashMap<>();
+        allElements = new HashMap<>();
     }
 
     //GETTER
@@ -79,7 +80,19 @@ public class Player {
         return objectivesWon;
     }
 
-    //SETTER
+    public HashMap<Integer, Element> getCenterResource() {
+        return centerResource;
+    }
+
+    public HashMap<Element, Integer> getAllElements() {
+        return allElements;
+    }
+
+    public ObjectiveCard[] getObjectiveCardOptions() {
+        return this.objectiveCardOptions;
+    }
+
+//SETTER
 
     public void setObjectiveCard(ObjectiveCard objectiveCard) {
         this.objectiveCard = objectiveCard;
@@ -88,7 +101,7 @@ public class Player {
     public void setStarterCard(StarterCard starterCard) {
         this.starterCard = starterCard;
         this.getPlacedCardsMap().put(this.getStarterCard().getId(), Side.FRONT); // also set the default side to FRONT
-        this.cornerCardsMap.put(starterCard.getId(), starterCard);
+        // !!! add elements
     }
 
     public void setSecretObjectiveCardOptions(ObjectiveCard[] objectiveCards) {
@@ -99,10 +112,6 @@ public class Player {
         this.color = color;
     }
 
-    public ObjectiveCard[] getObjectiveCardOptions() {
-        return this.objectiveCardOptions;
-    }
-
     public void setPoints(int points) {
         this.points = points;
     }
@@ -111,13 +120,6 @@ public class Player {
 
     public void addPoints(int points) {
         this.points += points;
-    }
-
-    public ArrayList<Element> getAllElements() {
-        ArrayList<Element> elements = new ArrayList<>();
-        getPlacedCardsMap().forEach((id, side) -> elements.addAll(this.cornerCardsMap.get(id).getUncoveredElements(side)));
-
-        return elements;
     }
 
     public Side getBoardSide(int cardId) {
@@ -131,18 +133,17 @@ public class Player {
 // -------------------Place Cards Map Managing-----------------
 
     public void placeCard(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent {
-        Corner tableCorner = tableCard.getCorners(placedCardsMap.get(tableCardId))[tableCornerPos.getCornerPosValue()];
-        if (tableCorner.getLinkedCorner() != null){
+        Corner tableCorner = tableCard.getCorners(this.placedCardsMap.get(tableCardId))[tableCornerPos.getCornerPosValue()];
+        if (tableCorner.getLinkedCorner() != null && tableCorner.getHidden() == false){
             throw new CardAlreadyPresent("you cannot place a card here");
         }
 
-        if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)){
-            ArrayList<Element> allPlayerElements = this.getAllElements();
+        if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)){ // if it is gold and is placed front side (so it has a challenge)
             Element[] allExistingElements = Element.values();
             boolean cardIsPlaceable = true;
 
             for (Element ele : allExistingElements) {
-                if (getElementOccurencies(allPlayerElements, ele) < getElementOccurencies(((GoldCard) placingCard).getResourceNeeded(), ele)) {
+                if (this.getAllElements().get(ele) < getElementOccurencies(((GoldCard) placingCard).getResourceNeeded(), ele)) {
                     cardIsPlaceable = false;
                     break;
                 }
@@ -152,9 +153,10 @@ public class Player {
                 throw new GoldCardCannotBePlaced("You haven't the necessary resources to place the goldcard");
             }
         }
-        placedCardsMap.put(placingCardId, placingCardSide);
-        handCardsMap.remove(placingCardId);
-        cornerCardsMap.put(placingCardId, placingCard);
+        this.placedCardsMap.put(placingCardId, placingCardSide);
+        this.handCardsMap.remove(placingCardId);
+
+        this.getCenterResource().put(placingCardId, placingCard.getResourceType());
     }
 
     public static int getElementOccurencies(ArrayList<Element> elements, Element targetElement) {
@@ -336,13 +338,14 @@ public class Player {
     // remember that placedCardsMap.get() returns the side of the card played
 
     private int getTimesWonElement(ArrayList<Element> elements) {
-        ArrayList<Element> allElements = getAllElements();
-        Map<Element, Long> counts = elements.stream()
-                .collect(Collectors.toMap(
-                        e -> e,  // Key mapper (identity function for the element)
-                        e -> allElements.stream().filter(ae -> ae.equals(e)).count()  // Value mapper (count occurrences)
-                ));
-        return counts.values().stream().reduce((a, b) -> a < b ? a : b).orElseThrow().intValue();
+        int min = Integer.MAX_VALUE;
+        for (Element ele : elements) {
+            if (this.getAllElements().get(ele) < min) {
+                min = this.getAllElements().get(ele);
+            }
+        }
+
+        return min;
     }
 
     private int getTimesWonStructure(StructureChallenge challenge) throws WrongInstanceTypeException {
@@ -355,7 +358,7 @@ public class Player {
             for (int j=0; j<cols; j++){
                 int cardId = getPlayerBoard().get(i).get(j);
                 if (cardId != -1){
-                    elementBoard[i][j] = this.cornerCardsMap.get(cardId).getResourceType();
+                    elementBoard[i][j] = this.getCenterResource().get(cardId); // get this info from gs
                 } else{
                     elementBoard[i][j] = Element.EMPTY;
                 }
@@ -409,10 +412,3 @@ public class Player {
     }
 
 }
-
-
-
-
-
-
-
