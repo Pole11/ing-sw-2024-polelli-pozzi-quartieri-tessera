@@ -1,28 +1,223 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.controller;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Main;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.Controller;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.CornerPos;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ControllerTest {
     @Test
     void placeCard() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent {
-        GameState game = Main.populate();
-        Controller controller = new Controller(game);
-        controller.startGame();
-        controller.chooseInitialStarterSide(0, Side.BACK);
-        int goldCoverageCardId = 55;
-        controller.placeCard(0, goldCoverageCardId, game.getPlayers().get(0).getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
-        controller.placeCard(0, goldCoverageCardId, game.getPlayers().get(0).getStarterCard().getId(), CornerPos.UPRIGHT, Side.FRONT);
-        controller.placeCard(0, goldCoverageCardId, game.getPlayers().get(0).getStarterCard().getId(), CornerPos.DOWNLEFT, Side.FRONT);
-        controller.placeCard(0, goldCoverageCardId, game.getPlayers().get(0).getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.FRONT);
-        // placing different cards should throw an exception
+        Player player = new Player("pole", Color.GREEN);
+        Main main = new Main();
+        // create cards map
+        HashMap<Integer, Card> cardsMap = main.createCardsMap();
 
+        assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
+
+        // create game state
+        GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
+        Controller c = new Controller(gs);
+        c.startGame();
+
+        Side starterCardSide = Side.BACK;
+        player.setStarterCard((StarterCard) gs.getCardsMap().get(85));
+        player.initializeBoard();
+        c.chooseInitialStarterSide(0, starterCardSide);
+        int starterCardId = player.getStarterCard().getId();
+
+        int resourceCardId1 = 1;
+        Side resourceCard1Side = Side.BACK;
+        CornerPos resourceCard1ToTableCornerPos = CornerPos.UPLEFT;
+        int resourceCardId2 = 13;
+        Side resourceCard2Side = Side.FRONT;
+        CornerPos resourceCard2ToTableCornerPos = CornerPos.DOWNLEFT;
+        int resourceCardId3 = 11;
+        Side resourceCard3Side = Side.BACK;
+        CornerPos resourceCard3ToTableCornerPos = CornerPos.UPLEFT;
+        int resourceCardId4 = 18;
+        Side resourceCard4Side = Side.FRONT;
+        CornerPos resourceCard4ToTableCornerPos = CornerPos.UPLEFT;
+        int goldCardId = 56;
+        Side goldCardSide = Side.FRONT;
+        CornerPos goldCardToTableCornerPos = CornerPos.UPLEFT;
+
+        assertEquals(1, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(1, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(1, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(1, player.getAllElements().get(Element.FUNGI)); // fungi
+
+        c.placeCard(0, resourceCardId1, starterCardId, resourceCard1ToTableCornerPos, resourceCard1Side);
+        Corner[] starterCardCorners = ((CornerCard) gs.getCardsMap().get(starterCardId)).getCorners(starterCardSide);
+        Corner[] resourceCard1Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId1)).getCorners(resourceCard1Side);
+
+        for (CornerPos cpos : CornerPos.values()) {
+            if (cpos.equals(resourceCard1ToTableCornerPos)) {
+                assertEquals(true, starterCardCorners[cpos.getCornerPosValue()].getCovered());
+                assertEquals(false, resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
+                assertEquals(starterCardCorners[cpos.getCornerPosValue()].getLinkedCorner(),
+                        resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4]);
+                assertEquals(resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner(),
+                        starterCardCorners[cpos.getCornerPosValue()]);
+            } else {
+                assertEquals(false, starterCardCorners[cpos.getCornerPosValue()].getCovered());
+                assertEquals(false, resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
+                assertEquals(null,
+                        resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
+                assertEquals(null,
+                        starterCardCorners[cpos.getCornerPosValue()].getLinkedCorner());
+            }
+        }
+
+        assertEquals(1, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(1, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
+
+        c.placeCard(0, resourceCardId2, resourceCardId1, resourceCard2ToTableCornerPos, resourceCard2Side);
+        resourceCard1Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId1)).getCorners(resourceCard1Side);
+        Corner[] resourceCard2Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId2)).getCorners(resourceCard2Side);
+
+        for (CornerPos cpos : CornerPos.values()) {
+            if (cpos.equals(resourceCard2ToTableCornerPos)) {
+                assertEquals(true, resourceCard1Corners[cpos.getCornerPosValue()].getCovered());
+                assertEquals(false, resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
+                assertEquals(resourceCard1Corners[cpos.getCornerPosValue()].getLinkedCorner(),
+                        resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4]);
+                assertEquals(resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner(),
+                        resourceCard1Corners[cpos.getCornerPosValue()]);
+            } else {
+                assertEquals(false, resourceCard1Corners[cpos.getCornerPosValue()].getCovered());
+                assertEquals(false, resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
+                assertEquals(null,
+                        resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
+            }
+
+        }
+
+        assertEquals(1, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(3, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
+
+        c.placeCard(0, resourceCardId3, resourceCardId1, resourceCard3ToTableCornerPos, resourceCard3Side);
+        resourceCard1Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId1)).getCorners(resourceCard1Side);
+        Corner[] resourceCard3Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId3)).getCorners(resourceCard3Side);
+
+        for (CornerPos cpos : CornerPos.values()) {
+            if (cpos.equals(resourceCard3ToTableCornerPos)) {
+                assertEquals(true, resourceCard1Corners[cpos.getCornerPosValue()].getCovered());
+                assertEquals(false, resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
+                assertEquals(resourceCard1Corners[cpos.getCornerPosValue()].getLinkedCorner(),
+                        resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4]);
+                assertEquals(resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner(),
+                        resourceCard1Corners[cpos.getCornerPosValue()]);
+            } else if (cpos.equals(resourceCard2ToTableCornerPos)) {
+                assertEquals(true, resourceCard1Corners[cpos.getCornerPosValue()].getCovered());
+            }else {
+                assertEquals(false, resourceCard1Corners[cpos.getCornerPosValue()].getCovered());
+                assertEquals(false, resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
+                assertEquals(null,
+                        resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
+            }
+
+        }
+
+        assertEquals(1, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(4, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
+
+        c.placeCard(0, resourceCardId4, resourceCardId3, resourceCard4ToTableCornerPos, resourceCard4Side);
+        resourceCard3Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId3)).getCorners(resourceCard3Side);
+        Corner[] resourceCard4Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId4)).getCorners(resourceCard4Side);
+
+        for (CornerPos cpos : CornerPos.values()) {
+            if (cpos.equals(resourceCard4ToTableCornerPos)) {
+                assertEquals(true, resourceCard3Corners[cpos.getCornerPosValue()].getCovered());
+                assertEquals(false, resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
+                assertEquals(resourceCard3Corners[cpos.getCornerPosValue()].getLinkedCorner(),
+                        resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4]);
+                assertEquals(resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner(),
+                        resourceCard3Corners[cpos.getCornerPosValue()]);
+            } else {
+                assertEquals(false, resourceCard3Corners[cpos.getCornerPosValue()].getCovered());
+                assertEquals(false, resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
+                assertEquals(null,
+                        resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
+            }
+
+        }
+
+        assertEquals(1, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(5, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
+
+        c.placeCard(0, goldCardId, resourceCardId2, goldCardToTableCornerPos, goldCardSide);
+        resourceCard2Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId2)).getCorners(resourceCard2Side);
+        Corner[] goldCardCorners = ((CornerCard) gs.getCardsMap().get(goldCardId)).getCorners(goldCardSide);
+
+        assertEquals(false, goldCardCorners[CornerPos.UPLEFT.getCornerPosValue()].getCovered());
+        assertEquals(null,
+                goldCardCorners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(false, goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getCovered());
+        assertEquals(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()],
+                goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
+        //assertEquals(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner(),
+        //        goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()]);
+        assertEquals(false, goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()].getCovered());
+        assertEquals(resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()],
+                goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner(),
+                goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()]);
+        assertEquals(false, goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()].getCovered());
+        assertEquals(null,
+                goldCardCorners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner());
+
+        assertEquals(true, resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()].getCovered());
+        assertEquals(goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()],
+                resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner(),
+                resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()]);
+        assertEquals(false, resourceCard2Corners[CornerPos.UPRIGHT.getCornerPosValue()].getCovered());
+        //assertEquals(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()],
+        //        resourceCard2Corners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
+        //assertEquals(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner(),
+        //        resourceCard2Corners[CornerPos.UPRIGHT.getCornerPosValue()]);
+        assertEquals(false, resourceCard2Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getCovered());
+        assertEquals(null,
+                resourceCard2Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(false, resourceCard2Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getCovered());
+        assertEquals(null,
+                resourceCard2Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner());
+
+        assertEquals(true, resourceCard3Corners[CornerPos.UPLEFT.getCornerPosValue()].getCovered());
+        //assertEquals(resourceCard1Corners[CornerPos.DOWNRIGHT.getCornerPosValue()],
+        //        resourceCard3Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner());
+        //assertEquals(resourceCard1Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner(),
+        //        resourceCard3Corners[CornerPos.UPLEFT.getCornerPosValue()]);
+        assertEquals(false, resourceCard3Corners[CornerPos.UPRIGHT.getCornerPosValue()].getCovered());
+        assertEquals(null,
+                resourceCard3Corners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(false, resourceCard3Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getCovered());
+        //assertEquals(null,
+        //        resourceCard3Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(true, resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getCovered());
+        //assertEquals(goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()],
+        //        resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner(),
+                resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()]);
     }
 }

@@ -143,10 +143,9 @@ public class Player {
         }
 
         if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)){ // if it is gold and is placed front side (so it has a challenge)
-            Element[] allExistingElements = Element.values();
             boolean cardIsPlaceable = true;
 
-            for (Element ele : allExistingElements) {
+            for (Element ele : Element.values()) {
                 if (this.getAllElements().get(ele) < getElementOccurencies(((GoldCard) placingCard).getResourceNeeded(), ele)) {
                     cardIsPlaceable = false;
                     break;
@@ -154,7 +153,7 @@ public class Player {
             }
 
             if (!cardIsPlaceable){
-                throw new GoldCardCannotBePlaced("You haven't the necessary resources to place the goldcard");
+                throw new GoldCardCannotBePlaced("You haven't the necessary resources to place the goldcard " + placingCardId);
             }
         }
         this.placedCardsMap.put(placingCardId, placingCardSide);
@@ -198,7 +197,7 @@ public class Player {
         }
 
         // Define the position of the new card
-        switch(existingCornerPos){
+        switch(existingCornerPos) {
             case CornerPos.UPLEFT:
                 rowIndex--;
                 break;
@@ -212,13 +211,14 @@ public class Player {
                 colIndex--;
                 break;
         }
+
         // Check if the new position is outside the bounds of the current matrix
         if (rowIndex < 0 || rowIndex >= playerBoard.size() || colIndex < 0 || colIndex >= playerBoard.getFirst().size()) {
             // Expand the matrix if necessary
             expandBoard(rowIndex, colIndex);
             if (rowIndex < 0){
                 rowIndex ++;
-            } else if (colIndex<0){
+            } else if (colIndex < 0){
                 colIndex ++;
             }
         }

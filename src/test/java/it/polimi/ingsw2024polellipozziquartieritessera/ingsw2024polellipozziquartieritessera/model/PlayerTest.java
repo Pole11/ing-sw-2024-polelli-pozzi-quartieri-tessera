@@ -35,25 +35,25 @@ public class PlayerTest {
         c.startGame();
         c.chooseInitialStarterSide(0, Side.BACK);
 
-        int ResourceCardId1 = 40;
-        int ResourceCardId2 = 32;
-        int ResourceCardId3 = 53;
+        int ResourceCardId1 = 1;
+        int ResourceCardId2 = 13;
+        int ResourceCardId3 = 11;
         int ResourceCardId4 = 18;
-        int GoldCard1 = 75;
+        int GoldCard1 = 56;
 
         c.placeCard(0, ResourceCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
         assertEquals(0, player.getPoints());
 
-        c.placeCard(0, ResourceCardId2, ResourceCardId1, CornerPos.DOWNLEFT, Side.BACK);
+        c.placeCard(0, ResourceCardId2, ResourceCardId1, CornerPos.DOWNLEFT, Side.FRONT);
         assertEquals(0, player.getPoints());
 
         c.placeCard(0, ResourceCardId3, ResourceCardId1, CornerPos.UPLEFT, Side.BACK);
         assertEquals(0, player.getPoints());
 
-        c.placeCard(0, ResourceCardId4, ResourceCardId3, CornerPos.UPRIGHT, Side.FRONT);
+        c.placeCard(0, ResourceCardId4, ResourceCardId3, CornerPos.UPLEFT, Side.FRONT);
         assertEquals(1, player.getPoints());
 
-        c.placeCard(0, GoldCard1, ResourceCardId2, CornerPos.UPLEFT, Side.BACK);
+        c.placeCard(0, GoldCard1, ResourceCardId2, CornerPos.UPLEFT, Side.FRONT);
         assertEquals(4 + 1, player.getPoints());
 
     }
