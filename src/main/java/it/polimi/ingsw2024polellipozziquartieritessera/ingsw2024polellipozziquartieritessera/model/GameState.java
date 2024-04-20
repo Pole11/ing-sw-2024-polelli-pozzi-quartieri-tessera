@@ -13,10 +13,10 @@ import java.util.*;
 
 public class GameState {
 
-    private final HashMap<Integer, Card> cardsMap; // map id and card
-    private final Board mainBoard;
-    private final ArrayList<Player> players; //player[0] is blackPlayer
-    private final Chat chat;
+    private HashMap<Integer, Card> cardsMap; // map id and card
+    private Board mainBoard;
+    private ArrayList<Player> players; //player[0] is blackPlayer
+    private Chat chat;
     private int currentPlayerIndex;
     private GamePhase currentGamePhase;
     private TurnPhase currentGameTurn;
@@ -47,7 +47,6 @@ public class GameState {
         }
 
         this.mainBoard = new Board(resourceCardDeck,goldCardDeck);
-
 
         if (!NicknameAndColorsAreValid()) {
             throw new NotUniquePlayerException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname AND the same color");
@@ -98,12 +97,9 @@ public class GameState {
         return true;
     }
 
-
-
-
     // GETTER
     public HashMap<Integer, Card> getCardsMap() {
-        return cardsMap;
+        return this.cardsMap;
     }
 
     public Board getMainBoard() {
@@ -508,7 +504,7 @@ public class GameState {
     public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingCardSide) throws WrongPlacingPositionException {
         Side tableSide = player.getBoardSide(tableCardId);
         CornerCard placingCard = (CornerCard) this.getCardsMap().get(placingCardId);
-        CornerCard tableCard = (CornerCard) this.getCardsMap().get(placingCardId);
+        CornerCard tableCard = (CornerCard) this.getCardsMap().get(tableCardId);
         Corner placingCorner = placingCard.getCorners(placingCardSide)[placingCornerPos.getCornerPosValue()];
         Corner tableCorner = tableCard.getCorners(tableSide)[tableCornerPos.getCornerPosValue()];
         if (placingCorner == null){
@@ -528,9 +524,11 @@ public class GameState {
         // update the allElements data structure
         // !!! add elements of the placing card
         for (Element ele : Element.values()) {
-            int currentOccurencies = player.getAllElements().get(ele);
-            int newOccurencies = Collections.frequency(placingCard.getUncoveredElements(placingCardSide), ele);
-            player.getAllElements().put(ele, currentOccurencies + newOccurencies);
+            if (player.getAllElements().get(ele) != null) {
+                int currentOccurencies = player.getAllElements().get(ele);
+                int newOccurencies = Collections.frequency(placingCard.getUncoveredElements(placingCardSide), ele);
+                player.getAllElements().put(ele, currentOccurencies + newOccurencies);
+            }
         }
 
         // check if you are covering other cards
@@ -551,8 +549,10 @@ public class GameState {
 
                         // !!! remove elements of the table card that are covered
                         Element cornerEle = matrixCorner.getElement();
-                        int currentOccurencies = player.getAllElements().get(cornerEle);
-                        player.getAllElements().put(cornerEle, currentOccurencies - 1);
+                        if (player.getAllElements().get(cornerEle) != null) {
+                            int currentOccurencies = player.getAllElements().get(cornerEle);
+                            player.getAllElements().put(cornerEle, currentOccurencies - 1);
+                        }
                     }
                     // check if there is a card in the up right corner
                     if (col < playerBoard.get(row).size() - 1 && playerBoard.get(row).get(col + 1) != -1) { // -1 means empty
@@ -567,8 +567,10 @@ public class GameState {
 
                         // !!! remove elements of the table card that are covered
                         Element cornerEle = matrixCorner.getElement();
-                        int currentOccurencies = player.getAllElements().get(cornerEle);
-                        player.getAllElements().put(cornerEle, currentOccurencies - 1);
+                        if (player.getAllElements().get(cornerEle) != null) {
+                            int currentOccurencies = player.getAllElements().get(cornerEle);
+                            player.getAllElements().put(cornerEle, currentOccurencies - 1);
+                        }
                     }
                     // check if there is a card in the down right corner
                     if (row < playerBoard.size() - 1 && playerBoard.get(row + 1).get(col) != -1) { // -1 means empty
@@ -583,8 +585,10 @@ public class GameState {
 
                         // !!! remove elements of the table card that are covered
                         Element cornerEle = matrixCorner.getElement();
-                        int currentOccurencies = player.getAllElements().get(cornerEle);
-                        player.getAllElements().put(cornerEle, currentOccurencies - 1);
+                        if (player.getAllElements().get(cornerEle) != null) {
+                            int currentOccurencies = player.getAllElements().get(cornerEle);
+                            player.getAllElements().put(cornerEle, currentOccurencies - 1);
+                        }
                     }
                     // check if there is a card in the down left corner
                     if (col > 0 && playerBoard.get(row).get(col - 1) != -1) { // -1 means empty
@@ -599,8 +603,10 @@ public class GameState {
 
                         // !!! remove elements of the table card that are covered
                         Element cornerEle = matrixCorner.getElement();
-                        int currentOccurencies = player.getAllElements().get(cornerEle);
-                        player.getAllElements().put(cornerEle, currentOccurencies - 1);
+                        if (player.getAllElements().get(cornerEle) != null) {
+                            int currentOccurencies = player.getAllElements().get(cornerEle);
+                            player.getAllElements().put(cornerEle, currentOccurencies - 1);
+                        }
                     }
                 }
             }

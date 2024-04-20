@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public abstract class CornerCard extends Card {
-    private final Corner[] frontCorners; // the corners of the front side (from top-left clockwise) 0 1
-    private final Corner[] backCorners; // the corners of the back side (from top-left clockwise)   3 2
+    private Corner[] frontCorners; // the corners of the front side (from top-left clockwise) 0 1
+    private Corner[] backCorners; // the corners of the back side (from top-left clockwise)   3 2
 
     // CONSTRUCTOR
     public CornerCard(int id, Corner[] frontCorners, Corner[] backCorners) {
@@ -28,6 +28,7 @@ public abstract class CornerCard extends Card {
     }
 
     // METHODS
+
     // return all the corners of the card (back and front)
     public ArrayList<Corner> getCorners() {
         // corner array initialization

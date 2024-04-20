@@ -54,7 +54,7 @@ public class PlayerTest {
         assertEquals(1, player.getPoints());
 
         c.placeCard(0, GoldCard1, ResourceCardId2, CornerPos.UPLEFT, Side.BACK);
-        assertEquals(4, player.getPoints());
+        assertEquals(4 + 1, player.getPoints());
 
     }
 }

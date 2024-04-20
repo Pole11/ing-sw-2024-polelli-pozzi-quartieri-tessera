@@ -10,19 +10,19 @@ import java.util.*;
 import java.util.stream.*;
 
 public class Player {
-    private final String nickname;
+    private String nickname;
     private Color color;
-    private final ArrayList<ArrayList<Integer>> playerBoard;
-    private final HashMap<Integer, Side> placedCardsMap;
-    private final HashMap<Integer, Side> handCardsMap;
+    private ArrayList<ArrayList<Integer>> playerBoard;
+    private HashMap<Integer, Side> placedCardsMap;
+    private HashMap<Integer, Side> handCardsMap;
 
     private int points;
     private int objectivesWon;
     private StarterCard starterCard; // it is the most important card because it is used to create all the composition of the cards
     private ObjectiveCard objectiveCard; // it is the secret objective
 
-    private final HashMap<Integer, Element> centerResource;
-    private final HashMap<Element, Integer> allElements;
+    private HashMap<Integer, Element> centerResource;
+    private HashMap<Element, Integer> allElements;
 
     //per ora objectiveCardOptions serve, poi secondo me si potrà rimuovere
     private ObjectiveCard[] objectiveCardOptions; // it is the  array of the choice for secret objective
@@ -40,6 +40,10 @@ public class Player {
         this.objectivesWon = 0;
         this.centerResource = new HashMap<>();
         allElements = new HashMap<>();
+
+        for (Element element : Element.values()) {
+            allElements.put(element, 0);
+        }
     }
 
     //GETTER
@@ -134,7 +138,7 @@ public class Player {
 
     public void placeCard(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent {
         Corner tableCorner = tableCard.getCorners(this.placedCardsMap.get(tableCardId))[tableCornerPos.getCornerPosValue()];
-        if (tableCorner.getLinkedCorner() != null && tableCorner.getHidden() == false){
+        if (tableCorner.getLinkedCorner() != null && tableCorner.getHidden() == true){
             throw new CardAlreadyPresent("you cannot place a card here");
         }
 

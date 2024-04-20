@@ -5,8 +5,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.util.ArrayList;
 
 public class ResourceCard extends CornerCard {
-    private final Element resourceType; //color of the card, determined by the major resourceType
-    private final int points; // points earned with the placement of the card
+    private Element resourceType; //color of the card, determined by the major resourceType
+    private int points; // points earned with the placement of the card
 
     // CONSTRUCTOR
     public ResourceCard(int id, Element resourceType, int points, Corner[] frontCorners, Corner[] backCorners) {
@@ -15,7 +15,7 @@ public class ResourceCard extends CornerCard {
         this.points = points;
     }
 
-    // GETTER.../ingsw2024polellipozziquartieritessera/model/cards/ObjectiveCardTest.java
+    // GETTER...
     public Element getResourceType() {
         return resourceType;
     }

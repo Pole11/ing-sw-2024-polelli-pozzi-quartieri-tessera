@@ -68,7 +68,6 @@ public class Controller {
             case CornerPos.DOWNRIGHT -> CornerPos.UPLEFT;
         };
 
-
         CornerCard placingCard = null;
         CornerCard tableCard = null;
         player.updateBoard(placingCardId, tableCardId, tableCornerPos);

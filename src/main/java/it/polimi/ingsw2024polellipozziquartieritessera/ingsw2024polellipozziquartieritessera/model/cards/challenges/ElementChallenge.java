@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ElementChallenge extends Challenge {
-    private final ArrayList<Element> elements;
+    private ArrayList<Element> elements;
 
     public ElementChallenge(ArrayList<Element> elements){
         // should we put a copy in here???

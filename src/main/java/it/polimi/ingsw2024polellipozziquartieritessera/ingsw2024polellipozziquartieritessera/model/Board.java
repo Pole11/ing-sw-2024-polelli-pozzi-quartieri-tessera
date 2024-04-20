@@ -9,8 +9,8 @@ public class Board {
     private GoldCard[] sharedGoldCards; // 2 gold cards shared between players
     private ResourceCard[] sharedResourceCards; // 2 resource cards shared between players
     private ObjectiveCard[] sharedObjectiveCards; // 2 objective cards shared between players
-    private final ArrayList<GoldCard> goldDeck;
-    private final ArrayList<ResourceCard> resourceDeck;
+    private ArrayList<GoldCard> goldDeck;
+    private ArrayList<ResourceCard> resourceDeck;
 
     public Board(ArrayList<ResourceCard> resourceCardDeck, ArrayList<GoldCard> goldCardDeck){
         sharedGoldCards = new GoldCard[Config.N_SHARED_GOLDS];
