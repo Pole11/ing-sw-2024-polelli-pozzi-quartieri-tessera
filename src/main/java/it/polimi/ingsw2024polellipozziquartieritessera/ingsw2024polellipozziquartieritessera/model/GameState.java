@@ -554,7 +554,7 @@ public class GameState {
 
                         indirectPlacingCorner.setLinkedCorner(matrixCorner);
                         indirectPlacingCorner.setCovered(false);// is false at default anyway
-                        matrixCorner.setLinkedCorner(placingCorner);
+                        matrixCorner.setLinkedCorner(indirectPlacingCorner);
                         matrixCorner.setCovered(true);
 
                         // !!! remove elements of the table card that are covered
@@ -575,7 +575,7 @@ public class GameState {
 
                         indirectPlacingCorner.setLinkedCorner(matrixCorner);
                         indirectPlacingCorner.setCovered(false);// is false at default anyway
-                        matrixCorner.setLinkedCorner(placingCorner);
+                        matrixCorner.setLinkedCorner(indirectPlacingCorner);
                         matrixCorner.setCovered(true);
 
                         // !!! remove elements of the table card that are covered
@@ -595,7 +595,7 @@ public class GameState {
 
                         indirectPlacingCorner.setLinkedCorner(matrixCorner);
                         indirectPlacingCorner.setCovered(false);// is false at default anyway
-                        matrixCorner.setLinkedCorner(placingCorner);
+                        matrixCorner.setLinkedCorner(indirectPlacingCorner);
                         matrixCorner.setCovered(true);
 
                         // !!! remove elements of the table card that are covered
@@ -615,7 +615,7 @@ public class GameState {
 
                         indirectPlacingCorner.setLinkedCorner(matrixCorner);
                         indirectPlacingCorner.setCovered(false);// is false at default anyway
-                        matrixCorner.setLinkedCorner(placingCorner);
+                        matrixCorner.setLinkedCorner(indirectPlacingCorner);
                         matrixCorner.setCovered(true);
 
                         // !!! remove elements of the table card that are covered

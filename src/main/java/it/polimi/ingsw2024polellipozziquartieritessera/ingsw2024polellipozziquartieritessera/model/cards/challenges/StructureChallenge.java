@@ -6,7 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 
 public class StructureChallenge extends Challenge{
-    private Element[][] configuration;
+    private final Element[][] configuration;
 
     public Element[][] getConfiguration() {return configuration;}
 

@@ -3,9 +3,9 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 
 public class Corner {
-    private Element element; // contains the resource/item on the corner (empty if has no element)
-    private int cardId; // identifier of the parent card (from 1 to 102)
-    private Boolean hidden;
+    private final Element element; // contains the resource/item on the corner (empty if has no element)
+    private final int cardId; // identifier of the parent card (from 1 to 102)
+    private final Boolean hidden;
     private Boolean covered; //true if there is another card on top (false otherwise)
     private Corner linkedCorner; // the corner linked to this one (null if not exists)
 

@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ControllerTest {
     @Test
@@ -68,15 +67,19 @@ public class ControllerTest {
                 assertEquals(false, resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
                 assertEquals(starterCardCorners[cpos.getCornerPosValue()].getLinkedCorner(),
                         resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4]);
+                assertTrue(starterCardCorners[cpos.getCornerPosValue()].getLinkedCorner() == resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4]);
                 assertEquals(resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner(),
                         starterCardCorners[cpos.getCornerPosValue()]);
+                assertTrue(resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner() == starterCardCorners[cpos.getCornerPosValue()]);
             } else {
                 assertEquals(false, starterCardCorners[cpos.getCornerPosValue()].getCovered());
                 assertEquals(false, resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
                 assertEquals(null,
                         resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
+                assertTrue(null == resourceCard1Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
                 assertEquals(null,
                         starterCardCorners[cpos.getCornerPosValue()].getLinkedCorner());
+                assertTrue(null == starterCardCorners[cpos.getCornerPosValue()].getLinkedCorner());
             }
         }
 
@@ -95,13 +98,16 @@ public class ControllerTest {
                 assertEquals(false, resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
                 assertEquals(resourceCard1Corners[cpos.getCornerPosValue()].getLinkedCorner(),
                         resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4]);
+                assertTrue(resourceCard1Corners[cpos.getCornerPosValue()].getLinkedCorner() == resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4]);
                 assertEquals(resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner(),
                         resourceCard1Corners[cpos.getCornerPosValue()]);
+                assertTrue(resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner() == resourceCard1Corners[cpos.getCornerPosValue()]);
             } else {
                 assertEquals(false, resourceCard1Corners[cpos.getCornerPosValue()].getCovered());
                 assertEquals(false, resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
                 assertEquals(null,
                         resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
+                assertTrue(null == resourceCard2Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
             }
 
         }
@@ -121,8 +127,10 @@ public class ControllerTest {
                 assertEquals(false, resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
                 assertEquals(resourceCard1Corners[cpos.getCornerPosValue()].getLinkedCorner(),
                         resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4]);
+                assertTrue(resourceCard1Corners[cpos.getCornerPosValue()].getLinkedCorner() == resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4]);
                 assertEquals(resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner(),
                         resourceCard1Corners[cpos.getCornerPosValue()]);
+                assertTrue(resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner() == resourceCard1Corners[cpos.getCornerPosValue()]);
             } else if (cpos.equals(resourceCard2ToTableCornerPos)) {
                 assertEquals(true, resourceCard1Corners[cpos.getCornerPosValue()].getCovered());
             }else {
@@ -130,6 +138,7 @@ public class ControllerTest {
                 assertEquals(false, resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
                 assertEquals(null,
                         resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
+                assertTrue(null == resourceCard3Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
             }
 
         }
@@ -149,13 +158,16 @@ public class ControllerTest {
                 assertEquals(false, resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
                 assertEquals(resourceCard3Corners[cpos.getCornerPosValue()].getLinkedCorner(),
                         resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4]);
+                assertTrue(resourceCard3Corners[cpos.getCornerPosValue()].getLinkedCorner() == resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4]);
                 assertEquals(resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner(),
                         resourceCard3Corners[cpos.getCornerPosValue()]);
+                assertTrue(resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner() == resourceCard3Corners[cpos.getCornerPosValue()]);
             } else {
                 assertEquals(false, resourceCard3Corners[cpos.getCornerPosValue()].getCovered());
                 assertEquals(false, resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4].getCovered());
                 assertEquals(null,
                         resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
+                assertTrue(null == resourceCard4Corners[(cpos.getCornerPosValue() + 2) % 4].getLinkedCorner());
             }
 
         }
@@ -172,52 +184,74 @@ public class ControllerTest {
         assertEquals(false, goldCardCorners[CornerPos.UPLEFT.getCornerPosValue()].getCovered());
         assertEquals(null,
                 goldCardCorners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(null == goldCardCorners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner());
         assertEquals(false, goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getCovered());
         assertEquals(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()],
                 goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
-        //assertEquals(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner(),
-        //        goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()]);
+        assertTrue(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()] == goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()] == goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner(),
+                goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()]);
+        assertTrue(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner() == goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()]);
         assertEquals(false, goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()].getCovered());
         assertEquals(resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()],
                 goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()] == goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner());
         assertEquals(resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner(),
                 goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()]);
+        assertTrue(resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner() == goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()]);
         assertEquals(false, goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()].getCovered());
         assertEquals(null,
                 goldCardCorners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(null == goldCardCorners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner());
 
         assertEquals(true, resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()].getCovered());
         assertEquals(goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()],
                 resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()] == resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner());
         assertEquals(goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner(),
                 resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()]);
+        assertTrue(goldCardCorners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner() == resourceCard2Corners[CornerPos.UPLEFT.getCornerPosValue()]);
         assertEquals(false, resourceCard2Corners[CornerPos.UPRIGHT.getCornerPosValue()].getCovered());
-        //assertEquals(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()],
-        //        resourceCard2Corners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
-        //assertEquals(resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner(),
-        //        resourceCard2Corners[CornerPos.UPRIGHT.getCornerPosValue()]);
+        assertEquals(resourceCard1Corners[CornerPos.DOWNLEFT.getCornerPosValue()],
+                resourceCard2Corners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(resourceCard1Corners[CornerPos.DOWNLEFT.getCornerPosValue()] == resourceCard2Corners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(resourceCard1Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner(),
+                resourceCard2Corners[CornerPos.UPRIGHT.getCornerPosValue()]);
+        assertTrue(resourceCard1Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner() == resourceCard2Corners[CornerPos.UPRIGHT.getCornerPosValue()]);
         assertEquals(false, resourceCard2Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getCovered());
         assertEquals(null,
                 resourceCard2Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(null == resourceCard2Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner());
         assertEquals(false, resourceCard2Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getCovered());
         assertEquals(null,
                 resourceCard2Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(null == resourceCard2Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner());
 
         assertEquals(true, resourceCard3Corners[CornerPos.UPLEFT.getCornerPosValue()].getCovered());
-        //assertEquals(resourceCard1Corners[CornerPos.DOWNRIGHT.getCornerPosValue()],
-        //        resourceCard3Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner());
-        //assertEquals(resourceCard1Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner(),
-        //        resourceCard3Corners[CornerPos.UPLEFT.getCornerPosValue()]);
+        assertEquals(resourceCard4Corners[CornerPos.DOWNRIGHT.getCornerPosValue()],
+                resourceCard3Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(resourceCard4Corners[CornerPos.DOWNRIGHT.getCornerPosValue()] == resourceCard3Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(resourceCard4Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner(),
+                resourceCard3Corners[CornerPos.UPLEFT.getCornerPosValue()]);
+        assertTrue(resourceCard4Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner() == resourceCard3Corners[CornerPos.UPLEFT.getCornerPosValue()]);
         assertEquals(false, resourceCard3Corners[CornerPos.UPRIGHT.getCornerPosValue()].getCovered());
         assertEquals(null,
                 resourceCard3Corners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(null == resourceCard3Corners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner());
         assertEquals(false, resourceCard3Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getCovered());
-        //assertEquals(null,
-        //        resourceCard3Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(resourceCard1Corners[CornerPos.UPLEFT.getCornerPosValue()],
+                resourceCard3Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(resourceCard1Corners[CornerPos.UPLEFT.getCornerPosValue()] == resourceCard3Corners[CornerPos.DOWNRIGHT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(resourceCard1Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner(),
+                resourceCard3Corners[CornerPos.DOWNRIGHT.getCornerPosValue()]);
+        assertTrue(resourceCard1Corners[CornerPos.UPLEFT.getCornerPosValue()].getLinkedCorner() == resourceCard3Corners[CornerPos.DOWNRIGHT.getCornerPosValue()]);
         assertEquals(true, resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getCovered());
-        //assertEquals(goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()],
-        //        resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner());
+        assertEquals(goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()],
+                resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner());
+        assertTrue(goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()] == resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()].getLinkedCorner());
         assertEquals(goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner(),
                 resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()]);
+        assertTrue(goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner() == resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()]);
     }
 }

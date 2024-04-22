@@ -6,10 +6,10 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.util.ArrayList;
 
 public class GoldCard extends CornerCard {
-    private Element resourceType; // color of the card, determined by the major resourceType
-    private Challenge challenge; // challenge related to this card (if null, points are gained when played)
-    private ArrayList<Element> resourceNeeded; // resource needed to place the card
-    private int points; // value used to calculate the gain (if challenge is null, it is simply returned)
+    private final Element resourceType; // color of the card, determined by the major resourceType
+    private final Challenge challenge; // challenge related to this card (if null, points are gained when played)
+    private final ArrayList<Element> resourceNeeded; // resource needed to place the card
+    private final int points; // value used to calculate the gain (if challenge is null, it is simply returned)
 
     // CONSTRUCTOR
     public GoldCard(int id, Element resourceType, Challenge challenge, ArrayList<Element> resourceNeeded, int points, Corner[] frontCorners, Corner[] backCorners) {
