@@ -520,10 +520,12 @@ public class GameState {
         if (tableCorner == null){
             throw new WrongPlacingPositionException("table corner is null");
         }
-        placingCorner.setLinkedCorner(tableCorner);
-        placingCorner.setCovered(false);// is false at default anyway
-        tableCorner.setLinkedCorner(placingCorner);
-        tableCorner.setCovered(true);
+
+        // there is a new method
+        //placingCorner.setLinkedCorner(tableCorner);
+        //placingCorner.setCovered(false);// is false at default anyway
+        //tableCorner.setLinkedCorner(placingCorner);
+        //tableCorner.setCovered(true);
 
         //player.updateBoard(placingCardId, tableCardId, tableCornerPos); // in theory it was already done
 
