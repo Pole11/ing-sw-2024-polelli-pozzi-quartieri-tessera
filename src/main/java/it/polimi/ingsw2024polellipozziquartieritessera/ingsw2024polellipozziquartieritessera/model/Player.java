@@ -180,10 +180,21 @@ public class Player {
 // -------------------Board Matrix Managing-----------------------
 
     public void initializeBoard(){
+        playerBoard.clear(); // re-initialize the board it is previously contained something
         // Initialization of player board as a 1x1 with the StarterCard in the center
         ArrayList<Integer> row = new ArrayList<>();
         row.add(getStarterCard().getId());
         playerBoard.add(row);
+    }
+
+    public void printBoard() {
+        for (int i = 0; i < playerBoard.size(); i++) {
+            ArrayList<Integer> row = playerBoard.get(i);
+            for (int j = 0; j < row.size(); j++) {
+                System.out.print(playerBoard.get(i).get(j) + " ");
+            }
+            System.out.println("");
+        }
     }
 
     public void updateBoard(int newCard, int existingCard, CornerPos existingCornerPos){
@@ -199,6 +210,10 @@ public class Player {
                     colIndex = j;
                 }
             }
+        }
+
+        if (rowIndex == -1 && colIndex == -1) {
+            // non ha trovato la carta, magari un'eccezione?
         }
 
         // Define the position of the new card

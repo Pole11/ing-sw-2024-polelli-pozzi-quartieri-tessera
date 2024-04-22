@@ -58,7 +58,7 @@ public class Controller {
 
     //----------------place, draw, flip-----------------------
 
-    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent, PlacingOnHiddenCornerException {
+    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent, PlacingOnHiddenCornerException, CardIsNotInHandException {
         Player player = gameState.getPlayerByIndex(playerIndex);
         // check that the card is in the hand of the player
         CornerPos placingCornerPos = switch (tableCornerPos) {
@@ -82,6 +82,18 @@ public class Controller {
         } else {
             throw new WrongInstanceTypeException("table card is not a CornerCard");
         }
+
+        //if (!player.getHandCardsMap().containsKey(placingCardId)) {
+        //    throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
+        //}
+
+        // controlla che la carta non sia già presente
+        for (Player p : gameState.getPlayers()) {
+            if (p.getPlacedCardsMap().get(placingCardId) != null) {
+                throw new CardAlreadyPresent("you cannot place a card that is already placed");
+            }
+        }
+
 
         player.updateBoard(placingCardId, tableCardId, tableCornerPos);
         player.placeCard(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
@@ -128,8 +140,6 @@ public class Controller {
             default:
         }
     }
-
-
 
     public void flipCard(int playerIndex, int cardId) {
         Player player = gameState.getPlayerByIndex(playerIndex);
