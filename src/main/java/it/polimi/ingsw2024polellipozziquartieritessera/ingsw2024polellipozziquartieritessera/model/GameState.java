@@ -13,10 +13,11 @@ import java.util.*;
 
 public class GameState {
 
-    private HashMap<Integer, Card> cardsMap; // map id and card
-    private Board mainBoard;
-    private ArrayList<Player> players; //player[0] is blackPlayer
-    private Chat chat;
+    // !!! THE REFERENCE TO CARDSMAP IS FINAL !!!
+    private final HashMap<Integer, Card> cardsMap; // map id and card
+    private final Board mainBoard;
+    private final ArrayList<Player> players; //player[0] is blackPlayer
+    private final Chat chat;
     private int currentPlayerIndex;
     private GamePhase currentGamePhase;
     private TurnPhase currentGameTurn;
@@ -170,7 +171,6 @@ public class GameState {
             // and that it is the turn of players[numberAnswered] to choose
             numberAnswered ++;
         }
-
     }
 
     // IV: let the player choose the color from the available colors

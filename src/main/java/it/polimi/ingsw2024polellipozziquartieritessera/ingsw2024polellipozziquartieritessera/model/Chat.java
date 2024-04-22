@@ -3,7 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import java.util.ArrayList;
 
 public class Chat {
-    private ArrayList<Message> messages;
+    private ArrayList<Message> messages; // may be final (the reference only)
     private int lastId;
 
     public Chat(){

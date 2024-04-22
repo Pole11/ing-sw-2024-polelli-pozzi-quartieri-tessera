@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 import java.lang.String;
 
 public class Message {
-    private int id;
+    private final int id;
     private static int maxId = 0;
-    private Player author;
-    private LocalDateTime dateTime;
-    private String content;
+    private final Player author;
+    private final LocalDateTime dateTime;
+    private final String content;
 
     public Message(Player author, LocalDateTime dateTime, String content){
         maxId++;

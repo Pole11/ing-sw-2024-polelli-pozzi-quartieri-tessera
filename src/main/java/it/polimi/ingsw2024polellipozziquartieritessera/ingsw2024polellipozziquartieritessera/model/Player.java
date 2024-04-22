@@ -10,19 +10,19 @@ import java.util.*;
 import java.util.stream.*;
 
 public class Player {
-    private String nickname;
+    private final String nickname;
     private Color color;
-    private ArrayList<ArrayList<Integer>> playerBoard;
-    private HashMap<Integer, Side> placedCardsMap;
-    private HashMap<Integer, Side> handCardsMap;
+    private final ArrayList<ArrayList<Integer>> playerBoard;
+    private final HashMap<Integer, Side> placedCardsMap;
+    private final HashMap<Integer, Side> handCardsMap;
 
     private int points;
     private int objectivesWon;
     private StarterCard starterCard; // it is the most important card because it is used to create all the composition of the cards
     private ObjectiveCard objectiveCard; // it is the secret objective
 
-    private HashMap<Integer, Element> centerResource;
-    private HashMap<Element, Integer> allElements;
+    private final HashMap<Integer, Element> centerResource;
+    private final HashMap<Element, Integer> allElements;
 
     //per ora objectiveCardOptions serve, poi secondo me si potrà rimuovere
     private ObjectiveCard[] objectiveCardOptions; // it is the  array of the choice for secret objective
