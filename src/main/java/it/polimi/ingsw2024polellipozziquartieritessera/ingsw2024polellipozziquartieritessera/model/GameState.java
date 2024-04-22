@@ -521,23 +521,13 @@ public class GameState {
             throw new WrongPlacingPositionException("table corner is null");
         }
 
-        // there is a new method
-        //placingCorner.setLinkedCorner(tableCorner);
-        //placingCorner.setCovered(false);// is false at default anyway
-        //tableCorner.setLinkedCorner(placingCorner);
-        //tableCorner.setCovered(true);
-
-        //player.updateBoard(placingCardId, tableCardId, tableCornerPos); // in theory it was already done
 
         // update the allElements data structure
-        // !!! add elements of the placing card
-        if (placingCardSide.equals(Side.BACK) && !(placingCard instanceof StarterCard) || !(placingCard instanceof StarterCard)) {
-            for (Element ele : Element.values()) {
-                if (player.getAllElements().get(ele) != null) {
-                    int currentOccurencies = player.getAllElements().get(ele);
-                    int newOccurencies = Collections.frequency(placingCard.getUncoveredElements(placingCardSide), ele);
-                    player.getAllElements().put(ele, currentOccurencies + newOccurencies);
-                }
+        for (Element ele : Element.values()) {
+            if (player.getAllElements().get(ele) != null) {
+                int currentOccurencies = player.getAllElements().get(ele);
+                int newOccurencies = Collections.frequency(placingCard.getUncoveredElements(placingCardSide), ele);
+                player.getAllElements().put(ele, currentOccurencies + newOccurencies);
             }
         }
 

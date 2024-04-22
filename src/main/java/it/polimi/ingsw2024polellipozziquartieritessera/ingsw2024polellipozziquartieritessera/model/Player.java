@@ -136,13 +136,17 @@ public class Player {
 
 // -------------------Place Cards Map Managing-----------------
 
-    public void placeCard(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent {
+    public void placeCard(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, GoldCardCannotBePlaced, CardAlreadyPresent, PlacingOnHiddenCornerException {
         Corner tableCorner = tableCard.getCorners(this.placedCardsMap.get(tableCardId))[tableCornerPos.getCornerPosValue()];
-        if (tableCorner.getLinkedCorner() != null && tableCorner.getHidden() == true){
-            throw new CardAlreadyPresent("you cannot place a card here");
+        if (tableCorner.getLinkedCorner() != null){
+            throw new CardAlreadyPresent("you cannot place a card here, the corner is already linked");
+        }
+        if (tableCorner.getHidden()){
+            throw new PlacingOnHiddenCornerException("you cannot place a card on a hidden corner");
         }
 
-        if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)){ // if it is gold and is placed front side (so it has a challenge)
+        // execute this block if the card is gold and has a challenge (is front)
+        if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)){
             boolean cardIsPlaceable = true;
 
             for (Element ele : Element.values()) {
@@ -156,6 +160,7 @@ public class Player {
                 throw new GoldCardCannotBePlaced("You haven't the necessary resources to place the goldcard " + placingCardId);
             }
         }
+
         this.placedCardsMap.put(placingCardId, placingCardSide);
         this.handCardsMap.remove(placingCardId);
 
@@ -320,7 +325,7 @@ public class Player {
             throw new WrongInstanceTypeException("cardChallenge is neither a structure or a element challenge");
         }
 
-        return Math.max(-1, timesWon * cardPoints); // if timesWon is not changed, then return -1
+        return timesWon * cardPoints; // if timesWon is not changed, then return -1
     };
 
 // ---------------------Get Times Won ----------------------------------

@@ -58,7 +58,7 @@ public class Controller {
 
     //----------------place, draw, flip-----------------------
 
-    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent {
+    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent, PlacingOnHiddenCornerException {
         Player player = gameState.getPlayerByIndex(playerIndex);
         // check that the card is in the hand of the player
         CornerPos placingCornerPos = switch (tableCornerPos) {
@@ -70,28 +70,26 @@ public class Controller {
 
         CornerCard placingCard = null;
         CornerCard tableCard = null;
-        player.updateBoard(placingCardId, tableCardId, tableCornerPos);
 
         if (gameState.getCard(placingCardId) instanceof CornerCard ){
             placingCard = (CornerCard) gameState.getCard(placingCardId);
-            //player.getCornerCardsMap().put(placingCardId, (CornerCard) gameState.getCard(placingCardId));
-            //placingCard = player.getCornerCardsMap().get(placingCardId);
         } else {
             throw new WrongInstanceTypeException("placing card is not a CornerCard");
         }
 
         if (gameState.getCard(tableCardId) instanceof CornerCard ){
             tableCard = (CornerCard) gameState.getCard(tableCardId);
-            //player.getCornerCardsMap().put(placingCardId, (CornerCard) gameState.getCard(tableCardId));
-            //tableCard = player.getCornerCardsMap().get(tableCardId);
         } else {
             throw new WrongInstanceTypeException("table card is not a CornerCard");
         }
 
-        player.placeCard(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide); // we might pass the game state map
-        this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
-        // place card must be runned at last because it needs the player already updated
+        player.updateBoard(placingCardId, tableCardId, tableCornerPos);
+        player.placeCard(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
 
+        this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
+        // place card of gameState must be runned at last because it needs the player already updated
+
+        //NON VA BENE QUI, CALCOLA I PUNTI DOPO
         int newPoints = player.getPoints() + player.getCardPoints(placingCard);
         player.setPoints(newPoints);
     }

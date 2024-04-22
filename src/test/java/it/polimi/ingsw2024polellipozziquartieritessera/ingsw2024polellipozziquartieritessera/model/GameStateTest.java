@@ -35,4 +35,20 @@ public class GameStateTest {
 
         assertThrowsExactly(NotUniquePlayerException.class, () -> new GameState(hmap3, players3));
     }
+
+    @Test
+    void calculateFinalPoints(){
+
+    }
+
+    @Test
+    void isGameEnded(){
+
+    }
+
+    @Test
+    void getWinnerPlayerIndex(){
+
+    }
+
 }

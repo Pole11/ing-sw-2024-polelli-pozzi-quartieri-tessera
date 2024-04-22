@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ControllerTest {
     @Test
-    void placeCard() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent {
+    void placeCard() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlaced, CardAlreadyPresent, PlacingOnHiddenCornerException {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
         // create cards map
@@ -254,4 +254,15 @@ public class ControllerTest {
                 resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()]);
         assertTrue(goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner() == resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()]);
     }
+
+
+    @Test
+    void drawCard(){
+
+    }
+
+    void flipCard(){
+
+    }
+
 }
