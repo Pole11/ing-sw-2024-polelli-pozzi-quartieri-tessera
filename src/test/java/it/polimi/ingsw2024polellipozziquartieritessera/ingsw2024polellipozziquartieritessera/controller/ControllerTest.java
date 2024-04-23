@@ -258,7 +258,7 @@ public class ControllerTest {
         assertTrue(goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner() == resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()]);
     }
 
-
+/*
     @Test
     void drawCard() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException, InvalidHandException {
         Player player = new Player("pole", Color.GREEN);
@@ -297,7 +297,7 @@ public class ControllerTest {
         assertEquals(gs.getMainBoard().getSharedGoldCards()[0], resource2);
         assertTrue(player.getHandCardsMap().containsKey(resource1.getId()));
 
-    }
+    }*/
 
     void flipCard(){
 

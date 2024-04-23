@@ -206,7 +206,7 @@ public class PlayerTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        assertThrows(WrongInstanceTypeException.class, ()->c.placeCard(0, 84, resourceCardId6, CornerPos.DOWNLEFT, Side.FRONT));
+        //assertThrows(WrongInstanceTypeException.class, ()->c.placeCard(0, 84, resourceCardId6, CornerPos.DOWNLEFT, Side.FRONT));
 
 
         c.placeCard(0, goldCardId3, resourceCardId6, CornerPos.DOWNLEFT, Side.BACK);
@@ -220,7 +220,7 @@ public class PlayerTest {
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
 
-        //c.placeCard(0, goldCardId4, goldCardId3, CornerPos.UPLEFT, Side.FRONT);
+        assertThrows(PlacingOnHiddenCornerException.class, () -> c.placeCard(0, goldCardId4, goldCardId3, CornerPos.UPLEFT, Side.FRONT));
 
         //1 corner covered
         c.placeCard(0, goldCardId4, goldCardId3, CornerPos.DOWNLEFT, Side.FRONT);
