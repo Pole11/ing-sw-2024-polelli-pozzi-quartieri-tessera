@@ -68,7 +68,6 @@ public class PlayerTest {
 
         assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
 
-
         int starterCardId = 81;
         int resourceCardId1 = 31;
         int goldCardId1 = 59;
@@ -98,7 +97,7 @@ public class PlayerTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(0, player.getAllElements().get(Element.QUILL));
 
-        // TODO: move them into another method
+        // TODO: move them into another standalone method
         //assertThrows(CardAlreadyPresent.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.BACK));
         //assertThrows(GoldCardCannotBePlaced.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT));
         //assertThrows(GoldCardCannotBePlaced.class, () -> c.placeCard(0, goldCardId1, resourceCardId1, CornerPos.DOWNRIGHT, Side.FRONT));
@@ -115,7 +114,7 @@ public class PlayerTest {
         assertEquals(0, player.getAllElements().get(Element.QUILL));
 
         c.placeCard(0, goldCardId2, player.getStarterCard().getId(), CornerPos.UPRIGHT, Side.FRONT);
-        //assertEquals(0, player.getPoints());
+        assertEquals(1, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
         assertEquals(1, player.getAllElements().get(Element.PLANT)); // plant
         assertEquals(3, player.getAllElements().get(Element.INSECT)); // insect
@@ -125,7 +124,7 @@ public class PlayerTest {
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
         c.placeCard(0, resourceCardId2, player.getStarterCard().getId(), CornerPos.DOWNLEFT, Side.FRONT);
-        //assertEquals(1, player.getPoints());
+        assertEquals(2, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
         assertEquals(2, player.getAllElements().get(Element.PLANT)); // plant
         assertEquals(2, player.getAllElements().get(Element.INSECT)); // insect
@@ -135,7 +134,7 @@ public class PlayerTest {
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
         c.placeCard(0, resourceCardId3, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
-        //assertEquals(2, player.getPoints());
+        assertEquals(3, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
         assertEquals(3, player.getAllElements().get(Element.PLANT)); // plant
         assertEquals(2, player.getAllElements().get(Element.INSECT)); // insect
@@ -147,8 +146,7 @@ public class PlayerTest {
 
         //card with hidden corner can be placed
         c.placeCard(0, resourceCardId4, goldCardId2, CornerPos.UPRIGHT, Side.FRONT);
-
-        //assertEquals(2, player.getPoints());
+        assertEquals(4, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
         assertEquals(3, player.getAllElements().get(Element.PLANT)); // plant
         assertEquals(3, player.getAllElements().get(Element.INSECT)); // insect
@@ -160,7 +158,7 @@ public class PlayerTest {
 
         //non funziona linked corner problem
         c.placeCard(0, resourceCardId5, goldCardId1, CornerPos.UPRIGHT, Side.FRONT);
-        //assertEquals(2, player.getPoints());
+        assertEquals(4, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
         assertEquals(4, player.getAllElements().get(Element.PLANT)); // plant
         assertEquals(4, player.getAllElements().get(Element.INSECT)); // insect
@@ -170,7 +168,7 @@ public class PlayerTest {
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
         c.placeCard(0, resourceCardId6, resourceCardId1, CornerPos.DOWNLEFT, Side.FRONT);
-        //assertEquals(???, player.getPoints());
+        assertEquals(5, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
         assertEquals(3, player.getAllElements().get(Element.PLANT)); // plant
         assertEquals(4, player.getAllElements().get(Element.INSECT)); // insect

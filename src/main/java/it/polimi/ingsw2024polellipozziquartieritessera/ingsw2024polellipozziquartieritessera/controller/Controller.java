@@ -83,9 +83,9 @@ public class Controller {
             throw new WrongInstanceTypeException("table card is not a CornerCard");
         }
 
-        //if (!player.getHandCardsMap().containsKey(placingCardId)) {
+        if (!player.getHandCardsMap().containsKey(placingCardId)) {
         //    throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
-        //}
+        }
 
         // controlla che la carta non sia già presente
         for (Player p : gameState.getPlayers()) {

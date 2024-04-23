@@ -208,6 +208,9 @@ public class Player {
                 if (row.get(j) == existingCard) {
                     rowIndex = i;
                     colIndex = j;
+                } else if (row.get(j) == newCard) {
+                    // la carta è già piazzata, esci subito
+                    return;
                 }
             }
         }
