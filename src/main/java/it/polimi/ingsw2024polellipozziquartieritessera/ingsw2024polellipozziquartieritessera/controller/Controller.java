@@ -55,7 +55,7 @@ public class Controller {
 
     //----------------place, draw, flip-----------------------
 
-    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardAlreadPlacedException {
+    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException {
         Player player = gameState.getPlayerByIndex(playerIndex);
         // check that the card is in the hand of the player
         CornerPos placingCornerPos = switch (tableCornerPos) {
@@ -68,213 +68,53 @@ public class Controller {
         CornerCard placingCard = null;
         CornerCard tableCard = null;
 
-        if (gameState.getCard(placingCardId) instanceof CornerCard ){
+        if (gameState.getCard(placingCardId) instanceof GoldCard || gameState.getCard(placingCardId) instanceof ResourceCard ){
             placingCard = (CornerCard) gameState.getCard(placingCardId);
-        } else {
-            throw new WrongInstanceTypeException("placing card is not a CornerCard");
-        }
+        } else throw new WrongInstanceTypeException("placing card is not a CornerCard");
 
-        if (gameState.getCard(tableCardId) instanceof CornerCard ){
+        if (gameState.getCard(placingCardId) instanceof GoldCard || gameState.getCard(placingCardId) instanceof ResourceCard){
             tableCard = (CornerCard) gameState.getCard(tableCardId);
-        } else {
-            throw new WrongInstanceTypeException("table card is not a CornerCard");
-        }
-
-        if (!player.getHandCardsMap().containsKey(placingCardId)) {
-            //    throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
-        }
-
-        // controlla che la carta non sia già presente
-        for (Player p : gameState.getPlayers()) {
-            if (p.getPlacedCardsMap().get(placingCardId) != null) {
-                throw new CardAlreadPlacedException("you cannot place a card that is already placed");
-            }
-        }
+        } else throw new WrongInstanceTypeException("table card is not a CornerCard");
 
         Corner placingCorner = placingCard.getCorners(placingCardSide)[placingCornerPos.getCornerPosValue()];
         Corner tableCorner = tableCard.getCorners(player.getPlacedCardsMap().get(tableCardId))[tableCornerPos.getCornerPosValue()];
 
-        if (tableCorner.getLinkedCorner() != null){
-            throw new CardAlreadyPresentOnTheCornerException("you cannot place a card here, the corner is already linked");
+        //if (!player.getHandCardsMap().containsKey(placingCardId)) throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
+
+
+        // controlla che la carta non sia già presente
+        for (Player p : gameState.getPlayers()) {
+            if (p.getPlacedCardsMap().get(placingCardId) != null) throw new CardAlreadPlacedException("you cannot place a card that is already placed");
         }
-        if (tableCorner.getHidden()){
-            throw new PlacingOnHiddenCornerException("you cannot place a card on a hidden corner");
-        }
+
+        if (tableCorner.getLinkedCorner() != null) throw new CardAlreadyPresentOnTheCornerException("you cannot place a card here, the corner is already linked");
+        if (tableCorner.getHidden()) throw new PlacingOnHiddenCornerException("you cannot place a card on a hidden corner");
+        if (placingCorner == null) throw new WrongPlacingPositionException("placing corner is null");
+        if (tableCorner == null) throw new WrongPlacingPositionException("table corner is null");
 
         // execute this block if the card is gold and has a challenge (is front)
-        if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)){
-            boolean cardIsPlaceable = true;
+        if (!goldPlaceable(player, placingCard, placingCardSide)) throw new GoldCardCannotBePlacedException("You haven't the necessary resources to place the goldcard " + placingCardId);
 
+        this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
+        player.placeCard(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
+        player.updateBoard(placingCardId, tableCardId, tableCornerPos);
+        gameState.updateElements(player, placingCard, placingCardSide);
+
+        int newPoints = player.getPoints() + player.getCardPoints(placingCard);
+        player.setPoints(newPoints);
+    }
+
+    private boolean goldPlaceable(Player player, CornerCard placingCard, Side placingCardSide){
+        boolean cardIsPlaceable = true;
+        if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)){
             for (Element ele : Element.values()) {
                 if (player.getAllElements().get(ele) < player.getElementOccurencies(((GoldCard) placingCard).getResourceNeeded(), ele)) {
                     cardIsPlaceable = false;
                     break;
                 }
             }
-
-            if (!cardIsPlaceable){
-                throw new GoldCardCannotBePlacedException("You haven't the necessary resources to place the goldcard " + placingCardId);
-            }
         }
-
-        if (placingCorner == null){
-            throw new WrongPlacingPositionException("placing corner is null");
-        }
-
-        if (tableCorner == null){
-            throw new WrongPlacingPositionException("table corner is null");
-        }
-
-        // check if the indirect corners are hidden
-        ArrayList<ArrayList<Integer>> playerBoard = player.getPlayerBoard();
-        for (Integer row = 0; row < playerBoard.size(); row++) {
-            for (Integer col = 0; col < playerBoard.get(row).size(); col++) {
-                if (playerBoard.get(row).get(col).equals(tableCardId)) { // if the card is the one on the table
-                    int placingRow = row;
-                    int placingCol = col;
-
-                    switch (tableCornerPos) {
-                        case CornerPos.UPLEFT -> placingRow--;
-                        case CornerPos.UPRIGHT -> placingCol++;
-                        case CornerPos.DOWNRIGHT -> placingRow++;
-                        case CornerPos.DOWNLEFT -> placingCol--;
-                    }
-
-                    // check if there is a card in the up left corner
-                    if (placingRow - 1 >= 0 && placingRow - 1 < playerBoard.size() && placingCol >= 0 && placingCol < playerBoard.getFirst().size() && playerBoard.get(placingRow - 1).get(placingCol) != -1) { // -1 means empty
-                        int matrixCardId = playerBoard.get(placingRow - 1).get(placingCol);
-                        CornerCard matrixCard = (CornerCard) gameState.getCardsMap().get(matrixCardId); // use the keys of player.placedCardsMap
-                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.DOWNRIGHT.getCornerPosValue()];
-
-
-                        if (matrixCorner.getHidden()) {
-                            throw new PlacingOnHiddenCornerException("you are trying to place on an hidden corner");
-                        }
-
-                        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[CornerPos.UPLEFT.getCornerPosValue()];
-
-                        indirectPlacingCorner.setLinkedCorner(matrixCorner);
-                        indirectPlacingCorner.setCovered(false);// is false at default anyway
-                        matrixCorner.setLinkedCorner(indirectPlacingCorner);
-                        matrixCorner.setCovered(true);
-
-                        // !!! remove elements of the table card that are covered
-                        Element cornerEle = matrixCorner.getElement();
-                        if (player.getAllElements().get(cornerEle) != null) {
-                            int currentOccurencies = player.getAllElements().get(cornerEle);
-                            if (currentOccurencies > 0)
-                                player.getAllElements().put(cornerEle, currentOccurencies - 1);
-                        }
-
-                    }
-                    // check if there is a card in the up right corner
-                    if (placingRow >= 0 && placingRow < playerBoard.size() && placingCol + 1 >= 0 && placingCol + 1 < playerBoard.getFirst().size() && playerBoard.get(placingRow).get(placingCol + 1) != -1) { // -1 means empty
-                        int matrixCardId = playerBoard.get(placingRow).get(placingCol + 1);
-                        CornerCard matrixCard = (CornerCard) gameState.getCardsMap().get(matrixCardId);
-                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.DOWNLEFT.getCornerPosValue()];
-
-                        if (matrixCorner.getHidden()) {
-                            throw new PlacingOnHiddenCornerException("you are trying to place on an hidden corner");
-                        }
-
-
-                        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[CornerPos.UPRIGHT.getCornerPosValue()];
-
-                        indirectPlacingCorner.setLinkedCorner(matrixCorner);
-                        indirectPlacingCorner.setCovered(false);// is false at default anyway
-                        matrixCorner.setLinkedCorner(indirectPlacingCorner);
-                        matrixCorner.setCovered(true);
-
-                        // !!! remove elements of the table card that are covered
-                        Element cornerEle = matrixCorner.getElement();
-                        if (player.getAllElements().get(cornerEle) != null) {
-                            int currentOccurencies = player.getAllElements().get(cornerEle);
-                            if (currentOccurencies > 0)
-                                player.getAllElements().put(cornerEle, currentOccurencies - 1);
-
-                        }
-
-                    }
-                    // check if there is a card in the down right corner
-                    if (placingRow + 1 >= 0 && placingRow + 1 < playerBoard.size() && placingCol >= 0 && placingCol < playerBoard.getFirst().size() && playerBoard.get(placingRow + 1).get(placingCol) != -1) { // -1 means empty
-                        int matrixCardId = playerBoard.get(placingRow + 1).get(placingCol);
-                        CornerCard matrixCard = (CornerCard) gameState.getCardsMap().get(matrixCardId);
-                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.UPLEFT.getCornerPosValue()];
-
-
-                        if (matrixCorner.getHidden()) {
-                            throw new PlacingOnHiddenCornerException("you are trying to place on an hidden corner");
-                        }
-
-
-                        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[CornerPos.DOWNRIGHT.getCornerPosValue()];
-
-                        indirectPlacingCorner.setLinkedCorner(matrixCorner);
-                        indirectPlacingCorner.setCovered(false);// is false at default anyway
-                        matrixCorner.setLinkedCorner(indirectPlacingCorner);
-                        matrixCorner.setCovered(true);
-
-                        // !!! remove elements of the table card that are covered
-                        Element cornerEle = matrixCorner.getElement();
-                        if (player.getAllElements().get(cornerEle) != null) {
-                            int currentOccurencies = player.getAllElements().get(cornerEle);
-                            if (currentOccurencies > 0)
-                                player.getAllElements().put(cornerEle, currentOccurencies - 1);
-                        }
-
-
-
-                    }
-
-                    // check if there is a card in the down left corner
-                    if (placingRow >= 0 && placingRow < playerBoard.size() && placingCol - 1 >= 0 && placingCol - 1 < playerBoard.getFirst().size() && playerBoard.get(placingRow).get(placingCol - 1) != -1) { // -1 means empty
-                        int matrixCardId = playerBoard.get(placingRow).get(placingCol - 1);
-                        CornerCard matrixCard = (CornerCard) gameState.getCardsMap().get(matrixCardId);
-                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.UPRIGHT.getCornerPosValue()];
-
-                        if (matrixCorner.getHidden()) {
-                            throw new PlacingOnHiddenCornerException("you are trying to place on an hidden corner");
-                        }
-
-                        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[CornerPos.DOWNLEFT.getCornerPosValue()];
-
-                        indirectPlacingCorner.setLinkedCorner(matrixCorner);
-                        indirectPlacingCorner.setCovered(false);// is false at default anyway
-                        matrixCorner.setLinkedCorner(indirectPlacingCorner);
-                        matrixCorner.setCovered(true);
-
-                        // !!! remove elements of the table card that are covered
-                        Element cornerEle = matrixCorner.getElement();
-                        if (player.getAllElements().get(cornerEle) != null) {
-                            int currentOccurencies = player.getAllElements().get(cornerEle);
-                            if (currentOccurencies > 0)
-                                player.getAllElements().put(cornerEle, currentOccurencies - 1);
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        player.placeCard(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
-        player.updateBoard(placingCardId, tableCardId, tableCornerPos);
-        //this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
-        // place card of gameState must be runned at last because it needs the player already updated
-
-
-        //MOVE FROM HERE
-        for (Element ele : Element.values()) {
-            if (player.getAllElements().get(ele) != null) {
-                int currentOccurencies = player.getAllElements().get(ele);
-                int newOccurencies = Collections.frequency(placingCard.getUncoveredElements(placingCardSide), ele);
-                player.getAllElements().put(ele, currentOccurencies + newOccurencies);
-            }
-        }
-
-        int newPoints = player.getPoints() + player.getCardPoints(placingCard);
-        player.setPoints(newPoints);
-
-
+        return cardIsPlaceable;
     }
 
 
@@ -285,7 +125,7 @@ public class Controller {
         Board board = this.gameState.getMainBoard();
         Player currentPlayer = this.gameState.getCurrentPlayer();
 
-        if (currentPlayer.getHandCardsMap().values().size() >= Config.MAX_HAND_CARDS - 1) {
+        if (currentPlayer.getHandCardsMap().values().size() > Config.MAX_HAND_CARDS) {
             throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
         }
 

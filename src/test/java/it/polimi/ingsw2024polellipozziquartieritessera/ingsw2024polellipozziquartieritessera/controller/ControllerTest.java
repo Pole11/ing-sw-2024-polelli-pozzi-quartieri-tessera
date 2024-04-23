@@ -60,6 +60,7 @@ public class ControllerTest {
         assertEquals(1, player.getAllElements().get(Element.INSECT)); // insect
         assertEquals(1, player.getAllElements().get(Element.FUNGI)); // fungi
 
+        player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
         c.placeCard(0, resourceCardId1, starterCardId, resourceCard1ToTableCornerPos, resourceCard1Side);
         Corner[] starterCardCorners = ((CornerCard) gs.getCardsMap().get(starterCardId)).getCorners(starterCardSide);
         Corner[] resourceCard1Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId1)).getCorners(resourceCard1Side);
@@ -91,6 +92,7 @@ public class ControllerTest {
         assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
         assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
 
+        player.getHandCardsMap().put(resourceCardId2, Side.FRONT);
         c.placeCard(0, resourceCardId2, resourceCardId1, resourceCard2ToTableCornerPos, resourceCard2Side);
         resourceCard1Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId1)).getCorners(resourceCard1Side);
         Corner[] resourceCard2Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId2)).getCorners(resourceCard2Side);
@@ -120,6 +122,7 @@ public class ControllerTest {
         assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
         assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
 
+        player.getHandCardsMap().put(resourceCardId3, Side.FRONT);
         c.placeCard(0, resourceCardId3, resourceCardId1, resourceCard3ToTableCornerPos, resourceCard3Side);
         resourceCard1Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId1)).getCorners(resourceCard1Side);
         Corner[] resourceCard3Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId3)).getCorners(resourceCard3Side);
@@ -151,6 +154,7 @@ public class ControllerTest {
         assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
         assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
 
+        player.getHandCardsMap().put(resourceCardId4, Side.FRONT);
         c.placeCard(0, resourceCardId4, resourceCardId3, resourceCard4ToTableCornerPos, resourceCard4Side);
         resourceCard3Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId3)).getCorners(resourceCard3Side);
         Corner[] resourceCard4Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId4)).getCorners(resourceCard4Side);
@@ -180,6 +184,7 @@ public class ControllerTest {
         assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
         assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
 
+        player.getHandCardsMap().put(goldCardId, Side.FRONT);
         c.placeCard(0, goldCardId, resourceCardId2, goldCardToTableCornerPos, goldCardSide);
         resourceCard2Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId2)).getCorners(resourceCard2Side);
         Corner[] goldCardCorners = ((CornerCard) gs.getCardsMap().get(goldCardId)).getCorners(goldCardSide);
@@ -258,7 +263,7 @@ public class ControllerTest {
         assertTrue(goldCardCorners[CornerPos.UPRIGHT.getCornerPosValue()].getLinkedCorner() == resourceCard3Corners[CornerPos.DOWNLEFT.getCornerPosValue()]);
     }
 
-/*
+
     @Test
     void drawCard() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException, InvalidHandException {
         Player player = new Player("pole", Color.GREEN);
@@ -279,25 +284,23 @@ public class ControllerTest {
         player.setStarterCard((StarterCard) gs.getCardsMap().get(starterCardId));
         player.initializeBoard();
         gs.chooseStarterSidePhase();
+        gs.setHands();
         c.chooseInitialStarterSide(0, Side.FRONT);
 
         gs.setCurrentPlayerIndex(0);
 
-
         GoldCard resource1 = gs.getMainBoard().getSharedGoldCards()[0];
-        GoldCard resource2 = gs.getMainBoard().getSharedGoldCards()[0];
+        GoldCard resource2 = gs.getMainBoard().getSharedGoldCards()[1];
 
         Map.Entry<Integer,Side> entry = player.getHandCardsMap().entrySet().iterator().next();
         player.getHandCardsMap().remove(entry.getKey());
 
-        System.out.println(player.getHandCardsMap());
-
         c.drawCard(DrawType.SHAREDGOLD1);
         assertNotEquals(gs.getMainBoard().getSharedGoldCards()[0], resource1);
-        assertEquals(gs.getMainBoard().getSharedGoldCards()[0], resource2);
+        assertEquals(gs.getMainBoard().getSharedGoldCards()[1], resource2);
         assertTrue(player.getHandCardsMap().containsKey(resource1.getId()));
 
-    }*/
+    }
 
     void flipCard(){
 
