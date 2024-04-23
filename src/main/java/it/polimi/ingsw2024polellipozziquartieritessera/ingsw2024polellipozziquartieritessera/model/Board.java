@@ -62,7 +62,7 @@ public class Board {
 
         // verify position is valid
         if (pos < 1 || pos > sharedGolds.length) {
-            throw new IllegalArgumentException("Invalid position: " + pos);
+            throw new IllegalArgumentException("invalid position: " + pos);
         }
 
         // get the card

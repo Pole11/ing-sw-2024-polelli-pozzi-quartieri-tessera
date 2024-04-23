@@ -507,20 +507,10 @@ public class GameState {
         board.fillSharedCardsGap();
     }
 
-    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingCardSide) throws WrongPlacingPositionException {
+    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingCardSide) {
         Side tableSide = player.getBoardSide(tableCardId);
         CornerCard placingCard = (CornerCard) this.getCardsMap().get(placingCardId);
         CornerCard tableCard = (CornerCard) this.getCardsMap().get(tableCardId);
-        Corner placingCorner = placingCard.getCorners(placingCardSide)[placingCornerPos.getCornerPosValue()];
-        Corner tableCorner = tableCard.getCorners(tableSide)[tableCornerPos.getCornerPosValue()];
-        if (placingCorner == null){
-            throw new WrongPlacingPositionException("placing corner is null");
-        }
-
-        if (tableCorner == null){
-            throw new WrongPlacingPositionException("table corner is null");
-        }
-
 
         // update the allElements data structure
         for (Element ele : Element.values()) {
@@ -617,6 +607,7 @@ public class GameState {
                             if (currentOccurencies > 0)
                                 player.getAllElements().put(cornerEle, currentOccurencies - 1);                        }
                     }
+                    break;
                 }
             }
         }

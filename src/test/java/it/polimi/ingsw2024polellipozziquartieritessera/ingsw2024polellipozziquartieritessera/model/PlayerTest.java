@@ -21,7 +21,7 @@ public class PlayerTest {
     }
 
     @Test
-    void getCardPointsTest1() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlaced, CardAlreadyPresent, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException {
+    void getCardPointsTest1() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
         // create cards map
@@ -60,7 +60,7 @@ public class PlayerTest {
 
     // check points and elements
     @Test
-    void getCardPointsTest2() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlaced, CardAlreadyPresent, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException {
+    void getCardPointsTest2() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadPlacedException {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
         // create cards map
@@ -77,7 +77,10 @@ public class PlayerTest {
         int resourceCardId4 = 39;
         int resourceCardId5 = 37;
         int resourceCardId6 = 10;
-        int resourceCardId7 = 12;
+        int resourceCardId7 = 71;
+        int resourceCardId8 = 75;
+        int goldCardId3 = 53;
+        int goldCardId4 = 54;
 
         // create game state
         GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
@@ -98,9 +101,9 @@ public class PlayerTest {
         assertEquals(0, player.getAllElements().get(Element.QUILL));
 
         // TODO: move them into another standalone method
-        //assertThrows(CardAlreadyPresent.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.BACK));
-        //assertThrows(GoldCardCannotBePlaced.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT));
-        //assertThrows(GoldCardCannotBePlaced.class, () -> c.placeCard(0, goldCardId1, resourceCardId1, CornerPos.DOWNRIGHT, Side.FRONT));
+        assertThrows(CardAlreadyPresentOnTheCornerException.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.BACK));
+        assertThrows(GoldCardCannotBePlacedException.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT));
+        assertThrows(GoldCardCannotBePlacedException.class, () -> c.placeCard(0, goldCardId1, resourceCardId1, CornerPos.DOWNRIGHT, Side.FRONT));
 
         c.placeCard(0, goldCardId1, resourceCardId1, CornerPos.DOWNRIGHT, Side.BACK);
 
@@ -177,8 +180,58 @@ public class PlayerTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
+        c.placeCard(0, resourceCardId7, goldCardId2, CornerPos.UPLEFT, Side.FRONT);
+        assertEquals(6, player.getPoints());
+        assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(2, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(4, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(1, player.getAllElements().get(Element.FUNGI)); // fungi
+        assertEquals(1, player.getAllElements().get(Element.INKWELL));
+        assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
+        assertEquals(1, player.getAllElements().get(Element.QUILL));
+
+        assertThrows(CardAlreadPlacedException.class, ()-> c.placeCard(0, resourceCardId7, resourceCardId4, CornerPos.UPRIGHT, Side.FRONT));
+        assertThrows(CardAlreadPlacedException.class, ()-> c.placeCard(0, resourceCardId1, resourceCardId4, CornerPos.UPRIGHT, Side.FRONT));
+
+        //2 corner covered
+        c.placeCard(0, resourceCardId8, goldCardId1, CornerPos.DOWNLEFT, Side.FRONT);
+        assertEquals(10, player.getPoints());
+        assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(2, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(4, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(1, player.getAllElements().get(Element.FUNGI)); // fungi
+        assertEquals(1, player.getAllElements().get(Element.INKWELL));
+        assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
+        assertEquals(1, player.getAllElements().get(Element.QUILL));
+
+        assertThrows(WrongInstanceTypeException.class, ()->c.placeCard(0, 84, resourceCardId6, CornerPos.DOWNLEFT, Side.FRONT));
+
+        c.placeCard(0, goldCardId3, resourceCardId6, CornerPos.DOWNLEFT, Side.BACK);
+        assertEquals(10, player.getPoints());
+        assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(3, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(4, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(0, player.getAllElements().get(Element.FUNGI)); // fungi
+        assertEquals(1, player.getAllElements().get(Element.INKWELL));
+        assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
+        assertEquals(1, player.getAllElements().get(Element.QUILL));
+
+        assertThrows(PlacingOnHiddenCornerException.class, () -> c.placeCard(0, goldCardId4, goldCardId3, CornerPos.UPLEFT, Side.FRONT));
+
+        //1 corner covered
+        c.placeCard(0, goldCardId4, goldCardId3, CornerPos.DOWNLEFT, Side.FRONT);
+
+        assertEquals(12, player.getPoints());
+        assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(3, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(4, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(0, player.getAllElements().get(Element.FUNGI)); // fungi
+        assertEquals(1, player.getAllElements().get(Element.INKWELL));
+        assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
+        assertEquals(1, player.getAllElements().get(Element.QUILL));
+
         //non funziona, piazza due volte la stessa carta senza dare errore
-        assertThrows(CardAlreadyPresent.class, ()-> c.placeCard(0, resourceCardId1, resourceCardId4, CornerPos.UPRIGHT, Side.FRONT));
+        assertThrows(CardAlreadPlacedException.class, ()-> c.placeCard(0, resourceCardId1, resourceCardId4, CornerPos.UPRIGHT, Side.FRONT));
 
     }
 

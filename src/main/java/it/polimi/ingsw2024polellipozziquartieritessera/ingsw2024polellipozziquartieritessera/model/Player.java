@@ -7,7 +7,6 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 public class Player {
     private final String nickname;
@@ -136,31 +135,7 @@ public class Player {
 
 // -------------------Place Cards Map Managing-----------------
 
-    public void placeCard(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, GoldCardCannotBePlaced, CardAlreadyPresent, PlacingOnHiddenCornerException {
-        Corner tableCorner = tableCard.getCorners(this.placedCardsMap.get(tableCardId))[tableCornerPos.getCornerPosValue()];
-        if (tableCorner.getLinkedCorner() != null){
-            throw new CardAlreadyPresent("you cannot place a card here, the corner is already linked");
-        }
-        if (tableCorner.getHidden()){
-            throw new PlacingOnHiddenCornerException("you cannot place a card on a hidden corner");
-        }
-
-        // execute this block if the card is gold and has a challenge (is front)
-        if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)){
-            boolean cardIsPlaceable = true;
-
-            for (Element ele : Element.values()) {
-                if (this.getAllElements().get(ele) < getElementOccurencies(((GoldCard) placingCard).getResourceNeeded(), ele)) {
-                    cardIsPlaceable = false;
-                    break;
-                }
-            }
-
-            if (!cardIsPlaceable){
-                throw new GoldCardCannotBePlaced("You haven't the necessary resources to place the goldcard " + placingCardId);
-            }
-        }
-
+    public void placeCard(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException {
         this.placedCardsMap.put(placingCardId, placingCardSide);
         this.handCardsMap.remove(placingCardId);
 
@@ -319,7 +294,7 @@ public class Player {
         if (placedCardsMap.containsKey(resourceCard.getId())) {
             side = placedCardsMap.get(resourceCard.getId());
         } else {
-            throw new CardNotPlacedException("The card is not placed");
+            throw new CardNotPlacedException("the card is not placed");
         }
         if (side == Side.FRONT){
             return resourceCard.getPoints();
@@ -329,7 +304,7 @@ public class Player {
     }
 
     public int getCardPoints(GoldCard goldCard) throws WrongInstanceTypeException, CardNotPlacedException {
-        if (!placedCardsMap.containsKey(goldCard.getId())) throw new CardNotPlacedException("The card is not placed");
+        if (!placedCardsMap.containsKey(goldCard.getId())) throw new CardNotPlacedException("the card is not placed");
         Challenge cardChallenge = goldCard.getChallenge();
         int cardPoints = goldCard.getPoints();
         int timesWon = 0;
@@ -350,8 +325,6 @@ public class Player {
 
     private int getTimesWonCoverage(GoldCard goldCard) {
         ArrayList<Corner> uncoveredCorners = goldCard.getUncoveredCorners(placedCardsMap.get(goldCard.getId()));
-        // Stream<Corner> linkedCorners = uncoveredCorners.stream().map(Corner::getLinkedCorner);
-        // int times = linkedCorners.mapToInt((Corner c) -> c == null ? 0 : 1).sum();
         int times = 0;
         for (int i = 0; i < uncoveredCorners.size(); i++) {
             Corner corner = uncoveredCorners.get(i);
