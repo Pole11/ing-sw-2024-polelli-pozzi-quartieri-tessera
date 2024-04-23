@@ -110,12 +110,12 @@ public class PlayerTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(0, player.getAllElements().get(Element.QUILL));
 
-
+        player.getHandCardsMap().put(goldCardId1, Side.FRONT);
         assertThrows(CardAlreadyPresentOnTheCornerException.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.BACK));
         assertThrows(GoldCardCannotBePlacedException.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT));
         assertThrows(GoldCardCannotBePlacedException.class, () -> c.placeCard(0, goldCardId1, resourceCardId1, CornerPos.DOWNRIGHT, Side.FRONT));
 
-        player.getHandCardsMap().put(goldCardId1, Side.FRONT);
+
         c.placeCard(0, goldCardId1, resourceCardId1, CornerPos.DOWNRIGHT, Side.BACK);
         assertEquals(0, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -203,6 +203,8 @@ public class PlayerTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
+        player.getHandCardsMap().put(resourceCardId7, Side.FRONT);
+        player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
         assertThrows(CardAlreadPlacedException.class, ()-> c.placeCard(0, resourceCardId7, resourceCardId4, CornerPos.UPRIGHT, Side.FRONT));
         assertThrows(CardAlreadPlacedException.class, ()-> c.placeCard(0, resourceCardId1, resourceCardId4, CornerPos.UPRIGHT, Side.FRONT));
         
@@ -231,6 +233,7 @@ public class PlayerTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
+        player.getHandCardsMap().put(goldCardId4, Side.FRONT);
         assertThrows(PlacingOnHiddenCornerException.class, () -> c.placeCard(0, goldCardId4, goldCardId3, CornerPos.UPLEFT, Side.FRONT));
 
         //1 corner covered

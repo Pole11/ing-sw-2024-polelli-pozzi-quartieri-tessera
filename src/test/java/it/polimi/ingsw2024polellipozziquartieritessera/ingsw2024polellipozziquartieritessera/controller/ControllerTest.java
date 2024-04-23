@@ -286,20 +286,66 @@ public class ControllerTest {
         gs.chooseStarterSidePhase();
         gs.setHands();
         c.chooseInitialStarterSide(0, Side.FRONT);
-
         gs.setCurrentPlayerIndex(0);
 
-        GoldCard resource1 = gs.getMainBoard().getSharedGoldCards()[0];
-        GoldCard resource2 = gs.getMainBoard().getSharedGoldCards()[1];
 
+
+        CornerCard card1 = gs.getMainBoard().getSharedGoldCards()[0];
+        CornerCard card2 = gs.getMainBoard().getSharedGoldCards()[1];
         Map.Entry<Integer,Side> entry = player.getHandCardsMap().entrySet().iterator().next();
-        player.getHandCardsMap().remove(entry.getKey());
-
         c.drawCard(DrawType.SHAREDGOLD1);
-        assertNotEquals(gs.getMainBoard().getSharedGoldCards()[0], resource1);
-        assertEquals(gs.getMainBoard().getSharedGoldCards()[1], resource2);
-        assertTrue(player.getHandCardsMap().containsKey(resource1.getId()));
+        assertNotEquals(gs.getMainBoard().getSharedGoldCards()[0], card1);
+        assertEquals(gs.getMainBoard().getSharedGoldCards()[1], card2);
+        assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
 
+        card1 = gs.getMainBoard().getSharedGoldCards()[0];
+        card2 = gs.getMainBoard().getSharedGoldCards()[1];
+        entry = player.getHandCardsMap().entrySet().iterator().next();
+
+        assertThrows(InvalidHandException.class, () -> c.drawCard(DrawType.SHAREDGOLD2));
+        player.getHandCardsMap().remove(entry.getKey());
+        c.drawCard(DrawType.SHAREDGOLD2);
+
+
+        assertEquals(gs.getMainBoard().getSharedGoldCards()[0], card1);
+        assertNotEquals(gs.getMainBoard().getSharedGoldCards()[1], card2);
+        assertTrue(player.getHandCardsMap().containsKey(card2.getId()));
+
+        card1 = gs.getMainBoard().getSharedResourceCards()[0];
+        card2 = gs.getMainBoard().getSharedResourceCards()[1];
+        entry = player.getHandCardsMap().entrySet().iterator().next();
+        player.getHandCardsMap().remove(entry.getKey());
+        c.drawCard(DrawType.SHAREDRESOURCE1);
+        assertNotEquals(gs.getMainBoard().getSharedResourceCards()[0], card1);
+        assertEquals(gs.getMainBoard().getSharedResourceCards()[1], card2);
+        assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
+
+        card1 = gs.getMainBoard().getSharedResourceCards()[0];
+        card2 = gs.getMainBoard().getSharedResourceCards()[1];
+        entry = player.getHandCardsMap().entrySet().iterator().next();
+        player.getHandCardsMap().remove(entry.getKey());
+        c.drawCard(DrawType.SHAREDRESOURCE2);
+        assertEquals(gs.getMainBoard().getSharedResourceCards()[0], card1);
+        assertNotEquals(gs.getMainBoard().getSharedResourceCards()[1], card2);
+        assertTrue(player.getHandCardsMap().containsKey(card2.getId()));
+
+        card1 = gs.getMainBoard().getResourceDeck().getLast();
+        int size = gs.getMainBoard().getResourceDeck().size();
+        entry = player.getHandCardsMap().entrySet().iterator().next();
+        player.getHandCardsMap().remove(entry.getKey());
+        c.drawCard(DrawType.DECKRESOURCE);
+        assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
+        assertEquals(gs.getMainBoard().getResourceDeck().size(), size -1);
+        assertNotEquals(gs.getMainBoard().getResourceDeck().getLast(), card1);
+
+        card1 = gs.getMainBoard().getGoldDeck().getLast();
+        size = gs.getMainBoard().getGoldDeck().size();
+        entry = player.getHandCardsMap().entrySet().iterator().next();
+        player.getHandCardsMap().remove(entry.getKey());
+        c.drawCard(DrawType.DECKGOLD);
+        assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
+        assertEquals(gs.getMainBoard().getGoldDeck().size(), size -1);
+        assertNotEquals(gs.getMainBoard().getGoldDeck().getLast(), card1);
     }
 
     void flipCard(){

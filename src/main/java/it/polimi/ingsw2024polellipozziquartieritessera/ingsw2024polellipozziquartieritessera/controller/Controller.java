@@ -79,7 +79,7 @@ public class Controller {
         Corner placingCorner = placingCard.getCorners(placingCardSide)[placingCornerPos.getCornerPosValue()];
         Corner tableCorner = tableCard.getCorners(player.getPlacedCardsMap().get(tableCardId))[tableCornerPos.getCornerPosValue()];
 
-        //if (!player.getHandCardsMap().containsKey(placingCardId)) throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
+        if (!player.getHandCardsMap().containsKey(placingCardId)) throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
 
 
         // controlla che la carta non sia già presente
