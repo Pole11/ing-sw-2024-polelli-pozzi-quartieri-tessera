@@ -197,15 +197,17 @@ public class Controller {
     }
 
     void drawCard(DrawType drawType) throws InvalidHandException {
+        // non so se vada messo qui
         this.gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE); //dobbiamo valutare se si intende
         // la fase che c'è dopo o da ora in poi
-        this.gameState.setCurrentPlayerIndex((this.gameState.getCurrentPlayerIndex() % this.gameState.getPlayers().size() ) + 1);
         Board board = this.gameState.getMainBoard();
         Player currentPlayer = this.gameState.getCurrentPlayer();
 
         if (currentPlayer.getHandCardsMap().values().size() >= Config.MAX_HAND_CARDS - 1) {
             throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
         }
+
+        //RICORDARSI DI CONTROLLARE SE LA CHIAMATA ARRIVA DAL CURRENT PLAYER
 
         switch(drawType) {
             case DrawType.DECKGOLD:
@@ -228,6 +230,9 @@ public class Controller {
                 break;
             default:
         }
+        // non so se vada bene qui
+        this.gameState.setCurrentPlayerIndex(((this.gameState.getCurrentPlayerIndex()+1) % this.gameState.getPlayers().size() ));
+
     }
 
     public void flipCard(int playerIndex, int cardId) {
