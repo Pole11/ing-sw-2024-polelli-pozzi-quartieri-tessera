@@ -10,10 +10,10 @@ import java.util.*;
 
 public class Player {
     private final String nickname;
-    private Color color;
     private final ArrayList<ArrayList<Integer>> playerBoard;
     private final HashMap<Integer, Side> placedCardsMap;
     private final HashMap<Integer, Side> handCardsMap;
+    private Color color;
 
     private int points;
     private int objectivesWon;
@@ -26,11 +26,11 @@ public class Player {
     //per ora objectiveCardOptions serve, poi secondo me si potrà rimuovere
     private ObjectiveCard[] objectiveCardOptions; // it is the  array of the choice for secret objective
 
-    public Player(String nickname, Color color){
+    public Player(String nickname){
         this.points = 0;
         this.nickname = nickname;
-        this.color = color;
 
+        this.color = null;
         this.objectiveCard = null;
         this.starterCard = null;
         this.playerBoard = new ArrayList<>();
@@ -255,7 +255,8 @@ public class Player {
 // -----------------------Challenge Managing---------------------------------
 
     public int getCardPoints(ObjectiveCard objCard) throws WrongInstanceTypeException, CardNotPlacedException {
-        if (!placedCardsMap.containsKey(objCard.getId())) throw new CardNotPlacedException("The card is not placed");
+        //if (!placedCardsMap.containsKey(objCard.getId())) throw new CardNotPlacedException("The card is not placed");
+        //QUESTO IF E' SBAGLIATO, le objective card non sono in placedCardsMap
         Challenge cardChallenge = objCard.getChallenge();
         int cardPoints = objCard.getPoints();
         int timesWon = -1;
@@ -308,7 +309,7 @@ public class Player {
         Challenge cardChallenge = goldCard.getChallenge();
         int cardPoints = goldCard.getPoints();
         int timesWon = 0;
-
+        if (cardChallenge == null) return cardPoints;
         if (cardChallenge instanceof ElementChallenge) {
             ArrayList<Element> elements = ((ElementChallenge) cardChallenge).getElements();
             timesWon = getTimesWonElement(elements);
@@ -338,14 +339,37 @@ public class Player {
     // remember that placedCardsMap.get() returns the side of the card played
 
     private int getTimesWonElement(ArrayList<Element> elements) {
+        HashMap<Element, Integer> challengeElementsOccurences = new HashMap<>();
+        HashMap<Element, Integer> playerElementsOccurences = new HashMap<>();
+        var ref = new Object() {
+            int min = Integer.MAX_VALUE;
+        };
+
+        elements.stream().forEach((element)->{
+            if (challengeElementsOccurences.containsKey(element)) {
+                challengeElementsOccurences.put(element, challengeElementsOccurences.get(element) + 1);
+            } else {
+                challengeElementsOccurences.put(element, 1);
+            }
+        });
+
+        challengeElementsOccurences.keySet().stream().forEach((element ->{
+            playerElementsOccurences.put(element, this.getAllElements().get(element));
+        }));
+
+        challengeElementsOccurences.keySet().stream().forEach((element -> {
+            ref.min = playerElementsOccurences.get(element) / challengeElementsOccurences.get(element);
+        }));
+
+        /* PARTE VECCHIA
         int min = Integer.MAX_VALUE;
         for (Element ele : elements) {
             if (this.getAllElements().get(ele) < min) {
                 min = this.getAllElements().get(ele);
             }
-        }
+        }*/
 
-        return min;
+        return ref.min;
     }
 
     private int getTimesWonStructure(StructureChallenge challenge) throws WrongInstanceTypeException {

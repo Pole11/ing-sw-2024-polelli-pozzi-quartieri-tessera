@@ -59,10 +59,10 @@ public class Main {
         HashMap cardsMap = createCardsMap(); //allocate and initialize all cards
         ArrayList<Player> players = new ArrayList<Player>(); //allocate players
         //creazione momentanea dei player, li prenderà dal controller
-        players.add(0, new Player("paolo", Color.RED));
-        players.add(1, new Player("piergiorgio", Color.BLUE));
-        players.add(2, new Player("fungiforme", Color.GREEN));
-        //players.set(3, new Player("fulmicotone", Color.YELLOW));
+        players.add(0, new Player("paolo"));
+        players.add(1, new Player("piergiorgio"));
+        players.add(2, new Player("fungiforme"));
+        //players.set(3, new Player("fulmicotone", ColLLOW));
         return new GameState(cardsMap, players);
     }
 

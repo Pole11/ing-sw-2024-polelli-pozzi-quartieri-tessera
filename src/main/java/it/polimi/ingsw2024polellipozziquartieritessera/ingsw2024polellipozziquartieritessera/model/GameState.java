@@ -49,53 +49,44 @@ public class GameState {
 
         this.mainBoard = new Board(resourceCardDeck,goldCardDeck);
 
-        if (!NicknameAndColorsAreValid()) {
-            throw new NotUniquePlayerException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname AND the same color");
-        }
-        if (!NicknamesAreValid()) {
-            throw new NotUniquePlayerNicknameException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname");
-        }
-        if (!ColorsAreValid()) {
-            throw new NotUniquePlayerColorException("While creating the GameState Object I encountered a problem regarding the creation of players with the same color");
-        }
+        NicknamesAreValid();
     }
 
     // TESTING
 
-    private boolean NicknamesAreValid() {
+
+    public void NicknamesAreValid() throws NotUniquePlayerNicknameException {
         // check if players are unique (by nickname and color)
         for (int i = 0; i < players.size(); i++) {
             for (int j = i+1; j < players.size(); j++) {
                 if (players.get(i).getNickname().equals(players.get(j).getNickname())) {
-                    return false;
+                    throw new NotUniquePlayerNicknameException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname");
                 }
             }
         }
-        return true;
     }
 
-    private boolean ColorsAreValid() {
+
+    public void ColorsAreValid() throws NotUniquePlayerColorException {
         // check if players are unique (by nickname and color)
         for (int i = 0; i < players.size(); i++) {
             for (int j = i+1; j < players.size(); j++) {
                 if (players.get(i).getColor().equals(players.get(j).getColor())) {
-                    return false;
+                    throw new NotUniquePlayerColorException("While creating the GameState Object I encountered a problem regarding the creation of players with the same color");
                 }
             }
         }
-        return true;
     }
 
-    private boolean NicknameAndColorsAreValid() {
+    public void NicknameAndColorsAreValid() throws NotUniquePlayerException {
         // check if players are unique (by nickname and color)
         for (int i = 0; i < players.size(); i++) {
             for (int j = i+1; j < players.size(); j++) {
                 if (players.get(i).getNickname().equals(players.get(j).getNickname()) && players.get(i).getColor().equals(players.get(j).getColor())) {
-                    return false;
+                    throw new NotUniquePlayerException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname AND the same color");
                 }
             }
         }
-        return true;
     }
 
     // GETTER
@@ -324,7 +315,7 @@ public class GameState {
         }
     }
 
-    //-------------------Game Phase flow---------------------
+//-------------------Game Phase flow---------------------
 
     private void playTurn() throws CardNotPlacedException, WrongInstanceTypeException {
         // notify current player to place card (notify all changes)
@@ -387,23 +378,30 @@ public class GameState {
     }
 
     private Boolean isGameEnded() {
-        // 20
+        // 20 points?
         for (int i = 0; i < this.getPlayers().size(); i++) {
             if (this.getPlayers().get(i).getPoints() >= 20) {
                 return true;
             }
         }
-        // fine carte
+        // cards ended?
         if (this.getMainBoard().getResourceDeck().isEmpty()) {
             return true;
         }
         return this.getMainBoard().getGoldDeck().isEmpty();
     }
 
-    private void calculateFinalPoints() throws CardNotPlacedException, WrongInstanceTypeException {
+    void calculateFinalPoints() throws CardNotPlacedException, WrongInstanceTypeException {
         for (int i = 0; i < this.getPlayers().size(); i++) {
+            //player obj
             int points = this.getPlayers().get(i).getCardPoints(this.getPlayers().get(i).getObjectiveCard());
-            this.getPlayers().get(i).addPoints(points);
+            this.getPlayers().get(i).addPoints(this.getPlayers().get(i).getCardPoints(this.getPlayers().get(i).getObjectiveCard()));
+            //shared obj 1
+            points = this.getPlayers().get(i).getCardPoints(this.mainBoard.getSharedObjectiveCards()[0]);
+            this.getPlayers().get(i).addPoints(this.getPlayers().get(i).getCardPoints(this.mainBoard.getSharedObjectiveCards()[0]));
+            //shared obj 2
+            points = this.getPlayers().get(i).getCardPoints(this.mainBoard.getSharedObjectiveCards()[1]);
+            this.getPlayers().get(i).addPoints(this.getPlayers().get(i).getCardPoints(this.mainBoard.getSharedObjectiveCards()[1]));
         }
     }
 
@@ -420,8 +418,8 @@ public class GameState {
         }
 
         // now winnerPlayerIndeces contains who has the maximum number of points
-        // decide the real winner
-        int maxChallengesWon = 0;
+        // decide the real winner if there is a draw
+        int maxChallengesWon = 0; // SERVE??
         ArrayList<Integer> winnerObjectives = new ArrayList<>();
         if (winnerPlayerIndeces.size() > 1) {
             int mostObjectivesWins = -1;
@@ -507,6 +505,7 @@ public class GameState {
         board.fillSharedCardsGap();
     }
 
+//----------------------------place Card--------------------------------
 
     public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingCardSide) throws PlacingOnHiddenCornerException {
         // check if the indirect corners are hidden
@@ -528,35 +527,25 @@ public class GameState {
                     // check if there is a card in the up left corner
                     if (placingRow - 1 >= 0 && placingRow - 1 < playerBoard.size() && placingCol >= 0 && placingCol < playerBoard.getFirst().size() && playerBoard.get(placingRow - 1).get(placingCol) != -1) { // -1 means empty
                         int matrixCardId = playerBoard.get(placingRow - 1).get(placingCol);
-                        CornerCard matrixCard = (CornerCard) this.getCardsMap().get(matrixCardId); // use the keys of player.placedCardsMap
-                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.DOWNRIGHT.getCornerPosValue()];
-                        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[CornerPos.UPLEFT.getCornerPosValue()];
-                        placeCardHelper(player, matrixCorner, indirectPlacingCorner);
+                        placeCardHelper(player, matrixCardId, placingCard, placingCardSide, CornerPos.DOWNRIGHT, CornerPos.UPLEFT);
+
                     }
                     // check if there is a card in the up right corner
                     if (placingRow >= 0 && placingRow < playerBoard.size() && placingCol + 1 >= 0 && placingCol + 1 < playerBoard.getFirst().size() && playerBoard.get(placingRow).get(placingCol + 1) != -1) { // -1 means empty
                         int matrixCardId = playerBoard.get(placingRow).get(placingCol + 1);
-                        CornerCard matrixCard = (CornerCard) this.getCardsMap().get(matrixCardId);
-                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.DOWNLEFT.getCornerPosValue()];
-                        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[CornerPos.UPRIGHT.getCornerPosValue()];
-                        placeCardHelper(player, matrixCorner, indirectPlacingCorner);
+                        placeCardHelper(player, matrixCardId, placingCard, placingCardSide, CornerPos.DOWNLEFT, CornerPos.UPRIGHT);
+
                     }
                     // check if there is a card in the down right corner
                     if (placingRow + 1 >= 0 && placingRow + 1 < playerBoard.size() && placingCol >= 0 && placingCol < playerBoard.getFirst().size() && playerBoard.get(placingRow + 1).get(placingCol) != -1) { // -1 means empty
                         int matrixCardId = playerBoard.get(placingRow + 1).get(placingCol);
-                        CornerCard matrixCard = (CornerCard) this.getCardsMap().get(matrixCardId);
-                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.UPLEFT.getCornerPosValue()];
-                        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[CornerPos.DOWNRIGHT.getCornerPosValue()];
-                        placeCardHelper(player, matrixCorner, indirectPlacingCorner);
+                        placeCardHelper(player, matrixCardId, placingCard, placingCardSide, CornerPos.UPLEFT, CornerPos.DOWNRIGHT);
                     }
 
                     // check if there is a card in the down left corner
                     if (placingRow >= 0 && placingRow < playerBoard.size() && placingCol - 1 >= 0 && placingCol - 1 < playerBoard.getFirst().size() && playerBoard.get(placingRow).get(placingCol - 1) != -1) { // -1 means empty
                         int matrixCardId = playerBoard.get(placingRow).get(placingCol - 1);
-                        CornerCard matrixCard = (CornerCard) this.getCardsMap().get(matrixCardId);
-                        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[CornerPos.UPRIGHT.getCornerPosValue()];
-                        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[CornerPos.DOWNLEFT.getCornerPosValue()];
-                        placeCardHelper(player, matrixCorner, indirectPlacingCorner);
+                        placeCardHelper(player, matrixCardId, placingCard, placingCardSide, CornerPos.UPRIGHT, CornerPos.DOWNLEFT);
                     }
                     break;
                 }
@@ -564,7 +553,11 @@ public class GameState {
         }
     }
 
-    private void placeCardHelper(Player player, Corner matrixCorner, Corner indirectPlacingCorner) throws PlacingOnHiddenCornerException {
+    private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {
+        CornerCard matrixCard = (CornerCard) this.getCardsMap().get(matrixCardId);
+        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[matrixCardCornerPos.getCornerPosValue()];
+        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[indirectPlacingCornerPos.getCornerPosValue()];
+
         if (matrixCorner.getHidden()) {
             throw new PlacingOnHiddenCornerException("you are trying to place on an hidden corner");
         }
@@ -575,7 +568,7 @@ public class GameState {
         matrixCorner.setLinkedCorner(indirectPlacingCorner);
         matrixCorner.setCovered(true);
 
-        // !!! remove elements of the table card that are covered
+        // remove elements of the table card that are covered
         Element cornerEle = matrixCorner.getElement();
         if (player.getAllElements().get(cornerEle) != null) {
             int currentOccurencies = player.getAllElements().get(cornerEle);

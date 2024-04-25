@@ -16,13 +16,13 @@ public class PlayerTest {
     void playerTestConstructor() {
         for (Color c : Color.values()){
             // TODO: test with different nickname lengths
-            assertAll(() -> new Player("Nickname", c));
+            assertAll(() -> new Player("Nickname"));
         }
     }
 
     @Test
     void getCardPointsTest1() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
-        Player player = new Player("pole", Color.GREEN);
+        Player player = new Player("pole");
         Main main = new Main();
         // create cards map
         HashMap<Integer, Card> cardsMap = main.createCardsMap();
@@ -66,7 +66,7 @@ public class PlayerTest {
     // check points and elements
     @Test
     void getCardPointsTest2() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException {
-        Player player = new Player("pole", Color.GREEN);
+        Player player = new Player("pole");
         Main main = new Main();
         // create cards map
         HashMap<Integer, Card> cardsMap = main.createCardsMap();
@@ -86,6 +86,8 @@ public class PlayerTest {
         int resourceCardId8 = 75;
         int goldCardId3 = 53;
         int goldCardId4 = 54;
+        int resourceCardId9 = 12;
+        int goldCardId5 = 58;
 
         // create game state
         GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
@@ -246,6 +248,29 @@ public class PlayerTest {
         assertEquals(0, player.getAllElements().get(Element.FUNGI)); // fungi
         assertEquals(1, player.getAllElements().get(Element.INKWELL));
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
+        assertEquals(1, player.getAllElements().get(Element.QUILL));
+
+
+        player.getHandCardsMap().put(resourceCardId9, Side.FRONT);
+        c.placeCard(0, resourceCardId9, goldCardId4, CornerPos.DOWNLEFT, Side.FRONT);
+        assertEquals(12, player.getPoints());
+        assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(5, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(4, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(0, player.getAllElements().get(Element.FUNGI)); // fungi
+        assertEquals(1, player.getAllElements().get(Element.INKWELL));
+        assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
+        assertEquals(1, player.getAllElements().get(Element.QUILL));
+
+        player.getHandCardsMap().put(goldCardId5, Side.FRONT);
+        c.placeCard(0, goldCardId5, resourceCardId2, CornerPos.UPLEFT, Side.FRONT);
+        assertEquals(15, player.getPoints());
+        assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
+        assertEquals(5, player.getAllElements().get(Element.PLANT)); // plant
+        assertEquals(4, player.getAllElements().get(Element.INSECT)); // insect
+        assertEquals(0, player.getAllElements().get(Element.FUNGI)); // fungi
+        assertEquals(1, player.getAllElements().get(Element.INKWELL));
+        assertEquals(1, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
     }

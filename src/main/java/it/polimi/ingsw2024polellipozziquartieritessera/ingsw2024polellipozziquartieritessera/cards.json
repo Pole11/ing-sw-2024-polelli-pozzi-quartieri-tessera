@@ -751,13 +751,13 @@
   "97" : {
     "Type" : "Objective",
     "ChallengeType" : "ElementChallenge",
-    "ChallengeElements": ["Insect","Insect","Insect"],
+    "ChallengeElements": ["Animal","Animal","Animal"],
     "Points" : "2"
   },
   "98" : {
     "Type" : "Objective",
     "ChallengeType" : "ElementChallenge",
-    "ChallengeElements": ["Plant","Plant","Plant"],
+    "ChallengeElements": ["Insect","Insect","Insect"],
     "Points" : "2"
   },
   "99" : {

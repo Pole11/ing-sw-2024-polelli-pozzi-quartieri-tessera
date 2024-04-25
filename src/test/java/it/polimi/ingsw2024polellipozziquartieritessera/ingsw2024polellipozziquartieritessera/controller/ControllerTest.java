@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ControllerTest {
     @Test
     void placeCard() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
-        Player player = new Player("pole", Color.GREEN);
+        Player player = new Player("pole");
         Main main = new Main();
         // create cards map
         HashMap<Integer, Card> cardsMap = main.createCardsMap();
@@ -266,7 +266,7 @@ public class ControllerTest {
 
     @Test
     void drawCard() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException, InvalidHandException {
-        Player player = new Player("pole", Color.GREEN);
+        Player player = new Player("pole");
         Main main = new Main();
         // create cards map
         HashMap<Integer, Card> cardsMap = main.createCardsMap();
