@@ -98,7 +98,7 @@ public class Main {
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
                     }
 
-                    elementChallenge = new ElementChallenge(id, elements);
+                    elementChallenge = new ElementChallenge(elements);
                     challenge = elementChallenge;
                     gameState.setElementChallenge(id, elementChallenge);
                 } else if (card.get("ChallengeType").equals("StructureChallenge")){
@@ -108,12 +108,12 @@ public class Main {
                             configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(i+j).toString().toUpperCase() );
                         }
                     }
-                    structureChallenge = new StructureChallenge(id, configuration);
+                    structureChallenge = new StructureChallenge(configuration);
                     challenge = structureChallenge;
                     gameState.setStructureChallenge(id, structureChallenge);
 
                 } else if (card.get("ChallengeType").equals("CoverageChallenge")){
-                    coverageChallenge = new CoverageChallenge(id);
+                    coverageChallenge = new CoverageChallenge();
                     challenge = coverageChallenge;
                     gameState.setCoverageChallenge(id, coverageChallenge);
                 } else if (card.get("ChallengeType").equals("NoChallenge")){

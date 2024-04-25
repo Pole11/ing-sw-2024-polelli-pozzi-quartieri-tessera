@@ -10,12 +10,14 @@ import java.util.Arrays;
 public abstract class CornerCard extends Card {
     private final Corner[] frontCorners; // the corners of the front side (from top-left clockwise) 0 1
     private final Corner[] backCorners; // the corners of the back side (from top-left clockwise)   3 2
+    private int points;
 
     // CONSTRUCTOR
-    public CornerCard(int id, Corner[] frontCorners, Corner[] backCorners) {
+    public CornerCard(int id, Corner[] frontCorners, Corner[] backCorners, int points) {
         super(id);
         this.frontCorners = frontCorners;
         this.backCorners =  backCorners;
+        this.points = points;
     }
 
     // GETTER
@@ -27,8 +29,9 @@ public abstract class CornerCard extends Card {
         return backCorners;
     }
 
-    // METHODS
+    public int getPoints() { return points; }
 
+    // METHODS
     // return all the corners of the card (back and front)
     public ArrayList<Corner> getCorners() {
         // corner array initialization

@@ -497,7 +497,15 @@ public class GameState {
 
     private void calculateFinalPoints() throws CardNotPlacedException, WrongInstanceTypeException {
         for (int i = 0; i < this.getPlayers().size(); i++) {
-            int points = this.getPlayers().get(i).getCardPoints(this.getPlayers().get(i).getObjectiveCard());
+            ObjectiveCard objCard = this.getPlayers().get(i).getObjectiveCard();
+            int points = 0;
+
+            if (this.structureChallengeMap.get(objCard.getId()) != null) {
+                points = this.getPlayers().get(i).getCardPoints(objCard, this.structureChallengeMap.get(objCard.getId()));
+            } else if (this.elementChallengeMap.get(objCard.getId()) != null) {
+                points = this.getPlayers().get(i).getCardPoints(objCard, this.elementChallengeMap.get(objCard.getId()));
+            }
+
             this.getPlayers().get(i).addPoints(points);
         }
     }

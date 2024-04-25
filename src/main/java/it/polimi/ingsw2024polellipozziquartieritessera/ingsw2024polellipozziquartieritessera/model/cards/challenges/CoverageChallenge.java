@@ -1,8 +1,18 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges;
 
-public class CoverageChallenge extends Challenge{
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 
-    public CoverageChallenge(int cardId) {
-        super(cardId);
+public class CoverageChallenge extends Challenge{
+    /*
+    private final GoldCard goldCard;
+
+    public CoverageChallenge(GoldCard goldCard) {
+        this.goldCard = goldCard;
     }
+
+    public GoldCard getGoldCard() {
+        return this.goldCard;
+    }
+    */
+
 }

@@ -7,9 +7,8 @@ import java.util.ArrayList;
 public class ElementChallenge extends Challenge {
     private final ArrayList<Element> elements;
 
-    public ElementChallenge(int cardId, ArrayList<Element> elements){
+    public ElementChallenge(ArrayList<Element> elements){
         // should we put a copy in here???
-        super(cardId);
         this.elements = elements;
     }
 

@@ -7,8 +7,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 public class StructureChallenge extends Challenge{
     private final Element[][] configuration;
 
-    public StructureChallenge(int cardId, Element[][] configuration) throws WrongStructureConfigurationSizeException {
-        super(cardId);
+    public StructureChallenge(Element[][] configuration) throws WrongStructureConfigurationSizeException {
         this.configuration = configuration;
 
         if (configuration.length != Config.N_STRUCTURE_CHALLENGE_CONFIGURATION) {

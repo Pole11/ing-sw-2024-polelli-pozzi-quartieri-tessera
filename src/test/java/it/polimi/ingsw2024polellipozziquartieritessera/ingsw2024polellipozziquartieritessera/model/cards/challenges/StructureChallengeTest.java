@@ -14,14 +14,12 @@ public class StructureChallengeTest {
         Element[][] mat24 = new Element[2][4];
         Element[][] mat42 = new Element[4][2];
         Element[][] mat44 = new Element[4][4];
-
-        int id = -1;
-
-        assertAll(() -> new StructureChallenge(id, mat33));
-        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(id, mat34));
-        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(id, mat43));
-        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(id, mat24));
-        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(id, mat42));
-        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(id, mat44));
+        
+        assertAll(() -> new StructureChallenge(mat33));
+        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat34));
+        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat43));
+        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat24));
+        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat42));
+        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat44));
     }
 }

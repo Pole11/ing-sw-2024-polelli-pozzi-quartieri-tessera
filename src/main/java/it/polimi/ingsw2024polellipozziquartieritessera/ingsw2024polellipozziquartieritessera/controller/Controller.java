@@ -85,10 +85,10 @@ public class Controller {
             if (p.getPlacedCardsMap().get(placingCardId) != null) throw new CardAlreadPlacedException("you cannot place a card that is already placed");
         }
 
+        if (tableCorner == null) throw new WrongPlacingPositionException("table corner is null");
         if (tableCorner.getLinkedCorner() != null) throw new CardAlreadyPresentOnTheCornerException("you cannot place a card here, the corner is already linked");
         if (tableCorner.getHidden()) throw new PlacingOnHiddenCornerException("you cannot place a card on a hidden corner");
         if (placingCorner == null) throw new WrongPlacingPositionException("placing corner is null");
-        if (tableCorner == null) throw new WrongPlacingPositionException("table corner is null");
 
         // execute this block if the card is gold and has a challenge (is front)
         if (!goldPlaceable(player, placingCard, placingCardSide)) throw new GoldCardCannotBePlacedException("You haven't the necessary resources to place the goldcard " + placingCardId);
@@ -98,8 +98,19 @@ public class Controller {
         player.updateBoard(placingCardId, tableCardId, tableCornerPos);
         gameState.updateElements(player, placingCard, placingCardSide);
 
-        int newPoints = player.getPoints() + player.getCardPoints(placingCard);
-        player.setPoints(newPoints);
+        int newPoints = 0;
+
+        if (gameState.getElementChallenge(placingCardId) != null) {
+            newPoints = player.getCardPoints(placingCard, gameState.getElementChallenge(placingCardId));
+        } else if (gameState.getCoverageChallenge(placingCardId) != null) {
+            newPoints = player.getCardPoints(placingCard, gameState.getCoverageChallenge(placingCardId));
+        } else if (gameState.getStructureChallenge(placingCardId) != null) {
+            newPoints = player.getCardPoints(placingCard, gameState.getStructureChallenge(placingCardId));
+        } else {
+            newPoints = player.getCardPoints(placingCard);
+        }
+
+        player.setPoints(player.getPoints() + newPoints);
     }
 
     private boolean goldPlaceable(Player player, CornerCard placingCard, Side placingCardSide){
