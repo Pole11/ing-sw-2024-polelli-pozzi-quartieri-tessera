@@ -18,17 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ControllerTest {
     @Test
     void placeCard() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
-        Player player = new Player("pole", Color.GREEN);
-        Main main = new Main();
-        // create cards map
-        HashMap<Integer, ResourceCard> resourceCardsMap = new HashMap();
-        HashMap<Integer, GoldCard> goldCardsMap = new HashMap();
-        HashMap<Integer, StarterCard> starterCardsMap = new HashMap();
-        HashMap<Integer, ObjectiveCard> objectiveCardsMap = new HashMap();
-        main.createCardsMap(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap);
-
-        assertDoesNotThrow(() -> new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
-
         int starterCardId = 85;
         Side starterCardSide = Side.BACK;
         int resourceCardId1 = 1;
@@ -48,7 +37,9 @@ public class ControllerTest {
         CornerPos goldCardToTableCornerPos = CornerPos.UPLEFT;
 
         // create game state
-        GameState gs = new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
+        Main.populate();
+        GameState gs = Main.gameState;
+        Player player = Main.gameState.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
         gs.setSharedGoldCards();
@@ -269,21 +260,12 @@ public class ControllerTest {
 
     @Test
     void drawCard() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException, InvalidHandException {
-        Player player = new Player("pole", Color.GREEN);
-        Main main = new Main();
-        // create cards map
-        HashMap<Integer, ResourceCard> resourceCardsMap = new HashMap();
-        HashMap<Integer, GoldCard> goldCardsMap = new HashMap();
-        HashMap<Integer, StarterCard> starterCardsMap = new HashMap();
-        HashMap<Integer, ObjectiveCard> objectiveCardsMap = new HashMap();
-        main.createCardsMap(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap);
-
-        assertDoesNotThrow(() -> new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
-
         int starterCardId = 81;
 
         // create game state
-        GameState gs = new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
+        Main.populate();
+        GameState gs = Main.gameState;
+        Player player = Main.gameState.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
         gs.setSharedGoldCards();

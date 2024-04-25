@@ -12,12 +12,12 @@ public class Board {
     private ArrayList<GoldCard> goldDeck; // may be final (the reference only)
     private ArrayList<ResourceCard> resourceDeck; // may be final (the reference only)
 
-    public Board(ArrayList<ResourceCard> resourceCardDeck, ArrayList<GoldCard> goldCardDeck){
+    public Board(){
         sharedGoldCards = new GoldCard[Config.N_SHARED_GOLDS];
         sharedResourceCards = new ResourceCard[Config.N_SHARED_RESOURCES];
         sharedObjectiveCards = new ObjectiveCard[Config.N_SHARED_OBJECTIVES];
-        goldDeck = goldCardDeck;
-        resourceDeck  = resourceCardDeck;
+        goldDeck = new ArrayList<>();
+        resourceDeck  = new ArrayList<>();
     }
 
     //SETTER
@@ -31,6 +31,25 @@ public class Board {
 
     public void setSharedObjectiveCards(ObjectiveCard[] sharedObjectiveCards) {
         this.sharedObjectiveCards = sharedObjectiveCards;
+    }
+
+    public void setDecks(ArrayList<ResourceCard> resourceCardDeck, ArrayList<GoldCard> goldCardDeck) {
+        setResourceDeck(resourceCardDeck);
+        setGoldDeck(goldCardDeck);
+    }
+
+    public void setGoldDeck(ArrayList<GoldCard> goldCardDeck) {
+        if (this.goldDeck.isEmpty()) {
+            this.goldDeck.addAll(goldCardDeck);
+
+        }
+    }
+
+    public void setResourceDeck(ArrayList<ResourceCard> resourceDeck) {
+        if (this.resourceDeck.isEmpty()) {
+            this.resourceDeck.addAll(resourceDeck);
+
+        }
     }
 
     //GETTER
@@ -112,8 +131,7 @@ public class Board {
             GoldCard drawnCard = getGoldDeck().getLast();
             goldDeck.removeLast();
             return drawnCard;
-        }
-        else{
+        } else {
             return null;
         }
     }

@@ -17,14 +17,14 @@ public class CardTest {
     @Test
     void testGetterSetter(){
         // setup
-        GameState g;
         try {
-            g = Main.populate();
+            Main.populate();
+            GameState g = Main.gameState;
+            Card card = g.getCard(5);
+            assertEquals(card.getId(), 5);
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        Card card = g.getCard(5);
-        assertEquals(card.getId(), 5);
     }
 }

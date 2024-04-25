@@ -3,13 +3,13 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ElementChallenge extends Challenge {
     private final ArrayList<Element> elements;
 
-    public ElementChallenge(ArrayList<Element> elements){
+    public ElementChallenge(int cardId, ArrayList<Element> elements){
         // should we put a copy in here???
+        super(cardId);
         this.elements = elements;
     }
 

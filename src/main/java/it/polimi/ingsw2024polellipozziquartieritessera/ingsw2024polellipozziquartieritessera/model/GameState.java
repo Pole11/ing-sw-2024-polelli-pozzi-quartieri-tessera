@@ -4,6 +4,9 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -15,6 +18,9 @@ public class GameState {
     private final HashMap<Integer, ResourceCard> resourceCardsMap; // map id and card
     private final HashMap<Integer, StarterCard> starterCardsMap; // map id and card
     private final HashMap<Integer, ObjectiveCard> objectiveCardsMap; // map id and card
+    private final HashMap<Integer, CoverageChallenge> coverageChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
+    private final HashMap<Integer, ElementChallenge> elementChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
+    private final HashMap<Integer, StructureChallenge> structureChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
     private final Board mainBoard;
     private final ArrayList<Player> players; //player[0] is blackPlayer
     private final Chat chat;
@@ -25,72 +31,53 @@ public class GameState {
     int numberAnswered = 0;
 
     // CONSTRUCTOR
-    public GameState(HashMap<Integer, ResourceCard> resourceCardsMap, HashMap<Integer, GoldCard> goldCardsMap, HashMap<Integer, StarterCard> starterCardsMap, HashMap<Integer, ObjectiveCard> objectiveCardsMap, ArrayList<Player> players) throws NotUniquePlayerException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
-        this.goldCardsMap = goldCardsMap;
-        this.resourceCardsMap = resourceCardsMap;
-        this.starterCardsMap = starterCardsMap;
-        this.objectiveCardsMap = objectiveCardsMap;
+    public GameState() {
+        this.goldCardsMap = new HashMap<>();
+        this.resourceCardsMap = new HashMap<>();
+        this.starterCardsMap = new HashMap<>();
+        this.objectiveCardsMap = new HashMap<>();
 
-        this.players = players;
+        this.coverageChallengeMap = new HashMap<>();
+        this.elementChallengeMap = new HashMap<>();
+        this.structureChallengeMap = new HashMap<>();
+
+        this.players = new ArrayList<>();
         this.currentPlayerIndex = 0;
         this.currentGamePhase = GamePhase.MAINPHASE;
         this.currentGameTurn = null;
         this.chat = new Chat();
         this.isLastTurn = false;
 
-
-        // get all gold cards and resource cards
-        ArrayList<GoldCard> goldCardDeck = new ArrayList<>();
-        ArrayList<ResourceCard> resourceCardDeck = new ArrayList<>();
-        for (GoldCard g : goldCardsMap.values())  goldCardDeck.add(g);
-        for (ResourceCard r : resourceCardsMap.values())  resourceCardDeck.add(r);
-
-        this.mainBoard = new Board(resourceCardDeck,goldCardDeck);
-
-        if (!NicknameAndColorsAreValid()) {
-            throw new NotUniquePlayerException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname AND the same color");
-        }
-        if (!NicknamesAreValid()) {
-            throw new NotUniquePlayerNicknameException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname");
-        }
-        if (!ColorsAreValid()) {
-            throw new NotUniquePlayerColorException("While creating the GameState Object I encountered a problem regarding the creation of players with the same color");
-        }
+        this.mainBoard = new Board();
     }
 
     // TESTING
 
-    private boolean NicknamesAreValid() {
+    private boolean NicknamesAreValid(Player player) {
         // check if players are unique (by nickname and color)
         for (int i = 0; i < players.size(); i++) {
-            for (int j = i+1; j < players.size(); j++) {
-                if (players.get(i).getNickname().equals(players.get(j).getNickname())) {
-                    return false;
-                }
+            if (players.get(i).getNickname().equals(player.getNickname())) {
+                return false;
             }
         }
         return true;
     }
 
-    private boolean ColorsAreValid() {
+    private boolean ColorsAreValid(Player player) {
         // check if players are unique (by nickname and color)
         for (int i = 0; i < players.size(); i++) {
-            for (int j = i+1; j < players.size(); j++) {
-                if (players.get(i).getColor().equals(players.get(j).getColor())) {
-                    return false;
-                }
+            if (players.get(i).getColor().equals(player.getColor())) {
+                return false;
             }
         }
         return true;
     }
 
-    private boolean NicknameAndColorsAreValid() {
+    private boolean NicknameAndColorsAreValid(Player player) {
         // check if players are unique (by nickname and color)
         for (int i = 0; i < players.size(); i++) {
-            for (int j = i+1; j < players.size(); j++) {
-                if (players.get(i).getNickname().equals(players.get(j).getNickname()) && players.get(i).getColor().equals(players.get(j).getColor())) {
-                    return false;
-                }
+            if (players.get(i).getNickname().equals(player.getNickname()) && players.get(i).getColor().equals(player.getColor())) {
+                return false;
             }
         }
         return true;
@@ -111,6 +98,10 @@ public class GameState {
 
     public int getCurrentPlayerIndex() {
         return currentPlayerIndex;
+    }
+
+    public Player getPlayer(int index) {
+        return players.get(index);
     }
 
     public GamePhase getCurrentGamePhase() {
@@ -171,6 +162,18 @@ public class GameState {
         return this.objectiveCardsMap.size();
     }
 
+    public CoverageChallenge getCoverageChallenge(int challengeId) {
+        return this.coverageChallengeMap.get(challengeId);
+    }
+
+    public ElementChallenge getElementChallenge(int challengeId) {
+        return this.elementChallengeMap.get(challengeId);
+    }
+
+    public StructureChallenge getStructureChallenge(int challengeId) {
+        return this.structureChallengeMap.get(challengeId);
+    }
+
     // SETTER
     public void setCurrentPlayerIndex(int currentPlayerIndex) {
         this.currentPlayerIndex = currentPlayerIndex;
@@ -200,7 +203,49 @@ public class GameState {
         this.objectiveCardsMap.put(cardId, objectiveCard);
     }
 
+    public void setCoverageChallenge(int challengeId, CoverageChallenge challenge) {
+        this.coverageChallengeMap.put(challengeId, challenge);
+    }
+
+    public void setElementChallenge(int challengeId, ElementChallenge challenge) {
+        this.elementChallengeMap.put(challengeId, challenge);
+    }
+
+    public void setStructureChallenge(int challengeId, StructureChallenge challenge) {
+        this.structureChallengeMap.put(challengeId, challenge);
+    }
+
+    public void setPlayer(int index, Player player) throws NotUniquePlayerException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
+        if (!NicknameAndColorsAreValid(player)) {
+            throw new NotUniquePlayerException("players with the same nickname AND the same color");
+        }
+        if (!NicknamesAreValid(player)) {
+            throw new NotUniquePlayerNicknameException("players with the same nickname");
+        }
+        if (!ColorsAreValid(player)) {
+            throw new NotUniquePlayerColorException("players with the same color");
+        }
+
+        players.add(index, player);
+    }
+
+    public void setMainBoard() {
+        // get all gold cards and resource cards
+        ArrayList<GoldCard> goldCardDeck = new ArrayList<>(goldCardsMap.values());
+        ArrayList<ResourceCard> resourceCardDeck = new ArrayList<>(resourceCardsMap.values());
+
+        this.mainBoard.setDecks(resourceCardDeck, goldCardDeck);
+    }
+
     // METHODS
+
+    public void removeAllPlayers() {
+        this.players.clear();
+    }
+
+    public void removePlayer(int index) {
+        this.players.remove(index);
+    }
 
     //------------ Starting Phases flow --------------------
 

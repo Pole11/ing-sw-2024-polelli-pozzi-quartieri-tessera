@@ -46,10 +46,7 @@ public class GoldCard extends CornerCard {
         // set center resource if the card is on the back side
         if (side == Side.BACK){
             uncoveredElements.add(this.resourceType);
-        }
-
-        // set all the corners resources if the card is on the front side
-        else{
+        } else { // set all the corners resources if the card is on the front side
             for (Corner corner : this.getUncoveredCorners(side)){
                 if(corner.getElement() != Element.EMPTY){
                     uncoveredElements.add(corner.getElement());

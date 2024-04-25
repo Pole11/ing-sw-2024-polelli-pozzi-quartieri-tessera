@@ -17,16 +17,18 @@ public class ObjectiveCardTest {
     @Test
     void testGetterSetter(){
         // setup
-        GameState g;
         try {
-            g = Main.populate();
+            Main.populate();
+            GameState g = Main.gameState;
+
+            ObjectiveCard card = g.getObjectiveCard(88);
+
+            assertNotNull(card.getChallenge());
+            assertTrue(card.getPoints()>0);
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        ObjectiveCard card = g.getObjectiveCard(88);
 
-        assertNotNull(card.getChallenge());
-        assertTrue(card.getPoints()>0);
     }
 }
