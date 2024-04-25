@@ -25,12 +25,16 @@ public class PlayerTest {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
         // create cards map
-        HashMap<Integer, Card> cardsMap = main.createCardsMap();
+        HashMap<Integer, ResourceCard> resourceCardsMap = new HashMap();
+        HashMap<Integer, GoldCard> goldCardsMap = new HashMap();
+        HashMap<Integer, StarterCard> starterCardsMap = new HashMap();
+        HashMap<Integer, ObjectiveCard> objectiveCardsMap = new HashMap();
+        main.createCardsMap(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap);
 
-        assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
+        assertDoesNotThrow(() -> new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
 
         // create game state
-        GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
+        GameState gs = new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
         Controller c = new Controller(gs);
         c.startGame();
         c.chooseInitialStarterSide(0, Side.BACK);
@@ -69,9 +73,13 @@ public class PlayerTest {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
         // create cards map
-        HashMap<Integer, Card> cardsMap = main.createCardsMap();
+        HashMap<Integer, ResourceCard> resourceCardsMap = new HashMap();
+        HashMap<Integer, GoldCard> goldCardsMap = new HashMap();
+        HashMap<Integer, StarterCard> starterCardsMap = new HashMap();
+        HashMap<Integer, ObjectiveCard> objectiveCardsMap = new HashMap();
+        main.createCardsMap(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap);
 
-        assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
+        assertDoesNotThrow(() -> new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
 
         int starterCardId = 81;
         int resourceCardId1 = 31;
@@ -88,12 +96,12 @@ public class PlayerTest {
         int goldCardId4 = 54;
 
         // create game state
-        GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
+        GameState gs = new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
         gs.setSharedGoldCards();
         gs.setSharedResourceCards();
-        player.setStarterCard((StarterCard) gs.getCardsMap().get(starterCardId));
+        player.setStarterCard(gs.getStarterCard(starterCardId));
         player.initializeBoard();
         gs.chooseStarterSidePhase();
         c.chooseInitialStarterSide(0, Side.FRONT);
@@ -218,7 +226,7 @@ public class PlayerTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        assertThrows(WrongInstanceTypeException.class, ()->c.placeCard(0, 84, resourceCardId6, CornerPos.DOWNLEFT, Side.FRONT));
+        assertThrows(WrongInstanceTypeException.class, ()-> c.placeCard(0, 84, resourceCardId6, CornerPos.DOWNLEFT, Side.FRONT));
 
         player.getHandCardsMap().put(goldCardId3, Side.FRONT);
         c.placeCard(0, goldCardId3, resourceCardId6, CornerPos.DOWNLEFT, Side.BACK);

@@ -21,9 +21,13 @@ public class ControllerTest {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
         // create cards map
-        HashMap<Integer, Card> cardsMap = main.createCardsMap();
+        HashMap<Integer, ResourceCard> resourceCardsMap = new HashMap();
+        HashMap<Integer, GoldCard> goldCardsMap = new HashMap();
+        HashMap<Integer, StarterCard> starterCardsMap = new HashMap();
+        HashMap<Integer, ObjectiveCard> objectiveCardsMap = new HashMap();
+        main.createCardsMap(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap);
 
-        assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
+        assertDoesNotThrow(() -> new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
 
         int starterCardId = 85;
         Side starterCardSide = Side.BACK;
@@ -43,14 +47,13 @@ public class ControllerTest {
         Side goldCardSide = Side.FRONT;
         CornerPos goldCardToTableCornerPos = CornerPos.UPLEFT;
 
-
         // create game state
-        GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
+        GameState gs = new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
         gs.setSharedGoldCards();
         gs.setSharedResourceCards();
-        player.setStarterCard((StarterCard) gs.getCardsMap().get(starterCardId));
+        player.setStarterCard(gs.getStarterCard(starterCardId));
         player.initializeBoard();
         gs.chooseStarterSidePhase();
         c.chooseInitialStarterSide(0, starterCardSide);
@@ -62,8 +65,8 @@ public class ControllerTest {
 
         player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
         c.placeCard(0, resourceCardId1, starterCardId, resourceCard1ToTableCornerPos, resourceCard1Side);
-        Corner[] starterCardCorners = ((CornerCard) gs.getCardsMap().get(starterCardId)).getCorners(starterCardSide);
-        Corner[] resourceCard1Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId1)).getCorners(resourceCard1Side);
+        Corner[] starterCardCorners = gs.getCornerCard(starterCardId).getCorners(starterCardSide);
+        Corner[] resourceCard1Corners = gs.getCornerCard(resourceCardId1).getCorners(resourceCard1Side);
 
         for (CornerPos cpos : CornerPos.values()) {
             if (cpos.equals(resourceCard1ToTableCornerPos)) {
@@ -94,8 +97,8 @@ public class ControllerTest {
 
         player.getHandCardsMap().put(resourceCardId2, Side.FRONT);
         c.placeCard(0, resourceCardId2, resourceCardId1, resourceCard2ToTableCornerPos, resourceCard2Side);
-        resourceCard1Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId1)).getCorners(resourceCard1Side);
-        Corner[] resourceCard2Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId2)).getCorners(resourceCard2Side);
+        resourceCard1Corners = gs.getCornerCard(resourceCardId1).getCorners(resourceCard1Side);
+        Corner[] resourceCard2Corners = gs.getCornerCard(resourceCardId2).getCorners(resourceCard2Side);
 
         for (CornerPos cpos : CornerPos.values()) {
             if (cpos.equals(resourceCard2ToTableCornerPos)) {
@@ -124,8 +127,8 @@ public class ControllerTest {
 
         player.getHandCardsMap().put(resourceCardId3, Side.FRONT);
         c.placeCard(0, resourceCardId3, resourceCardId1, resourceCard3ToTableCornerPos, resourceCard3Side);
-        resourceCard1Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId1)).getCorners(resourceCard1Side);
-        Corner[] resourceCard3Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId3)).getCorners(resourceCard3Side);
+        resourceCard1Corners = gs.getCornerCard(resourceCardId1).getCorners(resourceCard1Side);
+        Corner[] resourceCard3Corners = gs.getCornerCard(resourceCardId3).getCorners(resourceCard3Side);
 
         for (CornerPos cpos : CornerPos.values()) {
             if (cpos.equals(resourceCard3ToTableCornerPos)) {
@@ -156,8 +159,8 @@ public class ControllerTest {
 
         player.getHandCardsMap().put(resourceCardId4, Side.FRONT);
         c.placeCard(0, resourceCardId4, resourceCardId3, resourceCard4ToTableCornerPos, resourceCard4Side);
-        resourceCard3Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId3)).getCorners(resourceCard3Side);
-        Corner[] resourceCard4Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId4)).getCorners(resourceCard4Side);
+        resourceCard3Corners = gs.getCornerCard(resourceCardId3).getCorners(resourceCard3Side);
+        Corner[] resourceCard4Corners = gs.getCornerCard(resourceCardId4).getCorners(resourceCard4Side);
 
         for (CornerPos cpos : CornerPos.values()) {
             if (cpos.equals(resourceCard4ToTableCornerPos)) {
@@ -186,8 +189,8 @@ public class ControllerTest {
 
         player.getHandCardsMap().put(goldCardId, Side.FRONT);
         c.placeCard(0, goldCardId, resourceCardId2, goldCardToTableCornerPos, goldCardSide);
-        resourceCard2Corners = ((CornerCard) gs.getCardsMap().get(resourceCardId2)).getCorners(resourceCard2Side);
-        Corner[] goldCardCorners = ((CornerCard) gs.getCardsMap().get(goldCardId)).getCorners(goldCardSide);
+        resourceCard2Corners = gs.getCornerCard(resourceCardId2).getCorners(resourceCard2Side);
+        Corner[] goldCardCorners = gs.getCornerCard(goldCardId).getCorners(goldCardSide);
 
         assertEquals(false, goldCardCorners[CornerPos.UPLEFT.getCornerPosValue()].getCovered());
         assertEquals(null,
@@ -269,19 +272,23 @@ public class ControllerTest {
         Player player = new Player("pole", Color.GREEN);
         Main main = new Main();
         // create cards map
-        HashMap<Integer, Card> cardsMap = main.createCardsMap();
+        HashMap<Integer, ResourceCard> resourceCardsMap = new HashMap();
+        HashMap<Integer, GoldCard> goldCardsMap = new HashMap();
+        HashMap<Integer, StarterCard> starterCardsMap = new HashMap();
+        HashMap<Integer, ObjectiveCard> objectiveCardsMap = new HashMap();
+        main.createCardsMap(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap);
 
-        assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
+        assertDoesNotThrow(() -> new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
 
         int starterCardId = 81;
 
         // create game state
-        GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
+        GameState gs = new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
         gs.setSharedGoldCards();
         gs.setSharedResourceCards();
-        player.setStarterCard((StarterCard) gs.getCardsMap().get(starterCardId));
+        player.setStarterCard(gs.getStarterCard(starterCardId));
         player.initializeBoard();
         gs.chooseStarterSidePhase();
         gs.setHands();

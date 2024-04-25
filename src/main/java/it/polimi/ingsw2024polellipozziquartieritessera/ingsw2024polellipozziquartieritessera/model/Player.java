@@ -103,7 +103,7 @@ public class Player {
 
     public void setStarterCard(StarterCard starterCard) {
         this.starterCard = starterCard;
-        this.getPlacedCardsMap().put(this.getStarterCard().getId(), Side.FRONT); // also set the default side to FRONT
+        this.placedCardsMap.put(this.getStarterCard().getId(), Side.FRONT); // also set the default side to FRONT
         // !!! add elements
     }
 

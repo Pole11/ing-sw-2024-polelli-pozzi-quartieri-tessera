@@ -56,30 +56,34 @@ public class Main {
     }
 
     public static GameState populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
-        HashMap cardsMap = createCardsMap(); //allocate and initialize all cards
-        ArrayList<Player> players = new ArrayList<Player>(); //allocate players
+        HashMap<Integer, ResourceCard> resourceCardsMap = new HashMap();
+        HashMap<Integer, GoldCard> goldCardsMap = new HashMap();
+        HashMap<Integer, StarterCard> starterCardsMap = new HashMap();
+        HashMap<Integer, ObjectiveCard> objectiveCardsMap = new HashMap();
+        createCardsMap(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap);
+
+        ArrayList<Player> players = new ArrayList<>(); //allocate players
         //creazione momentanea dei player, li prenderà dal controller
         players.add(0, new Player("paolo", Color.RED));
         players.add(1, new Player("piergiorgio", Color.BLUE));
         players.add(2, new Player("fungiforme", Color.GREEN));
         //players.set(3, new Player("fulmicotone", Color.YELLOW));
-        return new GameState(cardsMap, players);
+        return new GameState(resourceCardsMap, goldCardsMap, starterCardsMap, objectiveCardsMap, players);
     }
-
-    public static HashMap createCardsMap() throws IOException, WrongStructureConfigurationSizeException {
+    public static void createCardsMap(HashMap resourceCardsMap, HashMap goldCardsMap, HashMap starterCardsMap, HashMap objectiveCardsMap) throws IOException, WrongStructureConfigurationSizeException {
         String filePath = new File("").getAbsolutePath();
         String jsonString = readJSON(filePath + Config.CARD_JSON_PATH);
         Gson gson = new Gson();
         Map cards = gson.fromJson(jsonString, Map.class);
-        HashMap cardsMap = new HashMap<Integer, Card>();
-        for (Object key : cards.keySet()) {
 
+        for (Object key : cards.keySet()) {
             Map card = gson.fromJson(cards.get(key).toString(), Map.class);
             Integer id = Integer.parseInt(key.toString());
 
             // ------ creating challenges ------
             Challenge challenge = null;
             if (card.get("Type").equals("Objective") || card.get("Type").equals("Gold")){
+                if (id < Config.firstObjectiveCardId) Config.firstObjectiveCardId = id;
                 if (card.get("ChallengeType").equals("ElementChallenge")){
                     ArrayList<Element> elements = new ArrayList<>();
                     for (Object e : (ArrayList) card.get("ChallengeElements")){
@@ -107,7 +111,7 @@ public class Main {
             }
 
             if (card.get("Type").equals("Objective")){
-                cardsMap.put(id, new ObjectiveCard(id, challenge, (int) Double.parseDouble(card.get("Points").toString())  ));
+                objectiveCardsMap.put(id, new ObjectiveCard(id, challenge, (int) Double.parseDouble(card.get("Points").toString())  ));
             } else {
                 // ------ creating corners ------
                 Corner[] frontCorners = new Corner[Config.N_CORNERS];
@@ -127,12 +131,11 @@ public class Main {
                         frontCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id, false);
                     }
                 }
-
                 //for in backCorners
-                for (int i = 0; i < Config.N_CORNERS; i++){
+                for (int i = 0; i < Config.N_CORNERS; i++) {
                     String element = ((ArrayList) card.get("BackCorners")).get(i).toString();
                     // card.get("BackCorners")).getClass() returns ArrayList so casting should be good
-                    if (element.equals("Empty")){
+                    if (element.equals("Empty")) {
                         backCorners[i] = new Corner(Element.EMPTY, id, false);
                     } else if(element.equals("Hidden")) {
                         backCorners[i] = new Corner(Element.EMPTY, id, true);
@@ -140,27 +143,24 @@ public class Main {
                         backCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id, false);
                     }
                 }
-
                 // ------ creating cards ------
-                if (card.get("Type").equals("Resource")){
-                    cardsMap.put(id, new ResourceCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), (int) Double.parseDouble(card.get("Points").toString()), frontCorners, backCorners));
-                } else if (card.get("Type").equals("Gold")){
+                if (card.get("Type").equals("Resource")) {
+                    resourceCardsMap.put(id, new ResourceCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), (int) Double.parseDouble(card.get("Points").toString()), frontCorners, backCorners));
+                } else if (card.get("Type").equals("Gold")) {
                     ArrayList<Element> elements = new ArrayList<>();
-                    for (Object e : (ArrayList) card.get("ResourceNeeded")){
+                    for (Object e : (ArrayList) card.get("ResourceNeeded")) {
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
                     }
-                    cardsMap.put(id, new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements, (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners));
-                } else if (card.get("Type").equals("Starter")){
+                    goldCardsMap.put(id, new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements, (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners));
+                } else if (card.get("Type").equals("Starter")) {
+                    if (id < Config.firstStarterCardId) Config.firstStarterCardId = id;
                     ArrayList<Element> elements = new ArrayList<>();
-                    for (Object e : (ArrayList) card.get("CenterResources")){
+                    for (Object e : (ArrayList) card.get("CenterResources")) {
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
                     }
-                    cardsMap.put(id, new StarterCard(id, frontCorners, backCorners, elements));
+                    starterCardsMap.put(id, new StarterCard(id, frontCorners, backCorners, elements));
                 }
-
-
             }
         }
-        return cardsMap;
     }
 }

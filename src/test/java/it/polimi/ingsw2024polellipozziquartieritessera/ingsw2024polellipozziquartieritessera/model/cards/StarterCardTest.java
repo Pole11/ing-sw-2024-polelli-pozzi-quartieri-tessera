@@ -23,7 +23,7 @@ public class StarterCardTest {
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        StarterCard card = (StarterCard) g.getCornerCard(84);
+        StarterCard card = g.getStarterCard(84);
 
         assertEquals(card.getCenterResource().getFirst(), Element.ANIMAL);
         assertEquals(card.getCenterResource().size(), 2);
@@ -39,7 +39,7 @@ public class StarterCardTest {
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        StarterCard card = (StarterCard) g.getCornerCard(84);
+        StarterCard card = g.getStarterCard(84);
 
         assertThrows(WrongInstanceTypeException.class, card::getResourceType);
         }
@@ -54,7 +54,7 @@ public class StarterCardTest {
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        StarterCard card = (StarterCard) g.getCornerCard(84);
+        StarterCard card = g.getStarterCard(84);
 
         // verify if the front elements are right
         ArrayList<Element> elements;

@@ -24,7 +24,7 @@ public class ObjectiveCardTest {
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        ObjectiveCard card = (ObjectiveCard) g.getCard(88);
+        ObjectiveCard card = g.getObjectiveCard(88);
 
         assertNotNull(card.getChallenge());
         assertTrue(card.getPoints()>0);
