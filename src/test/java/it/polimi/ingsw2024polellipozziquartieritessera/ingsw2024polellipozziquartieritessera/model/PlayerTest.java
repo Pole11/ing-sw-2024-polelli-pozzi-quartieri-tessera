@@ -100,6 +100,8 @@ public class PlayerTest {
         gs.chooseStarterSidePhase();
         c.chooseInitialStarterSide(0, Side.FRONT);
 
+        //NON FUNZIONA
+        //player.getCardPoints((CornerCard) gs.getCardsMap().get(3));
 
         player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
         c.placeCard(0, resourceCardId1, player.getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.BACK);
@@ -238,6 +240,11 @@ public class PlayerTest {
         player.getHandCardsMap().put(goldCardId4, Side.FRONT);
         assertThrows(PlacingOnHiddenCornerException.class, () -> c.placeCard(0, goldCardId4, goldCardId3, CornerPos.UPLEFT, Side.FRONT));
 
+        assertThrows(CardIsNotInHandException.class ,() -> c.placeCard(0,32, starterCardId, CornerPos.DOWNRIGHT, Side.FRONT));
+
+        player.getHandCardsMap().put(32, Side.FRONT);
+        assertThrows(CardAlreadyPresentOnTheCornerException.class ,() -> c.placeCard(0,32, starterCardId, CornerPos.DOWNRIGHT, Side.FRONT));
+
         //1 corner covered
         player.getHandCardsMap().put(goldCardId4, Side.FRONT);
         c.placeCard(0, goldCardId4, goldCardId3, CornerPos.DOWNLEFT, Side.FRONT);
@@ -272,6 +279,7 @@ public class PlayerTest {
         assertEquals(1, player.getAllElements().get(Element.INKWELL));
         assertEquals(1, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
+
 
     }
 

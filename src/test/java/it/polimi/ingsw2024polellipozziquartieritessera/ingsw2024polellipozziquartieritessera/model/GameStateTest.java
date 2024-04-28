@@ -379,17 +379,78 @@ public class GameStateTest {
     }
 
     @Test
-    void isGameEnded(){
+    void isGameEndedTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+        GameState gs = Main.populate();
+
+        assertFalse(gs.isGameEnded());
+
+        gs.getPlayers().get(0).setPoints(10);
+        assertFalse(gs.isGameEnded());
+
+        gs.getPlayers().get(0).setPoints(20);
+        assertTrue(gs.isGameEnded());
+
+        gs.getPlayers().get(0).setPoints(20);
+        gs.getMainBoard().getGoldDeck().removeAll(gs.getMainBoard().getGoldDeck());
+        assertTrue(gs.isGameEnded());
+
+        gs.getPlayers().get(0).setPoints(10);
+        assertTrue(gs.isGameEnded());
+    }
+
+    @Test
+    void isGameEndedTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+        GameState gs = Main.populate();
+
+        assertFalse(gs.isGameEnded());
+        gs.getMainBoard().getResourceDeck().removeAll(gs.getMainBoard().getResourceDeck());
+        assertTrue(gs.isGameEnded());
+
+    }
+
+
+
+    @Test
+    void getWinnerPlayerIndexTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, GameIsNotEndedException, CardNotPlacedException, WrongInstanceTypeException {
+        GameState gs = Main.populate();
+
+        ArrayList<Integer> first_wins = new ArrayList<>();
+        ArrayList<Integer> second_wins = new ArrayList<>();
+        ArrayList<Integer> first_second_win = new ArrayList<>();
+        first_wins.add(0);
+        second_wins.add(1);
+        first_second_win.add(0);
+        first_second_win.add(1);
+
+        assertThrows(GameIsNotEndedException.class, ()-> gs.getWinnerPlayerIndex());
+
+
+        gs.getPlayers().get(0).setPoints(24);
+        assertEquals(first_wins, gs.getWinnerPlayerIndex());
+
+        gs.getPlayers().get(1).getAllElements().put(Element.INSECT, 4);
+        //increments ObjectivesWon
+        gs.getPlayers().get(1).getCardPoints((ObjectiveCard) gs.getCard(98));
+        assertEquals(first_wins, gs.getWinnerPlayerIndex());
+
+        gs.getPlayers().get(1).setPoints(24);
+        assertEquals(second_wins, gs.getWinnerPlayerIndex());
+
+        gs.getPlayers().get(1).setPoints(25);
+        gs.getPlayers().get(0).getAllElements().put(Element.INSECT, 6);
+        gs.getPlayers().get(0).getCardPoints((ObjectiveCard) gs.getCard(98));
+        assertEquals(second_wins, gs.getWinnerPlayerIndex());
+
+        gs.getPlayers().get(1).setPoints(24);
+        assertEquals(first_second_win, gs.getWinnerPlayerIndex());
+
+        gs.getPlayers().get(0).getAllElements().put(Element.FUNGI, 6);
+        gs.getPlayers().get(0).getCardPoints((ObjectiveCard) gs.getCard(95));
+        assertEquals(first_wins, gs.getWinnerPlayerIndex());
 
     }
 
     @Test
-    void getWinnerPlayerIndex(){
-
-    }
-
-    @Test
-
     void setColorTest(){
         Player player = new Player("pole");
     }

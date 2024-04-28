@@ -348,7 +348,18 @@ public class ControllerTest {
         assertNotEquals(gs.getMainBoard().getGoldDeck().getLast(), card1);
     }
 
-    void flipCard(){
+    @Test
+    void flipCardTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+        GameState gs = Main.populate();
+        Controller c = new Controller(gs);
+
+        gs.getPlayers().get(0).getHandCardsMap().put(1, Side.FRONT);
+        assertEquals(Side.FRONT, gs.getPlayers().get(0).getHandCardsMap().get(1));
+        c.flipCard(0, 1);
+        assertEquals(Side.BACK, gs.getPlayers().get(0).getHandCardsMap().get(1));
+        c.flipCard(0, 1);
+        assertEquals(Side.FRONT, gs.getPlayers().get(0).getHandCardsMap().get(1));
+
 
     }
 

@@ -377,10 +377,10 @@ public class GameState {
         }
     }
 
-    private Boolean isGameEnded() {
+    public boolean isGameEnded() {
         // 20 points?
         for (int i = 0; i < this.getPlayers().size(); i++) {
-            if (this.getPlayers().get(i).getPoints() >= 20) {
+            if (this.getPlayers().get(i).getPoints() >= Config.POINTSTOENDPHASE) {
                 return true;
             }
         }
@@ -405,16 +405,26 @@ public class GameState {
         }
     }
 
-    private ArrayList<Integer> getWinnerPlayerIndex() {
+    public ArrayList<Integer> getWinnerPlayerIndex() throws GameIsNotEndedException {
+
+
         int maxPoints = 0;
         ArrayList<Integer> winnerPlayerIndeces = new ArrayList<>();
+        boolean playerReachedPoints = false;
         for (int i = 0; i < this.getPlayers().size(); i++) {
+            if (this.getPlayers().get(i).getPoints() >= Config.POINTSTOENDPHASE){
+                playerReachedPoints = true;
+            }
             if (this.getPlayers().get(i).getPoints() > maxPoints) {
                 winnerPlayerIndeces = new ArrayList<>();
                 winnerPlayerIndeces.add(i);
+                maxPoints = this.getPlayers().get(i).getPoints();
             } else if (this.getPlayers().get(i).getPoints() == maxPoints) {
                 winnerPlayerIndeces.add(i);
             }
+        }
+        if (!playerReachedPoints){
+            throw new GameIsNotEndedException("You called getWinnerPlayerIndex even if the game is not ended, no one is at 20 points");
         }
 
         // now winnerPlayerIndeces contains who has the maximum number of points
