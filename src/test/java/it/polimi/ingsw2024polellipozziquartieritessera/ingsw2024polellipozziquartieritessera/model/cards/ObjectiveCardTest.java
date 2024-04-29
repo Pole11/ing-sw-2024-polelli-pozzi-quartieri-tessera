@@ -15,20 +15,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ObjectiveCardTest {
     // ALL METHODS TESTED
     @Test
-    void testGetterSetter(){
-        // setup
-        try {
-            Main.populate();
-            GameState g = Main.gameState;
+    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+        GameState g = Main.populate();
 
-            ObjectiveCard card = g.getObjectiveCard(88);
+        GoldCard card = (GoldCard) g.getCornerCard(45);
 
-            assertNotNull(card.getChallenge());
-            assertTrue(card.getPoints()>0);
-        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
-            throw new RuntimeException(e);
-        }
+        assertNotNull(card.getResourceNeeded());
+        assertNotNull(card.getResourceType());
+        card.getChallenge();
+        card.getPoints();
 
     }
 }

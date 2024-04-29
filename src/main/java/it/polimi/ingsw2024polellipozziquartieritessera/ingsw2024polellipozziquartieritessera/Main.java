@@ -20,14 +20,13 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 
 public class Main {
-    public static GameState gameState = null;
 
     public static void main(String argv[]) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
         boolean store = existStore(); //FA persistance
         if (store){
             // takes data from store
         } else {
-            populate();
+            GameState gameState = populate();
         }
     }
 
@@ -55,25 +54,20 @@ public class Main {
         return content;
     }
 
-    public static void populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
-        gameState = new GameState();
-
-        createCardsMap();
-        createPlayersList();
+    public static GameState populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
+        GameState gameState = createCardsMap();
+        gameState.setPlayer(0, new Player("paolo"));
+        gameState.setPlayer(1, new Player("piergiorgio"));
+        gameState.setPlayer(2, new Player("fungiforme"));
+        gameState.setPlayer(3, new Player("paola"));
+        gameState.setMainBoard();
+        return gameState;
     }
 
-    private static void createPlayersList() { // helper function, just for testing purpose
-        try {
-            gameState.setPlayer(0, new Player("paolo"));
-            gameState.setPlayer(1, new Player("piergiorgio"));
-            gameState.setPlayer(2, new Player("fungiforme"));
-            gameState.setPlayer(3, new Player("paola"));
-        } catch (Exception e) {
-
-        }
-    }
 
     public static GameState createCardsMap() throws IOException, WrongStructureConfigurationSizeException {
+        GameState gameState = new GameState();
+
         String filePath = new File("").getAbsolutePath();
         String jsonString = readJSON(filePath + Config.CARD_JSON_PATH);
         Gson gson = new Gson();
@@ -90,7 +84,7 @@ public class Main {
             Challenge challenge = null;
 
             if (card.get("Type").equals("Objective") || card.get("Type").equals("Gold")){
-                if (id < Config.firstObjectiveCardId) Config.firstObjectiveCardId = id;
+                if (id < Config.firstObjectiveCardId && card.get("Type").equals("Objective")) Config.firstObjectiveCardId = id;
                 if (card.get("ChallengeType").equals("ElementChallenge")){
                     ArrayList<Element> elements = new ArrayList<>();
                     for (Object e : (ArrayList) card.get("ChallengeElements")){
@@ -175,7 +169,6 @@ public class Main {
                 }
             }
         }
-
-        gameState.setMainBoard();
+        return gameState;
     }
 }

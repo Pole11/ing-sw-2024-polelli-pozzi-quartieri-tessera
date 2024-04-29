@@ -19,11 +19,11 @@ public class BoardTest {
     // ALL METHODS TESTED
 
     @Test
-    void testGetterSetter(){
+    void testGetterSetter() {
         // setup
         try {
-            Main.populate();
-            GameState g = Main.gameState;
+            GameState g = Main.populate();
+            ;
 
             Board b = g.getMainBoard();
 
@@ -35,11 +35,10 @@ public class BoardTest {
     }
 
     @Test
-    void testDrawSharedCards(){
+    void testDrawSharedCards() {
         // setup
         try {
-            Main.populate();
-            GameState g = Main.gameState;
+            GameState g = Main.populate();
 
             Board b = g.getMainBoard();
             b.fillSharedCardsGap();
@@ -78,12 +77,12 @@ public class BoardTest {
             throw new RuntimeException(e);
         }
     }
+
     @Test
     void testGetFromResourceDeck() {
         // setup
         try {
-            Main.populate();
-            GameState g = Main.gameState;
+            GameState g = Main.populate();
 
             Board b = g.getMainBoard();
 
@@ -96,7 +95,7 @@ public class BoardTest {
             assertFalse(b.getResourceDeck().contains(drawnCard));
 
             // Draw every card from the deck
-            while (!b.getResourceDeck().isEmpty()){
+            while (!b.getResourceDeck().isEmpty()) {
                 drawnCard = b.getFromResourceDeck();
             }
 
@@ -112,8 +111,7 @@ public class BoardTest {
     void testGetFromGoldDeck() {
         // setup
         try {
-            Main.populate();
-            GameState g = Main.gameState;
+            GameState g = Main.populate();
 
             Board b = g.getMainBoard();
 
@@ -126,7 +124,7 @@ public class BoardTest {
             assertFalse(b.getGoldDeck().contains(drawnCard));
 
             // Draw every card from the deck
-            while (!b.getGoldDeck().isEmpty()){
+            while (!b.getGoldDeck().isEmpty()) {
                 drawnCard = b.getFromGoldDeck();
             }
 
@@ -142,8 +140,7 @@ public class BoardTest {
     void testFillSharedCardsGap() {
         // Setup
         try {
-            Main.populate();
-            GameState g = Main.gameState;
+            GameState g = Main.populate();
 
             Board b = g.getMainBoard();
 
@@ -179,30 +176,23 @@ public class BoardTest {
     }
 
     @Test
-    void testShuffleCards(){
-        // Setup
-        try {
-            Main.populate();
-            GameState g = Main.gameState;
+    void testShuffleCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+        GameState g = Main.populate();
+        Board b = g.getMainBoard();
 
-            Board b = g.getMainBoard();
+        // Save initial state
+        ArrayList<GoldCard> initialGoldDeck = new ArrayList<>(b.getGoldDeck());
+        ArrayList<ResourceCard> initialResourceDeck = new ArrayList<>(b.getResourceDeck());
 
-            // Save initial state
-            ArrayList<GoldCard> initialGoldDeck = new ArrayList<>(b.getGoldDeck());
-            ArrayList<ResourceCard> initialResourceDeck = new ArrayList<>(b.getResourceDeck());
+        // Shuffle decks
+        b.shuffleCards();
 
-            // Shuffle decks
-            b.shuffleCards();
+        // verify if different position of the cards
+        assertNotEquals(initialGoldDeck, b.getGoldDeck());
+        assertNotEquals(initialResourceDeck, b.getResourceDeck());
 
-            // verify if different position of the cards
-            assertNotEquals(initialGoldDeck, b.getGoldDeck());
-            assertNotEquals(initialResourceDeck, b.getResourceDeck());
-
-            // verify that the lists contains the same elements of before
-            assertTrue(initialGoldDeck.containsAll(b.getGoldDeck()) && b.getGoldDeck().containsAll(initialGoldDeck));
-            assertTrue(initialResourceDeck.containsAll(b.getResourceDeck()) && b.getResourceDeck().containsAll(initialResourceDeck));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // verify that the lists contains the same elements of before
+        assertTrue(initialGoldDeck.containsAll(b.getGoldDeck()) && b.getGoldDeck().containsAll(initialGoldDeck));
+        assertTrue(initialResourceDeck.containsAll(b.getResourceDeck()) && b.getResourceDeck().containsAll(initialResourceDeck));
     }
 }

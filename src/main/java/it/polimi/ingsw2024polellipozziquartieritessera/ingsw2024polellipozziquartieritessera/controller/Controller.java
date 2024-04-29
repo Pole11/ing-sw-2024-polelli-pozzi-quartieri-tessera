@@ -42,7 +42,7 @@ public class Controller {
         gameState.chooseStarterSidePhase();
     }
 
-    public void chooseInitialColor(int playerIndex, Color color){
+    public void chooseInitialColor(int playerIndex, Color color) throws NotUniquePlayerColorException {
         gameState.setColor(playerIndex, color);
         gameState.chooseColorPhase();
     }
@@ -104,8 +104,6 @@ public class Controller {
             newPoints = player.getCardPoints(placingCard, gameState.getElementChallenge(placingCardId));
         } else if (gameState.getCoverageChallenge(placingCardId) != null) {
             newPoints = player.getCardPoints(placingCard, gameState.getCoverageChallenge(placingCardId));
-        } else if (gameState.getStructureChallenge(placingCardId) != null) {
-            newPoints = player.getCardPoints(placingCard, gameState.getStructureChallenge(placingCardId));
         } else {
             newPoints = player.getCardPoints(placingCard);
         }
@@ -134,7 +132,7 @@ public class Controller {
         Board board = this.gameState.getMainBoard();
         Player currentPlayer = this.gameState.getCurrentPlayer();
 
-        if (currentPlayer.getHandCardsMap().values().size() > Config.MAX_HAND_CARDS) throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
+        if (currentPlayer.getHandCardsMap().values().size() >= Config.MAX_HAND_CARDS) throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
 
         //RICORDARSI DI CONTROLLARE SE LA CHIAMATA ARRIVA DAL CURRENT PLAYER
         switch(drawType) {

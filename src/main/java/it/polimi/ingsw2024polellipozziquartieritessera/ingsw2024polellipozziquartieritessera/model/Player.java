@@ -254,8 +254,7 @@ public class Player {
 
 // -----------------------Challenge Managing--------------------------------
 
-    public int getCardPoints(ObjectiveCard objCard, ElementChallenge elementChallenge) throws CardNotPlacedException {
-        //if (!placedCardsMap.containsKey(objCard.getId())) throw new CardNotPlacedException("The card is not placed");
+    public int getCardPoints(ObjectiveCard objCard, ElementChallenge elementChallenge) {
         int cardPoints = objCard.getPoints();
 
         ArrayList<Element> elements = elementChallenge.getElements();
@@ -269,8 +268,7 @@ public class Player {
         return Math.max(0, timesWon * cardPoints);
     }
 
-    public int getCardPoints(ObjectiveCard objCard, StructureChallenge structureChallenge) throws CardNotPlacedException {
-        //if (!placedCardsMap.containsKey(objCard.getId())) throw new CardNotPlacedException("The card is not placed");
+    public int getCardPoints(ObjectiveCard objCard, StructureChallenge structureChallenge) {
         int cardPoints = objCard.getPoints();
         int timesWon = getTimesWonStructure(structureChallenge);
 
@@ -282,25 +280,23 @@ public class Player {
         return timesWon * cardPoints;
     }
 
-    public int getCardPoints(CornerCard cornerCard, ElementChallenge elementChallenge) throws WrongInstanceTypeException, CardNotPlacedException {
+    public int getCardPoints(CornerCard cornerCard, ElementChallenge elementChallenge) throws CardNotPlacedException {
+        if (!placedCardsMap.containsKey(cornerCard.getId())) throw new CardNotPlacedException("The card is not placed");
         if (this.getBoardSide(cornerCard.getId()).equals(Side.BACK)) return 0;
 
         return cornerCard.getPoints() * getTimesWonElement(elementChallenge.getElements());
     }
 
-    public int getCardPoints(CornerCard cornerCard, CoverageChallenge coverageChallenge) throws WrongInstanceTypeException, CardNotPlacedException {
+    public int getCardPoints(CornerCard cornerCard, CoverageChallenge coverageChallenge) throws CardNotPlacedException {
+        if (!placedCardsMap.containsKey(cornerCard.getId())) throw new CardNotPlacedException("The card is not placed");
         if (this.getBoardSide(cornerCard.getId()).equals(Side.BACK)) return 0;
 
         return cornerCard.getPoints() * getTimesWonCoverage((GoldCard) cornerCard); // si può togliere il cast esplicito se migliorando la fase di popolazione nel main mettiamo alla coverageChallenge un attributo che fa riferimento alla carta gold a cui è associata!
     }
 
-    public int getCardPoints(CornerCard cornerCard, StructureChallenge structureChallenge) throws WrongInstanceTypeException, CardNotPlacedException {
-        if (this.getBoardSide(cornerCard.getId()).equals(Side.BACK)) return 0;
 
-        return cornerCard.getPoints() * getTimesWonStructure(structureChallenge); // si può togliere il cast esplicito se migliorando la fase di popolazione nel main mettiamo alla coverageChallenge un attributo che fa riferimento alla carta gold a cui è associata!
-    }
-
-    public int getCardPoints(CornerCard cornerCard) {
+    public int getCardPoints(CornerCard cornerCard) throws CardNotPlacedException {
+        if (!placedCardsMap.containsKey(cornerCard.getId())) throw new CardNotPlacedException("The card is not placed");
         if (this.getBoardSide(cornerCard.getId()).equals(Side.BACK)) return 0;
         return cornerCard.getPoints();
     }

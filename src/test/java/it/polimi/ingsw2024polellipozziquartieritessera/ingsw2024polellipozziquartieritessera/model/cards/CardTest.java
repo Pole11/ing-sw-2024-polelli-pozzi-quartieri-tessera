@@ -15,16 +15,10 @@ public class CardTest {
     // ALL METHODS TESTED
 
     @Test
-    void testGetterSetter(){
+    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
         // setup
-        try {
-            Main.populate();
-            GameState g = Main.gameState;
-            Card card = g.getCard(5);
-            assertEquals(card.getId(), 5);
-        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
-            throw new RuntimeException(e);
-        }
+        GameState g = Main.populate();
+        Card card = g.getCard(5);
+        assertEquals(card.getId(), 5);
     }
 }

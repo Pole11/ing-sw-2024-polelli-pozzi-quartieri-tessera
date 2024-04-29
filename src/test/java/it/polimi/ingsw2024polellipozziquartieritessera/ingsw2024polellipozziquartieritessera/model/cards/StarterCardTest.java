@@ -17,9 +17,7 @@ public class StarterCardTest {
     void testGetterSetter() {
         // setup
         try {
-            Main.populate();
-            GameState g = Main.gameState;
-
+            GameState g = Main.populate();
             StarterCard card = g.getStarterCard(84);
 
             assertEquals(card.getCenterResource().getFirst(), Element.ANIMAL);
@@ -31,27 +29,17 @@ public class StarterCardTest {
     }
 
     @Test
-    void testGetResourceType(){
+    void testGetResourceType() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
         // setup
-        try {
-            Main.populate();
-            GameState g = Main.gameState;
-
-            StarterCard card = g.getStarterCard(84);
-
-            assertThrows(WrongInstanceTypeException.class, card::getResourceType);
-        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
-            throw new RuntimeException(e);
-        }
+        GameState g = Main.populate();
+        StarterCard card = g.getStarterCard(84);
     }
 
     @Test
     void testGetUncoveredElements() {
         // setup
         try {
-            Main.populate();
-            GameState g = Main.gameState;
+            GameState g = Main.populate();
 
             StarterCard card = g.getStarterCard(84);
 

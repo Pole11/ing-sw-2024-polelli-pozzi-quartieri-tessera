@@ -51,43 +51,6 @@ public class GameState {
         this.mainBoard = new Board();
     }
 
-    // TESTING
-
-
-    public void NicknamesAreValid() throws NotUniquePlayerNicknameException {
-        // check if players are unique (by nickname and color)
-        for (int i = 0; i < players.size(); i++) {
-            for (int j = i+1; j < players.size(); j++) {
-                if (players.get(i).getNickname().equals(players.get(j).getNickname())) {
-                    throw new NotUniquePlayerNicknameException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname");
-                }
-            }
-        }
-    }
-
-
-    public void ColorsAreValid() throws NotUniquePlayerColorException {
-        // check if players are unique (by nickname and color)
-        for (int i = 0; i < players.size(); i++) {
-            for (int j = i+1; j < players.size(); j++) {
-                if (players.get(i).getColor().equals(players.get(j).getColor())) {
-                    throw new NotUniquePlayerColorException("While creating the GameState Object I encountered a problem regarding the creation of players with the same color");
-                }
-            }
-        }
-    }
-
-    public void NicknameAndColorsAreValid() throws NotUniquePlayerException {
-        // check if players are unique (by nickname and color)
-        for (int i = 0; i < players.size(); i++) {
-            for (int j = i+1; j < players.size(); j++) {
-                if (players.get(i).getNickname().equals(players.get(j).getNickname()) && players.get(i).getColor().equals(players.get(j).getColor())) {
-                    throw new NotUniquePlayerException("While creating the GameState Object I encountered a problem regarding the creation of players with the same nickname AND the same color");
-                }
-            }
-        }
-    }
-
     // GETTER
     public Board getMainBoard() {
         return mainBoard;
@@ -221,7 +184,11 @@ public class GameState {
     }
 
     public void setPlayer(int index, Player player) throws NotUniquePlayerNicknameException{
-        NicknamesAreValid();
+        for (int j = 0; j < players.size(); j++) {
+            if (player.getNickname().equals(players.get(j).getNickname())) {
+                throw new NotUniquePlayerNicknameException("nickame already used");
+            }
+        }
         players.add(index, player);
     }
 
@@ -360,7 +327,12 @@ public class GameState {
         }
     }
 
-    public void setColor(int playerIndex, Color color){//method called by view when the player chooses the side
+    public void setColor(int playerIndex, Color color) throws NotUniquePlayerColorException {//method called by view when the player chooses the side
+        for (int j = 0; j < players.size(); j++) {
+            if (color.equals(players.get(j).getColor())) {
+                throw new NotUniquePlayerColorException("While creating the GameState Object I encountered a problem regarding the creation of players with the same color");
+            }
+        }
         Player player = getPlayerByIndex(playerIndex);
         player.setColor(color);
     }
@@ -379,7 +351,7 @@ public class GameState {
     }
 
     //set SecretObjectiveOptions and SharedObjectiveCards
-    private void setObjectives(){
+    public void setObjectives(){
         Set<Integer> randomKeysSet = new HashSet<>(); // a set has no duplicates
         // Generate four different random numbers
         while (randomKeysSet.size() < 2 * getPlayers().size() + 2) { // 2 for each player and 2 shared
@@ -387,12 +359,12 @@ public class GameState {
             randomKeysSet.add(randomNumber);
         }
 
-        ObjectiveCard[] objectiveCards = new ObjectiveCard[2];
+
         ArrayList<Integer> randomKeysList = new ArrayList<>(randomKeysSet); // convert to a list to iterate
-        for (int i = 0; i < randomKeysList.size(); i++) {
+        for (int i = 0; i < players.size(); i++) {
             ObjectiveCard objectiveCard0 = this.getObjectiveCard(randomKeysList.get(i));
             ObjectiveCard objectiveCard1 = this.getObjectiveCard(randomKeysList.get(i + getPlayers().size()));
-
+            ObjectiveCard[] objectiveCards = new ObjectiveCard[2];
             objectiveCards[0] = objectiveCard0;
             objectiveCards[1] = objectiveCard1;
 
@@ -404,6 +376,7 @@ public class GameState {
     }
 
 
+    //called from controller
     public void setSecretObjective (int playerIndex, int cardId) throws InvalidObjectiveCardException {
         Player player = getPlayerByIndex(playerIndex);
         if (player.getObjectiveCardOptions()[0].getId() == cardId) {

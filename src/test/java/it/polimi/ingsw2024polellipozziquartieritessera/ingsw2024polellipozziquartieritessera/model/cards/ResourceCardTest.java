@@ -19,8 +19,7 @@ public class ResourceCardTest {
     void testGetterSetter(){
         // setup
         try {
-            Main.populate();
-            GameState g = Main.gameState;
+            GameState g = Main.populate();
 
             ResourceCard card = (ResourceCard) g.getCornerCard(32);
 
@@ -36,8 +35,7 @@ public class ResourceCardTest {
     void testGetUncoveredElements() {
         // setup
         try {
-            Main.populate();
-            GameState g = Main.gameState;
+            GameState g = Main.populate();
 
             ResourceCard card = (ResourceCard) g.getCornerCard(32);
 

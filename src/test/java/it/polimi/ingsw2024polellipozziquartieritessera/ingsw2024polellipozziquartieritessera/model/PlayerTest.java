@@ -22,21 +22,21 @@ public class PlayerTest {
 
     @Test
     void getCardPointsTest1() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
-        // create cards map
-        Main.populate();
-
-        // create game state
-        GameState gs = Main.gameState;
-        Player player = Main.gameState.getPlayer(0);
-        Controller c = new Controller(gs);
-        c.startGame();
-        c.chooseInitialStarterSide(0, Side.BACK);
-
         int resourceCardId1 = 1;
         int resourceCardId2 = 13;
         int resourceCardId3 = 11;
         int resourceCardId4 = 18;
         int goldCardId1 = 56;
+
+
+        // create game state
+        GameState gs = Main.createCardsMap();
+        gs.setPlayer(0, new Player("Nickname"));
+        Player player = gs.getPlayer(0);
+        Controller c = new Controller(gs);
+        c.startGame();
+        c.chooseInitialStarterSide(0, Side.BACK);
+
 
         player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
         c.placeCard(0, resourceCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
@@ -82,9 +82,9 @@ public class PlayerTest {
         int goldCardId5 = 58;
 
         // create game state
-        Main.populate();
-        GameState gs = Main.gameState;
-        Player player = Main.gameState.getPlayer(0);
+        GameState gs = Main.createCardsMap();
+        gs.setPlayer(0, new Player("jhonny"));
+        Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
         gs.setSharedGoldCards();
@@ -95,7 +95,7 @@ public class PlayerTest {
         c.chooseInitialStarterSide(0, Side.FRONT);
 
         //NON FUNZIONA
-        //player.getCardPoints((CornerCard) gs.getCardsMap().get(3));
+        assertThrows(CardNotPlacedException.class ,() -> player.getCardPoints(gs.getCornerCard(3)));
 
         player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
         c.placeCard(0, resourceCardId1, player.getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.BACK);

@@ -18,14 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ControllerTest {
     @Test
     void placeCard() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
-        /*
-        Player player = new Player("pole");
-        Main main = new Main();
-        // create cards map
-        HashMap<Integer, Card> cardsMap = main.createCardsMap();
 
-        assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
-        */
         int starterCardId = 85;
         Side starterCardSide = Side.BACK;
         int resourceCardId1 = 1;
@@ -46,8 +39,9 @@ public class ControllerTest {
 
         // create game state
         Main.populate();
-        GameState gs = Main.gameState;
-        Player player = Main.gameState.getPlayer(0);
+
+        GameState gs = Main.populate();
+        Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
         gs.setSharedGoldCards();
@@ -268,21 +262,12 @@ public class ControllerTest {
 
     @Test
     void drawCard() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException, InvalidHandException {
-        /*
-        Player player = new Player("pole");
-        Main main = new Main();
-        // create cards map
-        HashMap<Integer, Card> cardsMap = main.createCardsMap();
-
-        assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
-        */
 
         int starterCardId = 81;
 
         // create game state
-        Main.populate();
-        GameState gs = Main.gameState;
-        Player player = Main.gameState.getPlayer(0);
+        GameState gs = Main.populate();
+        Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
         gs.setSharedGoldCards();
@@ -295,11 +280,13 @@ public class ControllerTest {
         gs.setCurrentPlayerIndex(0);
 
 
-
         CornerCard card1 = gs.getMainBoard().getSharedGoldCards()[0];
         CornerCard card2 = gs.getMainBoard().getSharedGoldCards()[1];
         Map.Entry<Integer,Side> entry = player.getHandCardsMap().entrySet().iterator().next();
+        player.getHandCardsMap().remove(entry.getKey());
         c.drawCard(DrawType.SHAREDGOLD1);
+        assertEquals(1,gs.getCurrentPlayerIndex());
+        gs.setCurrentPlayerIndex(0);
         assertNotEquals(gs.getMainBoard().getSharedGoldCards()[0], card1);
         assertEquals(gs.getMainBoard().getSharedGoldCards()[1], card2);
         assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
@@ -307,12 +294,11 @@ public class ControllerTest {
         card1 = gs.getMainBoard().getSharedGoldCards()[0];
         card2 = gs.getMainBoard().getSharedGoldCards()[1];
         entry = player.getHandCardsMap().entrySet().iterator().next();
-
         assertThrows(InvalidHandException.class, () -> c.drawCard(DrawType.SHAREDGOLD2));
         player.getHandCardsMap().remove(entry.getKey());
         c.drawCard(DrawType.SHAREDGOLD2);
-
-
+        assertEquals(1,gs.getCurrentPlayerIndex());
+        gs.setCurrentPlayerIndex(0);
         assertEquals(gs.getMainBoard().getSharedGoldCards()[0], card1);
         assertNotEquals(gs.getMainBoard().getSharedGoldCards()[1], card2);
         assertTrue(player.getHandCardsMap().containsKey(card2.getId()));
@@ -322,6 +308,8 @@ public class ControllerTest {
         entry = player.getHandCardsMap().entrySet().iterator().next();
         player.getHandCardsMap().remove(entry.getKey());
         c.drawCard(DrawType.SHAREDRESOURCE1);
+        assertEquals(1,gs.getCurrentPlayerIndex());
+        gs.setCurrentPlayerIndex(0);
         assertNotEquals(gs.getMainBoard().getSharedResourceCards()[0], card1);
         assertEquals(gs.getMainBoard().getSharedResourceCards()[1], card2);
         assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
@@ -331,6 +319,8 @@ public class ControllerTest {
         entry = player.getHandCardsMap().entrySet().iterator().next();
         player.getHandCardsMap().remove(entry.getKey());
         c.drawCard(DrawType.SHAREDRESOURCE2);
+        assertEquals(1,gs.getCurrentPlayerIndex());
+        gs.setCurrentPlayerIndex(0);
         assertEquals(gs.getMainBoard().getSharedResourceCards()[0], card1);
         assertNotEquals(gs.getMainBoard().getSharedResourceCards()[1], card2);
         assertTrue(player.getHandCardsMap().containsKey(card2.getId()));
@@ -340,6 +330,8 @@ public class ControllerTest {
         entry = player.getHandCardsMap().entrySet().iterator().next();
         player.getHandCardsMap().remove(entry.getKey());
         c.drawCard(DrawType.DECKRESOURCE);
+        assertEquals(1,gs.getCurrentPlayerIndex());
+        gs.setCurrentPlayerIndex(0);
         assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
         assertEquals(gs.getMainBoard().getResourceDeck().size(), size -1);
         assertNotEquals(gs.getMainBoard().getResourceDeck().getLast(), card1);
@@ -349,6 +341,8 @@ public class ControllerTest {
         entry = player.getHandCardsMap().entrySet().iterator().next();
         player.getHandCardsMap().remove(entry.getKey());
         c.drawCard(DrawType.DECKGOLD);
+        assertEquals(1,gs.getCurrentPlayerIndex());
+        gs.setCurrentPlayerIndex(0);
         assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
         assertEquals(gs.getMainBoard().getGoldDeck().size(), size -1);
         assertNotEquals(gs.getMainBoard().getGoldDeck().getLast(), card1);
@@ -356,8 +350,7 @@ public class ControllerTest {
 
     @Test
     void flipCardTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        Main.populate();
-        GameState gs = Main.gameState;
+        GameState gs = Main.populate();
         Controller c = new Controller(gs);
 
         gs.getPlayers().get(0).getHandCardsMap().put(1, Side.FRONT);
