@@ -68,29 +68,27 @@ public class Controller {
         CornerCard placingCard = null;
         CornerCard tableCard = null;
 
-        if (gameState.getCard(placingCardId) instanceof GoldCard || gameState.getCard(placingCardId) instanceof ResourceCard ){
-            placingCard = (CornerCard) gameState.getCard(placingCardId);
-        } else throw new WrongInstanceTypeException("placing card is not a CornerCard");
+        placingCard = gameState.getCornerCard(placingCardId);
+        if (gameState.getStarterCard(placingCardId) != null) throw new WrongInstanceTypeException("you cannot place a starter card in the middle of the game");
+        if (placingCard == null) throw new WrongInstanceTypeException("placing card is not a CornerCard");
 
-        if (gameState.getCard(placingCardId) instanceof GoldCard || gameState.getCard(placingCardId) instanceof ResourceCard){
-            tableCard = (CornerCard) gameState.getCard(tableCardId);
-        } else throw new WrongInstanceTypeException("table card is not a CornerCard");
+        tableCard = gameState.getCornerCard(tableCardId);
+        if (tableCard == null) throw new WrongInstanceTypeException("table card is not a CornerCard");
 
         Corner placingCorner = placingCard.getCorners(placingCardSide)[placingCornerPos.getCornerPosValue()];
         Corner tableCorner = tableCard.getCorners(player.getPlacedCardsMap().get(tableCardId))[tableCornerPos.getCornerPosValue()];
 
         if (!player.getHandCardsMap().containsKey(placingCardId)) throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
 
-
         // controlla che la carta non sia già presente
         for (Player p : gameState.getPlayers()) {
             if (p.getPlacedCardsMap().get(placingCardId) != null) throw new CardAlreadPlacedException("you cannot place a card that is already placed");
         }
 
+        if (tableCorner == null) throw new WrongPlacingPositionException("table corner is null");
         if (tableCorner.getLinkedCorner() != null) throw new CardAlreadyPresentOnTheCornerException("you cannot place a card here, the corner is already linked");
         if (tableCorner.getHidden()) throw new PlacingOnHiddenCornerException("you cannot place a card on a hidden corner");
         if (placingCorner == null) throw new WrongPlacingPositionException("placing corner is null");
-        if (tableCorner == null) throw new WrongPlacingPositionException("table corner is null");
 
         // execute this block if the card is gold and has a challenge (is front)
         if (!goldPlaceable(player, placingCard, placingCardSide)) throw new GoldCardCannotBePlacedException("You haven't the necessary resources to place the goldcard " + placingCardId);
@@ -100,13 +98,24 @@ public class Controller {
         player.updateBoard(placingCardId, tableCardId, tableCornerPos);
         gameState.updateElements(player, placingCard, placingCardSide);
 
-        int newPoints = player.getPoints() + player.getCardPoints(placingCard);
-        player.setPoints(newPoints);
+        int newPoints = 0;
+
+        if (gameState.getElementChallenge(placingCardId) != null) {
+            newPoints = player.getCardPoints(placingCard, gameState.getElementChallenge(placingCardId));
+        } else if (gameState.getCoverageChallenge(placingCardId) != null) {
+            newPoints = player.getCardPoints(placingCard, gameState.getCoverageChallenge(placingCardId));
+        } else if (gameState.getStructureChallenge(placingCardId) != null) {
+            newPoints = player.getCardPoints(placingCard, gameState.getStructureChallenge(placingCardId));
+        } else {
+            newPoints = player.getCardPoints(placingCard);
+        }
+
+        player.setPoints(player.getPoints() + newPoints);
     }
 
     private boolean goldPlaceable(Player player, CornerCard placingCard, Side placingCardSide){
         boolean cardIsPlaceable = true;
-        if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)){
+        if (gameState.getGoldCard(placingCard.getId()) != null && placingCardSide.equals(Side.FRONT)){
             for (Element ele : Element.values()) {
                 if (player.getAllElements().get(ele) < player.getElementOccurencies(((GoldCard) placingCard).getResourceNeeded(), ele)) {
                     cardIsPlaceable = false;
@@ -125,12 +134,9 @@ public class Controller {
         Board board = this.gameState.getMainBoard();
         Player currentPlayer = this.gameState.getCurrentPlayer();
 
-        if (currentPlayer.getHandCardsMap().values().size() > Config.MAX_HAND_CARDS) {
-            throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
-        }
+        if (currentPlayer.getHandCardsMap().values().size() > Config.MAX_HAND_CARDS) throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
 
         //RICORDARSI DI CONTROLLARE SE LA CHIAMATA ARRIVA DAL CURRENT PLAYER
-
         switch(drawType) {
             case DrawType.DECKGOLD:
                 this.gameState.drawGoldFromDeck(board, currentPlayer);

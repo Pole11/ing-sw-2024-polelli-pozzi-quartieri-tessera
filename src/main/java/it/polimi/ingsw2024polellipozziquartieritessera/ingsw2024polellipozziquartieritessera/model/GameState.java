@@ -4,17 +4,23 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 
-import java.lang.reflect.Array;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GameState {
 
     // !!! THE REFERENCE TO CARDSMAP IS FINAL !!!
-    private final HashMap<Integer, Card> cardsMap; // map id and card
+    private final HashMap<Integer, GoldCard> goldCardsMap; // map id and card
+    private final HashMap<Integer, ResourceCard> resourceCardsMap; // map id and card
+    private final HashMap<Integer, StarterCard> starterCardsMap; // map id and card
+    private final HashMap<Integer, ObjectiveCard> objectiveCardsMap; // map id and card
+    private final HashMap<Integer, CoverageChallenge> coverageChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
+    private final HashMap<Integer, ElementChallenge> elementChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
+    private final HashMap<Integer, StructureChallenge> structureChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
     private final Board mainBoard;
     private final ArrayList<Player> players; //player[0] is blackPlayer
     private final Chat chat;
@@ -25,31 +31,24 @@ public class GameState {
     int numberAnswered = 0;
 
     // CONSTRUCTOR
-    public GameState(HashMap<Integer, Card> cardsMap, ArrayList<Player> players) throws NotUniquePlayerException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
-        this.cardsMap = cardsMap;
+    public GameState() {
+        this.goldCardsMap = new HashMap<>();
+        this.resourceCardsMap = new HashMap<>();
+        this.starterCardsMap = new HashMap<>();
+        this.objectiveCardsMap = new HashMap<>();
 
-        this.players = players;
+        this.coverageChallengeMap = new HashMap<>();
+        this.elementChallengeMap = new HashMap<>();
+        this.structureChallengeMap = new HashMap<>();
+
+        this.players = new ArrayList<>();
         this.currentPlayerIndex = 0;
         this.currentGamePhase = GamePhase.MAINPHASE;
         this.currentGameTurn = null;
         this.chat = new Chat();
         this.isLastTurn = false;
 
-
-        // get all gold cards and resource cards
-        ArrayList<GoldCard> goldCardDeck = new ArrayList<>();
-        ArrayList<ResourceCard> resourceCardDeck = new ArrayList<>();
-        for (int i = 0; i < this.getCardsMap().size(); i++) {
-            if (this.getCardsMap().get(i) instanceof GoldCard) {
-                goldCardDeck.add((GoldCard) this.getCardsMap().get(i));
-            } else if (this.getCardsMap().get(i) instanceof ResourceCard) {
-                resourceCardDeck.add((ResourceCard) this.getCardsMap().get(i));
-            }
-        }
-
-        this.mainBoard = new Board(resourceCardDeck,goldCardDeck);
-
-        NicknamesAreValid();
+        this.mainBoard = new Board();
     }
 
     // TESTING
@@ -90,10 +89,6 @@ public class GameState {
     }
 
     // GETTER
-    public HashMap<Integer, Card> getCardsMap() {
-        return this.cardsMap;
-    }
-
     public Board getMainBoard() {
         return mainBoard;
     }
@@ -110,12 +105,78 @@ public class GameState {
         return currentPlayerIndex;
     }
 
+    public Player getPlayer(int index) {
+        return players.get(index);
+    }
+
     public GamePhase getCurrentGamePhase() {
         return currentGamePhase;
     }
 
     public TurnPhase getCurrentGameTurn() {
         return currentGameTurn;
+    }
+
+    public GoldCard getGoldCard(int cardId) {
+        return this.goldCardsMap.get(cardId);
+    }
+
+    public ResourceCard getResourceCard(int cardId) {
+        return this.resourceCardsMap.get(cardId);
+    }
+
+    public StarterCard getStarterCard(int cardId) {
+        return this.starterCardsMap.get(cardId);
+    }
+
+    public ObjectiveCard getObjectiveCard(int cardId) {
+        return this.objectiveCardsMap.get(cardId);
+    }
+
+    public CornerCard getCornerCard(int cardId) {
+        CornerCard cornerCard = getResourceCard(cardId);
+        if (cornerCard == null) cornerCard = getGoldCard(cardId);
+        if (cornerCard == null) cornerCard = getStarterCard(cardId);
+
+        return cornerCard;
+    }
+
+    public Card getCard(int cardId) {
+        Card card = null;
+        if (getResourceCard(cardId) != null) card = getResourceCard(cardId);
+        else if (getGoldCard(cardId) != null) card = getGoldCard(cardId);
+        else if (getStarterCard(cardId) != null) card = getStarterCard(cardId);
+        else if (getObjectiveCard(cardId) != null) card = getObjectiveCard(cardId);
+
+        return card;
+    }
+
+    public int getResourceCardsQty() {
+        return this.resourceCardsMap.size();
+    }
+
+    public int getGoldCardsQty() {
+        return this.goldCardsMap.size();
+    }
+
+    public int getStarterCardsQty() {
+        return this.starterCardsMap.size();
+    }
+
+    public int getObjectiveCardsQty() {
+        return this.objectiveCardsMap.size();
+    }
+
+    public CoverageChallenge getCoverageChallenge(int challengeId) {
+        return this.coverageChallengeMap.get(challengeId);
+    }
+
+    public ElementChallenge getElementChallenge(int challengeId) {
+        return this.elementChallengeMap.get(challengeId);
+    }
+
+    public StructureChallenge getStructureChallenge(int challengeId) {
+        return this.structureChallengeMap.get(challengeId);
     }
 
     // SETTER
@@ -131,7 +192,56 @@ public class GameState {
         this.currentGameTurn = currentGameTurn;
     }
 
+    public void setGoldCard(int cardId, GoldCard goldCard) {
+        this.goldCardsMap.put(cardId, goldCard);
+    }
+
+    public void setResourceCard(int cardId, ResourceCard resourceCard) {
+        this.resourceCardsMap.put(cardId, resourceCard);
+    }
+
+    public void setStarterCard(int cardId, StarterCard starterCard) {
+        this.starterCardsMap.put(cardId, starterCard);
+    }
+
+    public void setObjectiveCard(int cardId, ObjectiveCard objectiveCard) {
+        this.objectiveCardsMap.put(cardId, objectiveCard);
+    }
+
+    public void setCoverageChallenge(int challengeId, CoverageChallenge challenge) {
+        this.coverageChallengeMap.put(challengeId, challenge);
+    }
+
+    public void setElementChallenge(int challengeId, ElementChallenge challenge) {
+        this.elementChallengeMap.put(challengeId, challenge);
+    }
+
+    public void setStructureChallenge(int challengeId, StructureChallenge challenge) {
+        this.structureChallengeMap.put(challengeId, challenge);
+    }
+
+    public void setPlayer(int index, Player player) throws NotUniquePlayerNicknameException{
+        NicknamesAreValid();
+        players.add(index, player);
+    }
+
+    public void setMainBoard() {
+        // get all gold cards and resource cards
+        ArrayList<GoldCard> goldCardDeck = new ArrayList<>(goldCardsMap.values());
+        ArrayList<ResourceCard> resourceCardDeck = new ArrayList<>(resourceCardsMap.values());
+
+        this.mainBoard.setDecks(resourceCardDeck, goldCardDeck);
+    }
+
     // METHODS
+
+    public void removeAllPlayers() {
+        this.players.clear();
+    }
+
+    public void removePlayer(int index) {
+        this.players.remove(index);
+    }
 
     //------------ Starting Phases flow --------------------
 
@@ -145,7 +255,7 @@ public class GameState {
 
     // II: initialize deck and shared cards / starter cards
     private void deckInitPhase(){
-        this.getMainBoard().shuffleCards();
+        this.mainBoard.shuffleCards();
         this.setSharedGoldCards();
         this.setSharedResourceCards();
         this.setStarters(); // set the starters cards for every player
@@ -223,20 +333,17 @@ public class GameState {
     public void setStarters() {
         // for every player set his starters (you have access to every player from the array players)
         ArrayList<Player> players = getPlayers();
-        // get all the starters
-        ArrayList<StarterCard> starters = new ArrayList<>();
 
-        for (int i = 0; i < this.cardsMap.size(); i++) {
-            if (cardsMap.get(i) instanceof StarterCard) {
-                starters.add((StarterCard) cardsMap.get(i));
-            }
+        Set<Integer> randomKeysSet = new HashSet<>(); // a set has no duplicates
+        // Generate four different random numbers
+        while (randomKeysSet.size() < getPlayers().size()) {
+            int randomNumber = Config.firstStarterCardId + ThreadLocalRandom.current().nextInt(this.getStarterCardsQty()); // Adjust range as needed
+            randomKeysSet.add(randomNumber);
         }
 
-        Random rand = new Random();
-        int key = rand.nextInt(60);
-
-        for (int i = 0; i < getPlayers().size(); i++) {
-            StarterCard starterCard = starters.get((key + i) % starters.size());
+        ArrayList<Integer> randomKeysList = new ArrayList<>(randomKeysSet); // convert to a list to iterate
+        for (int i = 0; i < randomKeysList.size(); i++) {
+            StarterCard starterCard = this.getStarterCard(randomKeysList.get(i));
             players.get(i).setStarterCard(starterCard); // we might pass it the map of all the cards
             players.get(i).initializeBoard(); // add the starter card to the board of the player
         }
@@ -244,7 +351,7 @@ public class GameState {
 
     public void setStarterSide(int playerIndex, Side side){
         Player player = getPlayerByIndex(playerIndex);
-        player.getPlacedCardsMap().put(player.getStarterCard().getId(), side);
+        player.getPlacedCardsMap().put(player.getStarterCard().getId(), side); // to fix the hash map obfuscation
 
         // add the initial elements of the starter card
         for (Element ele : player.getStarterCard().getUncoveredElements(side)) {
@@ -273,34 +380,27 @@ public class GameState {
 
     //set SecretObjectiveOptions and SharedObjectiveCards
     private void setObjectives(){
-        // for every player set two objectives cards to choose from
-        ArrayList<Player> players = getPlayers();
-        // get all the starters
-        ArrayList<ObjectiveCard> objectives = new ArrayList<>();
-
-        for (int i = 0; i < getCardsMap().size(); i++) {
-            if (getCardsMap().get(i) instanceof ObjectiveCard) {
-                objectives.add((ObjectiveCard) getCardsMap().get(i));
-            }
+        Set<Integer> randomKeysSet = new HashSet<>(); // a set has no duplicates
+        // Generate four different random numbers
+        while (randomKeysSet.size() < 2 * getPlayers().size() + 2) { // 2 for each player and 2 shared
+            int randomNumber = Config.firstObjectiveCardId + ThreadLocalRandom.current().nextInt(this.getObjectiveCardsQty()); // Adjust range as needed
+            randomKeysSet.add(randomNumber);
         }
 
-        // TODO: shuffle objective card deck
-
-        Random rand = new Random();
-        int key = rand.nextInt(98);
-
-        // get 8 consequences cards from a random point (make it more random later maybe)
         ObjectiveCard[] objectiveCards = new ObjectiveCard[2];
-        for (int i = 0; i < getPlayers().size(); i++) {
-            objectiveCards[0] = objectives.get((key + i) % objectives.size());
-            objectiveCards[1] = objectives.get((key + i + getPlayers().size()) % objectives.size());
-            // [..., ..., P1, P2, P3, P4, P1, P2, P3, P4, ...]
-            // [P2, P3, P4, ..., ..., ..., P1, P2, P3, P4, P1]
+        ArrayList<Integer> randomKeysList = new ArrayList<>(randomKeysSet); // convert to a list to iterate
+        for (int i = 0; i < randomKeysList.size(); i++) {
+            ObjectiveCard objectiveCard0 = this.getObjectiveCard(randomKeysList.get(i));
+            ObjectiveCard objectiveCard1 = this.getObjectiveCard(randomKeysList.get(i + getPlayers().size()));
+
+            objectiveCards[0] = objectiveCard0;
+            objectiveCards[1] = objectiveCard1;
 
             players.get(i).setSecretObjectiveCardOptions(objectiveCards);
         }
-        mainBoard.getSharedObjectiveCards()[0]=objectives.get((key + 4) % objectives.size());
-        mainBoard.getSharedObjectiveCards()[1]=objectives.get((key + 4 + getPlayers().size()) % objectives.size());
+
+        mainBoard.getSharedObjectiveCards()[0] = this.getObjectiveCard(randomKeysList.get(randomKeysList.size() - 2));
+        mainBoard.getSharedObjectiveCards()[1] = this.getObjectiveCard(randomKeysList.getLast());
     }
 
 
@@ -393,15 +493,34 @@ public class GameState {
 
     void calculateFinalPoints() throws CardNotPlacedException, WrongInstanceTypeException {
         for (int i = 0; i < this.getPlayers().size(); i++) {
-            //player obj
-            int points = this.getPlayers().get(i).getCardPoints(this.getPlayers().get(i).getObjectiveCard());
-            this.getPlayers().get(i).addPoints(this.getPlayers().get(i).getCardPoints(this.getPlayers().get(i).getObjectiveCard()));
-            //shared obj 1
-            points = this.getPlayers().get(i).getCardPoints(this.mainBoard.getSharedObjectiveCards()[0]);
-            this.getPlayers().get(i).addPoints(this.getPlayers().get(i).getCardPoints(this.mainBoard.getSharedObjectiveCards()[0]));
-            //shared obj 2
-            points = this.getPlayers().get(i).getCardPoints(this.mainBoard.getSharedObjectiveCards()[1]);
-            this.getPlayers().get(i).addPoints(this.getPlayers().get(i).getCardPoints(this.mainBoard.getSharedObjectiveCards()[1]));
+
+            ObjectiveCard objCard = this.getPlayers().get(i).getObjectiveCard();
+            ObjectiveCard sharedCard1 = this.mainBoard.getSharedObjectiveCards()[0];
+            ObjectiveCard sharedCard2 = this.mainBoard.getSharedObjectiveCards()[1];
+
+            int points = 0;
+            // player objective
+            if (this.structureChallengeMap.get(objCard.getId()) != null) {
+                points = this.getPlayers().get(i).getCardPoints(objCard, this.structureChallengeMap.get(objCard.getId()));
+            } else if (this.elementChallengeMap.get(objCard.getId()) != null) {
+                points = this.getPlayers().get(i).getCardPoints(objCard, this.elementChallengeMap.get(objCard.getId()));
+            }
+
+            // shared 1
+            if (this.structureChallengeMap.get(sharedCard1.getId()) != null) {
+                points += this.getPlayers().get(i).getCardPoints(sharedCard1, this.structureChallengeMap.get(sharedCard1.getId()));
+            } else if (this.elementChallengeMap.get(sharedCard1.getId()) != null) {
+                points += this.getPlayers().get(i).getCardPoints(sharedCard1, this.elementChallengeMap.get(sharedCard1.getId()));
+            }
+
+            // shared 2
+            if (this.structureChallengeMap.get(sharedCard2.getId()) != null) {
+                points += this.getPlayers().get(i).getCardPoints(sharedCard2, this.structureChallengeMap.get(sharedCard2.getId()));
+            } else if (this.elementChallengeMap.get(sharedCard2.getId()) != null) {
+                points += this.getPlayers().get(i).getCardPoints(sharedCard2, this.elementChallengeMap.get(sharedCard2.getId()));
+            }
+
+            this.getPlayers().get(i).addPoints(points);
         }
     }
 
@@ -459,28 +578,8 @@ public class GameState {
         return this.players.getFirst();
     }
 
-    public Player getPlayerByIndex(int index){return this.getPlayers().get(index);    }
-
-//--------------- get card from id ----------------------
-
-    public Card getCard(int id){
-        return this.getCardsMap().get(id);
-    }
-
-    public CornerCard getCornerCard(int id){
-        Card card = this.getCardsMap().get(id);
-        if (card instanceof CornerCard) {
-            return (CornerCard) card;
-        }
-        return null;
-    }
-
-    public ObjectiveCard getObjectiveCard(int id){
-        Card card = this.getCardsMap().get(id);
-        if (card instanceof ObjectiveCard) {
-            return (ObjectiveCard) card;
-        }
-        return null;
+    public Player getPlayerByIndex(int index){
+        return this.getPlayers().get(index);
     }
 
 //--------------All draw cards called from controller------------------
@@ -517,9 +616,10 @@ public class GameState {
 
 //----------------------------place Card--------------------------------
 
+    //QUESTO METODO VA SPLITTATO
     public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingCardSide) throws PlacingOnHiddenCornerException {
         // check if the indirect corners are hidden
-        CornerCard placingCard = (CornerCard) this.getCardsMap().get(placingCardId);
+        CornerCard placingCard = this.getCornerCard(placingCardId);
         ArrayList<ArrayList<Integer>> playerBoard = player.getPlayerBoard();
         for (Integer row = 0; row < playerBoard.size(); row++) {
             for (Integer col = 0; col < playerBoard.get(row).size(); col++) {
@@ -564,7 +664,7 @@ public class GameState {
     }
 
     private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {
-        CornerCard matrixCard = (CornerCard) this.getCardsMap().get(matrixCardId);
+        CornerCard matrixCard = this.getCornerCard(matrixCardId);
         Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[matrixCardCornerPos.getCornerPosValue()];
         Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[indirectPlacingCornerPos.getCornerPosValue()];
 

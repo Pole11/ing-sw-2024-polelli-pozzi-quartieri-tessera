@@ -20,20 +20,22 @@ public class CornerTest {
     @Test
     void testGetterSetter(){
         // setup
-        GameState g;
         try {
-            g = Main.populate();
+            Main.populate();
+            GameState g = Main.gameState;
+
+            CornerCard card = g.getCornerCard(40);
+            Corner corner = card.getCorners().getFirst();
+
+            corner.setLinkedCorner(corner.getLinkedCorner());
+            corner.setCovered(corner.getCovered());
+
+            assertNotNull(corner.getElement());
+            assertEquals(corner.getCard(), card.getId());
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        CornerCard card = g.getCornerCard(40);
-        Corner corner = card.getCorners().getFirst();
 
-        corner.setLinkedCorner(corner.getLinkedCorner());
-        corner.setCovered(corner.getCovered());
-
-        assertNotNull(corner.getElement());
-        assertEquals(corner.getCard(), card.getId());
     }
 }

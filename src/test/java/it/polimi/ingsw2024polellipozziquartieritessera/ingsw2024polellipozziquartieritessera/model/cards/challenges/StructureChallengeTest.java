@@ -14,7 +14,7 @@ public class StructureChallengeTest {
         Element[][] mat24 = new Element[2][4];
         Element[][] mat42 = new Element[4][2];
         Element[][] mat44 = new Element[4][4];
-
+        
         assertAll(() -> new StructureChallenge(mat33));
         assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat34));
         assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat43));

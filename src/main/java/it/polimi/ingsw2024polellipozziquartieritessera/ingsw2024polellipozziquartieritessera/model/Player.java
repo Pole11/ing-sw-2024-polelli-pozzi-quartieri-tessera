@@ -103,7 +103,7 @@ public class Player {
 
     public void setStarterCard(StarterCard starterCard) {
         this.starterCard = starterCard;
-        this.getPlacedCardsMap().put(this.getStarterCard().getId(), Side.FRONT); // also set the default side to FRONT
+        this.placedCardsMap.put(this.getStarterCard().getId(), Side.FRONT); // also set the default side to FRONT
         // !!! add elements
     }
 
@@ -252,75 +252,58 @@ public class Player {
         }
     }
 
-// -----------------------Challenge Managing---------------------------------
+// -----------------------Challenge Managing--------------------------------
 
-    public int getCardPoints(ObjectiveCard objCard) throws WrongInstanceTypeException, CardNotPlacedException {
+    public int getCardPoints(ObjectiveCard objCard, ElementChallenge elementChallenge) throws CardNotPlacedException {
         //if (!placedCardsMap.containsKey(objCard.getId())) throw new CardNotPlacedException("The card is not placed");
-        //QUESTO IF E' SBAGLIATO, le objective card non sono in placedCardsMap
-        Challenge cardChallenge = objCard.getChallenge();
         int cardPoints = objCard.getPoints();
-        int timesWon = -1;
 
-        if (cardChallenge instanceof StructureChallenge) {
-            timesWon = getTimesWonStructure((StructureChallenge) cardChallenge);
-        } else if (cardChallenge instanceof ElementChallenge) {
-            ArrayList<Element> elements = ((ElementChallenge) cardChallenge).getElements();
-            timesWon = getTimesWonElement(elements);
-        } else {
-            throw new WrongInstanceTypeException("cardChallenge is neither a structure or a element challenge");
+        ArrayList<Element> elements = elementChallenge.getElements();
+        int timesWon = getTimesWonElement(elements);
+
+        // update if challenge is completed at least one time
+        if (timesWon > 0){
+            objectivesWon++;
         }
+
+        return Math.max(0, timesWon * cardPoints);
+    }
+
+    public int getCardPoints(ObjectiveCard objCard, StructureChallenge structureChallenge) throws CardNotPlacedException {
+        //if (!placedCardsMap.containsKey(objCard.getId())) throw new CardNotPlacedException("The card is not placed");
+        int cardPoints = objCard.getPoints();
+        int timesWon = getTimesWonStructure(structureChallenge);
+
         // update if challenge is completed at least one time
         if (timesWon>0){
             objectivesWon++;
         }
 
-        return Math.max(-1, timesWon * cardPoints);
-    };
+        return timesWon * cardPoints;
+    }
 
-    public int getCardPoints(CornerCard cornerCard) throws WrongInstanceTypeException, CardNotPlacedException {
+    public int getCardPoints(CornerCard cornerCard, ElementChallenge elementChallenge) throws WrongInstanceTypeException, CardNotPlacedException {
         if (this.getBoardSide(cornerCard.getId()).equals(Side.BACK)) return 0;
 
-        if (cornerCard instanceof GoldCard){
-            return getCardPoints((GoldCard) cornerCard);
-        } else if (cornerCard instanceof ResourceCard)
-            return getCardPoints((ResourceCard) cornerCard);
-        else {
-            throw new WrongInstanceTypeException("CornerCard is neither a Gold or a Resource card");
-        }
+        return cornerCard.getPoints() * getTimesWonElement(elementChallenge.getElements());
     }
 
-    public int getCardPoints(ResourceCard resourceCard) throws CardNotPlacedException {
-        Side side = null;
-        side = placedCardsMap.get(resourceCard.getId());
-        if (placedCardsMap.containsKey(resourceCard.getId())) {
-            side = placedCardsMap.get(resourceCard.getId());
-        } else {
-            throw new CardNotPlacedException("the card is not placed");
-        }
-        if (side == Side.FRONT){
-            return resourceCard.getPoints();
-        } else {
-            return 0;
-        }
+    public int getCardPoints(CornerCard cornerCard, CoverageChallenge coverageChallenge) throws WrongInstanceTypeException, CardNotPlacedException {
+        if (this.getBoardSide(cornerCard.getId()).equals(Side.BACK)) return 0;
+
+        return cornerCard.getPoints() * getTimesWonCoverage((GoldCard) cornerCard); // si può togliere il cast esplicito se migliorando la fase di popolazione nel main mettiamo alla coverageChallenge un attributo che fa riferimento alla carta gold a cui è associata!
     }
 
-    public int getCardPoints(GoldCard goldCard) throws WrongInstanceTypeException, CardNotPlacedException {
-        if (!placedCardsMap.containsKey(goldCard.getId())) throw new CardNotPlacedException("the card is not placed");
-        Challenge cardChallenge = goldCard.getChallenge();
-        int cardPoints = goldCard.getPoints();
-        int timesWon = 0;
-        if (cardChallenge == null) return cardPoints;
-        if (cardChallenge instanceof ElementChallenge) {
-            ArrayList<Element> elements = ((ElementChallenge) cardChallenge).getElements();
-            timesWon = getTimesWonElement(elements);
-        } else if (cardChallenge instanceof CoverageChallenge) {
-            timesWon = getTimesWonCoverage(goldCard);
-        } else {
-            throw new WrongInstanceTypeException("cardChallenge is neither a structure or a element challenge");
-        }
+    public int getCardPoints(CornerCard cornerCard, StructureChallenge structureChallenge) throws WrongInstanceTypeException, CardNotPlacedException {
+        if (this.getBoardSide(cornerCard.getId()).equals(Side.BACK)) return 0;
 
-        return timesWon * cardPoints; // if timesWon is not changed, then return -1
-    };
+        return cornerCard.getPoints() * getTimesWonStructure(structureChallenge); // si può togliere il cast esplicito se migliorando la fase di popolazione nel main mettiamo alla coverageChallenge un attributo che fa riferimento alla carta gold a cui è associata!
+    }
+
+    public int getCardPoints(CornerCard cornerCard) {
+        if (this.getBoardSide(cornerCard.getId()).equals(Side.BACK)) return 0;
+        return cornerCard.getPoints();
+    }
 
 // ---------------------Get Times Won ----------------------------------
 
@@ -372,7 +355,7 @@ public class Player {
         return ref.min;
     }
 
-    private int getTimesWonStructure(StructureChallenge challenge) throws WrongInstanceTypeException {
+    private int getTimesWonStructure(StructureChallenge challenge) {
         int rows = getPlayerBoard().size();
         int cols = getPlayerBoard().getFirst().size();
 

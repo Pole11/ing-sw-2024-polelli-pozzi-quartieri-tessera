@@ -11,7 +11,7 @@ public class StarterCard extends CornerCard {
 
     // CONSTRUCTOR
     public StarterCard(int id, Corner[] frontCorners, Corner[] backCorners, ArrayList<Element> centerResource) {
-        super(id, frontCorners, backCorners);
+        super(id, frontCorners, backCorners, 0);
         this.centerResource = centerResource;
     }
 

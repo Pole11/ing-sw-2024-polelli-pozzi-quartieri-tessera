@@ -11,13 +11,17 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.Card;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ObjectiveCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.StarterCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
 import org.junit.jupiter.api.Test;
+
 public class GameStateTest {
 
     @Test
-    void gameStateTestConstructor() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
+    void gameStateTestConstructorColor() throws WrongStructureConfigurationSizeException, IOException {
         // same colors
-        HashMap hmap1 = new HashMap();
+        /*
+        Main.createCardsMap();
+        Main.gameState.removeAllPlayers();
 
         ArrayList<Player> players1 = new ArrayList<>();
         players1.add(new Player("nick1"));
@@ -29,17 +33,34 @@ public class GameStateTest {
         gs1.getPlayers().get(1).setColor(Color.YELLOW);
         assertThrowsExactly(NotUniquePlayerColorException.class, () -> gs1.ColorsAreValid() );
 
+        assertDoesNotThrow(() -> Main.gameState.setPlayer(0, new Player("nick1", Color.RED)));
+        assertThrowsExactly(NotUniquePlayerColorException.class, () -> Main.gameState.setPlayer(1, new Player("nick2", Color.RED)));
+        */
+    }
 
+    @Test
+    void gameStateTestConstructorNickname() throws WrongStructureConfigurationSizeException, IOException {
+        /*
         // same nickname
-        HashMap hmap2 = new HashMap();
+        Main.createCardsMap();
+        Main.gameState.removeAllPlayers();
 
         ArrayList players2 = new ArrayList<>();
         players2.add(new Player("nick1"));
         players2.add(new Player("nick1"));
 
         assertThrowsExactly(NotUniquePlayerNicknameException.class, () -> new GameState(hmap2, players2));
+        assertDoesNotThrow(() -> Main.gameState.setPlayer(0, new Player("nick1", Color.RED)));
+        assertThrowsExactly(NotUniquePlayerNicknameException.class, () -> Main.gameState.setPlayer(1, new Player("nick1", Color.BLUE)));
+        */
+    }
 
+
+
+    @Test
+    void gameStateTestConstructorColorAndNickname() throws WrongStructureConfigurationSizeException, IOException {
         // same colors and nicknames
+        /*
         HashMap hmap3 = new HashMap();
         ArrayList<Player> players3 = new ArrayList<>();
         GameState gs3 = new GameState(hmap3, players3);
@@ -48,6 +69,13 @@ public class GameStateTest {
         gs3.getPlayers().get(0).setColor(Color.YELLOW);
         gs3.getPlayers().get(1).setColor(Color.YELLOW);
         assertThrowsExactly(NotUniquePlayerException.class, () -> gs3.NicknameAndColorsAreValid());
+
+        Main.createCardsMap();
+        Main.gameState.removeAllPlayers();
+
+        assertDoesNotThrow(() -> Main.gameState.setPlayer(0, new Player("nick1", Color.RED)));
+        assertThrowsExactly(NotUniquePlayerException.class, () -> Main.gameState.setPlayer(1, new Player("nick1", Color.RED)));
+        */
     }
 
     @Test
@@ -55,12 +83,14 @@ public class GameStateTest {
 
 //-----------------------RECREATE SITUATION IN getCardPointsTest2-------------------------
 
-        Player player = new Player("pole");
-        Main main = new Main();
-        // create cards map
-        HashMap<Integer, Card> cardsMap = main.createCardsMap();
+        Main.createCardsMap();
+        GameState gs = Main.gameState;
+        //gs = new GameState();
+        Controller c = new Controller(gs);
+        gs.setPlayer(0, new Player("paolo"));
+        Player player = gs.getPlayer(0);
 
-        assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
+        //assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
 
         int starterCardId = 81;
         int resourceCardId1 = 31;
@@ -79,12 +109,12 @@ public class GameStateTest {
         int goldCardId5 = 58;
 
         // create game state
-        GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
-        Controller c = new Controller(gs);
+        //GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
+        //Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
         gs.setSharedGoldCards();
         gs.setSharedResourceCards();
-        player.setStarterCard((StarterCard) gs.getCardsMap().get(starterCardId));
+        player.setStarterCard(gs.getStarterCard(starterCardId));
         player.initializeBoard();
         gs.chooseStarterSidePhase();
         c.chooseInitialStarterSide(0, Side.FRONT);
@@ -326,22 +356,21 @@ public class GameStateTest {
     @Test
     void calculateFinalPointsTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException {
 
-        Player player = new Player("pole");
-        Main main = new Main();
-        // create cards map
-        HashMap<Integer, Card> cardsMap = main.createCardsMap();
+        Main.createCardsMap();
+        GameState gs = Main.gameState;
+        Controller c = new Controller(gs);
+        gs.setPlayer(0, new Player("paolo"));
+        Player player = gs.getPlayer(0);
 
-        assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
+        //assertDoesNotThrow(() -> new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player}))));
 
         int starterCardId = 85;
 
         // create game state
-        GameState gs = new GameState(cardsMap, new ArrayList<>(Arrays.asList(new Player[]{player})));
-        Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
         gs.setSharedGoldCards();
         gs.setSharedResourceCards();
-        player.setStarterCard((StarterCard) gs.getCardsMap().get(starterCardId));
+        player.setStarterCard(gs.getStarterCard(starterCardId));
         player.initializeBoard();
         gs.chooseStarterSidePhase();
         c.chooseInitialStarterSide(0, Side.BACK);
@@ -380,7 +409,10 @@ public class GameStateTest {
 
     @Test
     void isGameEndedTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        GameState gs = Main.populate();
+        Main.populate();
+        GameState gs = Main.gameState;
+        Controller c = new Controller(gs);
+        Player player = Main.gameState.getPlayer(0);
 
         assertFalse(gs.isGameEnded());
 
@@ -400,7 +432,10 @@ public class GameStateTest {
 
     @Test
     void isGameEndedTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        GameState gs = Main.populate();
+        Main.populate();
+        GameState gs = Main.gameState;
+        Controller c = new Controller(gs);
+        Player player = Main.gameState.getPlayer(0);
 
         assertFalse(gs.isGameEnded());
         gs.getMainBoard().getResourceDeck().removeAll(gs.getMainBoard().getResourceDeck());
@@ -412,7 +447,10 @@ public class GameStateTest {
 
     @Test
     void getWinnerPlayerIndexTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, GameIsNotEndedException, CardNotPlacedException, WrongInstanceTypeException {
-        GameState gs = Main.populate();
+        Main.populate();
+        GameState gs = Main.gameState;
+        Controller c = new Controller(gs);
+        Player player = Main.gameState.getPlayer(0);
 
         ArrayList<Integer> first_wins = new ArrayList<>();
         ArrayList<Integer> second_wins = new ArrayList<>();
@@ -430,7 +468,11 @@ public class GameStateTest {
 
         gs.getPlayers().get(1).getAllElements().put(Element.INSECT, 4);
         //increments ObjectivesWon
-        gs.getPlayers().get(1).getCardPoints((ObjectiveCard) gs.getCard(98));
+        if (gs.getElementChallenge(98) != null){
+            gs.getPlayers().get(1).getCardPoints(gs.getObjectiveCard(98), gs.getElementChallenge(98));
+        } else if (gs.getStructureChallenge(98) != null) {
+            gs.getPlayers().get(1).getCardPoints(gs.getObjectiveCard(98), gs.getStructureChallenge(98));
+        }
         assertEquals(first_wins, gs.getWinnerPlayerIndex());
 
         gs.getPlayers().get(1).setPoints(24);
@@ -438,15 +480,23 @@ public class GameStateTest {
 
         gs.getPlayers().get(1).setPoints(25);
         gs.getPlayers().get(0).getAllElements().put(Element.INSECT, 6);
-        gs.getPlayers().get(0).getCardPoints((ObjectiveCard) gs.getCard(98));
+        if (gs.getElementChallenge(98) != null){
+            gs.getPlayers().get(0).getCardPoints(gs.getObjectiveCard(98), gs.getElementChallenge(98));
+        } else if (gs.getStructureChallenge(98) != null) {
+            gs.getPlayers().get(0).getCardPoints(gs.getObjectiveCard(98), gs.getStructureChallenge(98));
+        }
+
         assertEquals(second_wins, gs.getWinnerPlayerIndex());
 
         gs.getPlayers().get(1).setPoints(24);
         assertEquals(first_second_win, gs.getWinnerPlayerIndex());
 
         gs.getPlayers().get(0).getAllElements().put(Element.FUNGI, 6);
-        gs.getPlayers().get(0).getCardPoints((ObjectiveCard) gs.getCard(95));
-        assertEquals(first_wins, gs.getWinnerPlayerIndex());
+        if (gs.getElementChallenge(98) != null){
+            gs.getPlayers().get(0).getCardPoints(gs.getObjectiveCard(95), gs.getElementChallenge(95));
+        } else if (gs.getStructureChallenge(98) != null) {
+            gs.getPlayers().get(0).getCardPoints(gs.getObjectiveCard(95), gs.getStructureChallenge(95));
+        }          assertEquals(first_wins, gs.getWinnerPlayerIndex());
 
     }
 

@@ -18,46 +18,49 @@ public class ResourceCardTest {
     @Test
     void testGetterSetter(){
         // setup
-        GameState g;
         try {
-            g = Main.populate();
+            Main.populate();
+            GameState g = Main.gameState;
+
+            ResourceCard card = (ResourceCard) g.getCornerCard(32);
+
+            assertEquals(card.getResourceType(), Element.INSECT);
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        ResourceCard card = (ResourceCard) g.getCornerCard(32);
 
-        assertEquals(card.getResourceType(), Element.INSECT);
     }
 
     @Test
     void testGetUncoveredElements() {
         // setup
-        GameState g;
         try {
-            g = Main.populate();
+            Main.populate();
+            GameState g = Main.gameState;
+
+            ResourceCard card = (ResourceCard) g.getCornerCard(32);
+
+            // verify if the return elements are the right ones
+            ArrayList<Element> elements;
+            elements = card.getUncoveredElements(Side.FRONT);
+            assertEquals(elements.getFirst(), Element.INSECT);
+            assertEquals(elements.toArray().length, 2);
+
+
+            // try cover the corner and see if there are no uncovered elements
+            for (Corner corner : card.getCorners(Side.FRONT)){
+                corner.setCovered(true);
+            }
+
+            assertTrue(card.getUncoveredElements(Side.FRONT).isEmpty());
+
+            // try with the back
+            assertEquals(card.getUncoveredElements(Side.BACK).getFirst(), Element.INSECT);
+            assertEquals(card.getUncoveredElements(Side.BACK).toArray().length, 1);
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        ResourceCard card = (ResourceCard) g.getCornerCard(32);
-
-        // verify if the return elements are the right ones
-        ArrayList<Element> elements;
-        elements = card.getUncoveredElements(Side.FRONT);
-        assertEquals(elements.getFirst(), Element.INSECT);
-        assertEquals(elements.toArray().length, 2);
-
-
-        // try cover the corner and see if there are no uncovered elements
-        for (Corner corner : card.getCorners(Side.FRONT)){
-            corner.setCovered(true);
-        }
-
-        assertTrue(card.getUncoveredElements(Side.FRONT).isEmpty());
-
-        // try with the back
-        assertEquals(card.getUncoveredElements(Side.BACK).getFirst(), Element.INSECT);
-        assertEquals(card.getUncoveredElements(Side.BACK).toArray().length, 1);
     }
 }

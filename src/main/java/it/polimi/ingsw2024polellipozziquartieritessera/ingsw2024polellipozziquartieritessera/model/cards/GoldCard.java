@@ -9,15 +9,13 @@ public class GoldCard extends CornerCard {
     private final Element resourceType; // color of the card, determined by the major resourceType
     private final Challenge challenge; // challenge related to this card (if null, points are gained when played)
     private final ArrayList<Element> resourceNeeded; // resource needed to place the card
-    private final int points; // value used to calculate the gain (if challenge is null, it is simply returned)
 
     // CONSTRUCTOR
     public GoldCard(int id, Element resourceType, Challenge challenge, ArrayList<Element> resourceNeeded, int points, Corner[] frontCorners, Corner[] backCorners) {
-        super(id, frontCorners, backCorners);
+        super(id, frontCorners, backCorners, points);
         this.resourceType = resourceType;
         this.challenge = challenge;
         this.resourceNeeded = resourceNeeded;
-        this.points = points;
     }
 
     // GETTER
@@ -33,10 +31,6 @@ public class GoldCard extends CornerCard {
         return resourceNeeded;
     }
 
-    public int getPoints() {
-        return points;
-    }
-
     // METHODS
     // returns the elements visible on the requested side
     public ArrayList<Element> getUncoveredElements(Side side){
@@ -46,10 +40,7 @@ public class GoldCard extends CornerCard {
         // set center resource if the card is on the back side
         if (side == Side.BACK){
             uncoveredElements.add(this.resourceType);
-        }
-
-        // set all the corners resources if the card is on the front side
-        else{
+        } else { // set all the corners resources if the card is on the front side
             for (Corner corner : this.getUncoveredCorners(side)){
                 if(corner.getElement() != Element.EMPTY){
                     uncoveredElements.add(corner.getElement());

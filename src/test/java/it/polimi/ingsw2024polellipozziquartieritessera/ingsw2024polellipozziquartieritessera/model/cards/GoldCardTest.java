@@ -19,50 +19,53 @@ public class GoldCardTest {
     @Test
     void testGetterSetter(){
         // setup
-        GameState g;
         try {
-            g = Main.populate();
+            Main.populate();
+            GameState g = Main.gameState;
+
+            GoldCard card = (GoldCard) g.getCornerCard(45);
+
+            assertNotNull(card.getResourceNeeded());
+            assertNotNull(card.getResourceType());
+            card.getChallenge();
+            card.getPoints();
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        GoldCard card = (GoldCard) g.getCornerCard(45);
-
-        assertNotNull(card.getResourceNeeded());
-        assertNotNull(card.getResourceType());
-        card.getChallenge();
-        card.getPoints();
     }
 
     @Test
     void testGetUncoveredElements() {
         // setup
-        GameState g;
         try {
-            g = Main.populate();
+            Main.populate();
+            GameState g = Main.gameState;
+
+            GoldCard card = (GoldCard) g.getCornerCard(58);
+
+            // verify if the return elements are the right ones
+            ArrayList<Element> elements;
+            elements = card.getUncoveredElements(Side.FRONT);
+            assertEquals(elements.getFirst(), Element.MANUSCRIPT);
+            assertEquals(elements.toArray().length, 1);
+
+
+            // try cover the corner and see if there are no uncovered elements
+            for (Corner corner : card.getCorners(Side.FRONT)){
+                corner.setCovered(true);
+            }
+
+            assertTrue(card.getUncoveredElements(Side.FRONT).isEmpty());
+
+            // try with the back
+            assertEquals(card.getUncoveredElements(Side.BACK).getFirst(), Element.PLANT);
+            assertEquals(card.getUncoveredElements(Side.BACK).toArray().length, 1);
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);
         }
-        GoldCard card = (GoldCard) g.getCornerCard(58);
 
-        // verify if the return elements are the right ones
-        ArrayList<Element> elements;
-        elements = card.getUncoveredElements(Side.FRONT);
-        assertEquals(elements.getFirst(), Element.MANUSCRIPT);
-        assertEquals(elements.toArray().length, 1);
-
-
-        // try cover the corner and see if there are no uncovered elements
-        for (Corner corner : card.getCorners(Side.FRONT)){
-            corner.setCovered(true);
-        }
-
-        assertTrue(card.getUncoveredElements(Side.FRONT).isEmpty());
-
-        // try with the back
-        assertEquals(card.getUncoveredElements(Side.BACK).getFirst(), Element.PLANT);
-        assertEquals(card.getUncoveredElements(Side.BACK).toArray().length, 1);
 
     }
 }
