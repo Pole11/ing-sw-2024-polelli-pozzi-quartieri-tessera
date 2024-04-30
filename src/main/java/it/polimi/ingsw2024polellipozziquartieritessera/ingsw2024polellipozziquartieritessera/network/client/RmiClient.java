@@ -35,11 +35,16 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     private void runTui() throws RemoteException {
         System.out.println("Welcome to CODEX!");
-        System.out.print("Please enter your username > ");
-        Scanner scan = new Scanner(System.in);
-        String nickname = scan.nextLine();
 
-        this.server.addConnectedPlayer(this, nickname);
+        boolean running = true;
+        Scanner scan = new Scanner(System.in);
+        while (running) {
+            System.out.print("> ");
+            String input = scan.nextLine();
+            if (input != null && !input.isEmpty() && !input.isBlank() && !input.equals("")) {
+                this.server.sendInput(this, input);
+            }
+        }
 
     }
 
@@ -48,7 +53,7 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     }
 
     public void printMsg(String msg) {
-        System.out.println(msg);
+        System.out.print("\nINFO FROM SERVER: " + msg + "\n");
     }
 
     public static void main(String args[]) {

@@ -45,7 +45,7 @@ public class GameState {
 
         this.players = new ArrayList<>();
         this.currentPlayerIndex = 0;
-        this.currentGamePhase = GamePhase.MAINPHASE;
+        this.currentGamePhase = GamePhase.NICKNAMEPHASE;
         this.currentGameTurn = null;
         this.chat = new Chat();
         this.isLastTurn = false;

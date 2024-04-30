@@ -34,6 +34,14 @@ public class Controller {
     // flipCard() *avverte il model del flipping della carta
     // ? sendMessage() *permette al model di salvare le informazioni del messaggio
 
+    public GamePhase getGamePhase() {
+        return this.gameState.getCurrentGamePhase();
+    }
+
+    public void setGamePhase(GamePhase gamePhase) {
+        this.gameState.setCurrentGamePhase(gamePhase);
+    }
+
     //settare players
 
     public void addPlayer(String nickname) throws NotUniquePlayerNicknameException {

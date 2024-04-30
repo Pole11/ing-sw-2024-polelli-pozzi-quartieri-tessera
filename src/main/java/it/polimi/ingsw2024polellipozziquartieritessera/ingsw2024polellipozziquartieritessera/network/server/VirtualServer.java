@@ -18,13 +18,15 @@ public interface VirtualServer extends Remote {
     // flip
     // place
     // draw
+    public void sendInput(VirtualView client, String msg) throws RemoteException;
+
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException;
 
     public void startGame() throws RemoteException;
 
     public void chooseInitialStarterSide(int playerIndex, Side side) throws RemoteException;
 
-    public void chooseInitialColor(int playerIndex, Color color) throws RemoteException;
+    public void chooseInitialColor(VirtualView client, int playerIndex, Color color) throws RemoteException;
 
     public void chooseInitialObjective(int playerIndex, int cardId) throws RemoteException;
 
