@@ -1,5 +1,5 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Main;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerColorException;
@@ -19,7 +19,7 @@ public class ResourceCardTest {
     void testGetterSetter(){
         // setup
         try {
-            GameState g = Main.populate();
+            GameState g = Populate.populate();
 
             ResourceCard card = (ResourceCard) g.getCornerCard(32);
 
@@ -35,7 +35,7 @@ public class ResourceCardTest {
     void testGetUncoveredElements() {
         // setup
         try {
-            GameState g = Main.populate();
+            GameState g = Populate.populate();
 
             ResourceCard card = (ResourceCard) g.getCornerCard(32);
 

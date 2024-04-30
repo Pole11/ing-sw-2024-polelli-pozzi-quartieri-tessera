@@ -1,16 +1,13 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,9 +35,9 @@ public class ControllerTest {
         CornerPos goldCardToTableCornerPos = CornerPos.UPLEFT;
 
         // create game state
-        Main.populate();
+        Populate.populate();
 
-        GameState gs = Main.populate();
+        GameState gs = Populate.populate();
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
@@ -266,7 +263,7 @@ public class ControllerTest {
         int starterCardId = 81;
 
         // create game state
-        GameState gs = Main.populate();
+        GameState gs = Populate.populate();
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
@@ -350,7 +347,7 @@ public class ControllerTest {
 
     @Test
     void flipCardTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        GameState gs = Main.populate();
+        GameState gs = Populate.populate();
         Controller c = new Controller(gs);
 
         gs.getPlayers().get(0).getHandCardsMap().put(1, Side.FRONT);

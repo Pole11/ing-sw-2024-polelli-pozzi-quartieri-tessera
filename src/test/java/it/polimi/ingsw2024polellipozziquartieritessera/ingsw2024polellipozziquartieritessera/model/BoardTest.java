@@ -1,7 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 import static org.junit.jupiter.api.Assertions.*;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Main;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerColorException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerNicknameException;
@@ -9,11 +9,9 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.GoldCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ResourceCard;
 import org.junit.jupiter.api.Test;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BoardTest {
     // ALL METHODS TESTED
@@ -22,7 +20,7 @@ public class BoardTest {
     void testGetterSetter() {
         // setup
         try {
-            GameState g = Main.populate();
+            GameState g = Populate.populate();
             ;
 
             Board b = g.getMainBoard();
@@ -38,7 +36,7 @@ public class BoardTest {
     void testDrawSharedCards() {
         // setup
         try {
-            GameState g = Main.populate();
+            GameState g = Populate.populate();
 
             Board b = g.getMainBoard();
             b.fillSharedCardsGap();
@@ -82,7 +80,7 @@ public class BoardTest {
     void testGetFromResourceDeck() {
         // setup
         try {
-            GameState g = Main.populate();
+            GameState g = Populate.populate();
 
             Board b = g.getMainBoard();
 
@@ -111,7 +109,7 @@ public class BoardTest {
     void testGetFromGoldDeck() {
         // setup
         try {
-            GameState g = Main.populate();
+            GameState g = Populate.populate();
 
             Board b = g.getMainBoard();
 
@@ -140,7 +138,7 @@ public class BoardTest {
     void testFillSharedCardsGap() {
         // Setup
         try {
-            GameState g = Main.populate();
+            GameState g = Populate.populate();
 
             Board b = g.getMainBoard();
 
@@ -177,7 +175,7 @@ public class BoardTest {
 
     @Test
     void testShuffleCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        GameState g = Main.populate();
+        GameState g = Populate.populate();
         Board b = g.getMainBoard();
 
         // Save initial state

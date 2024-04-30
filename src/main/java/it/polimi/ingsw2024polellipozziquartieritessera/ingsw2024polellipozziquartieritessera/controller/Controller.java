@@ -4,6 +4,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
+
+import java.io.IOException;
 import java.util.*;
 
 public class Controller {
@@ -32,7 +34,16 @@ public class Controller {
     // flipCard() *avverte il model del flipping della carta
     // ? sendMessage() *permette al model di salvare le informazioni del messaggio
 
+    //settare players
 
+    public void addPlayer(String nickname) throws NotUniquePlayerNicknameException {
+        gameState.setPlayer(gameState.getPlayers().size(), new Player(nickname));
+        if (gameState.getPlayers().size() >= Config.MAX_PLAYERS){
+            startGame();
+        }
+    }
+
+    //this is runned after gameState is populated with cards and players
     public void startGame(){
         this.gameState.startPhaseMethod();
     }
@@ -125,7 +136,7 @@ public class Controller {
     }
 
 
-    void drawCard(DrawType drawType) throws InvalidHandException {
+    public void drawCard(DrawType drawType) throws InvalidHandException {
         // non so se vada messo qui
         this.gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE); //dobbiamo valutare se si intende
         // la fase che c'è dopo o da ora in poi

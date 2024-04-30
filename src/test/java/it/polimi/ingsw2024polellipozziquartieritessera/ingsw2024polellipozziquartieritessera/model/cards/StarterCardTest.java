@@ -1,5 +1,5 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Main;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
@@ -17,7 +17,7 @@ public class StarterCardTest {
     void testGetterSetter() {
         // setup
         try {
-            GameState g = Main.populate();
+            GameState g = Populate.populate();
             StarterCard card = g.getStarterCard(84);
 
             assertEquals(card.getCenterResource().getFirst(), Element.ANIMAL);
@@ -31,7 +31,7 @@ public class StarterCardTest {
     @Test
     void testGetResourceType() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
         // setup
-        GameState g = Main.populate();
+        GameState g = Populate.populate();
         StarterCard card = g.getStarterCard(84);
     }
 
@@ -39,7 +39,7 @@ public class StarterCardTest {
     void testGetUncoveredElements() {
         // setup
         try {
-            GameState g = Main.populate();
+            GameState g = Populate.populate();
 
             StarterCard card = g.getStarterCard(84);
 

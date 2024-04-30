@@ -1,5 +1,5 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Main;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerColorException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerException;
@@ -19,7 +19,7 @@ public class CornerCardTest {
     @Test
     void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
         // setup
-        GameState g = Main.populate();
+        GameState g = Populate.populate();
 
         CornerCard card = g.getCornerCard(40);
 
@@ -36,7 +36,7 @@ public class CornerCardTest {
 
     @Test
     void testGetCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        GameState g = Main.populate();
+        GameState g = Populate.populate();
 
         CornerCard card = g.getCornerCard(40);
 
@@ -60,7 +60,7 @@ public class CornerCardTest {
 
     @Test
     void testGetLinkedCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        GameState g = Main.populate();
+        GameState g = Populate.populate();
 
         CornerCard card1 = g.getCornerCard(40);
         CornerCard card2 = g.getCornerCard(30);
@@ -80,7 +80,7 @@ public class CornerCardTest {
 
     @Test
     void testGetUncoveredCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        GameState g = Main.populate();
+        GameState g = Populate.populate();
 
         CornerCard card = g.getCornerCard(40);
         ArrayList<Corner> cornersFront = new ArrayList<>(Arrays.asList(card.getCorners(Side.FRONT)));
