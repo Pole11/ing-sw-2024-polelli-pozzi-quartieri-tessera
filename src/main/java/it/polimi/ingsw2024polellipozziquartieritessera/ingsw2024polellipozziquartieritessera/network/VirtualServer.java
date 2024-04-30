@@ -1,4 +1,4 @@
-package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.rmi;
+package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network;
 
 import java.rmi.*;
 

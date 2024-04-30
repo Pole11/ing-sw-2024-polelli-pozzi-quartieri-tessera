@@ -1,6 +1,7 @@
-package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.rmi;
+package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.rmi;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.Controller;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.VirtualServer;
 
 public class RmiServer implements VirtualServer {
     final Controller controller;

@@ -18,9 +18,11 @@ public class GameState {
     private final HashMap<Integer, ResourceCard> resourceCardsMap; // map id and card
     private final HashMap<Integer, StarterCard> starterCardsMap; // map id and card
     private final HashMap<Integer, ObjectiveCard> objectiveCardsMap; // map id and card
+
     private final HashMap<Integer, CoverageChallenge> coverageChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
     private final HashMap<Integer, ElementChallenge> elementChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
     private final HashMap<Integer, StructureChallenge> structureChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
+
     private final Board mainBoard;
     private final ArrayList<Player> players; //player[0] is blackPlayer
     private final Chat chat;
