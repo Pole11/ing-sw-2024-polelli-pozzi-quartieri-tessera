@@ -351,7 +351,7 @@ public class Player {
         return ref.min;
     }
 
-    private int getTimesWonStructure(StructureChallenge challenge) {
+    public int getTimesWonStructure(StructureChallenge challenge) {
         int rows = getPlayerBoard().size();
         int cols = getPlayerBoard().getFirst().size();
 

@@ -98,7 +98,7 @@ public class Main {
                     Element[][] configuration = new Element[Config.N_STRUCTURE_CHALLENGE_CONFIGURATION][Config.N_STRUCTURE_CHALLENGE_CONFIGURATION];
                     for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
                         for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
-                            configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(i+j).toString().toUpperCase() );
+                            configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(3*i+j).toString().toUpperCase() );
                         }
                     }
                     structureChallenge = new StructureChallenge(configuration);

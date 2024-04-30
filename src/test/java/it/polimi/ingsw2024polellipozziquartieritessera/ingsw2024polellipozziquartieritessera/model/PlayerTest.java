@@ -6,6 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -274,6 +275,51 @@ public class PlayerTest {
         assertEquals(1, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
+
+    }
+
+    @Test
+    void getStructurePointsTest() throws IOException, NotUniquePlayerException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
+        // create cards map
+
+        int starterCardId = 81;
+        int resourceCardId1 = 3;
+        int resourceCardId2 = 4;
+        int resourceCardId3 = 2;
+        int objectiveCardId1 = 87;
+        int objectiveCardId2 = 90;
+
+        // create game state
+        GameState gs = Main.createCardsMap();
+        gs.setPlayer(0, new Player("jhonny"));
+        Player player = gs.getPlayer(0);
+        Controller c = new Controller(gs);
+        gs.getMainBoard().shuffleCards();
+        gs.setSharedGoldCards();
+        gs.setSharedResourceCards();
+        player.setStarterCard(gs.getStarterCard(starterCardId));
+        player.initializeBoard();
+        gs.chooseStarterSidePhase();
+        c.chooseInitialStarterSide(0, Side.FRONT);
+
+
+        // testing one single structure challenge situation
+        ObjectiveCard objective1 = (ObjectiveCard) gs.getCard(objectiveCardId1);
+        ObjectiveCard objective2 = (ObjectiveCard) gs.getCard(objectiveCardId2);
+        Element[][] configuration1  = ((StructureChallenge) objective1.getChallenge()).getConfiguration();
+        Element[][] configuration2  = ((StructureChallenge) objective2.getChallenge()).getConfiguration();
+
+        player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
+        c.placeCard(0, resourceCardId1, player.getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
+        assertEquals(0, player.getTimesWonStructure((StructureChallenge) objective1.getChallenge()));
+
+        player.getHandCardsMap().put(resourceCardId2, Side.FRONT);
+        c.placeCard(0, resourceCardId2, resourceCardId1, CornerPos.UPRIGHT, Side.BACK);
+        assertEquals(0, player.getTimesWonStructure((StructureChallenge) objective1.getChallenge()));
+
+        player.getHandCardsMap().put(resourceCardId3, Side.FRONT);
+        c.placeCard(0, resourceCardId3, resourceCardId2, CornerPos.UPRIGHT, Side.BACK);
+        assertEquals(1, player.getTimesWonStructure((StructureChallenge) objective1.getChallenge()));
 
     }
 

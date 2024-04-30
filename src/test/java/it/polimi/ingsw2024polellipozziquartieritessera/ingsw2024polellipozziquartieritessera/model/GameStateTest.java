@@ -369,7 +369,7 @@ public class GameStateTest {
         gs.getMainBoard().getSharedObjectiveCards()[1] = (ObjectiveCard) gs.getCard(sharedObj2);
         player.setObjectiveCard( (ObjectiveCard) gs.getCard(secretObj));
         gs.calculateFinalPoints();
-        //assertEquals(5, player.getPoints());
+        assertEquals(5, player.getPoints());
 
     }
 
