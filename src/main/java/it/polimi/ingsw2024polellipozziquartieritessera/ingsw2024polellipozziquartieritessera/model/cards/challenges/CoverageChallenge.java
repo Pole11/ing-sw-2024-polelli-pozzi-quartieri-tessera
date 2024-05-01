@@ -14,5 +14,4 @@ public class CoverageChallenge extends Challenge{
         return this.goldCard;
     }
     */
-
 }

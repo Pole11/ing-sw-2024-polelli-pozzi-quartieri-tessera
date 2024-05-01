@@ -20,8 +20,8 @@ public class StarterCardTest {
             GameState g = Populate.populate();
             StarterCard card = g.getStarterCard(84);
 
-            assertEquals(card.getCenterResource().getFirst(), Element.ANIMAL);
-            assertEquals(card.getCenterResource().size(), 2);
+            assertEquals(card.getCenterResources().getFirst(), Element.ANIMAL);
+            assertEquals(card.getCenterResources().size(), 2);
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException | NotUniquePlayerException e) {
             throw new RuntimeException(e);

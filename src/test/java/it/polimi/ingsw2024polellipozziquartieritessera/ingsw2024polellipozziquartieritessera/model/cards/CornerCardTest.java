@@ -44,13 +44,13 @@ public class CornerCardTest {
         ArrayList<Corner> allCorners = card.getCorners();
 
         // get all front and back corners
-        Corner[] frontCorners = card.getCorners(Side.FRONT);
-        Corner[] backCorners = card.getCorners(Side.BACK);
+        ArrayList<Corner> frontCorners = card.getCorners(Side.FRONT);
+        ArrayList<Corner> backCorners = card.getCorners(Side.BACK);
 
         // verify number of corners is correct
         assertEquals(8, allCorners.size());
-        assertEquals(4, frontCorners.length);
-        assertEquals(4, backCorners.length);
+        assertEquals(4, frontCorners.size());
+        assertEquals(4, backCorners.size());
 
         // verify corners are not null
         for (Corner corner : allCorners){
@@ -83,8 +83,8 @@ public class CornerCardTest {
         GameState g = Populate.populate();
 
         CornerCard card = g.getCornerCard(40);
-        ArrayList<Corner> cornersFront = new ArrayList<>(Arrays.asList(card.getCorners(Side.FRONT)));
-        ArrayList<Corner> cornersBack = new ArrayList<>(Arrays.asList(card.getCorners(Side.BACK)));
+        ArrayList<Corner> cornersFront = card.getCorners(Side.FRONT);
+        ArrayList<Corner> cornersBack = card.getCorners(Side.BACK);
 
 
         // verify if none covered

@@ -33,22 +33,15 @@ public class Board {
         this.sharedObjectiveCards = sharedObjectiveCards;
     }
 
-    public void setDecks(ArrayList<ResourceCard> resourceCardDeck, ArrayList<GoldCard> goldCardDeck) {
-        setResourceDeck(resourceCardDeck);
-        setGoldDeck(goldCardDeck);
-    }
-
     public void setGoldDeck(ArrayList<GoldCard> goldCardDeck) {
         if (this.goldDeck.isEmpty()) {
             this.goldDeck.addAll(goldCardDeck);
-
         }
     }
 
     public void setResourceDeck(ArrayList<ResourceCard> resourceDeck) {
         if (this.resourceDeck.isEmpty()) {
             this.resourceDeck.addAll(resourceDeck);
-
         }
     }
 
@@ -75,6 +68,31 @@ public class Board {
 
 
     //METHODS
+    // set the decks
+    public void setDecks(ArrayList<ResourceCard> resourceCardDeck, ArrayList<GoldCard> goldCardDeck) {
+        setResourceDeck(resourceCardDeck);
+        setGoldDeck(goldCardDeck);
+    }
+
+    public void initSharedGoldCards() {
+        // it's like fillSharedGaps, look at the draw from shared methods to take inspiration
+        GoldCard card1 = getFromGoldDeck();
+        GoldCard card2 = getFromGoldDeck();
+
+        GoldCard[] cards = {card1, card2};
+
+        setSharedGoldCards(cards);
+    }
+
+    public void initSharedResourceCards() {
+        ResourceCard card1 = getFromResourceDeck();
+        ResourceCard card2 = getFromResourceDeck();
+
+        ResourceCard[] cards = {card1, card2};
+
+        setSharedResourceCards(cards);
+    }
+
     // returns the requested shared gold card
     public GoldCard drawSharedGoldCard(int pos) {
         GoldCard[] sharedGolds = getSharedGoldCards();

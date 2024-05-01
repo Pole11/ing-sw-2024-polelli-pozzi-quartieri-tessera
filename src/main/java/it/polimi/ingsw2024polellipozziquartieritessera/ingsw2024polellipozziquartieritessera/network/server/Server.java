@@ -3,12 +3,15 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.rmi.server.*;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.Controller;
@@ -18,17 +21,21 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
-
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 public class Server implements VirtualServer {
     final Controller controller;
-    final HashMap<Integer, VirtualView> clients = new HashMap<>();
-
-    public Server(Controller controller) {
+    final ArrayList<VirtualView> clients = new ArrayList<>();
+    final ServerSocket listenSocket;
+    int numberAnswered = 0;
+    
+    public Server(ServerSocket listenSocket, Controller controller) {
+        this.listenSocket = listenSocket;
         this.controller = controller;
     }
 
-    public static void main(String argv[]) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
+    public static void main(String[] argv) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
+        //setup gamestate
         GameState gameState = null;
         boolean store = Populate.existStore(); //FA persistance
         if (store){
@@ -36,171 +43,370 @@ public class Server implements VirtualServer {
         } else {
             gameState = Populate.populate();
         }
+        // listen to socket
+        String host = argv[0];
+        int socketport = Integer.parseInt(argv[1]);
+        int rmiport = Integer.parseInt(argv[2]);
+
+        ServerSocket listenSocket = new ServerSocket(socketport);
+        Server engine = new Server(listenSocket, new Controller(gameState));
+
+        //forse non funziona
+        //se non funziona da provare definire engine come VirtualServer e ((Server) engine).runServer
+
         // listen to rmi
-        VirtualServer engine = new Server(new Controller(gameState));
-        System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+        //VirtualServer engine = new Server(new Controller(gameState));
+        System.setProperty("java.rmi.server.hostname", host);
         String name = "VirtualServer";
         VirtualServer stub = (VirtualServer) UnicastRemoteObject.exportObject(engine, 0);
-        Registry registry = LocateRegistry.createRegistry(1234);
+        Registry registry = LocateRegistry.createRegistry(rmiport);
         registry.rebind(name, stub);
+        engine.runServer();
+    }
 
-        // listen to socket
+
+    private void runServer() throws IOException {
+        Socket clientSocket = null;
+        while ((clientSocket = this.listenSocket.accept()) != null) {
+            InputStreamReader socketRx = new InputStreamReader(clientSocket.getInputStream());
+            OutputStreamWriter socketTx = new OutputStreamWriter(clientSocket.getOutputStream());
+
+            ClientHandler handler = new ClientHandler(this,  new BufferedReader(socketRx), new BufferedWriter(socketTx));
+
+            clients.add(handler);
+            new Thread(() -> {
+                try {
+                    handler.runVirtualView();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
+        }
     }
 
     @Override
     public void connectRmi(VirtualView client) throws RemoteException {
-        if (clients.size() < Config.MAX_PLAYERS) {
-            System.out.println("new client connected");
-            client.printMsg("Please enter a nickname to start");
+        if (this.controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
+            System.out.println("New client connected");
+            client.printMessage("Please enter a nickname to start");
         } else {
-            client.printMsg("The game is full");
-            System.out.println("A new client tried to connect but the game is full");
+            System.out.println("A client tried to connect");
+            client.printMessage("The game is full. Wait for the game to end :>");
         }
-    }
-
-    @Override
-    public void sendInput(VirtualView client, String msg) {
-        if (msg == null || msg.isEmpty() || msg.isBlank() || msg.equals("")) return;
-        // fase di gioco
-        GamePhase gamePhase = this.controller.getGamePhase();
-        switch (gamePhase) {
-            case GamePhase.NICKNAMEPHASE:
-                if (msg.equals("start")) { // if the players wants to start the game
-                    if (clients.size() <= 1) {
-                        try {
-                            client.printMsg("Please wait until 1 or more player enter their username");
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        startGame();
-                    }
-                } else {
-                    // controlli nickname
-                    addConnectedPlayer(client, msg);
-                }
-                break;
-            case GamePhase.COLORPHASE:
-                int playerId = 0;
-                for (int i : this.clients.keySet()) {
-                    if (this.clients.get(i).equals(client)) {
-                        playerId = i;
-                        break;
-                    }
-                }
-                try {
-                    if (msg.equals("B")) {
-                        chooseInitialColor(client, playerId, Color.BLUE);
-                    } else if (msg.equals("G")) {
-                        chooseInitialColor(client, playerId, Color.GREEN);
-                    } else if (msg.equals("Y")) {
-                        chooseInitialColor(client, playerId, Color.YELLOW);
-                    } else if (msg.equals("R")) {
-                        chooseInitialColor(client, playerId, Color.RED);
-                    } else {
-                        client.printMsg("Please select a valid color from one of the lists [B, G, Y, R]");
-                    }
-                } catch (RemoteException e) {
-
-                }
-                break;
-        }
-        // capire se input valido
-        // chiama metodo controller
-        // se va tutto bene devi dire che va tutto bene
-        // se va tutto male devi dire che va tutto male
     }
 
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) {
-        // check if the color is valid
-
-        // nickname
-        try {
-            if (clients.values().contains(client)) {
-                client.printMsg("You already registered an account with this computer, you cannot register more than one.");
-                return;
-            } else if (clients.size() > 4) {
-                for (VirtualView clientIterator : this.clients.values()) {
-                    client.printMsg("The game is full");
-                }
-                return;
-            }
-
-            this.controller.addPlayer(nickname);
-            clients.put(clients.size(), client);
-            System.out.println("New player connected!");
-            for (VirtualView clientIterator : this.clients.values()) {
-                clientIterator.printMsg("User " + nickname + " has ben added to game!");
-            }
-        } catch (NotUniquePlayerNicknameException e) {
+        if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
             try {
-                client.printMsg("The nickname already exists :/\nPlease enter a new one");
-            } catch (RemoteException ex) {
-                ex.printStackTrace();
+                if (this.clients.contains(client)) {
+                    client.printError("You already registered an account with this computer, you cannot register more than one.");
+                    return;
+                } else if (this.clients.size() >= Config.MAX_PLAYERS) {
+                    client.printError("The game is full");
+                    return;
+                }
+
+                this.controller.addPlayer(nickname);
+                this.clients.add(client);
+                System.out.println("New player connected!");
+                for (VirtualView clientIterator : this.clients) {
+                    clientIterator.printMessage("User " + nickname + " has ben added to game!");
+                }
+            } catch (NotUniquePlayerNicknameException e) {
+                try {
+                    client.printError("The nickname already exists :/\nPlease enter a new one");
+                } catch (RemoteException ex) {
+                    ex.printStackTrace();
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        } else {
+            try {
+                client.printError("You cannot do this action now");
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     @Override
     public void startGame() {
-        // TODO: change game phase to choosing colors
-        System.out.println("Starting game");
-        for (VirtualView client : clients.values()) {
-            try {
-                client.printMsg("Please enter a color [B, G, Y, R]");
-            } catch (RemoteException e) {
-                e.printStackTrace();
+        if (clients.size() >= 2) {
+            System.out.println("Starting game");
+            for (VirtualView client : this.clients) {
+                try {
+                    client.printMessage("Please choose your starter side [Front / Back]");
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+            this.controller.startGame();
+            this.controller.setGamePhase(GamePhase.CHOOSESTARTERSIDEPHASE);
+        }
+        else{
+            for (VirtualView client : this.clients) {
+                try {
+                    client.printMessage("Number of player insufficient");
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        this.controller.setGamePhase(GamePhase.COLORPHASE);
-    }
-
-    @Override
-    public void chooseInitialStarterSide(int playerIndex, Side side) throws RemoteException {
 
     }
 
     @Override
-    public void chooseInitialColor(VirtualView client, int playerIndex, Color color) throws RemoteException {
-        try {
-            this.controller.chooseInitialColor(playerIndex, color);
-        } catch (NotUniquePlayerColorException e) {
-            client.printMsg("The color was already selected by another user, please select a new one ;)");
+    public void chooseInitialStarterSide(VirtualView client, String sideValue) throws RemoteException {
+        if (controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
+            int playerIndex = clients.indexOf(client);
+            Side side = null;
+
+            try {
+                side = Side.valueOf(sideValue.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                client.printError("Invalid side, please enter a valid side (Front / Back)");
+                return;
+            }
+
+            this.controller.chooseInitialStarterSide(playerIndex, side);
+            this.numberAnswered++;
+            try {
+                client.printMessage("Thank you!!!");
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (numberAnswered == clients.size()) {
+                numberAnswered = 0;
+                for (VirtualView clientIterator : this.clients) {
+                    try {
+                        clientIterator.printMessage("Please select a valid color from one of the lists [Blue, Green, Yellow, Red]");
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                this.controller.setGamePhase(GamePhase.COLORPHASE);
+            }
         }
-        // understand if it was the last player that had to set the color, if so go to the next phase
+        else{
+            try {
+                client.printError("You cannot do this action now");
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
-    public void chooseInitialObjective(int playerIndex, int cardId) throws RemoteException {
+    public void chooseInitialColor(VirtualView client, String colorValue) throws RemoteException {
+        if (controller.getGamePhase().equals(GamePhase.COLORPHASE)) {
+            int playerIndex = clients.indexOf(client);
+            Color color;
 
+            try {
+                color = Color.valueOf(colorValue.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                client.printMessage("Please select a valid color from one of the lists [Blue, Green, Yellow, Red]");
+                return;
+            }
+
+            try {
+                this.controller.chooseInitialColor(playerIndex, color);
+                numberAnswered ++;
+            } catch (NotUniquePlayerColorException e) {
+                client.printError("The color was already selected by another user, please select a new one ;)");
+                return;
+            }
+
+            if (numberAnswered == clients.size()) {
+                numberAnswered = 0;
+                controller.colorChoosed();
+                try {
+                    for (VirtualView clientIterator : this.clients) {
+                        playerIndex = clients.indexOf(clientIterator);
+                        clientIterator.printMessage("Select one of the objective card from the selection [0, 1]: " + this.controller.getObjectiveCardOptions(playerIndex)[0].getId() + ", " + this.controller.getObjectiveCardOptions(playerIndex)[1].getId());
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                this.controller.setGamePhase(GamePhase.CHOOSEOBJECTIVEPHASE);
+            }
+        }
+        else{
+            try {
+                client.printError("You cannot do this action now");
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
-    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws RemoteException {
+    public void chooseInitialObjective(VirtualView client, String cardIdString) throws RemoteException {
+        if (controller.getGamePhase().equals(GamePhase.CHOOSEOBJECTIVEPHASE)) {
+            int playerIndex = clients.indexOf(client);
+            int cardId;
 
+            try {
+                cardId = Integer.parseInt(cardIdString);
+            } catch (NumberFormatException e) {
+                client.printError("Please enter a valid card ID");
+                return;
+            }
+
+            try {
+                this.controller.chooseInitialObjective(playerIndex, cardId);
+                numberAnswered++;
+            } catch (InvalidObjectiveCardException e) {
+                client.printError("The objective card you selected was invalid, please try again");
+                return;
+            }
+
+            if (numberAnswered == clients.size()) {
+                numberAnswered = 0;
+                for (VirtualView clientIterator : this.clients) {
+                    try {
+                        clientIterator.printMessage("The preparation phase is over, the first player can now play is turn");
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                this.controller.setGamePhase(GamePhase.MAINPHASE);
+            }
+        }
+        else{
+            try {
+                client.printError("You cannot do this action now");
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
-    public void drawCard(DrawType drawType) throws RemoteException {
+    public void placeCard(VirtualView client, String placingCardIdString, String tableCardIdString, String tableCornerPos, String placingCardSideValue) throws RemoteException {
+        int playerIndex = clients.indexOf(client);
 
+        if (controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
+            (controller.getTurnPhase().equals(TurnPhase.PLACINGPHASE)) &&
+            (isRightTurn(playerIndex))){
+            int placingCardId;
+            int tableCardId;
+            Side placingCardSide;
+
+            try{
+                placingCardId = Integer.parseInt(placingCardIdString);
+                tableCardId = Integer.parseInt(tableCardIdString);
+            } catch (NumberFormatException e) {
+                client.printError("Please enter valid card ids");
+                return;
+            }
+
+            try{
+                placingCardSide = Side.valueOf(placingCardSideValue.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                client.printError("Please enter a valid side (Front / Back)");
+                return;
+            }
+
+
+            try {
+                this.controller.placeCard(playerIndex, placingCardId, tableCardId, CornerPos.valueOf(tableCornerPos), placingCardSide);
+            } catch (CardNotPlacedException | WrongInstanceTypeException e) {
+                throw new RuntimeException(e);
+            } catch (CardIsNotInHandException e) {
+                client.printError("Sorry, but the card is not in your hand");
+            } catch (WrongPlacingPositionException e) {
+                client.printError("");
+            } catch (PlacingOnHiddenCornerException e) {
+                client.printError("The selected corner does not exist, please select an existing corner");
+            } catch (CardAlreadyPresentOnTheCornerException e) {
+                client.printError("The selected corner was already connected to another card");
+            } catch (GoldCardCannotBePlacedException e) {
+                client.printError("You don't have the elements to place this card");
+            } catch (CardAlreadPlacedException e) {
+                client.printError("... You are certainly hackering ...");
+            }
+        } else {
+            try {
+                client.printError("You cannot do this action now");
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
-    public void flipCard(int playerIndex, int cardId) throws RemoteException {
+    public void drawCard(VirtualView client, String drawTypeValue) throws RemoteException {
+        int playerIndex = clients.indexOf(client);
 
+        if (controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
+            (controller.getTurnPhase().equals(TurnPhase.DRAWPHASE)) &&
+            (isRightTurn(playerIndex))){
+            DrawType drawType;
+
+            try{
+                drawType = DrawType.valueOf(drawTypeValue.toUpperCase());
+            } catch (IllegalArgumentException e){
+                client.printError("Please enter a valid draw type");
+                return;
+            }
+
+            try {
+                this.controller.drawCard(drawType);
+            } catch (InvalidHandException e) {
+                client.printError("Too many cards in hand");
+            }
+        }
+        else{
+            try {
+                client.printError("You cannot do this action now");
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public void flipCard(VirtualView client, String cardIdString) throws RemoteException {
+        if (controller.getGamePhase().equals(GamePhase.MAINPHASE)) {
+            int playerIndex = clients.indexOf(client);
+            int cardId;
+
+            try {
+                cardId = Integer.parseInt(cardIdString);
+            } catch (NumberFormatException e) {
+                client.printError("Please enter a valid card id");
+                return;
+            }
+
+            try {
+                this.controller.flipCard(playerIndex, cardId);
+            } catch (CardIsNotInHandException e) {
+                client.printError("The selected card is not in hand");
+            }
+        } else {
+            try {
+                client.printError("You cannot do this action now");
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
     public void openChat() {
-
+        this.controller.openChat();
     }
 
     @Override
-    public void addMessage(Player player, String content) {
-
+    public void addMessage(VirtualView client, String content) {
+        this.controller.addMessage(clients.indexOf(client), content);
     }
 
+    private boolean isRightTurn(int playerIndex){
+        return (controller.getCurrentPlayerIndex() == playerIndex);
+    }
 }

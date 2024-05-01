@@ -42,6 +42,18 @@ public class Controller {
         this.gameState.setCurrentGamePhase(gamePhase);
     }
 
+    public TurnPhase getTurnPhase() {
+        return this.gameState.getCurrentGameTurn();
+    }
+
+    public int getCurrentPlayerIndex(){
+        return this.gameState.getCurrentPlayerIndex();
+    }
+
+    public ObjectiveCard[] getObjectiveCardOptions(int playerId) {
+        return this.gameState.getPlayer(playerId).getObjectiveCardOptions();
+    }
+
     //settare players
 
     public void addPlayer(String nickname) throws NotUniquePlayerNicknameException {
@@ -58,19 +70,24 @@ public class Controller {
 
     public void chooseInitialStarterSide(int playerIndex, Side side){
         gameState.setStarterSide(playerIndex, side);
-        gameState.chooseStarterSidePhase();
+        //gameState.chooseStarterSidePhase();
     }
 
     public void chooseInitialColor(int playerIndex, Color color) throws NotUniquePlayerColorException {
         gameState.setColor(playerIndex, color);
-        gameState.chooseColorPhase();
+        //gameState.chooseColorPhase();
     }
 
-    public void chooseInitialObjective(int playerIndex, int cardId) throws InvalidObjectiveCardException {
-        gameState.setSecretObjective(playerIndex, cardId);
-        gameState.chooseObjectivePhase();
+    public void chooseInitialObjective(int playerIndex, int cardIndex) throws InvalidObjectiveCardException {
+        //cardId is 0 or 1, index of CardObjectiveOptions
+        gameState.setSecretObjective(playerIndex, cardIndex);
+        //gameState.chooseObjectivePhase();
     }
 
+    public void colorChoosed(){
+        gameState.setHands();
+        gameState.setObjectives();
+    }
 
     //----------------place, draw, flip-----------------------
 
@@ -94,8 +111,8 @@ public class Controller {
         tableCard = gameState.getCornerCard(tableCardId);
         if (tableCard == null) throw new WrongInstanceTypeException("table card is not a CornerCard");
 
-        Corner placingCorner = placingCard.getCorners(placingCardSide)[placingCornerPos.getCornerPosValue()];
-        Corner tableCorner = tableCard.getCorners(player.getPlacedCardsMap().get(tableCardId))[tableCornerPos.getCornerPosValue()];
+        Corner placingCorner = placingCard.getCorners(placingCardSide).get(placingCornerPos.ordinal());
+        Corner tableCorner = tableCard.getCorners(player.getPlacedCardsMap().get(tableCardId)).get(tableCornerPos.ordinal());
 
         if (!player.getHandCardsMap().containsKey(placingCardId)) throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
 
@@ -180,9 +197,12 @@ public class Controller {
 
     }
 
-    public void flipCard(int playerIndex, int cardId) {
+    public void flipCard(int playerIndex, int cardId) throws CardIsNotInHandException {
         Player player = gameState.getPlayerByIndex(playerIndex);
         Side side;
+        if (!player.getHandCardsMap().containsKey(cardId)){
+            throw new CardIsNotInHandException("The card" + cardId + " is not in the player" + playerIndex + "hand");
+        }
         if (player.getHandCardsMap().get(cardId).equals(Side.FRONT)){
             side = Side.BACK;
         } else {
@@ -193,7 +213,7 @@ public class Controller {
 
     public void openChat(){}
 
-    public void addMessage(Player player, String content){}
+    public void addMessage(int playerIndex, String content){}
 
 
 }

@@ -2,5 +2,5 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 public interface ElementTypeInterface {
 
-    String getDisplayableType();
+    public String getDisplayableType();
 }

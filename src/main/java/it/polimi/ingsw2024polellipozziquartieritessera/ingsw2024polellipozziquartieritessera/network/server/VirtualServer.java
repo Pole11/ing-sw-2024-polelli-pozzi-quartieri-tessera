@@ -18,26 +18,25 @@ public interface VirtualServer extends Remote {
     // flip
     // place
     // draw
-    public void sendInput(VirtualView client, String msg) throws RemoteException;
 
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException;
 
     public void startGame() throws RemoteException;
 
-    public void chooseInitialStarterSide(int playerIndex, Side side) throws RemoteException;
+    public void chooseInitialStarterSide(VirtualView client, String side) throws RemoteException;
 
-    public void chooseInitialColor(VirtualView client, int playerIndex, Color color) throws RemoteException;
+    public void chooseInitialColor(VirtualView client, String color) throws RemoteException;
 
-    public void chooseInitialObjective(int playerIndex, int cardId) throws RemoteException;
+    public void chooseInitialObjective(VirtualView client, String cardId) throws RemoteException;
 
-    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws RemoteException;
+    public void placeCard(VirtualView client, String placingCardId, String tableCardId, String tableCornerPos, String placingCardSide) throws RemoteException;
 
-    public void drawCard(DrawType drawType) throws RemoteException;
+    public void drawCard(VirtualView client, String drawType) throws RemoteException;
 
-    public void flipCard(int playerIndex, int cardId) throws RemoteException;
+    public void flipCard(VirtualView client, String cardId) throws RemoteException;
 
     public void openChat() throws RemoteException;
 
-    public void addMessage(Player player, String content) throws RemoteException;
+    public void addMessage(VirtualView client, String content) throws RemoteException;
 
 }
