@@ -107,7 +107,6 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
             System.out.print(e + ", ");
         });
         System.out.print("]\n");
-
     }
 
     public void printError(String msg) {

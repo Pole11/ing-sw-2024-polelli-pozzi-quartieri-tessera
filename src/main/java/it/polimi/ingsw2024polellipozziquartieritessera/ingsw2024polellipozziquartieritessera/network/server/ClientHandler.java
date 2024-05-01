@@ -21,12 +21,13 @@ public class ClientHandler implements VirtualView {
     public void runVirtualView() throws IOException {
         String line;
         // Read message type
+        System.out.println("client connected");
         while ((line = input.readLine()) != null) {
+            System.out.println(line);
             String[] message = line.split(", ");
             // Read message and perform action
             switch (message[0]) {
                 case "ADDUSER":
-                    System.out.println("nicname received: " + message[1]);
                     server.addConnectedPlayer(this, message[1]);
                     break;
                 case "STARTGAME":
@@ -56,6 +57,7 @@ public class ClientHandler implements VirtualView {
                     break;
             }
         }
+        System.out.println("player disconnected");
     }
 
     @Override

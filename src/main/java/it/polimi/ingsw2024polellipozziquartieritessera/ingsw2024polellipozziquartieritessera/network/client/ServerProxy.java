@@ -25,62 +25,62 @@ public class ServerProxy implements VirtualServer {
 
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException {
-        output.print("ADDUSER, " + nickname);
+        output.println("ADDUSER, " + nickname);
         output.flush();
-        System.out.println("printed user on buffer");
+        System.out.println("printlned user on buffer");
     }
 
     @Override
     public void startGame() throws RemoteException {
-        output.print("STARTGAME");
+        output.println("STARTGAME");
         output.flush();
     }
 
     @Override
     public void chooseInitialStarterSide(VirtualView client, String side) throws RemoteException {
-        output.print("CHOOSESTARTERSIDE, " + side);
+        output.println("CHOOSESTARTERSIDE, " + side);
         output.flush();
     }
 
     @Override
     public void chooseInitialColor(VirtualView client, String color) throws RemoteException {
-        output.print("CHOOSEINITIALCOLOR, " + color);
+        output.println("CHOOSEINITIALCOLOR, " + color);
         output.flush();
     }
 
     @Override
     public void chooseInitialObjective(VirtualView client, String cardId) throws RemoteException {
-        output.print("CHOOSEINITIALOBJECTIVE, " + cardId);
+        output.println("CHOOSEINITIALOBJECTIVE, " + cardId);
         output.flush();
     }
 
     @Override
     public void placeCard(VirtualView client, String placingCardId, String tableCardId, String tableCornerPos, String placingCardSide) throws RemoteException {
-        output.print("PLACECARD, " + placingCardId + tableCardId + tableCornerPos + placingCardSide);
+        output.println("PLACECARD, " + placingCardId + tableCardId + tableCornerPos + placingCardSide);
         output.flush();
     }
 
     @Override
     public void drawCard(VirtualView client, String drawType) throws RemoteException {
-        output.print("DRAWCARD, " + drawType);
+        output.println("DRAWCARD, " + drawType);
         output.flush();
     }
 
     @Override
     public void flipCard(VirtualView client, String cardId) throws RemoteException {
-        output.print("FLIPCARD, " + cardId);
+        output.println("FLIPCARD, " + cardId);
         output.flush();
     }
 
     @Override
     public void openChat() throws RemoteException {
-        output.print("OPENCHAT");
+        output.println("OPENCHAT");
         output.flush();
     }
 
     @Override
     public void addMessage(VirtualView client, String content) throws RemoteException {
-        output.print("ADDMESSAGE, " + content);
+        output.println("ADDMESSAGE, " + content);
         output.flush();
     }
 }

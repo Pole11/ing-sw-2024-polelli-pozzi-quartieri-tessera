@@ -61,6 +61,7 @@ public class SocketClient implements VirtualView {
     private void manageInput(String[] message) throws RemoteException {
         switch (message[0].toLowerCase()) {
             case Config.HELP_STRING:
+                this.printCommands();
                 break;
             case Config.ADDUSER_STRING:
                 server.addConnectedPlayer(this, message[1]);
@@ -96,11 +97,24 @@ public class SocketClient implements VirtualView {
         }
     }
 
-    @Override
-    public void printMessage(String msg) throws RemoteException {
-        System.out.print("\nINFO FROM SERVER: " + msg + "\n The possible commands are: [");
 
+    private void printCommands() {
+        System.out.print("The possible commands are: [");
+        Arrays.stream(Command.values()).forEach(e->{
+            System.out.print(e + ", ");
+        });
+        System.out.print("]\n");
     }
+
+    @Override
+    public void printMessage(String msg) {
+        System.out.print("\nINFO FROM SERVER: " + msg + "\n The possible commands are: [");
+        Arrays.stream(Command.values()).forEach(e->{
+            System.out.print(e + ", ");
+        });
+        System.out.print("]\n");
+    }
+
 
     @Override
     public void printError(String msg) throws RemoteException {

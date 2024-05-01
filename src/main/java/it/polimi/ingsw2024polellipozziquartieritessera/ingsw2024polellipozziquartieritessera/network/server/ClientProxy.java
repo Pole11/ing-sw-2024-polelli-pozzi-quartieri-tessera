@@ -15,10 +15,12 @@ public class ClientProxy implements VirtualView {
 
     @Override
     public void printMessage(String message) throws RemoteException {
-        output.print("MESSAGE, " + message);
+        output.println("MESSAGE, " + message);
+        output.flush();
     }
 
     public void printError(String error) throws RemoteException {
-        output.print("ERROR, " + error);
+        output.println("ERROR, " + error);
+        output.flush();
     }
 }

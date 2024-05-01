@@ -97,16 +97,13 @@ public class Server implements VirtualServer {
 
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) {
+
         if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
             try {
-                if (this.clients.contains(client)) {
-                    client.printError("You already registered an account with this computer, you cannot register more than one.");
-                    return;
-                } else if (this.clients.size() >= Config.MAX_PLAYERS) {
+                 if (this.clients.size() >= Config.MAX_PLAYERS) {
                     client.printError("The game is full");
                     return;
                 }
-
                 this.controller.addPlayer(nickname);
                 this.clients.add(client);
                 System.out.println("New player connected!");
