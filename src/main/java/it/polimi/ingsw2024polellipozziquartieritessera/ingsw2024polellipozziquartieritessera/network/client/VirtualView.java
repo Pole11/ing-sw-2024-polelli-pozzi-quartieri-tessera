@@ -6,4 +6,5 @@ import java.rmi.*;
 public interface VirtualView extends Remote {
     void printMessage(String message) throws RemoteException;
     void printError(String error) throws RemoteException;
+    void ping(String ping) throws RemoteException;
 }

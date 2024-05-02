@@ -1,11 +1,14 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.GamePhase;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.rmi.RemoteException;
+
 
 public class ClientHandler implements VirtualView {
     final Server server;
@@ -20,44 +23,45 @@ public class ClientHandler implements VirtualView {
 
     public void runVirtualView() throws IOException {
         String line;
-        // Read message type
-        System.out.println("client connected");
+        System.out.println("New Socket client connected");
         while ((line = input.readLine()) != null) {
             System.out.println(line);
             String[] message = line.split(", ");
             // Read message and perform action
-            switch (message[0]) {
-                case "ADDUSER":
+            switch (Command.valueOf(message[0].toUpperCase())) {
+                case Command.ADDUSER:
                     server.addConnectedPlayer(this, message[1]);
                     break;
-                case "STARTGAME":
+                case Command.START:
                     server.startGame();
-                case "CHOOSESTARTERSIDE":
+                    break;
+                case Command.CHOOSESTARTER:
                     server.chooseInitialStarterSide(this, message[1]);
-                case "CHOOSEINITIALCOLOR":
+                    break;
+                case Command.CHOOSECOLOR:
                     server.chooseInitialColor(this, message[1]);
                     break;
-                case "CHOOSEINITIALOBJECTIVE":
+                case Command.CHOOSEOBJECTIVE:
                     server.chooseInitialObjective(this, message[1]);
                     break;
-                case "PLACECARD":
+                case Command.PLACECARD:
                     server.placeCard(this, message[1], message[2], message[3], message[4]);
                     break;
-                case "DRAWCARD":
+                case Command.DRAWCARD:
                     server.drawCard(this, message[1]);
                     break;
-                case "FLIPCARD":
+                case Command.FLIPCARD:
                     server.flipCard(this, message[1]);
                     break;
-                case "OPENCHAT":
+                case Command.OPENCHAT:
                     server.openChat();
                     break;
                 default:
-                    System.err.println("[INVALID MESSAGE]");
+                    System.err.println("[INVALID MESSAGE FROM CLIENT]");
                     break;
             }
         }
-        System.out.println("player disconnected");
+        //System.out.println("player disconnected");
     }
 
     @Override
@@ -68,5 +72,10 @@ public class ClientHandler implements VirtualView {
     @Override
     public void printError(String error) throws RemoteException {
         view.printError(error);
+    }
+
+    @Override
+    public void ping(String ping) throws RemoteException {
+        view.ping(ping);
     }
 }

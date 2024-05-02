@@ -25,6 +25,7 @@ public class GameState {
 
     private final Board mainBoard;
     private final ArrayList<Player> players; //player[0] is blackPlayer
+    private final ArrayList<Boolean> playersConnected; //player[0] is blackPlayer
     private final Chat chat;
     private int currentPlayerIndex;
     private GamePhase currentGamePhase;
@@ -34,6 +35,7 @@ public class GameState {
 
     // CONSTRUCTOR
     public GameState() {
+        this.playersConnected = new ArrayList<>();
         this.goldCardsMap = new HashMap<>();
         this.resourceCardsMap = new HashMap<>();
         this.starterCardsMap = new HashMap<>();
@@ -46,7 +48,7 @@ public class GameState {
         this.players = new ArrayList<>();
         this.currentPlayerIndex = 0;
         this.currentGamePhase = GamePhase.NICKNAMEPHASE;
-        this.currentGameTurn = null;
+        this.currentGameTurn = TurnPhase.PLACINGPHASE;
         this.chat = new Chat();
         this.isLastTurn = false;
 
@@ -186,6 +188,14 @@ public class GameState {
     }
 
     // METHODS
+
+    public void setPlayersConnected(int index, boolean connected){
+        playersConnected.set(index, Boolean.valueOf(connected));
+    }
+
+    public boolean isConnected(int index){
+        return playersConnected.get(index);
+    }
 
     public void setPlayer(int index, Player player) throws NotUniquePlayerNicknameException{
         for (int j = 0; j < players.size(); j++) {

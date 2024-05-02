@@ -216,4 +216,8 @@ public class Controller {
     public void addMessage(int playerIndex, String content){}
 
 
+    public void setConnected(int index, boolean connected){
+        gameState.setPlayersConnected(index, connected);
+    }
+
 }

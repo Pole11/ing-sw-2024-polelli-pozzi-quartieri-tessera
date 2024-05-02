@@ -27,30 +27,29 @@ public class ServerProxy implements VirtualServer {
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException {
         output.println("ADDUSER, " + nickname);
         output.flush();
-        System.out.println("printlned user on buffer");
     }
 
     @Override
     public void startGame() throws RemoteException {
-        output.println("STARTGAME");
+        output.println("START");
         output.flush();
     }
 
     @Override
     public void chooseInitialStarterSide(VirtualView client, String side) throws RemoteException {
-        output.println("CHOOSESTARTERSIDE, " + side);
+        output.println("CHOOSESTARTER, " + side);
         output.flush();
     }
 
     @Override
     public void chooseInitialColor(VirtualView client, String color) throws RemoteException {
-        output.println("CHOOSEINITIALCOLOR, " + color);
+        output.println("CHOOSECOLOR, " + color);
         output.flush();
     }
 
     @Override
     public void chooseInitialObjective(VirtualView client, String cardId) throws RemoteException {
-        output.println("CHOOSEINITIALOBJECTIVE, " + cardId);
+        output.println("CHOOSEOBJECTIVE, " + cardId);
         output.flush();
     }
 

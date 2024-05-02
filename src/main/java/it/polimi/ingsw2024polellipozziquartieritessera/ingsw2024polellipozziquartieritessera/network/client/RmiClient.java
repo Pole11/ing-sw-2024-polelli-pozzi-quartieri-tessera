@@ -18,7 +18,8 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     private void run() {
         try {
-            this.server.connectRmi(this);
+            System.out.println("Welcome to CODEX!");
+
             // CHIEDI SE VUOLE GUI O TUI
             Scanner scan = new Scanner(System.in);
             System.out.print("Do you GUI? [Y/n] ");
@@ -26,65 +27,76 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
             if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
                 runGui();
             } else if (input.equalsIgnoreCase("n")) {
+                this.server.connectRmi(this);
                 runCli();
             } else {
                 System.out.println("Please enter a valid input!");
             }
+
         } catch (RemoteException e) {
 
         }
     }
 
-    private void runCli() throws RemoteException {
-        System.out.println("Welcome to CODEX!");
-
+    private void runCli() {
         boolean running = true;
         Scanner scan = new Scanner(System.in);
+        System.out.println("Please enter a nickname to start, with the command ADDUSER <nickname>");
         while (running) {
             System.out.print("> ");
             String line = scan.nextLine();
             String[] message = line.split(" ");
             if (line != null && !line.isEmpty() && !line.isBlank() && !line.equals("")) {
-                this.manageInput(message);
+                try {
+                    this.manageInput(message);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
 
     private void manageInput(String[] message) throws RemoteException {
-        switch(message[0].toLowerCase()) {
-            case Config.HELP_STRING:
+        try {
+            Command.valueOf(message[0].toUpperCase());
+        } catch(IllegalArgumentException e) {
+            System.err.println("INVALID COMMAND");
+            return;
+        }
+
+        switch (Command.valueOf(message[0].toUpperCase())) {
+            case Command.HELP:
                 this.printCommands();
                 break;
-            case Config.ADDUSER_STRING:
+            case Command.ADDUSER:
                 server.addConnectedPlayer(this, message[1]);
                 break;
-            case Config.START_STRING:
+            case Command.START:
                 server.startGame();
                 break;
-            case Config.CHOOSESTARTER_STRING:
+            case Command.CHOOSESTARTER:
                 server.chooseInitialStarterSide(this, message[1]);
                 break;
-            case Config.CHOOSECOLOR_STRING:
+            case Command.CHOOSECOLOR:
                 server.chooseInitialColor(this, message[1]);
                 break;
-            case Config.CHOOSEOBJECTIVE_STRING:
+            case Command.CHOOSEOBJECTIVE:
                 server.chooseInitialObjective(this, message[1]);
                 break;
-            case Config.PLACECARD_STRING:
+            case Command.PLACECARD:
                 server.placeCard(this, message[1], message[2], message[3], message[4]);
                 break;
-            case Config.DRAWCARD_STRING:
+            case Command.DRAWCARD:
                 server.drawCard(this, message[1]);
                 break;
-            case Config.FLIPCARD_STRING:
+            case Command.FLIPCARD:
                 server.flipCard(this, message[1]);
                 break;
-            case Config.OPENCHAT_STRING:
+            case Command.OPENCHAT:
                 server.openChat();
                 break;
-            case Config.ADDMESSAGE_STRING:
-                //sarà sbagliato perchè splitta sugli spazi
-                server.addMessage(this, message[1]);
+            default:
+                System.err.println("[INVALID MESSAGE] \n >");
                 break;
         }
     }
@@ -106,11 +118,16 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
         Arrays.stream(Command.values()).forEach(e->{
             System.out.print(e + ", ");
         });
-        System.out.print("]\n");
+        System.out.print("]\n>");
     }
 
     public void printError(String msg) {
-        System.err.print("\nERROR FROM SERVER: " + msg + "\n");
+        System.err.print("\nERROR FROM SERVER: " + msg + "\n>");
+    }
+
+    @Override
+    public void ping(String ping) throws RemoteException {
+
     }
 
     public static void execute(String host, String port) {

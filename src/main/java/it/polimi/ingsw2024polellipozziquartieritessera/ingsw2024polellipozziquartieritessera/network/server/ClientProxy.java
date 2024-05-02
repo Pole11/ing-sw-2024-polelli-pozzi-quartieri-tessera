@@ -23,4 +23,10 @@ public class ClientProxy implements VirtualView {
         output.println("ERROR, " + error);
         output.flush();
     }
+
+    @Override
+    public void ping(String ping) throws RemoteException {
+        output.println("PING, " + ping);
+        output.flush();
+    }
 }

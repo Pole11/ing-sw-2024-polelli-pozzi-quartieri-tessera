@@ -2,15 +2,14 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.rmi.server.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
@@ -19,13 +18,11 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 public class Server implements VirtualServer {
     final Controller controller;
-    final ArrayList<VirtualView> clients = new ArrayList<>();
+    final HashMap<Integer, VirtualView> clients = new HashMap<>();
     final ServerSocket listenSocket;
     int numberAnswered = 0;
     
@@ -64,7 +61,6 @@ public class Server implements VirtualServer {
         engine.runServer();
     }
 
-
     private void runServer() throws IOException {
         Socket clientSocket = null;
         while ((clientSocket = this.listenSocket.accept()) != null) {
@@ -73,10 +69,10 @@ public class Server implements VirtualServer {
 
             ClientHandler handler = new ClientHandler(this,  new BufferedReader(socketRx), new BufferedWriter(socketTx));
 
-            clients.add(handler);
             new Thread(() -> {
                 try {
                     handler.runVirtualView();
+                    System.out.println("Client disconnected");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -86,18 +82,11 @@ public class Server implements VirtualServer {
 
     @Override
     public void connectRmi(VirtualView client) throws RemoteException {
-        if (this.controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
-            System.out.println("New client connected");
-            client.printMessage("Please enter a nickname to start");
-        } else {
-            System.out.println("A client tried to connect");
-            client.printMessage("The game is full. Wait for the game to end :>");
-        }
+        System.out.println("New RMI client connected");
     }
 
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) {
-
         if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
             try {
                  if (this.clients.size() >= Config.MAX_PLAYERS) {
@@ -105,10 +94,12 @@ public class Server implements VirtualServer {
                     return;
                 }
                 this.controller.addPlayer(nickname);
-                this.clients.add(client);
+                this.clients.put(this.clients.size(), client);
                 System.out.println("New player connected!");
-                for (VirtualView clientIterator : this.clients) {
-                    clientIterator.printMessage("User " + nickname + " has ben added to game!");
+                for (VirtualView clientIterator : this.clients.values()) {
+                    if (ping(clientIterator)){
+                        clientIterator.printMessage("User " + nickname + " has ben added to game!");
+                    }
                 }
             } catch (NotUniquePlayerNicknameException e) {
                 try {
@@ -132,7 +123,7 @@ public class Server implements VirtualServer {
     public void startGame() {
         if (clients.size() >= 2) {
             System.out.println("Starting game");
-            for (VirtualView client : this.clients) {
+            for (VirtualView client : this.clients.values()) {
                 try {
                     client.printMessage("Please choose your starter side [Front / Back]");
                 } catch (RemoteException e) {
@@ -143,7 +134,7 @@ public class Server implements VirtualServer {
             this.controller.setGamePhase(GamePhase.CHOOSESTARTERSIDEPHASE);
         }
         else{
-            for (VirtualView client : this.clients) {
+            for (VirtualView client : this.clients.values()) {
                 try {
                     client.printMessage("Number of player insufficient");
                 } catch (RemoteException e) {
@@ -151,13 +142,12 @@ public class Server implements VirtualServer {
                 }
             }
         }
-
     }
 
     @Override
     public void chooseInitialStarterSide(VirtualView client, String sideValue) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
-            int playerIndex = clients.indexOf(client);
+            int playerIndex = getPlayerIndex(client);
             Side side = null;
 
             try {
@@ -177,7 +167,7 @@ public class Server implements VirtualServer {
 
             if (numberAnswered == clients.size()) {
                 numberAnswered = 0;
-                for (VirtualView clientIterator : this.clients) {
+                for (VirtualView clientIterator : this.clients.values()) {
                     try {
                         clientIterator.printMessage("Please select a valid color from one of the lists [Blue, Green, Yellow, Red]");
                     } catch (RemoteException e) {
@@ -199,7 +189,7 @@ public class Server implements VirtualServer {
     @Override
     public void chooseInitialColor(VirtualView client, String colorValue) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.COLORPHASE)) {
-            int playerIndex = clients.indexOf(client);
+            int playerIndex = getPlayerIndex(client);
             Color color;
 
             try {
@@ -221,8 +211,8 @@ public class Server implements VirtualServer {
                 numberAnswered = 0;
                 controller.colorChoosed();
                 try {
-                    for (VirtualView clientIterator : this.clients) {
-                        playerIndex = clients.indexOf(clientIterator);
+                    for (VirtualView clientIterator : this.clients.values()) {
+                        getPlayerIndex(clientIterator);
                         clientIterator.printMessage("Select one of the objective card from the selection [0, 1]: " + this.controller.getObjectiveCardOptions(playerIndex)[0].getId() + ", " + this.controller.getObjectiveCardOptions(playerIndex)[1].getId());
                     }
                 } catch (RemoteException e) {
@@ -243,7 +233,7 @@ public class Server implements VirtualServer {
     @Override
     public void chooseInitialObjective(VirtualView client, String cardIdString) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.CHOOSEOBJECTIVEPHASE)) {
-            int playerIndex = clients.indexOf(client);
+            int playerIndex = getPlayerIndex(client);
             int cardId;
 
             try {
@@ -263,7 +253,7 @@ public class Server implements VirtualServer {
 
             if (numberAnswered == clients.size()) {
                 numberAnswered = 0;
-                for (VirtualView clientIterator : this.clients) {
+                for (VirtualView clientIterator : this.clients.values()) {
                     try {
                         clientIterator.printMessage("The preparation phase is over, the first player can now play is turn");
                     } catch (RemoteException e) {
@@ -284,7 +274,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void placeCard(VirtualView client, String placingCardIdString, String tableCardIdString, String tableCornerPos, String placingCardSideValue) throws RemoteException {
-        int playerIndex = clients.indexOf(client);
+        int playerIndex = getPlayerIndex(client);
 
         if (controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
             (controller.getTurnPhase().equals(TurnPhase.PLACINGPHASE)) &&
@@ -307,7 +297,6 @@ public class Server implements VirtualServer {
                 client.printError("Please enter a valid side (Front / Back)");
                 return;
             }
-
 
             try {
                 this.controller.placeCard(playerIndex, placingCardId, tableCardId, CornerPos.valueOf(tableCornerPos), placingCardSide);
@@ -337,7 +326,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void drawCard(VirtualView client, String drawTypeValue) throws RemoteException {
-        int playerIndex = clients.indexOf(client);
+        int playerIndex = getPlayerIndex(client);
 
         if (controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
             (controller.getTurnPhase().equals(TurnPhase.DRAWPHASE)) &&
@@ -369,7 +358,7 @@ public class Server implements VirtualServer {
     @Override
     public void flipCard(VirtualView client, String cardIdString) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.MAINPHASE)) {
-            int playerIndex = clients.indexOf(client);
+            int playerIndex = getPlayerIndex(client);
             int cardId;
 
             try {
@@ -400,7 +389,38 @@ public class Server implements VirtualServer {
 
     @Override
     public void addMessage(VirtualView client, String content) {
-        this.controller.addMessage(clients.indexOf(client), content);
+        this.controller.addMessage(getPlayerIndex(client), content);
+    }
+
+    private boolean ping(VirtualView client){
+        try {
+            client.ping("ping");
+        } catch (RemoteException e) {
+            System.out.println("client" + getPlayerIndex(client) + "is disconnected");
+            return false;
+        }
+        return true;
+    }
+
+
+
+    private void updatePlayersConnected(){
+        AtomicInteger index = new AtomicInteger();
+        clients.values().stream().forEach(e->{
+            index.getAndIncrement();
+            ping(e);
+            boolean connected = true;
+            controller.setConnected(index.get(), connected);
+        });
+    }
+
+    private int getPlayerIndex(VirtualView client) {
+        for (int i : this.clients.keySet()) {
+            if (this.clients.get(i).equals(client)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private boolean isRightTurn(int playerIndex){
