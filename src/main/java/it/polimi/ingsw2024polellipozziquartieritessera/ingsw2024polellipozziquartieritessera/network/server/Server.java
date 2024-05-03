@@ -40,16 +40,13 @@ public class Server implements VirtualServer {
         } else {
             gameState = Populate.populate();
         }
-        // listen to socket
         String host = argv[0];
         int socketport = Integer.parseInt(argv[1]);
         int rmiport = Integer.parseInt(argv[2]);
 
+        // listen to socket
         ServerSocket listenSocket = new ServerSocket(socketport);
         Server engine = new Server(listenSocket, new Controller(gameState));
-
-        //forse non funziona
-        //se non funziona da provare definire engine come VirtualServer e ((Server) engine).runServer
 
         // listen to rmi
         System.setProperty("java.rmi.server.hostname", host);
@@ -58,6 +55,7 @@ public class Server implements VirtualServer {
         Registry registry = LocateRegistry.createRegistry(rmiport);
         registry.rebind(name, stub);
 
+        //listen to socket
         engine.runServer();
     }
 
