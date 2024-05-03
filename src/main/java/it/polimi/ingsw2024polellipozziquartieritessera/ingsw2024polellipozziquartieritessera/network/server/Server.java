@@ -52,12 +52,12 @@ public class Server implements VirtualServer {
         //se non funziona da provare definire engine come VirtualServer e ((Server) engine).runServer
 
         // listen to rmi
-        //VirtualServer engine = new Server(new Controller(gameState));
         System.setProperty("java.rmi.server.hostname", host);
         String name = "VirtualServer";
         VirtualServer stub = (VirtualServer) UnicastRemoteObject.exportObject(engine, 0);
         Registry registry = LocateRegistry.createRegistry(rmiport);
         registry.rebind(name, stub);
+
         engine.runServer();
     }
 

@@ -5,16 +5,15 @@ import argparse
 import re
 
 # Define global variables
-in_file_path = "./uml.md"
-out_file_path = "./uml-export.md"
-out_pdf_file_path = "./uml-export.pdf"
+in_file_path = "./net.md"
+out_file_path = "./net-export.md"
+out_pdf_file_path = "./gc10-net.pdf"
 pandoc_comand = "pandoc -i " + out_file_path + " -o " + out_pdf_file_path
 frontmatter_content = '''---
-title: "GC10 UML"
+title: "GC10 Network"
 sub-title: "Peer Review Document"
 toc: true
-lof: true
-toc-title: Table Of Contents
+toc-title: Indice
 author:
 - Riccardo Polelli
 - Filippo Pozzi

@@ -94,7 +94,6 @@ About element:
     - example of 1 Quill and  2 Inkwell: `element = [Quill, Inkwell, Inkwell]` 
 
 Order from top-left to bottom-left \[0-3\]
->>>>>>> Stashed changes
 
 ```
 01  

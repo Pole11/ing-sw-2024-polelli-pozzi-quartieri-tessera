@@ -17,7 +17,7 @@ public class SocketClient implements VirtualView {
     final BufferedReader input;
     final ServerProxy server;
 
-    protected SocketClient(BufferedReader input, BufferedWriter output) {
+    private SocketClient(BufferedReader input, BufferedWriter output) {
         this.input = input;
         this.server = new ServerProxy(output);
     }
@@ -164,10 +164,10 @@ public class SocketClient implements VirtualView {
     public static void execute(String host, String portString) throws IOException {
 
         int port = Integer.parseInt(portString);
-        Socket serverSocket = new Socket(host, port);
+        Socket socketToServer = new Socket(host, port);
 
-        InputStreamReader socketRx = new InputStreamReader(serverSocket.getInputStream());
-        OutputStreamWriter socketTx = new OutputStreamWriter(serverSocket.getOutputStream());
+        InputStreamReader socketRx = new InputStreamReader(socketToServer.getInputStream());
+        OutputStreamWriter socketTx = new OutputStreamWriter(socketToServer.getOutputStream());
 
         new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx)).run();
     }

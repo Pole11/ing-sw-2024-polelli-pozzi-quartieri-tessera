@@ -12,7 +12,7 @@ import java.rmi.*;
 public class RmiClient extends UnicastRemoteObject implements VirtualView {
     final VirtualServer server;
 
-    protected RmiClient(VirtualServer server) throws RemoteException {
+    private RmiClient(VirtualServer server) throws RemoteException {
         this.server = server;
     }
 
