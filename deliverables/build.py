@@ -8,7 +8,7 @@ import re
 in_file_path = "./net.md"
 out_file_path = "./net-export.md"
 out_pdf_file_path = "./gc10-net.pdf"
-pandoc_comand = "pandoc -i " + out_file_path + " -o " + out_pdf_file_path
+pandoc_comand = "pandoc -f markdown-implicit_figures -i " + out_file_path + " -o " + out_pdf_file_path
 frontmatter_content = '''---
 title: "GC10 Network"
 sub-title: "Peer Review Document"
