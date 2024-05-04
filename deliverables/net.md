@@ -22,7 +22,7 @@ La architettura RMI è di facile comprensione, pensiamo che sia di maggiore rile
 
 Per poter facilitare lo sviluppo della parte `Server`, la chiamata di metodi al `Controller` vengono *unificate*, sia che siano provenienti dal socket, sia che siano provenienti da RMI.
 Questo comportamento viene raggiunto chiamando direttamente i metodi del `Server` dall'`RMIClient` nel caso di RMI e dal `ClientHandler` nel caso di socket, che una volta ricevuto un nuovo comando nel suo buffer di ricezione, se nota che è un comando disponibile, chiamerà lo stesso identico metodo chiamato da RMI.
-
+Per questo motivo sia RMI che Socket utilizzano metodi che hanno come argomenti stringhe, che vengono convertite nelle strutture dati apposite nei metodi del `Server`, in modo da chiamare i metodi corrispondenti del `Controller`, i metodi presenti nell'interfaccia `VirtualServer` sono infatti gli stessi metodi del `Controller` con gli argomenti di tipo Stringa al posto delle strutture dati usate nel `Model`
 
 ## Formattazione dei messaggi
 
@@ -45,10 +45,14 @@ Analogamente, nella comunicazione *Server to Client* i messaggi sono formattati 
 
 Lista di comandi possibili: `MESSAGE` , `ERROR` , `PING`.
 
+- `MESSAGE` : serve ad inviare alla view un feedback positivo (aggiornamento del model)
+- `ERROR` : serve ad inviare alla view un errore
+- `PING` : serve a verificare la connessione del client prima di inviargli un messaggio, ad un client viene inviato un ping prima di ogni messaggio effettivo, e vengono inviati dei ping periodici a tutti i client in modo che il `Model` sia a conoscenza dei giocatori connessi, per poter attribuire le fasi del gioco in modo corretto
+
 
 # Server
 
-- All'avvio, il Server istanzia un `Controller` del gioco e gestice la rete RMI e Socket, istanziando un `java.net.ServerSocket` per Socket e un RemoteObject per RMI sulla porte specificate dalla riga di comando, è presente infatti un singolo server che gestisce le chiamate da Socket e RMI.
+- All'avvio, il Server istanzia un `Controller` del gioco e gestice la rete RMI e Socket, istanziando un `java.net.ServerSocket` per Socket e un RemoteObject per RMI sulla porte specificate dalla riga di comando, è presente infatti un singolo server che gestisce le chiamate da Socket e RMI. L'istanziazione del Controller avviene pasandogli il `GameState`, istanziato con l'utilizzo di populate, dove viene usato il JSON per istanziare le carte e tutto quello che serve al `GameState`
 - Il `Server` si pone in attesa di una richiesta di associazione da parte di un client che ha intenzione comunicare con il server sulla porta appena aperta
 - RMI
   - I metodi del `Server` sono messi a disposizione diretta da parte del client
@@ -62,9 +66,9 @@ Lista di comandi possibili: `MESSAGE` , `ERROR` , `PING`.
   - Nel caso di feedback da comunicare al client, il metodo `ClientHandler.printMessage(String)` viene chiamato. Questo metodo, a sua volta, chiama `ClientProxy.printMessage(String)`, il quale formatta il messaggio secondo il nostro protocollo proprietario e lo scrive sul suo stream di output. Successivamente, il messaggio viene inviato al client attraverso il protocollo TCP/IP. La stessa cosa avviene nel caso di errori da comunicare al client, con le chiamate di `ClientHandler.printError(String)` e `ClientProxy.printError(String)`
 
 
-- TODO: Siega Ping da qualche parte
+# Client 
 
-# Client
+E' presente un Client che, a seconda che l'utente voglia utilizzare Socket o RMI, chiama il metodo Execute della classe corrispondente
 
 ## Socket Client
 

@@ -8,16 +8,7 @@ import java.rmi.*;
 
 //server che vede il client
 public interface VirtualServer extends Remote {
-    void connectRmi(VirtualView vv) throws RemoteException;
-
-    // qua metto tutte le chiamate al controller
-    // set username
-    // set color
-    // set starter side
-    // set objective
-    // flip
-    // place
-    // draw
+    public void connectRmi(VirtualView vv) throws RemoteException;
 
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException;
 
