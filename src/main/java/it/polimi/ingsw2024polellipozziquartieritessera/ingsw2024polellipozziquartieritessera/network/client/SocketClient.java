@@ -22,6 +22,17 @@ public class SocketClient implements VirtualView {
         this.server = new ServerProxy(output);
     }
 
+    public static void execute(String host, String portString) throws IOException {
+
+        int port = Integer.parseInt(portString);
+        Socket socketToServer = new Socket(host, port);
+
+        InputStreamReader socketRx = new InputStreamReader(socketToServer.getInputStream());
+        OutputStreamWriter socketTx = new OutputStreamWriter(socketToServer.getOutputStream());
+
+        new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx)).run();
+    }
+
     private void run() throws RemoteException {
         new Thread(() -> {
             try {
@@ -35,10 +46,10 @@ public class SocketClient implements VirtualView {
         System.out.print("Do you GUI? [Y/n] ");
         String input = scan.nextLine();
         if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
-            runGui();
+            Client.runGui();
         } else if (input.equalsIgnoreCase("n")) {
             this.server.connectRmi(this);
-            runCli();
+            Client.runCli(server, this);
         } else {
             System.out.println("Please enter a valid input!");
         }
@@ -68,85 +79,10 @@ public class SocketClient implements VirtualView {
         }
     }
 
-    private void runCli() throws RemoteException {
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Please enter a nickname to start, with the command ADDUSER <nickname>");
-        while (true) {
-            System.out.print("> ");
-            String line = scan.nextLine();
-            String[] message = line.split(" ");
-            if (line != null && !line.isEmpty() && !line.isBlank() && !line.equals("")) {
-                this.manageInput(message);
-            }
-        }
-    }
-
-    private void runGui() throws RemoteException {
-
-    }
-
-    private void manageInput(String[] message) throws RemoteException {
-        try {
-            Command.valueOf(message[0].toUpperCase());
-        } catch(IllegalArgumentException e) {
-            System.err.println("[4xx INVALID COMMAND]");
-            return;
-        }
-
-        switch (Command.valueOf(message[0].toUpperCase())) {
-            case Command.HELP:
-                this.printCommands();
-                break;
-            case Command.ADDUSER:
-                server.addConnectedPlayer(this, message[1]);
-                break;
-            case Command.START:
-                server.startGame();
-                break;
-            case Command.CHOOSESTARTER:
-                server.chooseInitialStarterSide(this, message[1]);
-                break;
-            case Command.CHOOSECOLOR:
-                server.chooseInitialColor(this, message[1]);
-                break;
-            case Command.CHOOSEOBJECTIVE:
-                server.chooseInitialObjective(this, message[1]);
-                break;
-            case Command.PLACECARD:
-                server.placeCard(this, message[1], message[2], message[3], message[4]);
-                break;
-            case Command.DRAWCARD:
-                server.drawCard(this, message[1]);
-                break;
-            case Command.FLIPCARD:
-                server.flipCard(this, message[1]);
-                break;
-            case Command.OPENCHAT:
-                server.openChat();
-                break;
-            case Command.ADDMESSAGE:
-                //sarà sbagliato perchè splitta sugli spazi
-                server.addMessage(this, message[1]);
-                break;
-        }
-    }
-
-
-    private void printCommands() {
-        System.out.print("The possible commands are: [");
-        Arrays.stream(Command.values()).forEach(e->{
-            System.out.print(e + ", ");
-        });
-        System.out.print("]\n>");
-    }
-
     @Override
     public void printMessage(String msg) {
         System.out.print("\nINFO FROM SERVER: " + msg + "\n The possible commands are: [");
-        Arrays.stream(Command.values()).forEach(e->{
-            System.out.print(e + ", ");
-        });
-        System.out.print("]\n>");
+        Client.printCommands();
     }
 
 
@@ -160,16 +96,4 @@ public class SocketClient implements VirtualView {
     public void ping(String ping) throws RemoteException {
 
     }
-
-    public static void execute(String host, String portString) throws IOException {
-
-        int port = Integer.parseInt(portString);
-        Socket socketToServer = new Socket(host, port);
-
-        InputStreamReader socketRx = new InputStreamReader(socketToServer.getInputStream());
-        OutputStreamWriter socketTx = new OutputStreamWriter(socketToServer.getOutputStream());
-
-        new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx)).run();
-    }
-
 }
