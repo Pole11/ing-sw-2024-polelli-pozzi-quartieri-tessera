@@ -17,7 +17,7 @@ public class SocketClient implements VirtualView {
     final BufferedReader input;
     final ServerProxy server;
 
-    private SocketClient(BufferedReader input, BufferedWriter output) {
+    public SocketClient(BufferedReader input, BufferedWriter output) {
         this.input = input;
         this.server = new ServerProxy(output);
     }

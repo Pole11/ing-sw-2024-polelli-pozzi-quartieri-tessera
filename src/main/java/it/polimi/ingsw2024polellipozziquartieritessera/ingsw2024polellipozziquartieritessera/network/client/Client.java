@@ -50,7 +50,6 @@ public class Client{
 
     }
 
-
     private static void manageInput(VirtualServer server, String[] message, VirtualView client) throws RemoteException {
         try {
             Command.valueOf(message[0].toUpperCase());
@@ -66,7 +65,7 @@ public class Client{
             case Command.ADDUSER:
                 try {
                     server.addConnectedPlayer(client, message[1]);
-                } catch(IllegalArgumentException e) {
+                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.println("INVALID COMMAND\n> ");
                     return;
                 }
@@ -77,7 +76,7 @@ public class Client{
             case Command.CHOOSESTARTER:
                 try {
                     server.chooseInitialStarterSide(client, message[1]);
-                } catch(IllegalArgumentException e) {
+                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.println("INVALID COMMAND\n> ");
                     return;
                 }
@@ -85,7 +84,7 @@ public class Client{
             case Command.CHOOSECOLOR:
                 try {
                     server.chooseInitialColor(client, message[1]);
-                } catch(IllegalArgumentException e) {
+                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.println("INVALID COMMAND\n> ");
                     return;
                 }
@@ -93,7 +92,7 @@ public class Client{
             case Command.CHOOSEOBJECTIVE:
                 try {
                     server.chooseInitialObjective(client, message[1]);
-                } catch(IllegalArgumentException e) {
+                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.println("INVALID COMMAND\n> ");
                     return;
                 }
@@ -101,7 +100,7 @@ public class Client{
             case Command.PLACECARD:
                 try {
                     server.placeCard(client, message[1], message[2], message[3], message[4]);
-                } catch(IllegalArgumentException e) {
+                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.println("INVALID COMMAND\n> ");
                     return;
                 }
@@ -109,7 +108,7 @@ public class Client{
             case Command.DRAWCARD:
                 try {
                     server.drawCard(client, message[1]);
-                } catch(IllegalArgumentException e) {
+                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.println("INVALID COMMAND\n> ");
                     return;
                 }
@@ -117,7 +116,7 @@ public class Client{
             case Command.FLIPCARD:
                 try {
                     server.flipCard(client, message[1]);
-                } catch(IllegalArgumentException e) {
+                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.println("INVALID COMMAND\n> ");
                     return;
                 }
@@ -130,7 +129,6 @@ public class Client{
                 break;
         }
     }
-
 
     // dopo questa esecuzione, in RMI torna subito a runCli, in Socket no, quindi in
     //Socket non viene stampato subito >, mantre in RMI si

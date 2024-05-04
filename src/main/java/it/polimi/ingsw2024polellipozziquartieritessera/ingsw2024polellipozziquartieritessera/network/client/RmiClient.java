@@ -10,9 +10,10 @@ import java.rmi.registry.*;
 import java.rmi.*;
 
 public class RmiClient extends UnicastRemoteObject implements VirtualView {
-    final VirtualServer server;
+    private final VirtualServer server;
 
-    private RmiClient(VirtualServer server) throws RemoteException {
+    // TODO: it is public for testing purpose
+    public RmiClient(VirtualServer server) throws RemoteException {
         this.server = server;
     }
 
@@ -46,7 +47,6 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
         }
     }
-
 
     @Override
     public void printMessage(String msg) {

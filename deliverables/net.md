@@ -6,17 +6,11 @@ Iniziamo a mostrare le classi che abbiamo introdotto per gestire la comunicazion
 
 ![Netowrk](img/network2.svg)
 
-## Architettura di Rete Socket
-
-La architettura RMI è di facile comprensione, pensiamo che sia di maggiore rilevanza dare spazio all'architettura socket che abbiamo implementato.
-
-![Architettura del Socket](./img/socket-archi2.svg)
-
 ## Flusso di Comunicazione
 
-![Socket Flow](img%2Fsocket-protocol2.svg)
+![Socket Flow](img/socket-protocol2.svg)
 
-![Rmi Flow](img%2Frmi-protocol2.svg)
+![Rmi Flow](img/rmi-protocol2.svg)
 
 ## Integrazione tra RMI e Socket
 
@@ -49,11 +43,12 @@ Lista di comandi possibili: `MESSAGE` , `ERROR` , `PING`.
 - `ERROR` : serve ad inviare alla view un errore
 - `PING` : serve a verificare la connessione del client prima di inviargli un messaggio, ad un client viene inviato un ping prima di ogni messaggio effettivo, e vengono inviati dei ping periodici a tutti i client in modo che il `Model` sia a conoscenza dei giocatori connessi, per poter attribuire le fasi del gioco in modo corretto
 
-
 # Server
 
 - All'avvio, il Server istanzia un `Controller` del gioco e gestice la rete RMI e Socket, istanziando un `java.net.ServerSocket` per Socket e un RemoteObject per RMI sulla porte specificate dalla riga di comando, è presente infatti un singolo server che gestisce le chiamate da Socket e RMI. L'istanziazione del Controller avviene pasandogli il `GameState`, istanziato con l'utilizzo di populate, dove viene usato il JSON per istanziare le carte e tutto quello che serve al `GameState`
 - Il `Server` si pone in attesa di una richiesta di associazione da parte di un client che ha intenzione comunicare con il server sulla porta appena aperta
+- Il `Server` salva i `Client` che si connettono, in ordine di arrivo, all'interno di una lista (condivisa sia per i client RMI che per quelli Socket). L'ordine dei `Client` di questa lista corrisponde all'ordine dei `Player` nella lista dei giocatori del model. 
+  Se un giocatore si disconnette prima di aver scelto il nickname, non viene incluso nella lista dei clients. Contrariamente se un giocatore si disconnette dopo aver scelto il nickname, rimane nella lista dei clients sia nel server che nel model. Le informazioni sulla sua connessione vengono conservate e aggiornate nel model. Il giocatore ha la possibilità di riconnettersi successivamente tramite il suo nickname.
 - RMI
   - I metodi del `Server` sono messi a disposizione diretta da parte del client
 - Socket 
@@ -68,7 +63,7 @@ Lista di comandi possibili: `MESSAGE` , `ERROR` , `PING`.
 
 # Client 
 
-E' presente un Client che, a seconda che l'utente voglia utilizzare Socket o RMI, chiama il metodo Execute della classe corrispondente
+È presente un Client che, a seconda che l'utente voglia utilizzare Socket o RMI, chiama il metodo Execute della classe corrispondente
 
 ## Socket Client
 
@@ -79,7 +74,6 @@ E' presente un Client che, a seconda che l'utente voglia utilizzare Socket o RMI
 - la view riceve i comandi per giocare/creare un utente/... dall'utente
 - Una volta riconosciuto un comando correttamente formattato (la formattazione sarà descritta in seguito), Il comando, insieme ai relativi parametri, viene scritto secondo una sintassi proprietaria sul buffer di uscita del `ServerProxy`
 - Dopo la scrittura del comando, questo viene trasferito tramite il protocollo TCP/IP al buffer di ingresso del `ClientHandler` e sarà "catturato/letto" da `ClientHandler.runVirtualView`
-
 
 ## RMI Client
 

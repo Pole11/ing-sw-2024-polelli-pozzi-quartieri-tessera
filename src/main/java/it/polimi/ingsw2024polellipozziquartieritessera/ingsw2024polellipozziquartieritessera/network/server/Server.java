@@ -31,7 +31,7 @@ public class Server implements VirtualServer {
         this.controller = controller;
     }
 
-    public static void main(String[] argv) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException {
+    public static void main(String[] argv) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
         //setup gamestate
         GameState gameState = null;
         boolean store = Populate.existStore(); //FA persistance
@@ -399,8 +399,6 @@ public class Server implements VirtualServer {
         }
         return true;
     }
-
-
 
     private void updatePlayersConnected(){
         AtomicInteger index = new AtomicInteger();
