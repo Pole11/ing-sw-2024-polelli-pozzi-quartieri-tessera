@@ -24,7 +24,7 @@ Per questo motivo sia RMI che Socket utilizzano metodi che hanno come argomenti 
 
 I messaggi *Client to Server* sono del tipo: `"COMANDO, parametro1, ..., parametro"`.
 
-- `COMANDO`: Indica il tipo di metodo che il client desidera chiamare
+- `COMANDO` indica il tipo di metodo che il client desidera chiamare
 - I parametri del metodo sono codificati in formato di stringhe
 
 Lista di comandi possibili: `ADDUSER`, `START`, `CHOOSESTARTER`, `CHOOSECOLOR`, `CHOOSEOBJECTIVE`, `PLACECARD`, `DRAWCARD`, `FILPCARD`, `OPENCHAT`, `ADDMESSAGE`.
@@ -34,8 +34,8 @@ Lista di comandi possibili: `ADDUSER`, `START`, `CHOOSESTARTER`, `CHOOSECOLOR`, 
 
 Analogamente, nella comunicazione *Server to Client* i messaggi sono formattati come: `"COMANDO, MESSAGGIO"`.
 
-- `COMANDO`: Specifica se la comunicazione è riferita ad un messaggio generico, di errore o di ping 
-- il messaggio è codificato in forma di stringa
+- `COMANDO` specifica se la comunicazione è riferita ad un messaggio generico, di errore o di ping 
+- `MESSAGGIO` è codificato in forma di stringa
 
 Lista di comandi possibili: `MESSAGE` , `ERROR` , `PING`.
 
@@ -45,7 +45,7 @@ Lista di comandi possibili: `MESSAGE` , `ERROR` , `PING`.
 
 # Server
 
-- All'avvio, il Server istanzia un `Controller` del gioco e gestice la rete RMI e Socket, istanziando un `java.net.ServerSocket` per Socket e un RemoteObject per RMI sulla porte specificate dalla riga di comando. L'istanziazione del Controller avviene passandogli il `GameState`, istanziato con l'utilizzo di populate(), dove viene usato un JSON per generare le carte e tutto quello che serve al `GameState`
+- All'avvio, il Server istanzia un `Controller` del gioco e gestice la rete RMI e Socket, istanziando un `java.net.ServerSocket` per Socket e un RemoteObject per RMI sulla porte specificate dalla riga di comando. L'istanziazione del Controller avviene passandogli il `GameState`, istanziato con l'utilizzo di `populate()`, dove viene usato un JSON per generare le carte e tutto quello che serve al `GameState`
 - Il `Server` si pone in attesa di una richiesta di associazione da parte di un client che ha intenzione di comunicare con il server sulla porta appena aperta
 - Il `Server` salva i `Client` che si connettono, in ordine di arrivo, all'interno di una lista (condivisa sia per i client RMI che per quelli Socket). L'ordine dei `Client` di questa lista corrisponde all'ordine dei `Player` nella lista dei giocatori del model. 
   Se un giocatore si disconnette prima di aver scelto il nickname, non viene incluso nella lista dei clients. Al contrario, se un giocatore si disconnette dopo aver scelto il nickname, rimane nella lista dei clients sia nel server che nel model. Le informazioni sulla sua connessione vengono conservate e aggiornate nel model. Il giocatore ha la possibilità di riconnettersi successivamente tramite il suo nickname.
