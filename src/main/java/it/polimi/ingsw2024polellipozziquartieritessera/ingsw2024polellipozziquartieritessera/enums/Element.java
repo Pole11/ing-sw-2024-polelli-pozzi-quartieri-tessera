@@ -11,7 +11,6 @@ public enum Element implements ElementTypeInterface {
     PLANT(ElementType.RESOURCE),
     EMPTY(ElementType.EMPTY);
 
-
     private final ElementType type;
     private Element(ElementType type) {
         this.type = type;

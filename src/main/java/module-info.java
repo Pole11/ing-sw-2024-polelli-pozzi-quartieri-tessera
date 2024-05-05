@@ -14,4 +14,8 @@ module it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
     opens it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.tutorial to javafx.fxml;
     exports it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
     opens it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model to javafx.fxml;
+    exports it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server;
+    opens it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server to javafx.fxml;
+    exports it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
+    opens it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client to javafx.fxml;
 }

@@ -18,20 +18,24 @@ public class GameState {
     private final HashMap<Integer, ResourceCard> resourceCardsMap; // map id and card
     private final HashMap<Integer, StarterCard> starterCardsMap; // map id and card
     private final HashMap<Integer, ObjectiveCard> objectiveCardsMap; // map id and card
+
     private final HashMap<Integer, CoverageChallenge> coverageChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
     private final HashMap<Integer, ElementChallenge> elementChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
     private final HashMap<Integer, StructureChallenge> structureChallengeMap; // id of the card to find the related challenge, if null it has no challenge of that type
+
     private final Board mainBoard;
     private final ArrayList<Player> players; //player[0] is blackPlayer
+    private final ArrayList<Boolean> playersConnected; //player[0] is blackPlayer
     private final Chat chat;
     private int currentPlayerIndex;
     private GamePhase currentGamePhase;
     private TurnPhase currentGameTurn;
     private Boolean isLastTurn;
-    int numberAnswered = 0;
+
 
     // CONSTRUCTOR
     public GameState() {
+        this.playersConnected = new ArrayList<>();
         this.goldCardsMap = new HashMap<>();
         this.resourceCardsMap = new HashMap<>();
         this.starterCardsMap = new HashMap<>();
@@ -43,8 +47,8 @@ public class GameState {
 
         this.players = new ArrayList<>();
         this.currentPlayerIndex = 0;
-        this.currentGamePhase = GamePhase.MAINPHASE;
-        this.currentGameTurn = null;
+        this.currentGamePhase = GamePhase.NICKNAMEPHASE;
+        this.currentGameTurn = TurnPhase.PLACINGPHASE;
         this.chat = new Chat();
         this.isLastTurn = false;
 
@@ -183,6 +187,16 @@ public class GameState {
         this.structureChallengeMap.put(challengeId, challenge);
     }
 
+    // METHODS
+
+    public void setPlayersConnected(int index, boolean connected){
+        playersConnected.set(index, Boolean.valueOf(connected));
+    }
+
+    public boolean isConnected(int index){
+        return playersConnected.get(index);
+    }
+
     public void setPlayer(int index, Player player) throws NotUniquePlayerNicknameException{
         for (int j = 0; j < players.size(); j++) {
             if (player.getNickname().equals(players.get(j).getNickname())) {
@@ -200,7 +214,6 @@ public class GameState {
         this.mainBoard.setDecks(resourceCardDeck, goldCardDeck);
     }
 
-    // METHODS
 
     public void removeAllPlayers() {
         this.players.clear();
@@ -214,62 +227,23 @@ public class GameState {
 
     // I: start game / set phase
     public void startPhaseMethod() {
-        this.currentGamePhase = GamePhase.STARTPHASE;
-
-        // next phase
         deckInitPhase();
     }
 
     // II: initialize deck and shared cards / starter cards
     private void deckInitPhase(){
         this.mainBoard.shuffleCards();
-        this.setSharedGoldCards();
-        this.setSharedResourceCards();
-        this.setStarters(); // set the starters cards for every player
-        this.chooseStarterSidePhase();
+        this.mainBoard.initSharedGoldCards();
+        this.mainBoard.initSharedResourceCards();
+        this.initStarters(); // set the starters cards for every player
     }
 
     //III: let players choose the side
-    public void chooseStarterSidePhase(){
-        if (numberAnswered == players.size()) {
-            numberAnswered = 0;
-            chooseColorPhase();
-        } else {
-            // tell clients that they have to decide the starterSide
-            // and that it is the turn of players[numberAnswered] to choose
-            numberAnswered ++;
-        }
-    }
 
     // IV: let the player choose the color from the available colors
     // V: set hands and objectives for choice
-    public void chooseColorPhase(){
-        if (numberAnswered == players.size()) {
-            numberAnswered = 0;
-            setHands();
-            setObjectives();
-            chooseObjectivePhase();
-        } else {
-            // tell clients that they have to decide the color
-            // and that it is the turn of players[numberAnswered] to choose
-            // remember that you have pass the color available
-            numberAnswered ++;
-        }
-    }
 
     // VI: let the player choose the objective
-    public void chooseObjectivePhase(){
-        if (numberAnswered == players.size()-1) {
-            numberAnswered = 0;
-            currentGamePhase = GamePhase.MAINPHASE;
-            currentGameTurn = TurnPhase.PLACINGPHASE;
-            //playTurn();
-        } else {
-            // tell clients that they have to decide the objective
-            // and that it is the turn of players[numberAnswered] to choose
-            numberAnswered ++;
-        }
-    }
 
     // VII: si potrebbe come da specifica scegliere a questo punto
     // un giocatore randomico per essere il blackPlayer (al momento sembra superflua)
@@ -277,6 +251,7 @@ public class GameState {
 
     //------------ Starting Phases setter --------------------
 
+    /*
     public void setSharedGoldCards() {
         // it's like fillSharedGaps, look at the draw from shared methods to take inspiration
         GoldCard card1 = mainBoard.getFromGoldDeck();
@@ -294,10 +269,10 @@ public class GameState {
         ResourceCard[] cards = {card1, card2};
 
         mainBoard.setSharedResourceCards(cards);
-    }
+    }*/
 
 
-    public void setStarters() {
+    public void initStarters() {
         // for every player set his starters (you have access to every player from the array players)
         ArrayList<Player> players = getPlayers();
 
@@ -377,12 +352,10 @@ public class GameState {
 
 
     //called from controller
-    public void setSecretObjective (int playerIndex, int cardId) throws InvalidObjectiveCardException {
+    public void setSecretObjective (int playerIndex, int cardIndex) throws InvalidObjectiveCardException {
         Player player = getPlayerByIndex(playerIndex);
-        if (player.getObjectiveCardOptions()[0].getId() == cardId) {
-            player.setObjectiveCard(player.getObjectiveCardOptions()[0]);
-        } else if (player.getObjectiveCardOptions()[1].getId() == cardId) {
-            player.setObjectiveCard(player.getObjectiveCardOptions()[1]);
+        if (cardIndex == 0 || cardIndex == 1){
+            player.setObjectiveCard(player.getObjectiveCardOptions()[cardIndex]);
         } else {
             throw new InvalidObjectiveCardException("The card choosen was not in the options list");
         }
@@ -638,8 +611,8 @@ public class GameState {
 
     private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {
         CornerCard matrixCard = this.getCornerCard(matrixCardId);
-        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId))[matrixCardCornerPos.getCornerPosValue()];
-        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide)[indirectPlacingCornerPos.getCornerPosValue()];
+        Corner matrixCorner = matrixCard.getCorners(player.getBoardSide(matrixCardId)).get(matrixCardCornerPos.ordinal());
+        Corner indirectPlacingCorner = placingCard.getCorners(placingCardSide).get(indirectPlacingCornerPos.ordinal());
 
         if (matrixCorner.getHidden()) {
             throw new PlacingOnHiddenCornerException("you are trying to place on an hidden corner");

@@ -7,17 +7,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class StarterCard extends CornerCard {
-    private final ArrayList<Element> centerResource; // array of center resources in the front side
+    private final ArrayList<Element> centerResources; // array of center resources in the front side
 
     // CONSTRUCTOR
     public StarterCard(int id, Corner[] frontCorners, Corner[] backCorners, ArrayList<Element> centerResource) {
         super(id, frontCorners, backCorners, 0);
-        this.centerResource = centerResource;
+        this.centerResources = centerResource;
     }
 
     // GETTER
-    public ArrayList<Element> getCenterResource() {
-        return centerResource;
+    public ArrayList<Element> getCenterResources() {
+        return centerResources;
     }
 
     // METHODS
@@ -40,7 +40,7 @@ public class StarterCard extends CornerCard {
 
         // add center resources if on front side
         if (side == Side.FRONT){
-            uncoveredResources.addAll(centerResource);
+            uncoveredResources.addAll(centerResources);
         }
 
         return uncoveredResources;

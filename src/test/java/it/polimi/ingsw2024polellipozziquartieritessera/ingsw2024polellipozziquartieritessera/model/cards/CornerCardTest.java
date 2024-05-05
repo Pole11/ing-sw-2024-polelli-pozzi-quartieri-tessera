@@ -1,8 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Main;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerColorException;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerNicknameException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +17,7 @@ public class CornerCardTest {
     @Test
     void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
         // setup
-        GameState g = Main.populate();
+        GameState g = Populate.populate();
 
         CornerCard card = g.getCornerCard(40);
 
@@ -36,7 +34,7 @@ public class CornerCardTest {
 
     @Test
     void testGetCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        GameState g = Main.populate();
+        GameState g = Populate.populate();
 
         CornerCard card = g.getCornerCard(40);
 
@@ -44,13 +42,13 @@ public class CornerCardTest {
         ArrayList<Corner> allCorners = card.getCorners();
 
         // get all front and back corners
-        Corner[] frontCorners = card.getCorners(Side.FRONT);
-        Corner[] backCorners = card.getCorners(Side.BACK);
+        ArrayList<Corner> frontCorners = card.getCorners(Side.FRONT);
+        ArrayList<Corner> backCorners = card.getCorners(Side.BACK);
 
         // verify number of corners is correct
         assertEquals(8, allCorners.size());
-        assertEquals(4, frontCorners.length);
-        assertEquals(4, backCorners.length);
+        assertEquals(4, frontCorners.size());
+        assertEquals(4, backCorners.size());
 
         // verify corners are not null
         for (Corner corner : allCorners){
@@ -60,7 +58,7 @@ public class CornerCardTest {
 
     @Test
     void testGetLinkedCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        GameState g = Main.populate();
+        GameState g = Populate.populate();
 
         CornerCard card1 = g.getCornerCard(40);
         CornerCard card2 = g.getCornerCard(30);
@@ -80,11 +78,11 @@ public class CornerCardTest {
 
     @Test
     void testGetUncoveredCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
-        GameState g = Main.populate();
+        GameState g = Populate.populate();
 
         CornerCard card = g.getCornerCard(40);
-        ArrayList<Corner> cornersFront = new ArrayList<>(Arrays.asList(card.getCorners(Side.FRONT)));
-        ArrayList<Corner> cornersBack = new ArrayList<>(Arrays.asList(card.getCorners(Side.BACK)));
+        ArrayList<Corner> cornersFront = card.getCorners(Side.FRONT);
+        ArrayList<Corner> cornersBack = card.getCorners(Side.BACK);
 
 
         // verify if none covered

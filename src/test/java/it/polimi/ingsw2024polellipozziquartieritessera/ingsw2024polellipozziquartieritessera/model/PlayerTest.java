@@ -1,16 +1,14 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 import static org.junit.jupiter.api.Assertions.*;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.*;
 
 public class PlayerTest {
     @Test
@@ -31,7 +29,7 @@ public class PlayerTest {
 
 
         // create game state
-        GameState gs = Main.createCardsMap();
+        GameState gs = Populate.createCardsMap();
         gs.setPlayer(0, new Player("Nickname"));
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
@@ -83,16 +81,15 @@ public class PlayerTest {
         int goldCardId5 = 58;
 
         // create game state
-        GameState gs = Main.createCardsMap();
+        GameState gs = Populate.createCardsMap();
         gs.setPlayer(0, new Player("jhonny"));
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
-        gs.setSharedGoldCards();
-        gs.setSharedResourceCards();
+        gs.getMainBoard().initSharedGoldCards();
+        gs.getMainBoard().initSharedResourceCards();
         player.setStarterCard(gs.getStarterCard(starterCardId));
         player.initializeBoard();
-        gs.chooseStarterSidePhase();
         c.chooseInitialStarterSide(0, Side.FRONT);
 
         //NON FUNZIONA
