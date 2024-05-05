@@ -4,7 +4,7 @@
 
 This section provides a concise overview of the class structure we implemented to represent the different card types.
 
-![UML of Card](img/card2.svg)
+![UML of Card](deliverables/img/card2.svg)
 
 The following table summarizes the common attributes shared by all card types, facilitating their organization into classes and subclasses.
 
@@ -53,27 +53,27 @@ This is the one you must do in order to gain points. It is used in `ObjectiveCar
 #### Structure Challenge
 The structure challenge is only for objective cards.
 
-![Example of Structure Challenge](./img/structure.png)
+![Example of Structure Challenge](deliverables/img/structure.png)
 
 #### Resource Challenge
 The resource challenge is only for objective cards. The type of resources needed in the objective cards can vary.
 
 In the objective cards is like this:
 
-![Example of Resource Challenge](./img/element-obj.png)
+![Example of Resource Challenge](deliverables/img/element-obj.png)
 
 #### Item Challenge
 The item challenge is only for gold cards.
 
 In the gold cards is like this (the one on the top of the card):
 
-![Example of Item Challenge](img/element-gold.png)
+![Example of Item Challenge](deliverables/img/element-gold.png)
 
 #### Coverage Challenge
 This challenge is only for gold cards.
 Is the one on the top of the card.
 
-![Example of Coverage Challenge](img/coverage.png)
+![Example of Coverage Challenge](deliverables/img/coverage.png)
 
 Here is the UML for both the Card and the Challenge:
 
@@ -134,7 +134,7 @@ The `Element` refers to the `resourceType` of the card and the position is deter
 
 Order from top-left to bottom-left \[0-3\]
 
-![Example of Structure Challenge](./img/structure.png)
+![Example of Structure Challenge](deliverables/img/structure.png)
 
 #### Element Challenge
 
@@ -143,16 +143,16 @@ These tasks exhibit variability in the types of resources required.
 
 Here's a breakdown of how resources are typically handled within objective cards:
 
-![Example of Element Challenge in an Objective Card](./img/element-obj.png)
+![Example of Element Challenge in an Objective Card](deliverables//img/element-obj.png)
 
-![Example of Element Challenge in an Gold Card](img/element-gold.png)
+![Example of Element Challenge in an Gold Card](deliverables/img/element-gold.png)
 
 #### Coverage Challenge
 
 This challenge is used exclusively for gold cards.
 The challenge defines a point-awarding task based on the quantity of specified `Elements` present on the player's board.
 
-![Example of Coverage Challenge](img/coverage.png)
+![Example of Coverage Challenge](deliverables/img/coverage.png)
 
 Note that for the `GoldCoverageChallenge` the value of `points` is always 2.
 
@@ -165,7 +165,7 @@ Note that a **round** is made up by 4 **turns**.
 
 The players order in game is defined by the order of the players in the `players[]` array.
 
-![UML of GameState](img/gamestate2.svg)
+![UML of GameState](deliverables/img/gamestate2.svg)
 
 In the methods of the `Board` class, `pos` specify the position of the card (1 if it's the first, 2 if it's the second one)
 
@@ -175,7 +175,7 @@ This section details the enumerated data types we'll employ to represent various
 Due to graphical complexity, we won't illustrate all associations with other classes.
 However, it's important to remember that these enumerations are indeed connected to the classes that utilize them for data definition.
 
-![UML of Enums and Config](img/enums2.svg)
+![UML of Enums and Config](deliverables/img/enums2.svg)
 
 # Controller
 
@@ -184,7 +184,7 @@ However, it's important to remember that these enumerations are indeed connected
 - `getGameState` : this method provides a comprehensive overview of the current game state.
 - `flipCard` : this method flips the card currently held by the player. Subsequently, the placeCard method will utilize the flipped side for placement.
 
-![UML of Controller](img/controller2.svg)
+![UML of Controller](deliverables/img/controller2.svg)
 
 # Exceptions
 
@@ -214,13 +214,13 @@ While testing the constructors and some methods we noticed that defining some ex
 
 Iniziamo a mostrare le classi che abbiamo introdotto per gestire la comunicazione tra server e client.
 
-![Netowrk](img/network2.svg)
+![Netowrk](deliverables/img/network2.svg)
 
 ### Flusso di Comunicazione
 
-![Socket Flow](img/socket-protocol2.svg)
+![Socket Flow](deliverables/img/socket-protocol2.svg)
 
-![Rmi Flow](img/rmi-protocol2.svg)
+![Rmi Flow](deliverables/img/rmi-protocol2.svg)
 
 ### Integrazione tra RMI e Socket
 
@@ -294,4 +294,4 @@ Il client RMI come da definizione, cerca sull'indirizzo del server il registry c
 
 (you can *zoom* it)
 
-![Complete UML](img/complete2.svg)
+![Complete UML](deliverables/img/complete2.svg)
