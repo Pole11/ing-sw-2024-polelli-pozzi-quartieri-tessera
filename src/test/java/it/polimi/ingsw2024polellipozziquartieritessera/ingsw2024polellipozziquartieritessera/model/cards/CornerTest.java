@@ -16,7 +16,7 @@ public class CornerTest {
     // ALL METHODS TESTED
 
     @Test
-    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
 
         CornerCard card = g.getCornerCard(40);

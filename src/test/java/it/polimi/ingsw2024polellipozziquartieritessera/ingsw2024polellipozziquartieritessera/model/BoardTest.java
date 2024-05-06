@@ -26,7 +26,7 @@ public class BoardTest {
 
             b.setSharedObjectiveCards(b.getSharedObjectiveCards());
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
+                 NotUniquePlayerColorException  e) {
             throw new RuntimeException(e);
         }
     }
@@ -70,7 +70,7 @@ public class BoardTest {
             assertThrows(IllegalArgumentException.class, () -> b.drawSharedGoldCard(4));
             assertThrows(IllegalArgumentException.class, () -> b.drawSharedResourceCard(4));
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
+                 NotUniquePlayerColorException  e) {
             throw new RuntimeException(e);
         }
     }
@@ -99,7 +99,7 @@ public class BoardTest {
             // If deck is ended
             assertNull(drawnCard = b.getFromResourceDeck());
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
+                 NotUniquePlayerColorException e) {
             throw new RuntimeException(e);
         }
     }
@@ -128,7 +128,7 @@ public class BoardTest {
             // If deck is ended
             assertNull(drawnCard = b.getFromGoldDeck());
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
+                 NotUniquePlayerColorException  e) {
             throw new RuntimeException(e);
         }
     }
@@ -173,7 +173,7 @@ public class BoardTest {
     }
 
     @Test
-    void testShuffleCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void testShuffleCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
         Board b = g.getMainBoard();
 

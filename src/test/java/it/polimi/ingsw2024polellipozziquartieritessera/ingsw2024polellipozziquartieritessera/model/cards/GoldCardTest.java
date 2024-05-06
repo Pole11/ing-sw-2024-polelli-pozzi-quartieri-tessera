@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GoldCardTest {
     // ALL METHODS TESTED
     @Test
-    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
 
         GoldCard card = (GoldCard) g.getCornerCard(45);
@@ -28,7 +28,7 @@ public class GoldCardTest {
     }
 
     @Test
-    void testGetUncoveredElements() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void testGetUncoveredElements() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         // setup
         GameState g = Populate.populate();
 

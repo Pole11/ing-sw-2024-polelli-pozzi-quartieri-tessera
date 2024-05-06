@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 public class GameStateTest {
 
     @Test
-    void SetObjectiveTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, InvalidObjectiveCardException {
+    void SetObjectiveTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, InvalidObjectiveCardException {
         GameState gs = Populate.populate();
         gs.setPlayer(0, new Player("paolo"));
         gs.setPlayer(1, new Player("piergiorgio"));
@@ -49,7 +49,7 @@ public class GameStateTest {
     }
 
     @Test
-    void calculateFinalPointsTest() throws CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException, WrongStructureConfigurationSizeException, IOException {
+    void calculateFinalPointsTest() throws CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
 
 //-----------------------RECREATE SITUATION IN getCardPointsTest2-------------------------
 
@@ -321,7 +321,7 @@ public class GameStateTest {
 
 
     @Test
-    void calculateFinalPointsTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, NotUniquePlayerException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException {
+    void calculateFinalPointsTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException {
 
         GameState gs = Populate.createCardsMap();
         gs.setPlayer(0, new Player("paolo"));
@@ -373,7 +373,7 @@ public class GameStateTest {
     }
 
     @Test
-    void isGameEndedTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void isGameEndedTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState gs = Populate.populate();
         gs.setPlayer(0, new Player("paolo"));
         gs.setPlayer(1, new Player("piergiorgio"));
@@ -397,7 +397,7 @@ public class GameStateTest {
     }
 
     @Test
-    void isGameEndedTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void isGameEndedTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState gs = Populate.populate();
         Controller c = new Controller(gs);
 
@@ -410,7 +410,7 @@ public class GameStateTest {
 
 
     @Test
-    void getWinnerPlayerIndexTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException, GameIsNotEndedException, CardNotPlacedException, WrongInstanceTypeException {
+    void getWinnerPlayerIndexTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, GameIsNotEndedException, CardNotPlacedException, WrongInstanceTypeException {
         GameState gs = Populate.createCardsMap();
         gs.setPlayer(0, new Player("1"));
         gs.setPlayer(1, new Player("2"));

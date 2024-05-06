@@ -24,7 +24,7 @@ public class ResourceCardTest {
 
             assertEquals(card.getResourceType(), Element.INSECT);
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
+                 NotUniquePlayerColorException  e) {
             throw new RuntimeException(e);
         }
 
@@ -56,7 +56,7 @@ public class ResourceCardTest {
             assertEquals(card.getUncoveredElements(Side.BACK).getFirst(), Element.INSECT);
             assertEquals(card.getUncoveredElements(Side.BACK).toArray().length, 1);
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
+                 NotUniquePlayerColorException e) {
             throw new RuntimeException(e);
         }
     }

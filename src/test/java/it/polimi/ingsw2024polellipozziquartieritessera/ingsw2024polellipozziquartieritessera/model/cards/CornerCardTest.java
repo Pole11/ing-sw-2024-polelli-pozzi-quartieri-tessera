@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CornerCardTest {
     // ALL METHODS TESTED
     @Test
-    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         // setup
         GameState g = Populate.populate();
 
@@ -33,7 +33,7 @@ public class CornerCardTest {
     }
 
     @Test
-    void testGetCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void testGetCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
 
         CornerCard card = g.getCornerCard(40);
@@ -57,7 +57,7 @@ public class CornerCardTest {
     }
 
     @Test
-    void testGetLinkedCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void testGetLinkedCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
 
         CornerCard card1 = g.getCornerCard(40);
@@ -77,7 +77,7 @@ public class CornerCardTest {
     }
 
     @Test
-    void testGetUncoveredCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void testGetUncoveredCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
 
         CornerCard card = g.getCornerCard(40);

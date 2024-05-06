@@ -23,13 +23,13 @@ public class StarterCardTest {
             assertEquals(card.getCenterResources().getFirst(), Element.ANIMAL);
             assertEquals(card.getCenterResources().size(), 2);
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
+                 NotUniquePlayerColorException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Test
-    void testGetResourceType() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void testGetResourceType() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         // setup
         GameState g = Populate.populate();
         StarterCard card = g.getStarterCard(84);
@@ -61,7 +61,7 @@ public class StarterCardTest {
 
             assertTrue(card.getUncoveredElements(Side.BACK).isEmpty());
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException | NotUniquePlayerException e) {
+                 NotUniquePlayerColorException  e) {
             throw new RuntimeException(e);
         }
     }

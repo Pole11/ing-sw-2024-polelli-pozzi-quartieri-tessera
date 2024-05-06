@@ -13,7 +13,7 @@ public class CardTest {
     // ALL METHODS TESTED
 
     @Test
-    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, NotUniquePlayerException, IOException {
+    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException , IOException {
         // setup
         GameState g = Populate.populate();
         Card card = g.getCard(5);
