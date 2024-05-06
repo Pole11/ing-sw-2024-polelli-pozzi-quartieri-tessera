@@ -14,6 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GameState {
 
     // !!! THE REFERENCE TO CARDSMAP IS FINAL !!!
+    private final HashMap<Integer, Card> cardsMap;
     private final HashMap<Integer, GoldCard> goldCardsMap; // map id and card
     private final HashMap<Integer, ResourceCard> resourceCardsMap; // map id and card
     private final HashMap<Integer, StarterCard> starterCardsMap; // map id and card
@@ -35,6 +36,7 @@ public class GameState {
 
     // CONSTRUCTOR
     public GameState() {
+        this.cardsMap = new HashMap<>();
         this.playersConnected = new ArrayList<>();
         this.goldCardsMap = new HashMap<>();
         this.resourceCardsMap = new HashMap<>();
@@ -159,6 +161,10 @@ public class GameState {
         this.currentGameTurn = currentGameTurn;
     }
 
+    public void addCardToCardsMap(int cardId, Card card) {
+        this.cardsMap.put(cardId, card);
+    }
+
     public void setGoldCard(int cardId, GoldCard goldCard) {
         this.goldCardsMap.put(cardId, goldCard);
     }
@@ -250,26 +256,6 @@ public class GameState {
 
 
     //------------ Starting Phases setter --------------------
-
-    /*
-    public void setSharedGoldCards() {
-        // it's like fillSharedGaps, look at the draw from shared methods to take inspiration
-        GoldCard card1 = mainBoard.getFromGoldDeck();
-        GoldCard card2 = mainBoard.getFromGoldDeck();
-
-        GoldCard[] cards = {card1, card2};
-
-        mainBoard.setSharedGoldCards(cards);
-    }
-
-    public void setSharedResourceCards() {
-        ResourceCard card1 = mainBoard.getFromResourceDeck();
-        ResourceCard card2 = mainBoard.getFromResourceDeck();
-
-        ResourceCard[] cards = {card1, card2};
-
-        mainBoard.setSharedResourceCards(cards);
-    }*/
 
 
     public void initStarters() {

@@ -20,6 +20,11 @@ public class StarterCard extends CornerCard {
         return centerResources;
     }
 
+    @Override
+    public StarterCard getCard(){
+        return this;
+    }
+
     // METHODS
     // return null (it needs to be implemented because it's an abstract method in CornerCard)
     public Element getResourceType() throws WrongInstanceTypeException {

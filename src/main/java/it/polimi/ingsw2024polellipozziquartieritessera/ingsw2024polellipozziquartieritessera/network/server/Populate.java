@@ -49,12 +49,6 @@ public class Populate {
 
     public static GameState populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
         GameState gameState = createCardsMap();
-        /*
-        gameState.setPlayer(0, new Player("paolo"));
-        gameState.setPlayer(1, new Player("piergiorgio"));
-        gameState.setPlayer(2, new Player("fungiforme"));
-        gameState.setPlayer(3, new Player("paola"));
-         */
         gameState.setMainBoard();
         return gameState;
     }
@@ -113,7 +107,7 @@ public class Populate {
             }
 
             if (card.get("Type").equals("Objective")){
-                gameState.setObjectiveCard(id, new ObjectiveCard(id, challenge, (int) Double.parseDouble(card.get("Points").toString())  ));
+                gameState.addCardToCardsMap(id, new ObjectiveCard(id, challenge, (int) Double.parseDouble(card.get("Points").toString())  ));
             } else {
                 // ------ creating corners ------
                 Corner[] frontCorners = new Corner[Config.N_CORNERS];
@@ -147,20 +141,20 @@ public class Populate {
                 }
                 // ------ creating cards ------
                 if (card.get("Type").equals("Resource")) {
-                    gameState.setResourceCard(id, new ResourceCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), (int) Double.parseDouble(card.get("Points").toString()), frontCorners, backCorners));
+                    gameState.addCardToCardsMap(id, new ResourceCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), (int) Double.parseDouble(card.get("Points").toString()), frontCorners, backCorners));
                 } else if (card.get("Type").equals("Gold")) {
                     ArrayList<Element> elements = new ArrayList<>();
                     for (Object e : (ArrayList) card.get("ResourceNeeded")) {
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
                     }
-                    gameState.setGoldCard(id, new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements, (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners));
+                    gameState.addCardToCardsMap(id, new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements, (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners));
                 } else if (card.get("Type").equals("Starter")) {
                     if (id < Config.firstStarterCardId) Config.firstStarterCardId = id;
                     ArrayList<Element> elements = new ArrayList<>();
                     for (Object e : (ArrayList) card.get("CenterResources")) {
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
                     }
-                    gameState.setStarterCard(id, new StarterCard(id, frontCorners, backCorners, elements));
+                    gameState.addCardToCardsMap(id, new StarterCard(id, frontCorners, backCorners, elements));
                 }
             }
         }

@@ -18,6 +18,11 @@ public class ResourceCard extends CornerCard {
         return resourceType;
     }
 
+    @Override
+    public ResourceCard getCard() {
+        return this;
+    }
+
     // METHODS
     // returns the resource visible on the side requested
     public ArrayList<Element> getUncoveredElements(Side side){

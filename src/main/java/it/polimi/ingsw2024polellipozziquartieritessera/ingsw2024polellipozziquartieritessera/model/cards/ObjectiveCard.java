@@ -21,4 +21,9 @@ public class ObjectiveCard extends Card {
     public Challenge getChallenge() {
         return challenge;
     }
+
+    @Override
+    public ObjectiveCard getCard(){
+        return this;
+    }
 }

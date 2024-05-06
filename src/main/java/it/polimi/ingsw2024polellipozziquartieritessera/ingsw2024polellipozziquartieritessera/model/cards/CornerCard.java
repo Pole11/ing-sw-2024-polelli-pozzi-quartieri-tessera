@@ -31,6 +31,9 @@ public abstract class CornerCard extends Card {
 
     public int getPoints() { return points; }
 
+    @Override
+    public abstract CornerCard getCard();
+
     // METHODS
     // return all the corners of the card (back and front)
     public ArrayList<Corner> getCorners() {

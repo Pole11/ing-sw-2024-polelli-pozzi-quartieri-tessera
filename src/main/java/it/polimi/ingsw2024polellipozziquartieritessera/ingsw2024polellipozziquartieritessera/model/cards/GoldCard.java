@@ -31,6 +31,11 @@ public class GoldCard extends CornerCard {
         return resourceNeeded;
     }
 
+    @Override
+    public GoldCard getCard() {
+        return this;
+    }
+
     // METHODS
     // returns the elements visible on the requested side
     public ArrayList<Element> getUncoveredElements(Side side){
