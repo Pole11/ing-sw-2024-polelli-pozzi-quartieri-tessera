@@ -87,23 +87,43 @@ public class Server implements VirtualServer {
     public void addConnectedPlayer(VirtualView client, String nickname) {
         if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
             try {
-                 if (this.clients.size() >= Config.MAX_PLAYERS) {
+                if (this.clients.size() >= Config.MAX_PLAYERS) {
                     client.printError("The game is full");
                     return;
                 }
+                if (clients.containsValue(client)){
+                    client.printError("You already chose a nickname, you cannot change it");
+                    return;
+                }
+
                 this.controller.addPlayer(nickname);
                 this.clients.put(this.clients.size(), client);
                 System.out.println("New player connected!");
-                for (VirtualView clientIterator : this.clients.values()) {
-                    if (ping(clientIterator)){
-                        clientIterator.printMessage("User " + nickname + " has ben added to game!");
+                if (clients.size()==1){
+                    if(ping(client)){
+                        client.printMessage("you successfully entered the game with the nickname " + nickname + ", wait for at least two players to start the game");
+                    }
+                } else {
+                    for (VirtualView clientIterator : this.clients.values()) {
+                        if (clientIterator.equals(client)){
+                            if(ping(clientIterator)){
+                                clientIterator.printMessage("you successfully entered the game with the nickname " + nickname + ", there are " + clients.size() + " players connected, to start the game type START");
+                            }
+                        } else {
+                            if (ping(clientIterator)){
+                                clientIterator.printMessage("User " + nickname + " has ben added to game, there are " + clients.size() + " players connected, to start the game type START");
+                            }
+                        }
                     }
                 }
+
             } catch (NotUniquePlayerNicknameException e) {
                 try {
-                    client.printError("The nickname already exists :/\nPlease enter a new one");
+                    client.printError("The nickname already exists, please enter a new one");
                 } catch (RemoteException ex) {
                     ex.printStackTrace();
+                } finally {
+                    return;
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -118,27 +138,41 @@ public class Server implements VirtualServer {
     }
 
     @Override
-    public void startGame() {
+    public void showNickname(VirtualView client) throws RemoteException{
+        if (clients.containsValue(client)){
+            if(ping(client)){
+                client.printMessage("your nickname is " + controller.getPlayerNickname(getPlayerIndex(client)));
+            }
+        } else {
+            if(ping(client)){
+                client.printError("you didn't choose a nickname, use the command ADDUSER [nickname] to do that");
+            }
+        }
+    }
+
+    @Override
+    public void startGame(VirtualView client) throws RemoteException{
         if (clients.size() >= 2) {
             System.out.println("Starting game");
-            for (VirtualView client : this.clients.values()) {
-                try {
-                    client.printMessage("Please choose your starter side [Front / Back]");
-                } catch (RemoteException e) {
-                    e.printStackTrace();
+            for (VirtualView clientIterator : this.clients.values()) {
+                if (ping(clientIterator)){
+                    clientIterator.printMessage("The game has begun, Please choose the side of your starter card with the command " + Command.CHOOSESTARTER + " [Front / Back]");
                 }
             }
             this.controller.startGame();
             this.controller.setGamePhase(GamePhase.CHOOSESTARTERSIDEPHASE);
         }
         else{
-            for (VirtualView client : this.clients.values()) {
-                try {
-                    client.printMessage("Number of player insufficient");
-                } catch (RemoteException e) {
-                    e.printStackTrace();
+            if (clients.containsValue(client)){
+                if (ping(client)){
+                    client.printError("Number of player insufficient");
+                }
+            } else {
+                if (ping(client)){
+                    client.printError("you must choose your nickname with adduser first");
                 }
             }
+
         }
     }
 
@@ -158,7 +192,7 @@ public class Server implements VirtualServer {
             this.controller.chooseInitialStarterSide(playerIndex, side);
             this.numberAnswered++;
             try {
-                client.printMessage("Thank you!!!");
+                client.printMessage("Thank you!");
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
@@ -167,7 +201,7 @@ public class Server implements VirtualServer {
                 numberAnswered = 0;
                 for (VirtualView clientIterator : this.clients.values()) {
                     try {
-                        clientIterator.printMessage("Please select a valid color from one of the lists [Blue, Green, Yellow, Red]");
+                        clientIterator.printMessage("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]");
                     } catch (RemoteException e) {
                         throw new RuntimeException(e);
                     }
@@ -193,12 +227,13 @@ public class Server implements VirtualServer {
             try {
                 color = Color.valueOf(colorValue.toUpperCase());
             } catch (IllegalArgumentException e) {
-                client.printMessage("Please select a valid color from one of the lists [Blue, Green, Yellow, Red]");
+                client.printMessage("Please select a valid color from one of the list [Blue, Green, Yellow, Red]");
                 return;
             }
 
             try {
                 this.controller.chooseInitialColor(playerIndex, color);
+                client.printMessage("Thank you!");
                 numberAnswered ++;
             } catch (NotUniquePlayerColorException e) {
                 client.printError("The color was already selected by another user, please select a new one ;)");
@@ -211,12 +246,13 @@ public class Server implements VirtualServer {
                 try {
                     for (VirtualView clientIterator : this.clients.values()) {
                         getPlayerIndex(clientIterator);
-                        clientIterator.printMessage("Select one of the objective card from the selection [0, 1]: " + this.controller.getObjectiveCardOptions(playerIndex)[0].getId() + ", " + this.controller.getObjectiveCardOptions(playerIndex)[1].getId());
+                        clientIterator.printMessage("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1]: " + this.controller.getObjectiveCardOptions(playerIndex)[0].getId() + ", " + this.controller.getObjectiveCardOptions(playerIndex)[1].getId());
+                        this.controller.setGamePhase(GamePhase.CHOOSEOBJECTIVEPHASE);
+                        this.showHand(clientIterator);
                     }
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-                this.controller.setGamePhase(GamePhase.CHOOSEOBJECTIVEPHASE);
             }
         }
         else{
@@ -243,6 +279,7 @@ public class Server implements VirtualServer {
 
             try {
                 this.controller.chooseInitialObjective(playerIndex, cardId);
+                client.printMessage("Thank you!");
                 numberAnswered++;
             } catch (InvalidObjectiveCardException e) {
                 client.printError("The objective card you selected was invalid, please try again");
@@ -251,12 +288,19 @@ public class Server implements VirtualServer {
 
             if (numberAnswered == clients.size()) {
                 numberAnswered = 0;
-                for (VirtualView clientIterator : this.clients.values()) {
-                    try {
-                        clientIterator.printMessage("The preparation phase is over, the first player can now play is turn");
-                    } catch (RemoteException e) {
-                        throw new RuntimeException(e);
+                try {
+                    for (VirtualView clientIterator : this.clients.values()) {
+                        if (clients.get(controller.getCurrentPlayerIndex()).equals(clientIterator)) {
+                            if (ping(clientIterator)){
+                                clientIterator.printMessage("The preparation phase is over, it's your turn to play as first, use the command PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)] to place your card");
+                            }
+                        } else {
+                            clientIterator.printMessage("The preparation phase is over, it's now the turn of " + controller.getPlayerNickname(controller.getCurrentPlayerIndex()) + " to play as first");
+                        }
+                        this.showHand(clientIterator);
                     }
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
                 }
                 this.controller.setGamePhase(GamePhase.MAINPHASE);
             }
@@ -266,6 +310,19 @@ public class Server implements VirtualServer {
                 client.printError("You cannot do this action now");
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public void showHand(VirtualView client) throws RemoteException {
+        if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.COLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
+            if (ping(client)) {
+                client.printMessage("this is your hand");
+            }
+        } else {
+            if (ping(client)) {
+                client.printError("Your hand is not been inizialized");
             }
         }
     }
@@ -283,11 +340,19 @@ public class Server implements VirtualServer {
 
             try{
                 placingCardId = Integer.parseInt(placingCardIdString);
-                tableCardId = Integer.parseInt(tableCardIdString);
             } catch (NumberFormatException e) {
-                client.printError("Please enter valid card ids");
+                client.printError("Please enter valid card id of placingCard");
                 return;
             }
+
+            try{
+                tableCardId = Integer.parseInt(tableCardIdString);
+            } catch (NumberFormatException e) {
+                client.printError("Please enter valid card id of tableCard");
+                return;
+            }
+
+
 
             try{
                 placingCardSide = Side.valueOf(placingCardSideValue.toUpperCase());
@@ -298,6 +363,18 @@ public class Server implements VirtualServer {
 
             try {
                 this.controller.placeCard(playerIndex, placingCardId, tableCardId, CornerPos.valueOf(tableCornerPos), placingCardSide);
+                for (VirtualView clientIterator : this.clients.values()) {
+                    if (client.equals(clientIterator)) {
+                        if (ping(clientIterator)){
+                            clientIterator.printMessage("you placed your card, now you have to draw your card with DRAW [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]");
+                        }
+                    } else {
+                        if (ping(clientIterator)){
+                            clientIterator.printMessage(controller.getPlayerNickname(controller.getCurrentPlayerIndex()) + "placed his card");
+                        }
+                    }
+                }
+
             } catch (CardNotPlacedException | WrongInstanceTypeException e) {
                 throw new RuntimeException(e);
             } catch (CardIsNotInHandException e) {
@@ -338,8 +415,25 @@ public class Server implements VirtualServer {
                 return;
             }
 
+
             try {
+                int playing_client_index = controller.getCurrentPlayerIndex();
                 this.controller.drawCard(drawType);
+                for (VirtualView clientIterator : this.clients.values()) {
+                    if (clients.get(playing_client_index).equals(clientIterator)) {
+                        if (ping(clientIterator)){
+                            clientIterator.printMessage("you drew your card, now is the turn of " + controller.getPlayerNickname(controller.getCurrentPlayerIndex()));
+                        }
+                    } else if (clients.get(controller.getCurrentPlayerIndex()).equals(clientIterator)) {
+                        if (ping(clientIterator)) {
+                            clientIterator.printMessage(controller.getPlayerNickname(playing_client_index) + "drew his card, now it's your turn to place your card with PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)]");
+                        }
+                    } else {
+                        if (ping(clientIterator)){
+                            clientIterator.printMessage(controller.getPlayerNickname(playing_client_index) + "drew his card, now it's the turn of " + controller.getPlayerNickname(controller.getCurrentPlayerIndex()) + " to place his card");
+                        }
+                    }
+                }
             } catch (InvalidHandException e) {
                 client.printError("Too many cards in hand");
             }
@@ -358,14 +452,12 @@ public class Server implements VirtualServer {
         if (controller.getGamePhase().equals(GamePhase.MAINPHASE)) {
             int playerIndex = getPlayerIndex(client);
             int cardId;
-
             try {
                 cardId = Integer.parseInt(cardIdString);
             } catch (NumberFormatException e) {
                 client.printError("Please enter a valid card id");
                 return;
             }
-
             try {
                 this.controller.flipCard(playerIndex, cardId);
             } catch (CardIsNotInHandException e) {

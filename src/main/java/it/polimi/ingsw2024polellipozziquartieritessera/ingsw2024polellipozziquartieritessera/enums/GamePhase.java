@@ -4,7 +4,6 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 public enum GamePhase {
     // TODO: check if the order is wrong
     NICKNAMEPHASE,
-    STARTPHASE,// choose one of the two objective cards from the two options and the side of the starter card
     CHOOSESTARTERSIDEPHASE,
     COLORPHASE,
     CHOOSEOBJECTIVEPHASE,

@@ -50,12 +50,11 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     @Override
     public void printMessage(String msg) {
-        System.out.print("\nINFO FROM SERVER: " + msg + "\n The possible commands are: [");
-        Client.printCommands();
+        System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
 
     @Override
-    public void printError(String msg) {
+    public void printError(String msg) throws RemoteException {
         System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
     }
 

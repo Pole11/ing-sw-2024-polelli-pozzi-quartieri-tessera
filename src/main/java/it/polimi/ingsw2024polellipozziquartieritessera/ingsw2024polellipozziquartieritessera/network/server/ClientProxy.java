@@ -15,18 +15,18 @@ public class ClientProxy implements VirtualView {
 
     @Override
     public void printMessage(String message) throws RemoteException {
-        output.println("MESSAGE, " + message);
+        output.println("MESSAGE; " + message);
         output.flush();
     }
 
     public void printError(String error) throws RemoteException {
-        output.println("ERROR, " + error);
+        output.println("ERROR; " + error);
         output.flush();
     }
 
     @Override
     public void ping(String ping) throws RemoteException {
-        output.println("PING, " + ping);
+        output.println("PING; " + ping);
         output.flush();
     }
 }

@@ -17,6 +17,7 @@ public class SocketClient implements VirtualView {
     final BufferedReader input;
     final ServerProxy server;
 
+
     public SocketClient(BufferedReader input, BufferedWriter output) {
         this.input = input;
         this.server = new ServerProxy(output);
@@ -61,7 +62,7 @@ public class SocketClient implements VirtualView {
         String line;
         // Read message type
         while ((line = input.readLine()) != null) {
-            String[] message = line.split(", ");
+            String[] message = line.split("; ");
             switch (message[0]) {
                 case "MESSAGE":
                     this.printMessage(message[1]);
@@ -81,15 +82,12 @@ public class SocketClient implements VirtualView {
 
     @Override
     public void printMessage(String msg) {
-        System.out.print("\nINFO FROM SERVER: " + msg + "\n The possible commands are: [");
-        Client.printCommands();
+        System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
-
 
     @Override
     public void printError(String msg) throws RemoteException {
-        System.err.print("\nERROR FROM SERVER: " + msg + "\n");
-
+        System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
     }
 
     @Override

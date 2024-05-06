@@ -23,7 +23,7 @@ public class Client{
 
         if (input.equalsIgnoreCase("socket")) {
             SocketClient.execute(host, port);
-        } else {
+        } else { //default rmi
             RmiClient.execute(host, port);
         }
     }
@@ -32,8 +32,8 @@ public class Client{
         boolean running = true;
         Scanner scan = new Scanner(System.in);
         System.out.println("Please enter a nickname to start, with the command ADDUSER <nickname>");
+        System.out.print("> ");
         while (running) {
-            System.out.print("> ");
             String line = scan.nextLine();
             String[] message = line.split(" ");
             if (line != null && !line.isEmpty() && !line.isBlank() && !line.equals("")) {
@@ -42,6 +42,8 @@ public class Client{
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
+            } else if (line != null){
+                System.out.print("> ");
             }
         }
     }
@@ -54,30 +56,36 @@ public class Client{
         try {
             Command.valueOf(message[0].toUpperCase());
         } catch(IllegalArgumentException e) {
-            System.err.println("INVALID COMMAND\n> ");
+            System.err.print("INVALID COMMAND\n> ");
             return;
         }
 
         switch (Command.valueOf(message[0].toUpperCase())) {
             case Command.HELP:
-                printCommands();
+                printAllCommands();
                 break;
             case Command.ADDUSER:
                 try {
                     server.addConnectedPlayer(client, message[1]);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.println("INVALID COMMAND\n> ");
+                    System.err.print("INVALID COMMAND\n> ");
                     return;
                 }
                 break;
+            case Command.SHOWNICKNAME:
+                server.showNickname(client);
+                break;
             case Command.START:
-                server.startGame();
+                server.startGame(client);
+                break;
+            case Command.SHOWHAND:
+                server.showHand(client);
                 break;
             case Command.CHOOSESTARTER:
                 try {
                     server.chooseInitialStarterSide(client, message[1]);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.println("INVALID COMMAND\n> ");
+                    System.err.print("INVALID COMMAND\n> ");
                     return;
                 }
                 break;
@@ -85,7 +93,7 @@ public class Client{
                 try {
                     server.chooseInitialColor(client, message[1]);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.println("INVALID COMMAND\n> ");
+                    System.err.print("INVALID COMMAND\n> ");
                     return;
                 }
                 break;
@@ -93,7 +101,7 @@ public class Client{
                 try {
                     server.chooseInitialObjective(client, message[1]);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.println("INVALID COMMAND\n> ");
+                    System.err.print("INVALID COMMAND\n> ");
                     return;
                 }
                 break;
@@ -101,7 +109,7 @@ public class Client{
                 try {
                     server.placeCard(client, message[1], message[2], message[3], message[4]);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.println("INVALID COMMAND\n> ");
+                    System.err.print("INVALID COMMAND\n> ");
                     return;
                 }
                 break;
@@ -109,7 +117,7 @@ public class Client{
                 try {
                     server.drawCard(client, message[1]);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.println("INVALID COMMAND\n> ");
+                    System.err.print("INVALID COMMAND\n> ");
                     return;
                 }
                 break;
@@ -117,7 +125,7 @@ public class Client{
                 try {
                     server.flipCard(client, message[1]);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.println("INVALID COMMAND\n> ");
+                    System.err.print("INVALID COMMAND\n> ");
                     return;
                 }
                 break;
@@ -125,18 +133,16 @@ public class Client{
                 server.openChat();
                 break;
             default:
-                System.err.println("[INVALID MESSAGE]\n> ");
+                System.err.print("INVALID COMMAND\n> ");
                 break;
         }
     }
 
-    // dopo questa esecuzione, in RMI torna subito a runCli, in Socket no, quindi in
-    //Socket non viene stampato subito >, mantre in RMI si
-    public static void printCommands() {
+    public static void printAllCommands() {
         System.out.print("The possible commands are: [");
         Arrays.stream(Command.values()).forEach(e->{
             System.out.print(e + ", ");
         });
-        System.out.print("]\n");
+        System.out.print("]\n> ");
     }
 }

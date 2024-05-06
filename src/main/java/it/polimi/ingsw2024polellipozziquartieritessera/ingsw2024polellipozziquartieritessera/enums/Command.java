@@ -4,10 +4,12 @@ public enum Command {
 
      HELP,
      ADDUSER,
+     SHOWNICKNAME,
      START,
      CHOOSESTARTER,
      CHOOSECOLOR,
      CHOOSEOBJECTIVE,
+     SHOWHAND,
      PLACECARD,
      DRAWCARD,
      FLIPCARD,

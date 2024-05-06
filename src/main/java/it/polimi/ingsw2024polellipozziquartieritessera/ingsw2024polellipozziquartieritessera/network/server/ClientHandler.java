@@ -26,7 +26,7 @@ public class ClientHandler implements VirtualView {
         System.out.println("New Socket client connected");
         while ((line = input.readLine()) != null) {
             System.out.println(line);
-            String[] message = line.split(", ");
+            String[] message = line.split("; ");
             // TODO: check if message[0] exists
             // Read message and perform action
             switch (Command.valueOf(message[0].toUpperCase())) {
@@ -34,9 +34,13 @@ public class ClientHandler implements VirtualView {
                     // TODO: check if message[1] exists
                     server.addConnectedPlayer(this, message[1]);
                     break;
+                case Command.SHOWNICKNAME:
+                    // TODO: check if message[1] exists
+                    server.showNickname(this);
+                    break;
                 case Command.START:
                     // TODO: check if message[1] exists
-                    server.startGame();
+                    server.startGame(this);
                     break;
                 case Command.CHOOSESTARTER:
                     // TODO: check if message[1] exists
@@ -49,6 +53,10 @@ public class ClientHandler implements VirtualView {
                 case Command.CHOOSEOBJECTIVE:
                     // TODO: check if message[1] exists
                     server.chooseInitialObjective(this, message[1]);
+                    break;
+                case Command.SHOWHAND:
+                    // TODO: check if message[1] exists
+                    server.showHand(this);
                     break;
                 case Command.PLACECARD:
                     // TODO: check if message[1] exists
@@ -71,7 +79,6 @@ public class ClientHandler implements VirtualView {
                     break;
             }
         }
-        //System.out.println("player disconnected");
     }
 
     @Override

@@ -247,7 +247,7 @@ public class GameState {
 
     // VII: si potrebbe come da specifica scegliere a questo punto
     // un giocatore randomico per essere il blackPlayer (al momento sembra superflua)
-    // ma fa schifo
+
 
     //------------ Starting Phases setter --------------------
 

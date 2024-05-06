@@ -50,6 +50,10 @@ public class Controller {
         return this.gameState.getCurrentPlayerIndex();
     }
 
+    public String getPlayerNickname(int index){
+        return this.gameState.getPlayer(index).getNickname();
+    }
+
     public ObjectiveCard[] getObjectiveCardOptions(int playerId) {
         return this.gameState.getPlayer(playerId).getObjectiveCardOptions();
     }
@@ -164,6 +168,7 @@ public class Controller {
             }
 
             player.setPoints(player.getPoints() + newPoints);
+            gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE);
         }
     }
 
@@ -216,8 +221,9 @@ public class Controller {
                     break;
                 default:
             }
-            // non so se vada bene qui
             this.gameState.setCurrentPlayerIndex(((this.gameState.getCurrentPlayerIndex() + 1) % this.gameState.getPlayers().size()));
+            //if (gameState.isConnected(getCurrentPlayerIndex()))
+            //da mettere in while, va al successivo giocatore se quello è disconnesso e controlla se sono tutti disconnessi, che stoppi il gioco
         }
     }
 

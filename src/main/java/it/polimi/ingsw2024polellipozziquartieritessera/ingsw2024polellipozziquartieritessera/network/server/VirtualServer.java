@@ -11,8 +11,9 @@ public interface VirtualServer extends Remote {
     public void connectRmi(VirtualView vv) throws RemoteException;
 
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException;
+    public void showNickname(VirtualView client) throws RemoteException;
 
-    public void startGame() throws RemoteException;
+    public void startGame(VirtualView client) throws RemoteException;
 
     public void chooseInitialStarterSide(VirtualView client, String side) throws RemoteException;
 
@@ -20,6 +21,7 @@ public interface VirtualServer extends Remote {
 
     public void chooseInitialObjective(VirtualView client, String cardId) throws RemoteException;
 
+    public void showHand(VirtualView client) throws RemoteException;
     public void placeCard(VirtualView client, String placingCardId, String tableCardId, String tableCornerPos, String placingCardSide) throws RemoteException;
 
     public void drawCard(VirtualView client, String drawType) throws RemoteException;
