@@ -81,12 +81,14 @@ public class SocketClient implements VirtualView {
 
     @Override
     public void printMessage(String msg) {
-        System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
+        Client.printMessage(msg);
+        //System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
 
     @Override
     public void printError(String msg) throws RemoteException {
-        System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
+        Client.printError(msg);
+        //System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
     }
 
     @Override

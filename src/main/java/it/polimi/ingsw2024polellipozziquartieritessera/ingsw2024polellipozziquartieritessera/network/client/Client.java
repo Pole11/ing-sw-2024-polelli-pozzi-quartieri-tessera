@@ -5,31 +5,27 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.net.Socket;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Client{
+public class Client {
+    private static boolean meDoGui;
+    private static GUIController guiController;
 
     public static void main(String[] args) throws IOException {
         String input = args[0];
@@ -44,6 +40,7 @@ public class Client{
     }
 
     public static void runCli(VirtualServer server, VirtualView client) {
+        meDoGui = false;
         boolean running = true;
         Scanner scan = new Scanner(System.in);
         System.out.println("Please enter a nickname to start, with the command ADDUSER <nickname>");
@@ -64,7 +61,8 @@ public class Client{
     }
 
     public static void runGui(){
-
+        new GUIApplication().runGui();
+        meDoGui = true;
     }
 
     private static void manageInput(VirtualServer server, String[] message, VirtualView client) throws RemoteException {
@@ -268,5 +266,21 @@ public class Client{
             }
         }
 
+    }
+
+    public static void printMessage(String msg) {
+        if (meDoGui) {
+            guiController.setServerMessage(msg);
+        } else {
+            System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
+        }
+    }
+
+    public static void printError(String msg) {
+        if (meDoGui) {
+
+        } else {
+            System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
+        }
     }
 }

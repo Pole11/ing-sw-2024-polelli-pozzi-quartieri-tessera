@@ -141,11 +141,11 @@ public class Server implements VirtualServer {
     public void showNickname(VirtualView client) throws RemoteException{
         if (clients.containsValue(client)){
             if(ping(client)){
-                client.printMessage("your nickname is " + controller.getPlayerNickname(getPlayerIndex(client)));
+                client.printMessage("Your nickname is " + controller.getPlayerNickname(getPlayerIndex(client)));
             }
         } else {
             if(ping(client)){
-                client.printError("you didn't choose a nickname, use the command ADDUSER [nickname] to do that");
+                client.printError("You didn't choose a nickname, use the command ADDUSER [nickname] to do that");
             }
         }
     }

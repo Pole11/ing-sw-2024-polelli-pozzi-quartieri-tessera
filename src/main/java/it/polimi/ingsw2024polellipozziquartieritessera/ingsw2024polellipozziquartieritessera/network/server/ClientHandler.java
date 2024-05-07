@@ -30,7 +30,13 @@ public class ClientHandler implements VirtualView {
             String[] message = line.split("; ");
             // TODO: check if message[0] exists
             // Read message and perform action
-            switch (Command.valueOf(message[0].toUpperCase())) {
+            Command command = null;
+            try {
+                command = Command.valueOf(message[0].toUpperCase());
+            } catch(IllegalArgumentException e) {
+                System.out.println("Invalid command: " + message[0]);
+            }
+            switch (command) {
                 case Command.ADDUSER:
                     // TODO: check if message[1] exists
                     server.addConnectedPlayer(this, message[1]);
