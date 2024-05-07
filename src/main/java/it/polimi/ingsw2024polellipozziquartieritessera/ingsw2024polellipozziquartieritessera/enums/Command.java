@@ -10,6 +10,7 @@ public enum Command {
      CHOOSECOLOR,
      CHOOSEOBJECTIVE,
      SHOWHAND,
+     SHOWOBJECTIVES,
      PLACECARD,
      DRAWCARD,
      FLIPCARD,

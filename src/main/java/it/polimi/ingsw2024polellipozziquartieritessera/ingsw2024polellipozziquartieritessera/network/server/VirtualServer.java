@@ -23,7 +23,7 @@ public interface VirtualServer extends Remote {
 
     public void showHand(VirtualView client) throws RemoteException;
 
-    //public void showCommonObjectives(VirtualView client);// show common objectives
+    public void showCommonObjectives(VirtualView client) throws RemoteException;// show common objectives
     //public void showObjectives(VirtualView client); // show two objective card (for starting choice)
     //public void showBoard(VirtualView client); // show current board
     //public void showSharedCards(VirtualView client);// show shared cards

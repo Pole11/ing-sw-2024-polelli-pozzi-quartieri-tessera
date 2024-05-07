@@ -335,6 +335,23 @@ public class Server implements VirtualServer {
     }
 
     @Override
+    public void showCommonObjectives(VirtualView client) throws RemoteException {
+        if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.COLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)){
+            if (ping(client)){
+                // TODO: implement method in controller
+                // int card1Id = controller.getSharedObjectives().get(0);
+                // int card2Id = controller.getSharedObjectives().get(1);
+
+                // client.printCard(card1Id, Side.UP, card2Id, SIde.UP);
+            }
+        } else{
+            if (ping(client)) {
+                client.printError("Your hand has not been inizialized");
+            }
+        }
+    }
+
+    @Override
     public void placeCard(VirtualView client, String placingCardIdString, String tableCardIdString, String tableCornerPos, String placingCardSideValue) throws RemoteException {
         int playerIndex = getPlayerIndex(client);
 

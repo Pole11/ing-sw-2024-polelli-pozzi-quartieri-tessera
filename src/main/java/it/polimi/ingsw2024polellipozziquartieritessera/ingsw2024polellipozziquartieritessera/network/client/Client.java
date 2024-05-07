@@ -18,6 +18,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -96,6 +97,9 @@ public class Client{
             case Command.SHOWHAND:
                 server.showHand(client);
                 break;
+            case Command.SHOWOBJECTIVES:
+                server.showCommonObjectives(client);
+                break;
             case Command.CHOOSESTARTER:
                 try {
                     server.chooseInitialStarterSide(client, message[1]);
@@ -161,6 +165,19 @@ public class Client{
         System.out.print("]\n> ");
     }
 
+    public static void printCard(int id1, Side side1, int id2, Side side2, int id3, Side side3){
+        printCard(id1, side1);
+        printCard(id2, side2);
+        printCard(id3, side3);
+        // TODO better
+    }
+
+    public static void printCard(int id1, Side side1, int id2, Side side2){
+        printCard(id1, side1);
+        printCard(id2, side2);
+        // TODO better
+    }
+
     public static void printCard(int cardId, Side side) {
         String filePath = new File("").getAbsolutePath();
         String jsonString = null;
@@ -172,101 +189,162 @@ public class Client{
         Gson gson = new Gson();
         Map cards = gson.fromJson(jsonString, Map.class);
 
-        for (Object key : cards.keySet()) {
+
+        for (Object key : cards.keySet()){
             Map card = gson.fromJson(cards.get(key).toString(), Map.class);
-            Integer id = Integer.parseInt(key.toString());
+            int id = Integer.parseInt(key.toString());
 
-            if (id == cardId) {
-                // ------ creating challenges ------
-                CoverageChallenge coverageChallenge = null;
-                ElementChallenge elementChallenge = null;
-                StructureChallenge structureChallenge = null;
-                Challenge challenge = null;
-
-                if (card.get("Type").equals("Objective") || card.get("Type").equals("Gold")){
-                    if (card.get("ChallengeType").equals("ElementChallenge")){
-                        ArrayList<Element> elements = new ArrayList<>();
-                        for (Object e : (ArrayList) card.get("ChallengeElements")) {
-                            elements.add(Element.valueOf(e.toString().toUpperCase()));
-                        }
-                        // printa elementChallenge con elements
-                    } else if (card.get("ChallengeType").equals("StructureChallenge")){
-                        Element[][] configuration = new Element[Config.N_STRUCTURE_CHALLENGE_CONFIGURATION][Config.N_STRUCTURE_CHALLENGE_CONFIGURATION];
-                        for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
-                            for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
-                                configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(3*i+j).toString().toUpperCase() );
-                            }
-                        }
-                        // printa structureChallenge configuration
-                    } else if (card.get("ChallengeType").equals("CoverageChallenge")){
-                        // printa coverageChallenge
-                    } else if (card.get("ChallengeType").equals("NoChallenge")){
-                        // non printare challenge ma spazi vuoti tipo
-                    } else {
-                        throw new RuntimeException(); //sistema
-                    }
-                }
-
-                if (card.get("Type").equals("Objective")){
-                    // printa (int) Double.parseDouble(card.get("Points").toString())
-                } else {
-                    // ------ creating corners ------
-                    Corner[] frontCorners = new Corner[Config.N_CORNERS];
-                    Corner[] backCorners = new Corner[Config.N_CORNERS];
-
-
-                    //for in frontCorners
-                    for (int i = 0; i < Config.N_CORNERS; i++){
-                        String element = ((ArrayList) card.get("FrontCorners")).get(i).toString();
-                        // card.get("FrontCorners")).getClass() returns ArrayList so casting should be good
-                        if (element.equals("Empty")){
-                            //probably can be removed because it falls in the else clause, also in line 135
-                            frontCorners[i] = new Corner(Element.EMPTY, id, false);
-                        } else if(element.equals("Hidden")) {
-                            frontCorners[i] = new Corner(Element.EMPTY, id, true);;
-                        } else {
-                            frontCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id, false);
-                        }
-                        // printa contenuto dei corner
-                    }
-                    //for in backCorners
-                    for (int i = 0; i < Config.N_CORNERS; i++) {
-                        String element = ((ArrayList) card.get("BackCorners")).get(i).toString();
-                        // card.get("BackCorners")).getClass() returns ArrayList so casting should be good
-                        if (element.equals("Empty")) {
-                            backCorners[i] = new Corner(Element.EMPTY, id, false);
-                        } else if(element.equals("Hidden")) {
-                            backCorners[i] = new Corner(Element.EMPTY, id, true);
-                        } else {
-                            backCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id, false);
-                        }
-                        // printa contenuto dei corner
-                    }
-                    // ------ creating cards ------
-                    if (card.get("Type").equals("Resource")) {
-                        // printa Element.valueOf(card.get("ResourceType").toString().toUpperCase())
-                        // printa (int) Double.parseDouble(card.get("Points").toString())
-                        // printa i corner
-                    } else if (card.get("Type").equals("Gold")) {
-                        ArrayList<Element> elements = new ArrayList<>();
-                        for (Object e : (ArrayList) card.get("ResourceNeeded")) {
-                            elements.add(Element.valueOf(e.toString().toUpperCase()));
-                        }
-                        // printa Element.valueOf(card.get("ResourceType").toString().toUpperCase())
-                        // printa elements
-                        // printa Double.parseDouble(card.get("Points").toString())
-                    } else if (card.get("Type").equals("Starter")) {
-                        ArrayList<Element> elements = new ArrayList<>();
-                        for (Object e : (ArrayList) card.get("CenterResources")) {
-                            elements.add(Element.valueOf(e.toString().toUpperCase()));
-                        }
-                        // printa frontCorners
-                        // printa backCorners
-                        // printa elements
-                    }
+            if (id == cardId){
+                switch (card.get("Type").toString()){
+                    case "Objective":
+                        printObjectiveCard(card);
+                        break;
+                    case "Resource":
+                        printResourceCard(card, side);
+                        break;
+                    case "Gold":
+                        printGoldCard(card, side);
+                        break;
+                    case "Starter":
+                        printStarterCard(card, side);
+                        break;
                 }
             }
         }
+    }
 
+    private static void printObjectiveCard(Map card){
+        // attributes
+        String points;
+        ArrayList<Element> elementChallenge = null;
+        Element[][] structureChallenge = null;
+
+        // set points
+        points = card.get("Points").toString();
+
+        // set challenge
+        if (card.get("ChallengeType").equals("StructureChallenge")){
+            Element[][] configuration = new Element[Config.N_STRUCTURE_CHALLENGE_CONFIGURATION][Config.N_STRUCTURE_CHALLENGE_CONFIGURATION];
+            for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
+                for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
+                    configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(3*i+j).toString().toUpperCase() );
+                }
+            }
+            structureChallenge = configuration;
+        } else if (card.get("ChallengeType").equals("ElementChallenge")){
+            ArrayList<Element> elements = new ArrayList<>();
+            for (Object e : (ArrayList) card.get("ChallengeElements")) {
+                elements.add(Element.valueOf(e.toString().toUpperCase()));
+            }
+            elementChallenge = elements;
+        }
+
+        // TODO: printing
+    }
+
+    private static void printResourceCard(Map card, Side side){
+        // attributes
+        String points;
+        Element resource;
+        Element[] frontCorners = new Element[Config.N_CORNERS];
+        Element[] backCorners = new Element[Config.N_CORNERS];
+
+        // set points
+        points = card.get("Points").toString();
+
+        // set resource
+        resource = Element.valueOf(card.get("Resource").toString().toUpperCase());
+
+        // set corners
+        //for in frontCorners
+        for (int i = 0; i < Config.N_CORNERS; i++){
+            frontCorners[i] = Element.valueOf(((ArrayList) card.get("FrontCorners")).get(i).toString().toUpperCase());
+        }
+        //for in backCorners
+        for (int i = 0; i < Config.N_CORNERS; i++) {
+            backCorners[i] = Element.valueOf(((ArrayList) card.get("BackCorners")).get(i).toString().toUpperCase());
+        }
+
+        // TODO: printing
+
+        // if (side) ...
+    }
+
+    private static void printGoldCard(Map card, Side side){
+        // attributes
+        String points;
+        Element resource;
+        Element[] frontCorners = new Element[Config.N_CORNERS];
+        Element[] backCorners = new Element[Config.N_CORNERS];
+        boolean coverageChallenge = false;
+        boolean noChallenge = false;
+        ArrayList<Element> elementChallenge = null;
+        ArrayList<Element> resourceNeeded = null;
+
+        // set points
+        points = card.get("Points").toString();
+
+        // set resource
+        resource = Element.valueOf(card.get("Resource").toString().toUpperCase());
+
+        // set corners
+        //for in frontCorners
+        for (int i = 0; i < Config.N_CORNERS; i++){
+            frontCorners[i] = Element.valueOf(((ArrayList) card.get("FrontCorners")).get(i).toString().toUpperCase());
+        }
+        //for in backCorners
+        for (int i = 0; i < Config.N_CORNERS; i++) {
+            backCorners[i] = Element.valueOf(((ArrayList) card.get("BackCorners")).get(i).toString().toUpperCase());
+        }
+
+        // set challenge
+        if (card.get("ChallengeType").equals("Coverage")){
+            coverageChallenge = true;
+        } else if (card.get("ChallengeType").equals("ElementChallenge")){
+            ArrayList<Element> elements = new ArrayList<>();
+            for (Object e : (ArrayList) card.get("ChallengeElements")) {
+                elements.add(Element.valueOf(e.toString().toUpperCase()));
+            }
+            elementChallenge = elements;
+        } else{
+            noChallenge = true;
+        }
+
+        // set needed resources
+        for (Object e : (ArrayList) card.get("ResourceNeeded")) {
+            resourceNeeded.add(Element.valueOf(e.toString().toUpperCase()));
+        }
+
+        // TODO: printing
+
+        // if (side) ...
+    }
+
+    private static void printStarterCard(Map card, Side side){
+        // attributes
+        Element[] frontCorners = new Element[Config.N_CORNERS];
+        Element[] backCorners = new Element[Config.N_CORNERS];
+        ArrayList<Element> centerResources = null;
+
+        // set corners
+        //for in frontCorners
+        for (int i = 0; i < Config.N_CORNERS; i++){
+            frontCorners[i] = Element.valueOf(((ArrayList) card.get("FrontCorners")).get(i).toString().toUpperCase());
+        }
+        //for in backCorners
+        for (int i = 0; i < Config.N_CORNERS; i++) {
+            backCorners[i] = Element.valueOf(((ArrayList) card.get("BackCorners")).get(i).toString().toUpperCase());
+        }
+
+        // set center resources
+        for (Object e : (ArrayList) card.get("CenterResources")) {
+            centerResources.add(Element.valueOf(e.toString().toUpperCase()));
+        }
+
+        // TODO: printing
+    }
+
+    private static int getId(Object key) {
+        return Integer.parseInt(key.toString());
     }
 }
