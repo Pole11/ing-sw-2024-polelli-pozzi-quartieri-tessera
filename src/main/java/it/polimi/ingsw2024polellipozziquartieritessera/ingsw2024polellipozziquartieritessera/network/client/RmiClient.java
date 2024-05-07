@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
 
@@ -50,6 +51,7 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     @Override
     public void printMessage(String msg) {
+        // check if there is gui and if so show the message on the gui
         System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
 
@@ -62,4 +64,25 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     public void ping(String ping) throws RemoteException {
 
     }
+
+    @Override
+    public void printCard(int id1, Side side1, int id2, Side side2, int id3, Side side3) throws RemoteException {
+        System.out.print("\n");
+        Client.printCard(id1, side1);
+        Client.printCard(id2, side2);
+        Client.printCard(id3, side3);
+
+        System.out.print("\n> ");
+    }
+
+    @Override
+    public void printCard(int id1, Side side1, int id2, Side side2) throws RemoteException {
+        
+    }
+
+    @Override
+    public void printCard(int id, Side side) throws RemoteException {
+
+    }
+
 }

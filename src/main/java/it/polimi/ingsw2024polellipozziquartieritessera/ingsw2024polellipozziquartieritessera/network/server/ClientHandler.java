@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.GamePhase;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
 
@@ -94,5 +95,18 @@ public class ClientHandler implements VirtualView {
     @Override
     public void ping(String ping) throws RemoteException {
         view.ping(ping);
+    }
+
+    @Override
+    public void printCard(int id1, Side side1, int id2, Side side2, int id3, Side side3) throws RemoteException {
+        view.printCard(id1, side1, id2, side2, id3, side3);
+    }
+    @Override
+    public void printCard(int id1, Side side1, int id2, Side side2) throws RemoteException {
+        view.printCard(id1, side1, id2, side2);
+    }
+    @Override
+    public void printCard(int id, Side side) throws RemoteException {
+        view.printCard(id, side);
     }
 }

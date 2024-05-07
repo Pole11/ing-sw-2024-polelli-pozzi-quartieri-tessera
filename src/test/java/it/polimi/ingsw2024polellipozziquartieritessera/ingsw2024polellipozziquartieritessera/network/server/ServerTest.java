@@ -18,8 +18,8 @@ public class ServerTest {
     @Test
     public void GameIsFullTest() throws IOException, NotBoundException {
         String host = "127.0.0.1";
-        String portRmi = "6969";
-        String portSocket = "7777";
+        String portRmi = "1234";
+        String portSocket = "1235";
 
         Registry registry = LocateRegistry.getRegistry(host, Integer.parseInt(portRmi));
         VirtualServer server = (VirtualServer) registry.lookup("VirtualServer");

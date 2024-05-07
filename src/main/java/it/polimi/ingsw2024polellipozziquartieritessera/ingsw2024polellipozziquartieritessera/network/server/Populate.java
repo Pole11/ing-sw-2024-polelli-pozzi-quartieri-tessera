@@ -28,7 +28,7 @@ public class Populate {
         return false;
     }
 
-    private static String readJSON(String fileName) throws IOException {
+    public static String readJSON(String fileName) throws IOException {
         BufferedReader reader= null;
         try {reader = new BufferedReader(new FileReader(fileName));}
         catch (IOException e) {
@@ -58,7 +58,6 @@ public class Populate {
         gameState.setMainBoard();
         return gameState;
     }
-
 
     public static GameState createCardsMap() throws IOException, WrongStructureConfigurationSizeException {
         GameState gameState = new GameState();

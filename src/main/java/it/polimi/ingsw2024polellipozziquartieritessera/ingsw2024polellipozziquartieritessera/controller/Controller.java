@@ -7,6 +7,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.io.IOException;
 import java.util.*;
+import java.util.Collections;
 
 public class Controller {
     GameState gameState;
@@ -254,4 +255,23 @@ public class Controller {
         }
     }
 
+    public ArrayList<Integer> getHandId(int playerIndex){
+        ArrayList<Integer> cardHandId = new ArrayList<>();
+        cardHandId.addAll(gameState.getPlayer(playerIndex).getHandCardsMap().keySet());
+        Collections.sort(cardHandId);
+        return cardHandId;
+    }
+
+    public ArrayList<Side> getHandSide(int playerIndex){
+        ArrayList<Integer> cardHandId = new ArrayList<>();
+        cardHandId.addAll(gameState.getPlayer(playerIndex).getHandCardsMap().keySet());
+        Collections.sort(cardHandId);
+
+        ArrayList<Side> cardHandsSide = new ArrayList<>();
+        for (int cardId : cardHandId){
+            cardHandsSide.add(gameState.getPlayer(playerIndex).getHandCardsMap().get(cardId));
+        }
+
+        return cardHandsSide;
+    }
 }

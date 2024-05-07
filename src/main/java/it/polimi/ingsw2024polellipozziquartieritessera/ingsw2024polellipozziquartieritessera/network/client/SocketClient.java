@@ -17,7 +17,6 @@ public class SocketClient implements VirtualView {
     final BufferedReader input;
     final ServerProxy server;
 
-
     public SocketClient(BufferedReader input, BufferedWriter output) {
         this.input = input;
         this.server = new ServerProxy(output);
@@ -94,4 +93,20 @@ public class SocketClient implements VirtualView {
     public void ping(String ping) throws RemoteException {
 
     }
+
+    @Override
+    public void printCard(int id1, Side side1, int id2, Side side2, int id3, Side side3) throws RemoteException {
+
+    }
+
+    @Override
+    public void printCard(int id1, Side side1, int id2, Side side2) throws RemoteException {
+
+    }
+
+    @Override
+    public void printCard(int id, Side side) throws RemoteException {
+
+    }
+
 }

@@ -156,7 +156,7 @@ public class Server implements VirtualServer {
             System.out.println("Starting game");
             for (VirtualView clientIterator : this.clients.values()) {
                 if (ping(clientIterator)){
-                    clientIterator.printMessage("The game has begun, Please choose the side of your starter card with the command " + Command.CHOOSESTARTER + " [Front / Back]");
+                    clientIterator.printMessage("The game has begun. Please choose the side of your starter card with the command " + Command.CHOOSESTARTER + " [Front / Back]");
                 }
             }
             this.controller.startGame();
@@ -169,7 +169,7 @@ public class Server implements VirtualServer {
                 }
             } else {
                 if (ping(client)){
-                    client.printError("you must choose your nickname with adduser first");
+                    client.printError("You must choose your nickname with adduser first");
                 }
             }
 
@@ -318,11 +318,18 @@ public class Server implements VirtualServer {
     public void showHand(VirtualView client) throws RemoteException {
         if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.COLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
             if (ping(client)) {
-                client.printMessage("this is your hand");
+                int card1Id = controller.getHandId(getPlayerIndex(client)).get(0);
+                Side card1Side = controller.getHandSide(getPlayerIndex(client)).get(0);
+                int card2Id = controller.getHandId(getPlayerIndex(client)).get(1);
+                Side card2Side = controller.getHandSide(getPlayerIndex(client)).get(1);
+                int card3Id = controller.getHandId(getPlayerIndex(client)).get(2);
+                Side card3Side = controller.getHandSide(getPlayerIndex(client)).get(2);
+
+                client.printCard(card1Id, card1Side, card2Id, card2Side, card3Id, card3Side);
             }
         } else {
             if (ping(client)) {
-                client.printError("Your hand is not been inizialized");
+                client.printError("Your hand has not been inizialized");
             }
         }
     }
@@ -351,8 +358,6 @@ public class Server implements VirtualServer {
                 client.printError("Please enter valid card id of tableCard");
                 return;
             }
-
-
 
             try{
                 placingCardSide = Side.valueOf(placingCardSideValue.toUpperCase());
@@ -388,7 +393,7 @@ public class Server implements VirtualServer {
             } catch (GoldCardCannotBePlacedException e) {
                 client.printError("You don't have the elements to place this card");
             } catch (CardAlreadPlacedException e) {
-                client.printError("... You are certainly hackering ...");
+                client.printError("... You are certainly hacking ...");
             }
         } else {
             try {
@@ -414,7 +419,6 @@ public class Server implements VirtualServer {
                 client.printError("Please enter a valid draw type");
                 return;
             }
-
 
             try {
                 int playing_client_index = controller.getCurrentPlayerIndex();
