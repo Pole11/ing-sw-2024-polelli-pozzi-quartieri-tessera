@@ -14,7 +14,6 @@ import java.rmi.registry.Registry;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerTest {
-
     @Test
     public void GameIsFullTest() throws IOException, NotBoundException {
         String host = "127.0.0.1";

@@ -2,6 +2,8 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongInstanceTypeException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +28,18 @@ public class StarterCard extends CornerCard {
     }
 
     // METHODS
+
+
+    @Override
+    public Challenge getChallenge() {
+        return null;
+    }
+
+    @Override
+    public int calculatePoints(Player player) {
+        return 0;
+    }
+
     // return null (it needs to be implemented because it's an abstract method in CornerCard)
     public Element getResourceType() throws WrongInstanceTypeException {
         throw new WrongInstanceTypeException("called a method on starter card that is implemented only on Resource or Gold card");

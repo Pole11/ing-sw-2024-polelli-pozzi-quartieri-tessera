@@ -19,7 +19,7 @@ public class CornerTest {
     void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
 
-        CornerCard card = g.getCornerCard(40);
+        CornerCard card = (CornerCard) g.getCard(40);
         Corner corner = card.getCorners().getFirst();
 
         corner.setLinkedCorner(corner.getLinkedCorner());

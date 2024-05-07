@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ControllerTest {
     @Test
-    void placeCard() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
+    void placeCardTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
 
         int starterCardId = 85;
         Side starterCardSide = Side.BACK;
@@ -48,7 +48,7 @@ public class ControllerTest {
         gs.getMainBoard().shuffleCards();
         gs.getMainBoard().initSharedGoldCards();
         gs.getMainBoard().initSharedResourceCards();
-        player.setStarterCard(gs.getStarterCard(starterCardId));
+        player.setStarterCard((StarterCard) gs.getCard(starterCardId));
         player.initializeBoard();
         c.chooseInitialStarterSide(0, starterCardSide);
 
@@ -59,8 +59,8 @@ public class ControllerTest {
 
         player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
         c.placeCard(0, resourceCardId1, starterCardId, resourceCard1ToTableCornerPos, resourceCard1Side);
-        ArrayList<Corner> starterCardCorners = gs.getCornerCard(starterCardId).getCorners(starterCardSide);
-        ArrayList<Corner> resourceCard1Corners = gs.getCornerCard(resourceCardId1).getCorners(resourceCard1Side);
+        ArrayList<Corner> starterCardCorners = ((StarterCard) gs.getCard(starterCardId)).getCorners(starterCardSide);
+        ArrayList<Corner> resourceCard1Corners = ((CornerCard) gs.getCard(resourceCardId1)).getCorners(resourceCard1Side);
 
         for (CornerPos cpos : CornerPos.values()) {
             if (cpos.equals(resourceCard1ToTableCornerPos)) {
@@ -91,8 +91,8 @@ public class ControllerTest {
 
         player.getHandCardsMap().put(resourceCardId2, Side.FRONT);
         c.placeCard(0, resourceCardId2, resourceCardId1, resourceCard2ToTableCornerPos, resourceCard2Side);
-        resourceCard1Corners = gs.getCornerCard(resourceCardId1).getCorners(resourceCard1Side);
-        ArrayList<Corner> resourceCard2Corners = gs.getCornerCard(resourceCardId2).getCorners(resourceCard2Side);
+        resourceCard1Corners = ((CornerCard) gs.getCard(resourceCardId1)).getCorners(resourceCard1Side);
+        ArrayList<Corner> resourceCard2Corners = ((CornerCard) gs.getCard(resourceCardId2)).getCorners(resourceCard2Side);
 
         for (CornerPos cpos : CornerPos.values()) {
             if (cpos.equals(resourceCard2ToTableCornerPos)) {
@@ -121,8 +121,8 @@ public class ControllerTest {
 
         player.getHandCardsMap().put(resourceCardId3, Side.FRONT);
         c.placeCard(0, resourceCardId3, resourceCardId1, resourceCard3ToTableCornerPos, resourceCard3Side);
-        resourceCard1Corners = gs.getCornerCard(resourceCardId1).getCorners(resourceCard1Side);
-        ArrayList<Corner> resourceCard3Corners = gs.getCornerCard(resourceCardId3).getCorners(resourceCard3Side);
+        resourceCard1Corners = ((CornerCard) gs.getCard(resourceCardId1)).getCorners(resourceCard1Side);
+        ArrayList<Corner> resourceCard3Corners = ((CornerCard) gs.getCard(resourceCardId3)).getCorners(resourceCard3Side);
 
         for (CornerPos cpos : CornerPos.values()) {
             if (cpos.equals(resourceCard3ToTableCornerPos)) {
@@ -151,8 +151,8 @@ public class ControllerTest {
 
         player.getHandCardsMap().put(resourceCardId4, Side.FRONT);
         c.placeCard(0, resourceCardId4, resourceCardId3, resourceCard4ToTableCornerPos, resourceCard4Side);
-        resourceCard3Corners = gs.getCornerCard(resourceCardId3).getCorners(resourceCard3Side);
-        ArrayList<Corner> resourceCard4Corners = gs.getCornerCard(resourceCardId4).getCorners(resourceCard4Side);
+        resourceCard3Corners = ((CornerCard) gs.getCard(resourceCardId3)).getCorners(resourceCard3Side);
+        ArrayList<Corner> resourceCard4Corners = ((CornerCard) gs.getCard(resourceCardId4)).getCorners(resourceCard4Side);
 
         for (CornerPos cpos : CornerPos.values()) {
             if (cpos.equals(resourceCard4ToTableCornerPos)) {
@@ -180,8 +180,8 @@ public class ControllerTest {
 
         player.getHandCardsMap().put(goldCardId, Side.FRONT);
         c.placeCard(0, goldCardId, resourceCardId2, goldCardToTableCornerPos, goldCardSide);
-        resourceCard2Corners = gs.getCornerCard(resourceCardId2).getCorners(resourceCard2Side);
-        ArrayList<Corner> goldCardCorners = gs.getCornerCard(goldCardId).getCorners(goldCardSide);
+        resourceCard2Corners = ((CornerCard)  gs.getCard(resourceCardId2)).getCorners(resourceCard2Side);
+        ArrayList<Corner> goldCardCorners = ((CornerCard)  gs.getCard(goldCardId)).getCorners(goldCardSide);
 
         assertEquals(false, goldCardCorners.get(CornerPos.UPLEFT.ordinal()).getCovered());
         assertEquals(null,
@@ -274,7 +274,7 @@ public class ControllerTest {
         gs.getMainBoard().shuffleCards();
         gs.getMainBoard().initSharedGoldCards();
         gs.getMainBoard().initSharedResourceCards();
-        player.setStarterCard(gs.getStarterCard(starterCardId));
+        player.setStarterCard((StarterCard) gs.getCard(starterCardId));
         player.initializeBoard();
         gs.setHands();
         c.chooseInitialStarterSide(0, Side.FRONT);

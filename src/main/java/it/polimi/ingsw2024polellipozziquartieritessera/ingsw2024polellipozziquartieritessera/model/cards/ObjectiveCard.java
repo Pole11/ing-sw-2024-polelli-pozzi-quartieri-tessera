@@ -1,5 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
 
 public class ObjectiveCard extends Card {
@@ -21,6 +22,15 @@ public class ObjectiveCard extends Card {
     public Challenge getChallenge() {
         return challenge;
     }
+
+    public int calculatePoints(Player player){
+        int timesWon = this.challenge.getTimesWon(player, this);
+        if (timesWon > 0) {
+            player.incrementObjectivesWon();
+        }
+        return timesWon*this.points;
+    }
+
 
     @Override
     public ObjectiveCard getCard(){

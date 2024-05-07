@@ -1,6 +1,9 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.CardNotPlacedException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
 
 import java.util.ArrayList;
 
@@ -24,6 +27,20 @@ public class ResourceCard extends CornerCard {
     }
 
     // METHODS
+
+
+    @Override
+    public Challenge getChallenge() {
+        return null;
+    }
+
+    @Override
+    public int calculatePoints(Player player) throws CardNotPlacedException {
+        if (!player.getPlacedCardsMap().containsKey(this.getId())) throw new CardNotPlacedException("The card is not placed");
+        if (player.getBoardSide(this.getId()).equals(Side.BACK)) return 0;
+        return this.getPoints();
+    }
+
     // returns the resource visible on the side requested
     public ArrayList<Element> getUncoveredElements(Side side){
         // resource array initialization

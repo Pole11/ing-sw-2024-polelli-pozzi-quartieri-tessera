@@ -17,7 +17,7 @@ public class ObjectiveCardTest {
     void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
 
-        GoldCard card = (GoldCard) g.getCornerCard(45);
+        GoldCard card = (GoldCard) g.getCard(45);
 
         assertNotNull(card.getResourceNeeded());
         assertNotNull(card.getResourceType());

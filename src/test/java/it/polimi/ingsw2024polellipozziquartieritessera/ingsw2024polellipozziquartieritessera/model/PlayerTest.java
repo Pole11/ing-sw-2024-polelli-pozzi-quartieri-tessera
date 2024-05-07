@@ -90,12 +90,11 @@ public class PlayerTest {
         gs.getMainBoard().shuffleCards();
         gs.getMainBoard().initSharedGoldCards();
         gs.getMainBoard().initSharedResourceCards();
-        player.setStarterCard(gs.getStarterCard(starterCardId));
+        player.setStarterCard((StarterCard)  gs.getCard(starterCardId));
         player.initializeBoard();
         c.chooseInitialStarterSide(0, Side.FRONT);
 
-        //NON FUNZIONA
-        assertThrows(CardNotPlacedException.class ,() -> player.getCardPoints(gs.getCornerCard(3)));
+        assertThrows(CardNotPlacedException.class ,() ->  gs.getCard(3).calculatePoints(player));
 
         player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
         c.placeCard(0, resourceCardId1, player.getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.BACK);
@@ -112,7 +111,6 @@ public class PlayerTest {
         assertThrows(CardAlreadyPresentOnTheCornerException.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.BACK));
         assertThrows(GoldCardCannotBePlacedException.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT));
         assertThrows(GoldCardCannotBePlacedException.class, () -> c.placeCard(0, goldCardId1, resourceCardId1, CornerPos.DOWNRIGHT, Side.FRONT));
-
 
         c.placeCard(0, goldCardId1, resourceCardId1, CornerPos.DOWNRIGHT, Side.BACK);
         assertEquals(0, player.getPoints());
@@ -296,7 +294,7 @@ public class PlayerTest {
         gs.getMainBoard().shuffleCards();
         gs.getMainBoard().initSharedGoldCards();
         gs.getMainBoard().initSharedResourceCards();
-        player.setStarterCard(gs.getStarterCard(starterCardId));
+        player.setStarterCard((StarterCard) gs.getCard(starterCardId));
         player.initializeBoard();
         c.chooseInitialStarterSide(0, Side.FRONT);
 
@@ -309,15 +307,15 @@ public class PlayerTest {
 
         player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
         c.placeCard(0, resourceCardId1, player.getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
-        assertEquals(0, player.getTimesWonStructure((StructureChallenge) objective1.getChallenge()));
+        assertEquals(0, objective1.getChallenge().getTimesWon(player, objective1));
 
         player.getHandCardsMap().put(resourceCardId2, Side.FRONT);
         c.placeCard(0, resourceCardId2, resourceCardId1, CornerPos.UPRIGHT, Side.BACK);
-        assertEquals(0, player.getTimesWonStructure((StructureChallenge) objective1.getChallenge()));
+        assertEquals(0, objective1.getChallenge().getTimesWon(player, objective1));
 
         player.getHandCardsMap().put(resourceCardId3, Side.FRONT);
         c.placeCard(0, resourceCardId3, resourceCardId2, CornerPos.UPRIGHT, Side.BACK);
-        assertEquals(1, player.getTimesWonStructure((StructureChallenge) objective1.getChallenge()));
+        assertEquals(1, objective1.getChallenge().getTimesWon(player, objective1));
 
     }
 

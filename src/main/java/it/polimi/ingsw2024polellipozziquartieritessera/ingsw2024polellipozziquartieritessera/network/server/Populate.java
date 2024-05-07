@@ -18,10 +18,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Populate {
-
 
     public static boolean existStore(){
         //check if exists store
@@ -48,11 +48,10 @@ public class Populate {
     }
 
     public static GameState populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
+        //superfluo ma cambia dopo merge
         GameState gameState = createCardsMap();
-        gameState.setMainBoard();
         return gameState;
     }
-
 
     public static GameState createCardsMap() throws IOException, WrongStructureConfigurationSizeException {
         GameState gameState = new GameState();
@@ -63,95 +62,42 @@ public class Populate {
         Map cards = gson.fromJson(jsonString, Map.class);
 
         for (Object key : cards.keySet()) {
+
             Map card = gson.fromJson(cards.get(key).toString(), Map.class);
             Integer id = Integer.parseInt(key.toString());
 
             // ------ creating challenges ------
-            CoverageChallenge coverageChallenge = null;
-            ElementChallenge elementChallenge = null;
-            StructureChallenge structureChallenge = null;
-            Challenge challenge = null;
-
-            if (card.get("Type").equals("Objective") || card.get("Type").equals("Gold")){
-                if (id < Config.firstObjectiveCardId && card.get("Type").equals("Objective")) Config.firstObjectiveCardId = id;
-                if (card.get("ChallengeType").equals("ElementChallenge")){
-                    ArrayList<Element> elements = new ArrayList<>();
-                    for (Object e : (ArrayList) card.get("ChallengeElements")){
-                        elements.add(Element.valueOf(e.toString().toUpperCase()));
-                    }
-
-                    elementChallenge = new ElementChallenge(elements);
-                    challenge = elementChallenge;
-                    gameState.setElementChallenge(id, elementChallenge);
-                } else if (card.get("ChallengeType").equals("StructureChallenge")){
-                    Element[][] configuration = new Element[Config.N_STRUCTURE_CHALLENGE_CONFIGURATION][Config.N_STRUCTURE_CHALLENGE_CONFIGURATION];
-                    for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
-                        for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
-                            configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(3*i+j).toString().toUpperCase() );
-                        }
-                    }
-                    structureChallenge = new StructureChallenge(configuration);
-                    challenge = structureChallenge;
-                    gameState.setStructureChallenge(id, structureChallenge);
-
-                } else if (card.get("ChallengeType").equals("CoverageChallenge")){
-                    coverageChallenge = new CoverageChallenge();
-                    challenge = coverageChallenge;
-                    gameState.setCoverageChallenge(id, coverageChallenge);
-                } else if (card.get("ChallengeType").equals("NoChallenge")){
-
-                } else {
-                    System.out.println(card.get("ChallengeType"));
-                    throw new RuntimeException(); //sistema
-                }
-            }
+            Challenge challenge = createChallenge(card);
 
             if (card.get("Type").equals("Objective")){
+                if (id < Config.firstObjectiveCardId) Config.firstObjectiveCardId = id;
                 gameState.addCardToCardsMap(id, new ObjectiveCard(id, challenge, (int) Double.parseDouble(card.get("Points").toString())  ));
             } else {
+
                 // ------ creating corners ------
-                Corner[] frontCorners = new Corner[Config.N_CORNERS];
-                Corner[] backCorners = new Corner[Config.N_CORNERS];
+                Corner[] frontCorners = createCorners("FrontCorners", card, id);
+                Corner[] backCorners = createCorners("BackCorners", card, id);
 
 
-                //for in frontCorners
-                for (int i = 0; i < Config.N_CORNERS; i++){
-                    String element = ((ArrayList) card.get("FrontCorners")).get(i).toString();
-                    // card.get("FrontCorners")).getClass() returns ArrayList so casting should be good
-                    if (element.equals("Empty")){
-                        //probably can be removed because it falls in the else clause, also in line 135
-                        frontCorners[i] = new Corner(Element.EMPTY, id, false);
-                    } else if(element.equals("Hidden")) {
-                        frontCorners[i] = new Corner(Element.EMPTY, id, true);;
-                    } else {
-                        frontCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id, false);
-                    }
-                }
-                //for in backCorners
-                for (int i = 0; i < Config.N_CORNERS; i++) {
-                    String element = ((ArrayList) card.get("BackCorners")).get(i).toString();
-                    // card.get("BackCorners")).getClass() returns ArrayList so casting should be good
-                    if (element.equals("Empty")) {
-                        backCorners[i] = new Corner(Element.EMPTY, id, false);
-                    } else if(element.equals("Hidden")) {
-                        backCorners[i] = new Corner(Element.EMPTY, id, true);
-                    } else {
-                        backCorners[i] = new Corner(Element.valueOf(element.toUpperCase()), id, false);
-                    }
-                }
                 // ------ creating cards ------
-                if (card.get("Type").equals("Resource")) {
-                    gameState.addCardToCardsMap(id, new ResourceCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), (int) Double.parseDouble(card.get("Points").toString()), frontCorners, backCorners));
-                } else if (card.get("Type").equals("Gold")) {
+                if (card.get("Type").equals("Resource")){
+                    if (id < Config.firstResourceCardId) Config.firstResourceCardId = id;
+                    ResourceCard resourceCard = new ResourceCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), (int) Double.parseDouble(card.get("Points").toString()), frontCorners, backCorners);
+                    gameState.addCardToCardsMap(id, resourceCard);
+                    gameState.getMainBoard().addToResourceDeck(resourceCard);
+                } else if (card.get("Type").equals("Gold")){
+                    if (id < Config.firstGoldCardId) Config.firstGoldCardId = id;
                     ArrayList<Element> elements = new ArrayList<>();
-                    for (Object e : (ArrayList) card.get("ResourceNeeded")) {
+                    for (Object e : (ArrayList) card.get("ResourceNeeded")){
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
                     }
-                    gameState.addCardToCardsMap(id, new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements, (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners));
-                } else if (card.get("Type").equals("Starter")) {
+                    GoldCard goldCard = new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements, (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners);
+                    gameState.addCardToCardsMap(id, goldCard);
+                    gameState.getMainBoard().addToGoldDeck(goldCard);
+                } else if (card.get("Type").equals("Starter")){
                     if (id < Config.firstStarterCardId) Config.firstStarterCardId = id;
                     ArrayList<Element> elements = new ArrayList<>();
-                    for (Object e : (ArrayList) card.get("CenterResources")) {
+                    for (Object e : (ArrayList) card.get("CenterResources")){
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
                     }
                     gameState.addCardToCardsMap(id, new StarterCard(id, frontCorners, backCorners, elements));
@@ -159,5 +105,53 @@ public class Populate {
             }
         }
         return gameState;
+    }
+
+    private static Challenge createChallenge(Map card) throws WrongStructureConfigurationSizeException {
+        Challenge challenge = null;
+        if (card.get("Type").equals("Objective") || card.get("Type").equals("Gold")){
+            if (card.get("ChallengeType").equals("ElementChallenge")){
+                ArrayList<Element> elements = new ArrayList<>();
+                for (Object e : (ArrayList) card.get("ChallengeElements")){
+                    elements.add(Element.valueOf(e.toString().toUpperCase()));
+                }
+
+                challenge = new ElementChallenge(elements);
+            } else if (card.get("ChallengeType").equals("StructureChallenge")){
+                Element[][] configuration = new Element[Config.N_STRUCTURE_CHALLENGE_CONFIGURATION][Config.N_STRUCTURE_CHALLENGE_CONFIGURATION];
+                for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
+                    for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
+                        configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(3*i+j).toString().toUpperCase() );
+                    }
+                }
+                challenge = new StructureChallenge(configuration);
+            } else if (card.get("ChallengeType").equals("CoverageChallenge")){
+                challenge = new CoverageChallenge();
+            } else if (card.get("ChallengeType").equals("NoChallenge")){
+
+            } else {
+                System.out.println(card.get("ChallengeType"));
+                throw new RuntimeException(); //sistema
+            }
+        }
+        return challenge;
+    }
+
+    private static Corner[] createCorners(String side, Map card, Integer id){
+        Corner[] corners = new Corner[Config.N_CORNERS];
+        //for in frontCorners
+        for (int i = 0; i < Config.N_CORNERS; i++){
+            String element = ((ArrayList) card.get(side)).get(i).toString();
+            // card.get("FrontCorners")).getClass() returns ArrayList so casting should be good
+            if (element.equals("Empty")){
+                //probably can be removed because it falls in the else clause, also in line 135
+                corners[i] = new Corner(Element.EMPTY, id, false);
+            } else if(element.equals("Hidden")) {
+                corners[i] = new Corner(Element.EMPTY, id, true);;
+            } else {
+                corners[i] = new Corner(Element.valueOf(element.toUpperCase()), id, false);
+            }
+        }
+        return corners;
     }
 }
