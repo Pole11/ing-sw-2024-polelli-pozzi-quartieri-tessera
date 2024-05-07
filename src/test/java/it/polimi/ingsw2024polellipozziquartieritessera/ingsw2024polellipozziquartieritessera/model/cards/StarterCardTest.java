@@ -18,7 +18,7 @@ public class StarterCardTest {
         // setup
         try {
             GameState g = Populate.populate();
-            StarterCard card = g.getStarterCard(84);
+            StarterCard card = (StarterCard) g.getCard(84);
 
             assertEquals(card.getCenterResources().getFirst(), Element.ANIMAL);
             assertEquals(card.getCenterResources().size(), 2);
@@ -32,7 +32,7 @@ public class StarterCardTest {
     void testGetResourceType() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         // setup
         GameState g = Populate.populate();
-        StarterCard card = g.getStarterCard(84);
+        StarterCard card = (StarterCard) g.getCard(84);
     }
 
     @Test
@@ -41,7 +41,7 @@ public class StarterCardTest {
         try {
             GameState g = Populate.populate();
 
-            StarterCard card = g.getStarterCard(84);
+            StarterCard card = (StarterCard) g.getCard(84);
 
             // verify if the front elements are right
             ArrayList<Element> elements;

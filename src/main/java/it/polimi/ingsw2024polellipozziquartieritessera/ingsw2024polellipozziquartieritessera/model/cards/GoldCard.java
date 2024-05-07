@@ -1,5 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.CardNotPlacedException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 
@@ -23,15 +25,35 @@ public class GoldCard extends CornerCard {
         return resourceType;
     }
 
-    public Challenge getChallenge() {
-        return challenge;
-    }
-
     public ArrayList<Element> getResourceNeeded() {
         return resourceNeeded;
     }
 
+    @Override
+    public GoldCard getCard() {
+        return this;
+    }
+
     // METHODS
+
+
+    @Override
+    public Challenge getChallenge() {
+        return challenge;
+    }
+
+    @Override
+    public int calculatePoints(Player player) throws CardNotPlacedException {
+        if (player.getBoardSide(this.getId()).equals(Side.BACK)) return 0;
+        if (!player.getPlacedCardsMap().containsKey(this.getId())) throw new CardNotPlacedException("The card is not placed");
+        if (challenge == null) {
+            return this.getPoints();
+        } else {
+            int timesWon = challenge.getTimesWon(player, this);
+            return this.getPoints() * timesWon;
+        }
+    }
+
     // returns the elements visible on the requested side
     public ArrayList<Element> getUncoveredElements(Side side){
         // resource array initialization
@@ -47,8 +69,6 @@ public class GoldCard extends CornerCard {
                 }
             }
         }
-
         return uncoveredElements;
     }
-
 }

@@ -20,7 +20,7 @@ public class ResourceCardTest {
         try {
             GameState g = Populate.populate();
 
-            ResourceCard card = (ResourceCard) g.getCornerCard(32);
+            ResourceCard card = (ResourceCard) g.getCard(32);
 
             assertEquals(card.getResourceType(), Element.INSECT);
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
@@ -36,7 +36,7 @@ public class ResourceCardTest {
         try {
             GameState g = Populate.populate();
 
-            ResourceCard card = (ResourceCard) g.getCornerCard(32);
+            ResourceCard card = (ResourceCard) g.getCard(32);
 
             // verify if the return elements are the right ones
             ArrayList<Element> elements;

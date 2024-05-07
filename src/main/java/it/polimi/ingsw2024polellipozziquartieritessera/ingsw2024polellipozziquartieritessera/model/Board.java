@@ -9,8 +9,8 @@ public class Board {
     private GoldCard[] sharedGoldCards; // 2 gold cards shared between players
     private ResourceCard[] sharedResourceCards; // 2 resource cards shared between players
     private ObjectiveCard[] sharedObjectiveCards; // 2 objective cards shared between players
-    private ArrayList<GoldCard> goldDeck; // may be final (the reference only)
-    private ArrayList<ResourceCard> resourceDeck; // may be final (the reference only)
+    private final ArrayList<GoldCard> goldDeck; // may be final (the reference only)
+    private final ArrayList<ResourceCard> resourceDeck; // may be final (the reference only)
 
     public Board(){
         sharedGoldCards = new GoldCard[Config.N_SHARED_GOLDS];
@@ -31,18 +31,6 @@ public class Board {
 
     public void setSharedObjectiveCards(ObjectiveCard[] sharedObjectiveCards) {
         this.sharedObjectiveCards = sharedObjectiveCards;
-    }
-
-    public void setGoldDeck(ArrayList<GoldCard> goldCardDeck) {
-        if (this.goldDeck.isEmpty()) {
-            this.goldDeck.addAll(goldCardDeck);
-        }
-    }
-
-    public void setResourceDeck(ArrayList<ResourceCard> resourceDeck) {
-        if (this.resourceDeck.isEmpty()) {
-            this.resourceDeck.addAll(resourceDeck);
-        }
     }
 
     //GETTER
@@ -66,13 +54,19 @@ public class Board {
         return resourceDeck;
     }
 
+    //ADDER
+
+    public void addToGoldDeck(GoldCard goldCard) {
+        goldDeck.add(goldCard);
+    }
+
+    public void addToResourceDeck(ResourceCard resourceCard) {
+        resourceDeck.add(resourceCard);
+    }
+
 
     //METHODS
-    // set the decks
-    public void setDecks(ArrayList<ResourceCard> resourceCardDeck, ArrayList<GoldCard> goldCardDeck) {
-        setResourceDeck(resourceCardDeck);
-        setGoldDeck(goldCardDeck);
-    }
+
 
     public void initSharedGoldCards() {
         // it's like fillSharedGaps, look at the draw from shared methods to take inspiration

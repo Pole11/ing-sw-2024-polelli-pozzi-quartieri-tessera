@@ -19,7 +19,7 @@ public class CornerCardTest {
         // setup
         GameState g = Populate.populate();
 
-        CornerCard card = g.getCornerCard(40);
+        CornerCard card = (CornerCard) g.getCard(40);
 
         assertEquals(card.getFrontCorners().length, 4);
         assertEquals(card.getBackCorners().length, 4);
@@ -36,7 +36,7 @@ public class CornerCardTest {
     void testGetCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
 
-        CornerCard card = g.getCornerCard(40);
+        CornerCard card = (CornerCard) g.getCard(40);
 
         // get all corners
         ArrayList<Corner> allCorners = card.getCorners();
@@ -60,9 +60,9 @@ public class CornerCardTest {
     void testGetLinkedCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
 
-        CornerCard card1 = g.getCornerCard(40);
-        CornerCard card2 = g.getCornerCard(30);
-        CornerCard card3 = g.getCornerCard(20);
+        CornerCard card1 = (CornerCard) g.getCard(40);
+        CornerCard card2 = (CornerCard) g.getCard(30);
+        CornerCard card3 = (CornerCard) g.getCard(20);
 
         // set the linked corner
         card1.getCorners().getFirst().setLinkedCorner(card2.getCorners().getFirst());
@@ -80,7 +80,7 @@ public class CornerCardTest {
     void testGetUncoveredCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
 
-        CornerCard card = g.getCornerCard(40);
+        CornerCard card = (CornerCard) g.getCard(40);
         ArrayList<Corner> cornersFront = card.getCorners(Side.FRONT);
         ArrayList<Corner> cornersBack = card.getCorners(Side.BACK);
 

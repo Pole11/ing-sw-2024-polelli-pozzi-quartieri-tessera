@@ -119,6 +119,11 @@ public class Player {
         this.points = points;
     }
 
+    //ADDER
+    public void incrementObjectivesWon(){
+        objectivesWon ++;
+    }
+
     // METHODS
 
     public void addPoints(int points) {
@@ -220,7 +225,6 @@ public class Player {
                 colIndex ++;
             }
         }
-
         // Place the new card at the specified position
         playerBoard.get(rowIndex).set(colIndex, newCard);
     }
@@ -254,6 +258,8 @@ public class Player {
 
 // -----------------------Challenge Managing--------------------------------
 
+
+
     public int getCardPoints(ObjectiveCard objCard, ElementChallenge elementChallenge) {
         int cardPoints = objCard.getPoints();
 
@@ -279,6 +285,8 @@ public class Player {
 
         return timesWon * cardPoints;
     }
+
+
 
     public int getCardPoints(CornerCard cornerCard, ElementChallenge elementChallenge) throws CardNotPlacedException {
         if (!placedCardsMap.containsKey(cornerCard.getId())) throw new CardNotPlacedException("The card is not placed");
@@ -340,13 +348,6 @@ public class Player {
             ref.min = playerElementsOccurences.get(element) / challengeElementsOccurences.get(element);
         }));
 
-        /* PARTE VECCHIA
-        int min = Integer.MAX_VALUE;
-        for (Element ele : elements) {
-            if (this.getAllElements().get(ele) < min) {
-                min = this.getAllElements().get(ele);
-            }
-        }*/
 
         return ref.min;
     }
@@ -413,5 +414,6 @@ public class Player {
 
         return recurrences;
     }
+
 
 }
