@@ -408,7 +408,7 @@ public class GameStateTest {
     }
 
 
-/*
+
     @Test
     void getWinnerPlayerIndexTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, GameIsNotEndedException, CardNotPlacedException, WrongInstanceTypeException {
         GameState gs = Populate.createCardsMap();
@@ -430,12 +430,9 @@ public class GameStateTest {
         assertEquals(first_wins, gs.getWinnerPlayerIndex());
 
         gs.getPlayers().get(1).getAllElements().put(Element.INSECT, 4);
+
         //increments ObjectivesWon
-        if (gs.getElementChallenge(98) != null){
-            gs.getPlayers().get(1).getCardPoints(gs.getObjectiveCard(98), gs.getElementChallenge(98));
-        } else if (gs.getStructureChallenge(98) != null) {
-            gs.getPlayers().get(1).getCardPoints(gs.getObjectiveCard(98), gs.getStructureChallenge(98));
-        }
+        gs.getCard(98).calculatePoints(gs.getPlayers().get(1));
         assertEquals(first_wins, gs.getWinnerPlayerIndex());
 
         gs.getPlayers().get(1).setPoints(24);
@@ -443,26 +440,17 @@ public class GameStateTest {
 
         gs.getPlayers().get(1).setPoints(25);
         gs.getPlayers().get(0).getAllElements().put(Element.INSECT, 6);
-        if (gs.getElementChallenge(98) != null){
-            gs.getPlayers().get(0).getCardPoints(gs.getObjectiveCard(98), gs.getElementChallenge(98));
-        } else if (gs.getStructureChallenge(98) != null) {
-            gs.getPlayers().get(0).getCardPoints(gs.getObjectiveCard(98), gs.getStructureChallenge(98));
-        }
-
+        gs.getCard(98).calculatePoints(gs.getPlayers().get(0));
         assertEquals(second_wins, gs.getWinnerPlayerIndex());
 
         gs.getPlayers().get(1).setPoints(24);
         assertEquals(first_second_win, gs.getWinnerPlayerIndex());
 
         gs.getPlayers().get(0).getAllElements().put(Element.FUNGI, 6);
-        if (gs.getElementChallenge(98) != null){
-            gs.getPlayers().get(0).getCardPoints(gs.getObjectiveCard(95), gs.getElementChallenge(95));
-        } else if (gs.getStructureChallenge(98) != null) {
-            gs.getPlayers().get(0).getCardPoints(gs.getObjectiveCard(95), gs.getStructureChallenge(95));
-        }          assertEquals(first_wins, gs.getWinnerPlayerIndex());
-
+        gs.getCard(95).calculatePoints(gs.getPlayer(0));
+        assertEquals(first_wins, gs.getWinnerPlayerIndex());
     }
-*/
+
     @Test
     void setColorTest(){
         Player player = new Player("pole");

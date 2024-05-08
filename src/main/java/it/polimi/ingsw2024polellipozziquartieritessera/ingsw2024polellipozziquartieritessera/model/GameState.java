@@ -68,50 +68,9 @@ public class GameState {
         return currentGameTurn;
     }
 
-
-
     public Card getCard(int cardId) {
         return cardsMap.get(cardId);
     }
-
-/*
-
-    public CornerCard getCornerCard(int cardId) {
-        CornerCard cornerCard = getResourceCard(cardId);
-        if (cornerCard == null) cornerCard = getGoldCard(cardId);
-        if (cornerCard == null) cornerCard = getStarterCard(cardId);
-
-        return cornerCard;
-    }
-
-    public Card getCard(int cardId) {
-        Card card = null;
-        if (getResourceCard(cardId) != null) card = getResourceCard(cardId);
-        else if (getGoldCard(cardId) != null) card = getGoldCard(cardId);
-        else if (getStarterCard(cardId) != null) card = getStarterCard(cardId);
-        else if (getObjectiveCard(cardId) != null) card = getObjectiveCard(cardId);
-
-        return card;
-    }
-
-
-    public int getResourceCardsQty() {
-        return this.resourceCardsMap.size();
-    }
-
-    public int getGoldCardsQty() {
-        return this.goldCardsMap.size();
-    }
-
-    public int getStarterCardsQty() {
-        return this.starterCardsMap.size();
-    }
-
-    public int getObjectiveCardsQty() {
-        return this.objectiveCardsMap.size();
-    }
-*/
-
 
     // SETTER
     public void setCurrentPlayerIndex(int currentPlayerIndex) {
@@ -173,19 +132,13 @@ public class GameState {
     // VII: si potrebbe come da specifica scegliere a questo punto
     // un giocatore randomico per essere il blackPlayer (al momento sembra superflua)
 
-    //questo metodo è inutile
+
     public void startPhaseMethod() {
-        deckInitPhase();
-    }
-
-
-    private void deckInitPhase(){
         this.mainBoard.shuffleCards();
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
         this.initStarters(); // set the starters cards for every player
     }
-
 
     public void initStarters() {
         // for every player set his starters (you have access to every player from the array players)
@@ -498,7 +451,7 @@ public class GameState {
     public int getTurnTime(){
         return 0;
     }
-}
+    }
 
 
 /*
