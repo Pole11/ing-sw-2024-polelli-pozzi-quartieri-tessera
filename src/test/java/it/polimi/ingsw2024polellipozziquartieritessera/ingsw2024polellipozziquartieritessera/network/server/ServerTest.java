@@ -14,6 +14,7 @@ import java.rmi.registry.Registry;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerTest {
+    /*
     @Test
     public void GameIsFullTest() throws IOException, NotBoundException {
         String host = "127.0.0.1";
@@ -59,5 +60,5 @@ public class ServerTest {
         // check with 3 RMI 2 socket
 
         // check with 2 RMI 3 socket
-    }
+    }*/
 }

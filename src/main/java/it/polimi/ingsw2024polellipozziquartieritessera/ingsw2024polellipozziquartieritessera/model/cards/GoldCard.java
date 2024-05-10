@@ -45,7 +45,7 @@ public class GoldCard extends CornerCard {
     @Override
     public int calculatePoints(Player player) throws CardNotPlacedException {
         if (player.getBoardSide(this.getId()).equals(Side.BACK)) return 0;
-        if (!player.getPlacedCardsMap().containsKey(this.getId())) throw new CardNotPlacedException("The card is not placed");
+        if (!player.placedCardContains(this.getId())) throw new CardNotPlacedException("The card is not placed");
         if (challenge == null) {
             return this.getPoints();
         } else {

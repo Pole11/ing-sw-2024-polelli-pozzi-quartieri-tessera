@@ -16,7 +16,7 @@ public class ResourceCard extends CornerCard {
         this.resourceType = resourceType;
     }
 
-    // GETTER...
+    // GETTER
     public Element getResourceType() {
         return resourceType;
     }
@@ -36,7 +36,7 @@ public class ResourceCard extends CornerCard {
 
     @Override
     public int calculatePoints(Player player) throws CardNotPlacedException {
-        if (!player.getPlacedCardsMap().containsKey(this.getId())) throw new CardNotPlacedException("The card is not placed");
+        if (!player.placedCardContains(this.getId())) throw new CardNotPlacedException("The card is not placed");
         if (player.getBoardSide(this.getId()).equals(Side.BACK)) return 0;
         return this.getPoints();
     }

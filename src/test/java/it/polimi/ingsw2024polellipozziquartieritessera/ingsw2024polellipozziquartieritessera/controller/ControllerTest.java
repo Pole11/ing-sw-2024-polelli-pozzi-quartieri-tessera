@@ -57,7 +57,7 @@ public class ControllerTest {
         assertEquals(1, player.getAllElements().get(Element.INSECT)); // insect
         assertEquals(1, player.getAllElements().get(Element.FUNGI)); // fungi
 
-        player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId1, Side.FRONT);
         c.placeCard(0, resourceCardId1, starterCardId, resourceCard1ToTableCornerPos, resourceCard1Side);
         ArrayList<Corner> starterCardCorners = ((StarterCard) gs.getCard(starterCardId)).getCorners(starterCardSide);
         ArrayList<Corner> resourceCard1Corners = ((CornerCard) gs.getCard(resourceCardId1)).getCorners(resourceCard1Side);
@@ -89,7 +89,7 @@ public class ControllerTest {
         assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
         assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
 
-        player.getHandCardsMap().put(resourceCardId2, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId2, Side.FRONT);
         c.placeCard(0, resourceCardId2, resourceCardId1, resourceCard2ToTableCornerPos, resourceCard2Side);
         resourceCard1Corners = ((CornerCard) gs.getCard(resourceCardId1)).getCorners(resourceCard1Side);
         ArrayList<Corner> resourceCard2Corners = ((CornerCard) gs.getCard(resourceCardId2)).getCorners(resourceCard2Side);
@@ -119,7 +119,7 @@ public class ControllerTest {
         assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
         assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
 
-        player.getHandCardsMap().put(resourceCardId3, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId3, Side.FRONT);
         c.placeCard(0, resourceCardId3, resourceCardId1, resourceCard3ToTableCornerPos, resourceCard3Side);
         resourceCard1Corners = ((CornerCard) gs.getCard(resourceCardId1)).getCorners(resourceCard1Side);
         ArrayList<Corner> resourceCard3Corners = ((CornerCard) gs.getCard(resourceCardId3)).getCorners(resourceCard3Side);
@@ -149,7 +149,7 @@ public class ControllerTest {
         assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
         assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
 
-        player.getHandCardsMap().put(resourceCardId4, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId4, Side.FRONT);
         c.placeCard(0, resourceCardId4, resourceCardId3, resourceCard4ToTableCornerPos, resourceCard4Side);
         resourceCard3Corners = ((CornerCard) gs.getCard(resourceCardId3)).getCorners(resourceCard3Side);
         ArrayList<Corner> resourceCard4Corners = ((CornerCard) gs.getCard(resourceCardId4)).getCorners(resourceCard4Side);
@@ -178,7 +178,7 @@ public class ControllerTest {
         assertEquals(0, player.getAllElements().get(Element.INSECT)); // insect
         assertEquals(2, player.getAllElements().get(Element.FUNGI)); // fungi
 
-        player.getHandCardsMap().put(goldCardId, Side.FRONT);
+        player.addToHandCardsMap(goldCardId, Side.FRONT);
         c.placeCard(0, goldCardId, resourceCardId2, goldCardToTableCornerPos, goldCardSide);
         resourceCard2Corners = ((CornerCard)  gs.getCard(resourceCardId2)).getCorners(resourceCard2Side);
         ArrayList<Corner> goldCardCorners = ((CornerCard)  gs.getCard(goldCardId)).getCorners(goldCardSide);
@@ -276,75 +276,78 @@ public class ControllerTest {
         gs.getMainBoard().initSharedResourceCards();
         player.setStarterCard((StarterCard) gs.getCard(starterCardId));
         player.initializeBoard();
-        gs.setHands();
+        //gs.setHands();
         c.chooseInitialStarterSide(0, Side.FRONT);
         gs.setCurrentPlayerIndex(0);
 
 
         CornerCard card1 = gs.getMainBoard().getSharedGoldCards()[0];
         CornerCard card2 = gs.getMainBoard().getSharedGoldCards()[1];
-        Map.Entry<Integer,Side> entry = player.getHandCardsMap().entrySet().iterator().next();
-        player.getHandCardsMap().remove(entry.getKey());
+        /*Map.Entry<Integer,Side> entry = player.getHandCardsMap().entrySet().iterator().next();
+        player.getHandCardsMap().remove(entry.getKey());*/
         c.drawCard(DrawType.SHAREDGOLD1);
         assertEquals(1,gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
         assertNotEquals(gs.getMainBoard().getSharedGoldCards()[0], card1);
         assertEquals(gs.getMainBoard().getSharedGoldCards()[1], card2);
-        assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
+        assertTrue(player.handCardContains(card1.getId()));
 
         card1 = gs.getMainBoard().getSharedGoldCards()[0];
         card2 = gs.getMainBoard().getSharedGoldCards()[1];
-        entry = player.getHandCardsMap().entrySet().iterator().next();
-        assertThrows(InvalidHandException.class, () -> c.drawCard(DrawType.SHAREDGOLD2));
-        player.getHandCardsMap().remove(entry.getKey());
+        //entry = player.getHandCardsMap().entrySet().iterator().next();
+        //player.getHandCardsMap().remove(entry.getKey());
         c.drawCard(DrawType.SHAREDGOLD2);
         assertEquals(1,gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
         assertEquals(gs.getMainBoard().getSharedGoldCards()[0], card1);
         assertNotEquals(gs.getMainBoard().getSharedGoldCards()[1], card2);
-        assertTrue(player.getHandCardsMap().containsKey(card2.getId()));
+        assertTrue(player.handCardContains(card2.getId()));
 
         card1 = gs.getMainBoard().getSharedResourceCards()[0];
         card2 = gs.getMainBoard().getSharedResourceCards()[1];
-        entry = player.getHandCardsMap().entrySet().iterator().next();
-        player.getHandCardsMap().remove(entry.getKey());
+        /*entry = player.getHandCardsMap().entrySet().iterator().next();
+        player.getHandCardsMap().remove(entry.getKey());*/
         c.drawCard(DrawType.SHAREDRESOURCE1);
         assertEquals(1,gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
         assertNotEquals(gs.getMainBoard().getSharedResourceCards()[0], card1);
         assertEquals(gs.getMainBoard().getSharedResourceCards()[1], card2);
-        assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
+        assertTrue(player.handCardContains(card1.getId()));
 
+        assertThrows(InvalidHandException.class, () -> c.drawCard(DrawType.SHAREDGOLD2));
+        player.removeFromHandCardsMap(card1.getId());
         card1 = gs.getMainBoard().getSharedResourceCards()[0];
         card2 = gs.getMainBoard().getSharedResourceCards()[1];
-        entry = player.getHandCardsMap().entrySet().iterator().next();
-        player.getHandCardsMap().remove(entry.getKey());
+        /*entry = player.getHandCardsMap().entrySet().iterator().next();
+        player.getHandCardsMap().remove(entry.getKey());*/
         c.drawCard(DrawType.SHAREDRESOURCE2);
         assertEquals(1,gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
         assertEquals(gs.getMainBoard().getSharedResourceCards()[0], card1);
         assertNotEquals(gs.getMainBoard().getSharedResourceCards()[1], card2);
-        assertTrue(player.getHandCardsMap().containsKey(card2.getId()));
+        assertTrue(player.handCardContains(card2.getId()));
 
+        player.removeFromHandCardsMap(card2.getId());
         card1 = gs.getMainBoard().getResourceDeck().getLast();
         int size = gs.getMainBoard().getResourceDeck().size();
-        entry = player.getHandCardsMap().entrySet().iterator().next();
-        player.getHandCardsMap().remove(entry.getKey());
+        /*entry = player.getHandCardsMap().entrySet().iterator().next();
+        player.getHandCardsMap().remove(entry.getKey());*/
         c.drawCard(DrawType.DECKRESOURCE);
         assertEquals(1,gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
-        assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
+        assertTrue(player.handCardContains(card1.getId()));
         assertEquals(gs.getMainBoard().getResourceDeck().size(), size -1);
         assertNotEquals(gs.getMainBoard().getResourceDeck().getLast(), card1);
 
+        player.removeFromHandCardsMap(card1.getId());
         card1 = gs.getMainBoard().getGoldDeck().getLast();
         size = gs.getMainBoard().getGoldDeck().size();
-        entry = player.getHandCardsMap().entrySet().iterator().next();
-        player.getHandCardsMap().remove(entry.getKey());
+        /*entry = player.getHandCardsMap().entrySet().iterator().next();
+        player.getHandCardsMap().remove(entry.getKey());*/
         c.drawCard(DrawType.DECKGOLD);
         assertEquals(1,gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
-        assertTrue(player.getHandCardsMap().containsKey(card1.getId()));
+        assertTrue(player.handCardContains(card1.getId()));
         assertEquals(gs.getMainBoard().getGoldDeck().size(), size -1);
         assertNotEquals(gs.getMainBoard().getGoldDeck().getLast(), card1);
     }
@@ -358,12 +361,12 @@ public class ControllerTest {
         gs.setPlayer(3, new Player("paola"));
         Controller c = new Controller(gs);
 
-        gs.getPlayers().get(0).getHandCardsMap().put(1, Side.FRONT);
-        assertEquals(Side.FRONT, gs.getPlayers().get(0).getHandCardsMap().get(1));
+        gs.getPlayers().get(0).addToHandCardsMap(1, Side.FRONT);
+        assertEquals(Side.FRONT, gs.getPlayers().get(0).getHandCardSide(1));
         c.flipCard(0, 1);
-        assertEquals(Side.BACK, gs.getPlayers().get(0).getHandCardsMap().get(1));
+        assertEquals(Side.BACK, gs.getPlayers().get(0).getHandCardSide(1));
         c.flipCard(0, 1);
-        assertEquals(Side.FRONT, gs.getPlayers().get(0).getHandCardsMap().get(1));
+        assertEquals(Side.FRONT, gs.getPlayers().get(0).getHandCardSide(1));
 
 
     }

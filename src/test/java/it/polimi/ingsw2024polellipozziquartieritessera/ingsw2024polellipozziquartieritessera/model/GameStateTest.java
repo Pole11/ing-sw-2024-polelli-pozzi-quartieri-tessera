@@ -88,7 +88,7 @@ public class GameStateTest {
         c.chooseInitialStarterSide(0, Side.FRONT);
 
 
-        player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId1, Side.FRONT);
         c.placeCard(0, resourceCardId1, player.getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.BACK);
         assertEquals(0, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -99,7 +99,7 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(0, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(goldCardId1, Side.FRONT);
+        player.addToHandCardsMap(goldCardId1, Side.FRONT);
         assertThrows(CardAlreadyPresentOnTheCornerException.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.DOWNRIGHT, Side.BACK));
         assertThrows(GoldCardCannotBePlacedException.class, () -> c.placeCard(0, goldCardId1, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT));
         assertThrows(GoldCardCannotBePlacedException.class, () -> c.placeCard(0, goldCardId1, resourceCardId1, CornerPos.DOWNRIGHT, Side.FRONT));
@@ -115,7 +115,7 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(0, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(goldCardId2, Side.FRONT);
+        player.addToHandCardsMap(goldCardId2, Side.FRONT);
         c.placeCard(0, goldCardId2, player.getStarterCard().getId(), CornerPos.UPRIGHT, Side.FRONT);
         assertEquals(1, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -126,7 +126,7 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(resourceCardId2, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId2, Side.FRONT);
         c.placeCard(0, resourceCardId2, player.getStarterCard().getId(), CornerPos.DOWNLEFT, Side.FRONT);
         assertEquals(2, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -137,7 +137,7 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(resourceCardId3, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId3, Side.FRONT);
         c.placeCard(0, resourceCardId3, player.getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
         assertEquals(3, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -148,7 +148,7 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(resourceCardId4, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId4, Side.FRONT);
         c.placeCard(0, resourceCardId4, goldCardId2, CornerPos.UPRIGHT, Side.FRONT);
         assertEquals(4, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -159,7 +159,7 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(resourceCardId5, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId5, Side.FRONT);
         c.placeCard(0, resourceCardId5, goldCardId1, CornerPos.UPRIGHT, Side.FRONT);
         assertEquals(4, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -170,7 +170,7 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(resourceCardId6, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId6, Side.FRONT);
         c.placeCard(0, resourceCardId6, resourceCardId1, CornerPos.DOWNLEFT, Side.FRONT);
         assertEquals(5, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -181,7 +181,7 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(resourceCardId7, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId7, Side.FRONT);
         c.placeCard(0, resourceCardId7, goldCardId2, CornerPos.UPLEFT, Side.FRONT);
         assertEquals(6, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -192,13 +192,13 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(resourceCardId7, Side.FRONT);
-        player.getHandCardsMap().put(resourceCardId1, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId7, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId1, Side.FRONT);
         assertThrows(CardAlreadPlacedException.class, ()-> c.placeCard(0, resourceCardId7, resourceCardId4, CornerPos.UPRIGHT, Side.FRONT));
         assertThrows(CardAlreadPlacedException.class, ()-> c.placeCard(0, resourceCardId1, resourceCardId4, CornerPos.UPRIGHT, Side.FRONT));
 
         //2 corner covered
-        player.getHandCardsMap().put(resourceCardId8, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId8, Side.FRONT);
         c.placeCard(0, resourceCardId8, goldCardId1, CornerPos.DOWNLEFT, Side.FRONT);
         assertEquals(10, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -211,7 +211,7 @@ public class GameStateTest {
 
         assertThrows(WrongInstanceTypeException.class, ()->c.placeCard(0, 84, resourceCardId6, CornerPos.DOWNLEFT, Side.FRONT));
 
-        player.getHandCardsMap().put(goldCardId3, Side.FRONT);
+        player.addToHandCardsMap(goldCardId3, Side.FRONT);
         c.placeCard(0, goldCardId3, resourceCardId6, CornerPos.DOWNLEFT, Side.BACK);
         assertEquals(10, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -222,11 +222,11 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(goldCardId4, Side.FRONT);
+        player.addToHandCardsMap(goldCardId4, Side.FRONT);
         assertThrows(PlacingOnHiddenCornerException.class, () -> c.placeCard(0, goldCardId4, goldCardId3, CornerPos.UPLEFT, Side.FRONT));
 
         //1 corner covered
-        player.getHandCardsMap().put(goldCardId4, Side.FRONT);
+        player.addToHandCardsMap(goldCardId4, Side.FRONT);
         c.placeCard(0, goldCardId4, goldCardId3, CornerPos.DOWNLEFT, Side.FRONT);
         assertEquals(12, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -237,7 +237,7 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(resourceCardId9, Side.FRONT);
+        player.addToHandCardsMap(resourceCardId9, Side.FRONT);
         c.placeCard(0, resourceCardId9, goldCardId4, CornerPos.DOWNLEFT, Side.FRONT);
         assertEquals(12, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -248,7 +248,7 @@ public class GameStateTest {
         assertEquals(0, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
 
-        player.getHandCardsMap().put(goldCardId5, Side.FRONT);
+        player.addToHandCardsMap(goldCardId5, Side.FRONT);
         c.placeCard(0, goldCardId5, resourceCardId2, CornerPos.UPLEFT, Side.FRONT);
         assertEquals(15, player.getPoints());
         assertEquals(0, player.getAllElements().get(Element.ANIMAL)); // animal
@@ -341,25 +341,25 @@ public class GameStateTest {
         player.initializeBoard();
         c.chooseInitialStarterSide(0, Side.BACK);
 
-        player.getHandCardsMap().put(41, Side.FRONT);
+        player.addToHandCardsMap(41, Side.FRONT);
         c.placeCard(0, 41, starterCardId, CornerPos.UPLEFT, Side.BACK);
 
-        player.getHandCardsMap().put(42, Side.FRONT);
+        player.addToHandCardsMap(42, Side.FRONT);
         c.placeCard(0, 42, 41, CornerPos.UPRIGHT, Side.BACK);
 
-        player.getHandCardsMap().put(43, Side.FRONT);
+        player.addToHandCardsMap(43, Side.FRONT);
         c.placeCard(0, 43, 42, CornerPos.UPRIGHT, Side.BACK);
 
-        player.getHandCardsMap().put(44, Side.FRONT);
+        player.addToHandCardsMap(44, Side.FRONT);
         c.placeCard(0, 44, 42, CornerPos.DOWNRIGHT, Side.BACK);
 
-        player.getHandCardsMap().put(45, Side.FRONT);
+        player.addToHandCardsMap(45, Side.FRONT);
         c.placeCard(0, 45, starterCardId, CornerPos.DOWNRIGHT, Side.BACK);
 
-        player.getHandCardsMap().put(51, Side.FRONT);
+        player.addToHandCardsMap(51, Side.FRONT);
         c.placeCard(0, 51, 45, CornerPos.UPRIGHT, Side.BACK);
 
-        player.getHandCardsMap().put(52, Side.FRONT);
+        player.addToHandCardsMap(52, Side.FRONT);
         c.placeCard(0, 52, 45, CornerPos.DOWNRIGHT, Side.BACK);
 
         int sharedObj1 = 87; //gives 2 points
@@ -429,7 +429,7 @@ public class GameStateTest {
         gs.getPlayers().get(0).setPoints(24);
         assertEquals(first_wins, gs.getWinnerPlayerIndex());
 
-        gs.getPlayers().get(1).getAllElements().put(Element.INSECT, 4);
+        gs.getPlayers().get(1).addToAllElements(Element.INSECT, 4);
 
         //increments ObjectivesWon
         gs.getCard(98).calculatePoints(gs.getPlayers().get(1));
@@ -439,14 +439,14 @@ public class GameStateTest {
         assertEquals(second_wins, gs.getWinnerPlayerIndex());
 
         gs.getPlayers().get(1).setPoints(25);
-        gs.getPlayers().get(0).getAllElements().put(Element.INSECT, 6);
+        gs.getPlayers().get(0).addToAllElements(Element.INSECT, 6);
         gs.getCard(98).calculatePoints(gs.getPlayers().get(0));
         assertEquals(second_wins, gs.getWinnerPlayerIndex());
 
         gs.getPlayers().get(1).setPoints(24);
         assertEquals(first_second_win, gs.getWinnerPlayerIndex());
 
-        gs.getPlayers().get(0).getAllElements().put(Element.FUNGI, 6);
+        gs.getPlayers().get(0).addToAllElements(Element.FUNGI, 6);
         gs.getCard(95).calculatePoints(gs.getPlayer(0));
         assertEquals(first_wins, gs.getWinnerPlayerIndex());
     }

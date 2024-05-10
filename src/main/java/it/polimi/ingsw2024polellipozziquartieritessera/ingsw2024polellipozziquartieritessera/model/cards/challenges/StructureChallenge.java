@@ -43,7 +43,7 @@ public class StructureChallenge extends Challenge{
             for (int j=0; j<cols; j++){
                 int cardId = player.getPlayerBoard().get(i).get(j);
                 if (cardId != -1){
-                    elementBoard[i][j] = player.getCenterResource().get(cardId); // get this info from gs
+                    elementBoard[i][j] = player.getCenterResource(cardId);
                 } else{
                     elementBoard[i][j] = Element.EMPTY;
                 }

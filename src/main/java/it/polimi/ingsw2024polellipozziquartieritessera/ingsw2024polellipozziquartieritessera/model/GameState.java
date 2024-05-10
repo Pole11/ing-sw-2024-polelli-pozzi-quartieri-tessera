@@ -161,12 +161,12 @@ public class GameState {
 
     public void setStarterSide(int playerIndex, Side side){
         Player player = getPlayerByIndex(playerIndex);
-        player.getPlacedCardsMap().put(player.getStarterCard().getId(), side); // to fix the hash map obfuscation
+        player.addToPlacedCardsMap(player.getStarterCard().getId(), side);
 
         // add the initial elements of the starter card
         for (Element ele : player.getStarterCard().getUncoveredElements(side)) {
             int currentOccurencies = player.getAllElements().get(ele);
-            player.getAllElements().put(ele, currentOccurencies + 1);
+            player.addToAllElements(ele, currentOccurencies + 1);
         }
     }
 
@@ -187,9 +187,10 @@ public class GameState {
             ResourceCard resourceCard1 = mainBoard.getFromResourceDeck();
             ResourceCard resourceCard2 = mainBoard.getFromResourceDeck();
 
-            getPlayers().get(i).getHandCardsMap().put(goldCard.getId(), Side.FRONT); // default is front side
-            getPlayers().get(i).getHandCardsMap().put(resourceCard1.getId(), Side.FRONT); // default is front side
-            getPlayers().get(i).getHandCardsMap().put(resourceCard2.getId(), Side.FRONT); // default is front side
+
+            getPlayers().get(i).addToHandCardsMap(goldCard.getId(), Side.FRONT); // default is front side
+            getPlayers().get(i).addToHandCardsMap(resourceCard1.getId(), Side.FRONT); // default is front side
+            getPlayers().get(i).addToHandCardsMap(resourceCard2.getId(), Side.FRONT); // default is front side
         }
     }
 
@@ -222,7 +223,7 @@ public class GameState {
     public void setSecretObjective (int playerIndex, int cardIndex) throws InvalidObjectiveCardException {
         Player player = getPlayerByIndex(playerIndex);
         if (cardIndex == 0 || cardIndex == 1){
-            player.setObjectiveCard(player.getObjectiveCardOptions()[cardIndex]);
+            player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
         } else {
             throw new InvalidObjectiveCardException("The card choosen was not in the options list");
         }
@@ -332,13 +333,13 @@ public class GameState {
         // get new card
         GoldCard newGoldCard = board.getFromGoldDeck();
         // add card to player hand
-        currentPlayer.getHandCardsMap().put(newGoldCard.getId(), Side.FRONT); // the front side is the default
+        currentPlayer.addToHandCardsMap(newGoldCard.getId(), Side.FRONT); // the front side is the default
     }
 
     public void drawGoldFromShared(Board board, Player currentPlayer, int index) {
         // get new gold card
         GoldCard newGoldCard = board.drawSharedGoldCard(index);
-        currentPlayer.getHandCardsMap().put(newGoldCard.getId(), Side.FRONT);
+        currentPlayer.addToHandCardsMap(newGoldCard.getId(), Side.FRONT);
         // fill the gap
         board.fillSharedCardsGap();
     }
@@ -347,13 +348,13 @@ public class GameState {
         // get new card
         ResourceCard newResourceCard = board.getFromResourceDeck();
         // had card to player hand
-        currentPlayer.getHandCardsMap().put(newResourceCard.getId(), Side.FRONT);
+        currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
     }
 
     public void drawResourceFromShared(Board board, Player currentPlayer, int index) {
         // get new resource card
         ResourceCard newResourceCard = board.drawSharedResourceCard(index);
-        currentPlayer.getHandCardsMap().put(newResourceCard.getId(), Side.FRONT);
+        currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
         // fill the gap
         board.fillSharedCardsGap();
     }
@@ -404,6 +405,7 @@ public class GameState {
                 }
             }
         }
+        updateElements(player, placingCard, placingCardSide);
     }
 
     private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {
@@ -423,11 +425,12 @@ public class GameState {
 
         // remove elements of the table card that are covered
         Element cornerEle = matrixCorner.getElement();
-        if (player.getAllElements().get(cornerEle) != null) {
+        if (player.getAllElements().containsKey(cornerEle)) {
             int currentOccurencies = player.getAllElements().get(cornerEle);
             if (currentOccurencies > 0)
-                player.getAllElements().put(cornerEle, currentOccurencies - 1);
+                player.removeFromAllElements(cornerEle);
         }
+
     }
 
 
@@ -436,7 +439,7 @@ public class GameState {
             if (player.getAllElements().get(ele) != null) {
                 int currentOccurencies = player.getAllElements().get(ele);
                 int newOccurencies = Collections.frequency(placingCard.getUncoveredElements(placingCardSide), ele);
-                player.getAllElements().put(ele, currentOccurencies + newOccurencies);
+                player.addToAllElements(ele, currentOccurencies + newOccurencies);
             }
         }
     }

@@ -316,7 +316,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void showHand(VirtualView client) throws RemoteException {
-        if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.COLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
+        /*if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.COLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
             if (ping(client)) {
                 int card1Id = controller.getHandId(getPlayerIndex(client)).get(0);
                 Side card1Side = controller.getHandSide(getPlayerIndex(client)).get(0);
@@ -332,6 +332,8 @@ public class Server implements VirtualServer {
                 client.printError("Your hand has not been inizialized");
             }
         }
+
+         */
     }
 
     @Override
