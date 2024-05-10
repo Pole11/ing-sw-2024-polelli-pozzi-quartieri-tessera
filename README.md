@@ -175,7 +175,7 @@ This section details the enumerated data types we'll employ to represent various
 Due to graphical complexity, we won't illustrate all associations with other classes.
 However, it's important to remember that these enumerations are indeed connected to the classes that utilize them for data definition.
 
-![UML of Enums and Config](deliverables/img/enums2.svg)
+![UML of Enums and Config](deliverables/img/enums.svg)
 
 # Controller
 
