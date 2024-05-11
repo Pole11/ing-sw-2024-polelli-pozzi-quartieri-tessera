@@ -25,6 +25,7 @@ import java.util.Scanner;
 
 public class Client {
     private static boolean meDoGui;
+    private static GUIApplication guiApplication;
     private static GUIController guiController;
 
     public static void main(String[] args) throws IOException {
@@ -61,12 +62,19 @@ public class Client {
     }
 
     public static void runGui(VirtualServer server, VirtualView client){
-        GUIApplication guiApplication = new GUIApplication();
-        guiApplication.runGui();
-        guiController = guiApplication.getController();
-        guiController.setClient(client);
-        guiController.setServer(server);
         meDoGui = true;
+
+        guiApplication = new GUIApplication();
+
+        guiApplication.setServer(server);
+        guiApplication.setClient(client);
+
+        // il punto è che dovresti fare questo ma dopo il runGui
+        //guiController = guiApplication.getGUIController();
+        //System.out.println("CCC" + guiController);
+        guiController = new GUIController(client, server);
+
+        guiApplication.runGui(guiController);
     }
 
     public static void manageInput(VirtualServer server, String[] message, VirtualView client) throws RemoteException {
@@ -275,16 +283,15 @@ public class Client {
     public static void printMessage(String msg) {
         if (meDoGui) {
             guiController.setServerMessage(msg);
-        } else {
-            System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
         }
+        System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
 
     public static void printError(String msg) {
         if (meDoGui) {
-
-        } else {
-            System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
+            guiController.setServerError(msg);
         }
+        System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
+
     }
 }

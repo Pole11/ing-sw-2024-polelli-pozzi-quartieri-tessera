@@ -23,7 +23,6 @@ public class SocketClient implements VirtualView {
     }
 
     public static void execute(String host, String portString) throws IOException {
-
         int port = Integer.parseInt(portString);
         Socket socketToServer = new Socket(host, port);
 
