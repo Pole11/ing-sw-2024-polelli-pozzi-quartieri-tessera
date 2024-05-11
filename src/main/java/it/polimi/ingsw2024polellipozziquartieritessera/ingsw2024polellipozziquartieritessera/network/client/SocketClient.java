@@ -46,7 +46,7 @@ public class SocketClient implements VirtualView {
         System.out.print("Do you GUI? [Y/n] ");
         String input = scan.nextLine();
         if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
-            Client.runGui();
+            Client.runGui(server, this);
         } else if (input.equalsIgnoreCase("n")) {
             this.server.connectRmi(this);
             Client.runCli(server, this);

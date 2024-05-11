@@ -4,12 +4,30 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Button?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Text?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController">
+<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
+    <Text text="Welcome to Codex Naturalis"
+          GridPane.columnIndex="0" GridPane.rowIndex="0"
+          GridPane.columnSpan="2"/>
+
+    <Label text="Nickname:"
+           GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <TextField
+            fx:id="nicknameTextField"
+            GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+    <Button text="Sign In"
+            GridPane.columnIndex="0" GridPane.rowIndex="2"
+            onAction="#handleAddUser"/>
+
     <Label fx:id="serverMessageLabel"/>
-</VBox>
+</GridPane>

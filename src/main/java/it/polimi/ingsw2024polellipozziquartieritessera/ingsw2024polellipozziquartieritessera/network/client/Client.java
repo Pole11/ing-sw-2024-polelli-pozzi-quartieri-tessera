@@ -60,12 +60,16 @@ public class Client {
         }
     }
 
-    public static void runGui(){
-        new GUIApplication().runGui();
+    public static void runGui(VirtualServer server, VirtualView client){
+        GUIApplication guiApplication = new GUIApplication();
+        guiApplication.runGui();
+        guiController = guiApplication.getController();
+        guiController.setClient(client);
+        guiController.setServer(server);
         meDoGui = true;
     }
 
-    private static void manageInput(VirtualServer server, String[] message, VirtualView client) throws RemoteException {
+    public static void manageInput(VirtualServer server, String[] message, VirtualView client) throws RemoteException {
         try {
             Command.valueOf(message[0].toUpperCase());
         } catch(IllegalArgumentException e) {

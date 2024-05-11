@@ -27,7 +27,7 @@ def translate():
 def compile():
     # Compile to pdf using pandoc
     subprocess.run(pandoc_comand, shell=True, capture_output=True, text=True)
-
+    print(pandoc_comand)
     print("PDF generated " + out_pdf_file_path)
 
 # Create a parser to define flags
@@ -50,8 +50,8 @@ pandoc_comand = "pandoc -f markdown-implicit_figures -i " + out_file_path + " -o
 
 # Define global variables
 frontmatter_content = '''---
-title: {title}
-sub-title: {sub_title}
+title: \"{title}\"
+sub-title: \"{sub_title}\"
 toc: true
 toc-title: Indice
 author:
