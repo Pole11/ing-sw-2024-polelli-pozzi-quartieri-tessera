@@ -22,6 +22,9 @@ public class Board {
     }
 
     //GETTER
+
+    //-----card------
+
     public GoldCard getSharedGoldCard(int index) {
         return sharedGoldCards[index];
     }
@@ -32,6 +35,16 @@ public class Board {
 
     public ObjectiveCard getSharedObjectiveCard(int index) {
         return sharedObjectiveCards[index];
+    }
+
+    //----size-----
+
+    public int getGoldDeckSize(){
+        return goldDeck.size();
+    }
+
+    public int getResourceDeckSize(){
+        return resourceDeck.size();
     }
 
     //SETTER
