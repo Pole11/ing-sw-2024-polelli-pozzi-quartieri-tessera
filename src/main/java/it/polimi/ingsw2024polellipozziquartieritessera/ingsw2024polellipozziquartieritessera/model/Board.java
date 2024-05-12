@@ -2,6 +2,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -20,7 +21,46 @@ public class Board {
         resourceDeck  = new ArrayList<>();
     }
 
+    //GETTER
+    public GoldCard getSharedGoldCard(int index) {
+        return sharedGoldCards[index];
+    }
+
+    public ResourceCard getSharedResourceCard(int index) {
+        return sharedResourceCards[index];
+    }
+
+    public ObjectiveCard getSharedObjectiveCard(int index) {
+        return sharedObjectiveCards[index];
+    }
+
     //SETTER
+
+    public void setSharedGoldCard(int index, GoldCard sharedGoldCard) {
+        this.sharedGoldCards[index] = sharedGoldCard;
+    }
+
+    public void setSharedResourceCard(int index, ResourceCard sharedResourceCard) {
+        this.sharedResourceCards[index] = sharedResourceCard;
+    }
+
+    public void setSharedObjectiveCard(int index, ObjectiveCard sharedObjectiveCard) {
+        this.sharedObjectiveCards[index] = sharedObjectiveCard;
+    }
+
+    //EMPTINESS
+
+    public boolean isResourceDeckEmpty(){
+        return resourceDeck.isEmpty();
+    }
+
+    public boolean isGoldDeckEmpty(){
+        return resourceDeck.isEmpty();
+    }
+
+
+    //SETTER
+    /*
     public void setSharedGoldCards(GoldCard[] sharedGoldCards) {
         this.sharedGoldCards = sharedGoldCards;
     }
@@ -46,14 +86,15 @@ public class Board {
         return sharedObjectiveCards;
     }
 
+
     public ArrayList<GoldCard> getGoldDeck() {
-        return goldDeck;
+        return new ArrayList<>(goldDeck);
     }
 
     public ArrayList<ResourceCard> getResourceDeck() {
-        return resourceDeck;
+        return new ArrayList<>(resourceDeck);
     }
-
+    */
     //ADDER
 
     public void addToGoldDeck(GoldCard goldCard) {
@@ -64,90 +105,89 @@ public class Board {
         resourceDeck.add(resourceCard);
     }
 
+    //deck remover are not needed, because the card are remove in the drawcard in this class
+
 
     //METHODS
 
+    //------------inizitization-----------------
 
-    public void initSharedGoldCards() {
+    public void initSharedGoldCards() throws EmptyDeckException {
         // it's like fillSharedGaps, look at the draw from shared methods to take inspiration
-        GoldCard card1 = getFromGoldDeck();
-        GoldCard card2 = getFromGoldDeck();
-
-        GoldCard[] cards = {card1, card2};
-
-        setSharedGoldCards(cards);
+        this.sharedGoldCards[0] = drawFromGoldDeck();
+        this.sharedGoldCards[1] = drawFromGoldDeck();
     }
 
-    public void initSharedResourceCards() {
-        ResourceCard card1 = getFromResourceDeck();
-        ResourceCard card2 = getFromResourceDeck();
-
-        ResourceCard[] cards = {card1, card2};
-
-        setSharedResourceCards(cards);
+    public void initSharedResourceCards() throws EmptyDeckException {
+        this.sharedResourceCards[0] = drawFromResourceDeck();
+        this.sharedResourceCards[1] = drawFromResourceDeck();
     }
 
-    // returns the requested shared gold card
-    public GoldCard drawSharedGoldCard(int pos) {
-        GoldCard[] sharedGolds = getSharedGoldCards();
 
-        // verify position is valid
-        if (pos < 1 || pos > sharedGolds.length) {
-            throw new IllegalArgumentException("invalid position: " + pos);
+    public void shuffleCards() {
+        Random randStream = new Random();
+        for (int i = 0; i < this.goldDeck.size(); i++) {
+            int j = i + randStream.nextInt(this.goldDeck.size()-i);
+            GoldCard temp = this.goldDeck.get(i);
+            this.goldDeck.set(i, this.goldDeck.get(j));
+            this.goldDeck.set(j, temp);
         }
 
+        for (int i = 0; i < this.resourceDeck.size(); i++) {
+            int j = i + randStream.nextInt(this.resourceDeck.size()-i);
+            ResourceCard temp2 = this.resourceDeck.get(i);
+            this.resourceDeck.set(i, this.resourceDeck.get(j));
+            this.resourceDeck.set(j, temp2);
+        }
+    }
+
+    //-------------drawCard Methods-----------------------
+
+    // returns the card and replace shared
+    public GoldCard drawSharedGoldCard(int pos) throws EmptyDeckException {
+        // verify position is valid
+        if (pos < 1 || pos > this.sharedGoldCards.length) {
+            throw new IllegalArgumentException("invalid position: " + pos);
+        }
         // get the card
-        GoldCard drawnCard = sharedGolds[pos - 1];
-
-        // remove card from shared
-        sharedGolds[pos - 1] = null;
-        setSharedGoldCards(sharedGolds);
-
+        GoldCard drawnCard = this.sharedGoldCards[pos - 1];
+        // replace card in shared
+        this.sharedGoldCards[pos - 1] = drawFromGoldDeck();
         // return the specified card
         return drawnCard;
     }
 
-    // returns the requested shared resource card
-    public ResourceCard drawSharedResourceCard(int pos) {
-        ResourceCard[] sharedResources = getSharedResourceCards();
-
+    // returns the card and replace shared
+    public ResourceCard drawSharedResourceCard(int pos) throws EmptyDeckException {
         // verify position is valid
-        if (pos < 1 || pos > sharedResources.length) {
+        if (pos < 1 || pos > this.sharedResourceCards.length) {
             throw new IllegalArgumentException("Invalid position: " + pos);
         }
-
         // get the specified card
-        ResourceCard drawnCard = sharedResources[pos - 1];
-
-        // remove card from shared
-        sharedResources[pos - 1] = null;
-        setSharedResourceCards(sharedResources);
-
+        ResourceCard drawnCard = this.sharedResourceCards[pos - 1];
+        // replace card in shared
+        this.sharedResourceCards[pos - 1] = drawFromResourceDeck();
         // return the card
         return drawnCard;
     }
 
-    public ResourceCard getFromResourceDeck(){
-        if (!resourceDeck.isEmpty()){
-            ResourceCard drawnCard = getResourceDeck().getLast();
-            resourceDeck.removeLast();
-            return drawnCard;
-        }
-        else{
-            return null;
-        }
+    //return and remove
+    public ResourceCard drawFromResourceDeck() throws EmptyDeckException {
+        if (resourceDeck.isEmpty()) throw new EmptyDeckException("The resource deck is empty");
+        ResourceCard drawnCard = this.resourceDeck.getLast();
+        resourceDeck.removeLast();
+        return drawnCard;
     }
 
-    public GoldCard getFromGoldDeck(){
-        if (!goldDeck.isEmpty()){
-            GoldCard drawnCard = getGoldDeck().getLast();
-            goldDeck.removeLast();
-            return drawnCard;
-        } else {
-            return null;
-        }
+    //return and remove
+    public GoldCard drawFromGoldDeck() throws EmptyDeckException {
+        if (resourceDeck.isEmpty()) throw new EmptyDeckException("The gold deck is empty");
+        GoldCard drawnCard = this.goldDeck.getLast();
+        goldDeck.removeLast();
+        return drawnCard;
     }
 
+    /*
     public void fillSharedCardsGap(){
         // verify if the shared cards have some gaps
         for (int index = 0; index < Config.N_SHARED_RESOURCES; index++){
@@ -170,20 +210,5 @@ public class Board {
         }
     }
 
-    public void shuffleCards() {
-        Random randStream = new Random();
-        for (int i = 0; i < goldDeck.size(); i++) {
-            int j = i + randStream.nextInt(goldDeck.size()-i);
-            GoldCard temp = goldDeck.get(i);
-            goldDeck.set(i, goldDeck.get(j));
-            goldDeck.set(j, temp);
-        }
-
-        for (int i = 0; i < resourceDeck.size(); i++) {
-            int j = i + randStream.nextInt(resourceDeck.size()-i);
-            ResourceCard temp2 = resourceDeck.get(i);
-            resourceDeck.set(i, resourceDeck.get(j));
-            resourceDeck.set(j, temp2);
-        }
-    }
+     */
 }

@@ -133,7 +133,7 @@ public class GameState {
     // un giocatore randomico per essere il blackPlayer (al momento sembra superflua)
 
 
-    public void startPhaseMethod() {
+    public void startPhaseMethod() throws EmptyDeckException {
         this.mainBoard.shuffleCards();
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
@@ -180,12 +180,12 @@ public class GameState {
         player.setColor(color);
     }
 
-    public void setHands() {
+    public void setHands() throws EmptyDeckException {
         // popolate hands for every player
         for (int i = 0; i < getPlayers().size(); i++) {
-            GoldCard goldCard = mainBoard.getFromGoldDeck();
-            ResourceCard resourceCard1 = mainBoard.getFromResourceDeck();
-            ResourceCard resourceCard2 = mainBoard.getFromResourceDeck();
+            GoldCard goldCard = mainBoard.drawFromGoldDeck();
+            ResourceCard resourceCard1 = mainBoard.drawFromResourceDeck();
+            ResourceCard resourceCard2 = mainBoard.drawFromResourceDeck();
 
 
             getPlayers().get(i).addToHandCardsMap(goldCard.getId(), Side.FRONT); // default is front side
@@ -214,8 +214,8 @@ public class GameState {
             players.get(i).setSecretObjectiveCardOptions(objectiveCards);
         }
 
-        mainBoard.getSharedObjectiveCards()[0] = (ObjectiveCard) cardsMap.get(randomKeysList.get(randomKeysList.size() - 2));
-        mainBoard.getSharedObjectiveCards()[1] = (ObjectiveCard) cardsMap.get(randomKeysList.getLast());
+        mainBoard.setSharedObjectiveCard(0, (ObjectiveCard) cardsMap.get(randomKeysList.get(randomKeysList.size() - 2)));
+        mainBoard.setSharedObjectiveCard(1, (ObjectiveCard) cardsMap.get(randomKeysList.getLast()));
     }
 
 
@@ -239,15 +239,15 @@ public class GameState {
             }
         }
         // cards ended?
-        if (this.getMainBoard().getResourceDeck().isEmpty()) {
+        if (this.getMainBoard().isResourceDeckEmpty()) {
             return true;
         }
-        return this.getMainBoard().getGoldDeck().isEmpty();
+        return this.getMainBoard().isGoldDeckEmpty();
     }
 
     void calculateFinalPoints() throws CardNotPlacedException, WrongInstanceTypeException {
-        ObjectiveCard sharedCard1 = this.mainBoard.getSharedObjectiveCards()[0];
-        ObjectiveCard sharedCard2 = this.mainBoard.getSharedObjectiveCards()[1];
+        ObjectiveCard sharedCard1 = this.mainBoard.getSharedObjectiveCard(0);
+        ObjectiveCard sharedCard2 = this.mainBoard.getSharedObjectiveCard(1);
 
         for (int i = 0; i < this.getPlayers().size(); i++) {
             Player player = this.getPlayers().get(i);
@@ -329,34 +329,33 @@ public class GameState {
 
 //--------------All draw cards called from controller------------------
 
-    public void drawGoldFromDeck(Board board, Player currentPlayer) {
+    public void drawGoldFromDeck(Board board, Player currentPlayer) throws EmptyDeckException {
         // get new card
-        GoldCard newGoldCard = board.getFromGoldDeck();
+        GoldCard newGoldCard = board.drawFromGoldDeck();
         // add card to player hand
         currentPlayer.addToHandCardsMap(newGoldCard.getId(), Side.FRONT); // the front side is the default
     }
 
-    public void drawGoldFromShared(Board board, Player currentPlayer, int index) {
-        // get new gold card
-        GoldCard newGoldCard = board.drawSharedGoldCard(index);
-        currentPlayer.addToHandCardsMap(newGoldCard.getId(), Side.FRONT);
-        // fill the gap
-        board.fillSharedCardsGap();
-    }
-
-    public void drawResourceFromDeck(Board board, Player currentPlayer) {
+    public void drawResourceFromDeck(Board board, Player currentPlayer) throws EmptyDeckException {
         // get new card
-        ResourceCard newResourceCard = board.getFromResourceDeck();
+        ResourceCard newResourceCard = board.drawFromResourceDeck();
         // had card to player hand
         currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
     }
 
-    public void drawResourceFromShared(Board board, Player currentPlayer, int index) {
+    public void drawGoldFromShared(Board board, Player currentPlayer, int index) throws EmptyDeckException {
+        // get new gold card
+        GoldCard newGoldCard = board.drawSharedGoldCard(index);
+        // had card to player hand
+        currentPlayer.addToHandCardsMap(newGoldCard.getId(), Side.FRONT);
+    }
+
+
+    public void drawResourceFromShared(Board board, Player currentPlayer, int index) throws EmptyDeckException {
         // get new resource card
         ResourceCard newResourceCard = board.drawSharedResourceCard(index);
+        // had card to player hand
         currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
-        // fill the gap
-        board.fillSharedCardsGap();
     }
 
 //----------------------------place Card--------------------------------
@@ -454,7 +453,7 @@ public class GameState {
     public int getTurnTime(){
         return 0;
     }
-    }
+}
 
 
 /*

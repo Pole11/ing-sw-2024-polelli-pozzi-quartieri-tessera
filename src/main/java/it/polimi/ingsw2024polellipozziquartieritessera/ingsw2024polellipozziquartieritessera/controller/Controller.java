@@ -66,7 +66,7 @@ public class Controller {
 
     //settare players
 
-    public void addPlayer(String nickname) throws NotUniquePlayerNicknameException {
+    public void addPlayer(String nickname) throws NotUniquePlayerNicknameException, EmptyDeckException {
         synchronized (this.gameState) {
             gameState.setPlayer(gameState.getPlayers().size(), new Player(nickname));
             if (gameState.getPlayers().size() >= Config.MAX_PLAYERS){
@@ -76,7 +76,7 @@ public class Controller {
     }
 
     //this is runned after gameState is populated with cards and players
-    public void startGame(){
+    public void startGame() throws EmptyDeckException {
         synchronized (this.gameState) {
             this.gameState.startPhaseMethod();
         }
@@ -104,7 +104,7 @@ public class Controller {
         }
     }
 
-    public void colorChoosed(){
+    public void colorChoosed() throws EmptyDeckException {
         synchronized (this.gameState) {
             gameState.setHands();
             gameState.setObjectives();
@@ -181,18 +181,14 @@ public class Controller {
     }
 
 
-    public void drawCard(DrawType drawType) throws InvalidHandException {
+    public void drawCard(DrawType drawType) throws InvalidHandException, EmptyDeckException {
         synchronized (this.gameState) {
-            // non so se vada messo qui
-            this.gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE); //dobbiamo valutare se si intende
-            // la fase che c'è dopo o da ora in poi
+            this.gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE);
             Board board = this.gameState.getMainBoard();
             Player currentPlayer = this.gameState.getCurrentPlayer();
 
-            if (currentPlayer.getHandSize() >= Config.MAX_HAND_CARDS)
-                throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
+            if (currentPlayer.getHandSize() >= Config.MAX_HAND_CARDS) throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
 
-            //RICORDARSI DI CONTROLLARE SE LA CHIAMATA ARRIVA DAL CURRENT PLAYER
             switch (drawType) {
                 case DrawType.DECKGOLD:
                     this.gameState.drawGoldFromDeck(board, currentPlayer);

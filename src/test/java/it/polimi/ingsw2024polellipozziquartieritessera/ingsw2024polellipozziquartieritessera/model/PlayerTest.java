@@ -289,7 +289,7 @@ public class PlayerTest {
 
         // create game state
         GameState gs = Populate.createCardsMap();
-        gs.setPlayer(0, new Player("jhonny"));
+        gs.setPlayer(0, new Player("test"));
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
