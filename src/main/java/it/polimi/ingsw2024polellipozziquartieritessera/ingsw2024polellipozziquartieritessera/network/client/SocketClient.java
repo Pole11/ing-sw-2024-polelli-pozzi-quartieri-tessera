@@ -23,7 +23,6 @@ public class SocketClient implements VirtualView {
     }
 
     public static void execute(String host, String portString) throws IOException {
-
         int port = Integer.parseInt(portString);
         Socket socketToServer = new Socket(host, port);
 
@@ -46,7 +45,7 @@ public class SocketClient implements VirtualView {
         System.out.print("Do you GUI? [Y/n] ");
         String input = scan.nextLine();
         if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
-            Client.runGui();
+            Client.runGui(server, this);
         } else if (input.equalsIgnoreCase("n")) {
             this.server.connectRmi(this);
             Client.runCli(server, this);
@@ -81,12 +80,14 @@ public class SocketClient implements VirtualView {
 
     @Override
     public void printMessage(String msg) {
-        System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
+        Client.printMessage(msg);
+        //System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
 
     @Override
     public void printError(String msg) throws RemoteException {
-        System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
+        Client.printError(msg);
+        //System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
     }
 
     @Override

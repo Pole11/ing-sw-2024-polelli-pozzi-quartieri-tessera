@@ -37,7 +37,7 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
             System.out.print("Do you GUI? [Y/n] ");
             String input = scan.nextLine();
             if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
-                Client.runGui();
+                Client.runGui(server, this);
             } else if (input.equalsIgnoreCase("n")) {
                 this.server.connectRmi(this);
                 Client.runCli(server, this);
@@ -52,37 +52,38 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     @Override
     public void printMessage(String msg) {
         // check if there is gui and if so show the message on the gui
-        System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
+        Client.printMessage(msg);
+        //System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
+
     }
 
     @Override
     public void printError(String msg) throws RemoteException {
-        System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
+        Client.printError(msg);
+        //System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
+
     }
 
     @Override
     public void ping(String ping) throws RemoteException {
-
     }
 
     @Override
     public void printCard(int id1, Side side1, int id2, Side side2, int id3, Side side3) throws RemoteException {
-        System.out.print("\n");
-        Client.printCard(id1, side1);
-        Client.printCard(id2, side2);
-        Client.printCard(id3, side3);
+            System.out.print("\n");
+            Client.printCard(id1, side1);
+            Client.printCard(id2, side2);
+            Client.printCard(id3, side3);
 
-        System.out.print("\n> ");
+            System.out.print("\n> ");
     }
 
     @Override
     public void printCard(int id1, Side side1, int id2, Side side2) throws RemoteException {
-        
     }
 
     @Override
     public void printCard(int id, Side side) throws RemoteException {
-
     }
 
 }
