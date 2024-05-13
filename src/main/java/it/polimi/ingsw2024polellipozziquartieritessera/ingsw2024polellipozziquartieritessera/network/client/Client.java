@@ -25,10 +25,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Client{
 
@@ -265,9 +262,23 @@ public class Client{
             backCorners[i] = Element.valueOf(((ArrayList) card.get("BackCorners")).get(i).toString().toUpperCase());
         }
 
-        // TODO: printing
-
-        // if (side) ...
+        if (side == Side.BACK){
+            System.out.println("+-----------------+");
+            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("|" + getFormattedString(17, "") + "|");
+            System.out.println("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
+            System.out.println("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) +"|");
+            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("+-----------------+");
+        } else{
+            System.out.println("+-----------------+");
+            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, points)+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("|" + getFormattedString(17, "") + "|");
+            System.out.println("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
+            System.out.println("|" + getFormattedString(17, "") + "|");
+            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("+-----------------+");
+        }
     }
 
     private static void printGoldCard(Map card, Side side){
@@ -315,9 +326,44 @@ public class Client{
             resourceNeeded.add(Element.valueOf(e.toString().toUpperCase()));
         }
 
-        // TODO: printing
+        // define cost and challenge strings
+        HashMap<Element, Integer> cost = new HashMap<>();
+        for (Element e : resourceNeeded){
+            if(!cost.containsKey(e)){
+                cost.put(e,1);
+            } else{
+                cost.put(e, cost.get(e)+1);
+            }
+        }
+        String costString = "";
+        for (Element key : cost.keySet()){
+            costString = cost.get(key) + key.toString().substring(0,3).toUpperCase();
+        }
 
-        // if (side) ...
+        String challengeString = "";
+        if (coverageChallenge){
+            challengeString = "cha: COV";
+        } else if (elementChallenge != null){
+            challengeString = "cha: " + elementChallenge.getFirst().toString().substring(0,3).toUpperCase();
+        }
+
+        if (side == Side.BACK){
+            System.out.println("+-----------------+");
+            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("|" + getFormattedString(17, "") + "|");
+            System.out.println("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
+            System.out.println("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) +"|");
+            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("+-----------------+");
+        } else{
+            System.out.println("+-----------------+");
+            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, points)+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("|"+ getFormattedString(17, costString)+"|");
+            System.out.println("|"+ getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
+            System.out.println("|"+ getFormattedString(17, challengeString)+"|");
+            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("+-----------------+");
+        }
     }
 
     private static void printStarterCard(Map card, Side side){
@@ -341,10 +387,67 @@ public class Client{
             centerResources.add(Element.valueOf(e.toString().toUpperCase()));
         }
 
-        // TODO: printing
+        // create centerString
+        String centerString = "";
+        for (Element e : centerResources){
+            centerString = centerString + " " + e.toString().substring(0, 3).toUpperCase();
+        }
+        if (centerString.startsWith(" ")) {
+            centerString = centerString.substring(1);
+        }
+
+        if (side == Side.BACK){
+            System.out.println("+-----------------+");
+            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("|" + getFormattedString(17, "") + "|");
+            System.out.println("|" + getFormattedString(17, "") + "|");
+            System.out.println("|" + getFormattedString(17, "") + "|");
+            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("+-----------------+");
+        } else{
+            System.out.println("+-----------------+");
+            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("|" + getFormattedString(17, "") + "|");
+            System.out.println("|"+ getFormattedString(17, centerString) +"|");
+            System.out.println("|" + getFormattedString(17, "") + "|");
+            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            System.out.println("+-----------------+");
+        }
     }
 
     private static int getId(Object key) {
         return Integer.parseInt(key.toString());
     }
+
+    private static String getFormattedString(int length, String content){
+        // ------
+        if (length%2 == 0){
+            while (content.length() < length){
+                if (content.length()%2 == 0){
+                    content = " " + content + " ";
+                } else{
+                    content = content + " ";
+                }
+            }
+        } else{
+            while (content.length() < length){
+                if (content.length()%2 == 0){
+                    content = content + " ";
+                } else{
+                    content = " " + content + " ";
+                }
+            }
+        }
+        return content;
+    }
 }
+
+// TODO: capire come fare a chiamare le print card... da dove, chi lo fa, etc.
+// TODO: la mappa possiamo farla in due modi
+// 1)      2)
+// 2 3     1>2
+// 4 1     ^
+//         3>4
+// TODO: scegliere come printare le objectives
+// 1) testuale (scrivere cosa fanno)
+// 2) visuale (disegnare la objective)
