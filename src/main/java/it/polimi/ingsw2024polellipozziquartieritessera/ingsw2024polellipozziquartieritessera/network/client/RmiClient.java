@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.GamePhase;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
@@ -24,6 +25,7 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
             VirtualServer server = (VirtualServer) registry.lookup("VirtualServer");
             (new RmiClient(server)).run(); // crea la mia copia sul server
         } catch (RemoteException | NotBoundException e) {
+            e.printStackTrace();
             System.out.println("An error occurred while executing RmiClient!");
         }
     }
@@ -80,6 +82,17 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     @Override
     public void printCard(int id, Side side) throws RemoteException {
+    }
+
+    @Override
+    public void changePhase(String nextGamePhaseString) {
+        Client.changePhase(nextGamePhaseString);
+        /*try {
+            GamePhase nextGamePhase = GamePhase.valueOf(nextGamePhaseString);
+            Client.changePhase(nextGamePhase);
+        } catch (Exception e) {
+            System.err.println("Invalid game phase");
+        }*/
     }
 
 }

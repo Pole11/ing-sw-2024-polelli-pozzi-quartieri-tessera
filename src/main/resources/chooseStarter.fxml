@@ -36,7 +36,4 @@
             fx:id="serverErrorLabel"
             GridPane.columnIndex="0" GridPane.rowIndex="4"/>
 
-    <Button text="Go Back"
-            GridPane.columnIndex="0" GridPane.rowIndex="5"
-            onAction="#goToLobby"/>
 </GridPane>

@@ -32,6 +32,7 @@ public class Client {
     private static boolean meDoGui;
     private static GUIApplication guiApplication;
     private static GUIController guiController;
+    private static GamePhase currentGamePhase;
 
     public static void main(String[] args) throws IOException {
         String input = args[0];
@@ -539,6 +540,54 @@ public class Client {
         System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
 
     }
+
+    public static void changePhase(String nextGamePhaseString) {
+        GamePhase nextGamePhase = null;
+        try {
+            nextGamePhase = GamePhase.valueOf(nextGamePhaseString);
+        } catch (Exception e) {
+            System.err.println("Invalid game phase");
+        }
+
+        currentGamePhase = nextGamePhase;
+
+        switch (nextGamePhase) {
+            case GamePhase.NICKNAMEPHASE -> {
+                guiController.goToScene("/start.fxml");
+            }
+            case GamePhase.CHOOSESTARTERSIDEPHASE -> {
+                guiController.goToScene("/chooseStarter.fxml");
+            }
+            case GamePhase.CHOOSECOLORPHASE -> {
+                guiController.goToScene("/chooseColor.fxml");
+            }
+            case GamePhase.CHOOSEOBJECTIVEPHASE -> {
+                guiController.goToScene("/chooseObjective.fxml");
+            }
+            case GamePhase.MAINPHASE -> {
+                guiController.goToScene("/game.fxml");
+            }
+            case GamePhase.ENDPHASE -> {
+            }
+            case GamePhase.FINALPHASE -> {
+                guiController.goToScene("/final.fxml");
+            }
+        }
+
+    }
+
+    /*public static void changePhase(TurnPhase nextTurnPhase) {
+        if (currentGamePhase.equals(GamePhase.MAINPHASE)) {
+            switch (nextTurnPhase) {
+                case TurnPhase.PLACINGPHASE -> {
+
+                }
+                case TurnPhase.DRAWPHASE -> {
+
+                }
+            }
+        }
+    }*/
 }
 
 // TODO: capire come fare a chiamare le print card... da dove, chi lo fa, etc.

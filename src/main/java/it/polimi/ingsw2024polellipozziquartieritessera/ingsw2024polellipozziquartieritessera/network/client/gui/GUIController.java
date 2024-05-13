@@ -50,16 +50,8 @@ public class GUIController {
             e.printStackTrace(); // TODO: remove on prod
             serverMessageLabel.setText("There was an error while adding a user");
         }
-
         // check if the user has logged in
-
         // check if the game is startable
-        try {
-            GUIApplication.changeScene("/chooseStarter.fxml");
-        } catch (IOException e) {
-            // handle
-            e.printStackTrace();
-        }
     }
 
     @FXML
@@ -79,13 +71,6 @@ public class GUIController {
         } catch (RemoteException e) {
             e.printStackTrace(); // TODO: remove on prod
             serverMessageLabel.setText("There was an error while choosing the starter side");
-        }
-
-        try {
-            GUIApplication.changeScene("/chooseColor.fxml");
-        } catch (IOException e) {
-            // handle
-            e.printStackTrace();
         }
     }
 
@@ -119,54 +104,17 @@ public class GUIController {
         }
     }
 
-    @FXML
-    private void goToChooseObjective(ActionEvent event) {
-        try {
-            GUIApplication.changeScene("/chooseObjective.fxml");
-        } catch (IOException e) {
-            // handle
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void goToChooseColor(ActionEvent event) {
-        try {
-            GUIApplication.changeScene("/chooseColor.fxml");
-        } catch (IOException e) {
-            // handle
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void goToChooseStarter(ActionEvent event) {
-        try {
-            GUIApplication.changeScene("/chooseStarter.fxml");
-        } catch (IOException e) {
-            // handle
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void goToLobby(ActionEvent event) {
-        try {
-            GUIApplication.changeScene("/lobby.fxml");
-        } catch (IOException e) {
-            // handle
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void goToGame(ActionEvent event) {
-        try {
-            GUIApplication.changeScene("/game.fxml");
-        } catch (IOException e) {
-            // handle
-            e.printStackTrace();
-        }
+    public void goToScene(String fxml) {
+        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+            @Override
+            public void run() {
+                try {
+                    GUIApplication.changeScene(fxml);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     @FXML
@@ -186,13 +134,6 @@ public class GUIController {
         } catch (RemoteException e) {
             e.printStackTrace(); // TODO: remove on prod
             serverMessageLabel.setText("There was an error while adding a user");
-        }
-
-        try {
-            GUIApplication.changeScene("/game.fxml");
-        } catch (IOException e) {
-            // handle
-            e.printStackTrace();
         }
     }
 

@@ -71,6 +71,9 @@ public class SocketClient implements VirtualView {
                 case "PING":
                     this.ping(message[1]);
                     break;
+                case "PHASE":
+                    this.changePhase(message[1]);
+                    break;
                 default:
                     System.err.println("[5xx INVALID MESSAGE FROM SERVER]");
                     break;
@@ -108,6 +111,20 @@ public class SocketClient implements VirtualView {
     @Override
     public void printCard(int id, Side side) throws RemoteException {
 
+    }
+
+    @Override
+    public void changePhase(String nextGamePhaseString) {
+        Client.changePhase(nextGamePhaseString);
+        /*
+        try {
+            System.out.println(nextGamePhaseString);
+            GamePhase nextGamePhase = GamePhase.valueOf(nextGamePhaseString);
+            Client.changePhase(nextGamePhase);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Invalid game phase");
+        }*/
     }
 
 }

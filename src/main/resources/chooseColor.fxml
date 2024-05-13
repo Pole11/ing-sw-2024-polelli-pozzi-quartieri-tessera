@@ -37,13 +37,6 @@
             GridPane.columnIndex="3" GridPane.rowIndex="1"
             onAction="#chooseRedColor"/>
 
-    <Button text="Back"
-            GridPane.columnIndex="0" GridPane.rowIndex="5"
-            onAction="#goToChooseStarter"/>
-    <Button text="Next"
-            GridPane.columnIndex="1" GridPane.rowIndex="5"
-            onAction="#goToChooseObjective"/>
-
     <Label
             fx:id="serverMessageLabel"
             GridPane.columnIndex="0" GridPane.rowIndex="3"/>

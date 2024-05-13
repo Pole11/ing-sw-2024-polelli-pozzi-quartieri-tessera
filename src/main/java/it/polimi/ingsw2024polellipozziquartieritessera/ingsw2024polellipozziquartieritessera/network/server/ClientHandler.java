@@ -178,4 +178,9 @@ public class ClientHandler implements VirtualView {
     public void printCard(int id, Side side) throws RemoteException {
         view.printCard(id, side);
     }
+
+    @Override
+    public void changePhase(String nextGamePhaseString) throws RemoteException {
+        view.changePhase(nextGamePhaseString);
+    }
 }

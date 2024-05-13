@@ -5,7 +5,7 @@ public enum GamePhase {
     // TODO: check if the order is wrong
     NICKNAMEPHASE,
     CHOOSESTARTERSIDEPHASE,
-    COLORPHASE,
+    CHOOSECOLORPHASE,
     CHOOSEOBJECTIVEPHASE,
     MAINPHASE, // does it really need a description?
     ENDPHASE,  // last round(s)

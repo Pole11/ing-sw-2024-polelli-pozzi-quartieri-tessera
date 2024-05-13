@@ -40,4 +40,9 @@ public class ClientProxy implements VirtualView {
     @Override
     public void printCard(int id, Side side) throws RemoteException {
     }
+
+    @Override
+    public void changePhase(String nextGamePhaseString) {
+        output.println("PHASE; " + nextGamePhaseString);
+    }
 }
