@@ -39,8 +39,8 @@ public class ServerProxy implements VirtualServer {
     }
 
     @Override
-    public void chooseInitialStarterSide(VirtualView client, String side) throws RemoteException {
-        output.println(Command.CHOOSESTARTER + "; " + side);
+    public void chooseInitialStarterSide(VirtualView client, Side side) throws RemoteException {
+        output.println(Command.CHOOSESTARTER + "; " + side.toString());
         output.flush();
     }
 

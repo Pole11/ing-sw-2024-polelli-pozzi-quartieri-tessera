@@ -15,7 +15,7 @@ public interface VirtualServer extends Remote {
 
     public void startGame(VirtualView client) throws RemoteException;
 
-    public void chooseInitialStarterSide(VirtualView client, String side) throws RemoteException;
+    public void chooseInitialStarterSide(VirtualView client, Side side) throws RemoteException;
 
     public void chooseInitialColor(VirtualView client, String color) throws RemoteException;
 

@@ -98,7 +98,14 @@ public class Client{
                 break;
             case Command.CHOOSESTARTER:
                 try {
-                    server.chooseInitialStarterSide(client, message[1]);
+                    Side side;
+                    try {
+                        side = Side.valueOf(message[1].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        client.printError("Invalid side, please enter a valid side (Front / Back)");
+                        return;
+                    }
+                    server.chooseInitialStarterSide(client, side);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.print("INVALID COMMAND\n> ");
                     return;
