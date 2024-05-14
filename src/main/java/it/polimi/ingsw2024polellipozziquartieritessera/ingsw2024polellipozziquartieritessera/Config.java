@@ -8,6 +8,7 @@ public class Config {
     public static final int N_SHARED_OBJECTIVES = 2;
     public static final int N_CORNERS = 4;
     public static final int N_STRUCTURE_CHALLENGE_CONFIGURATION = 3;
+    public static final int N_OBJECTIVE_CARD_OPTIONS = 2;
     public static final int MAX_TURN_TIME = 60;
     public static final int MAX_CHAT_LENGHT = 255;
     public static final int POINTSTOENDPHASE = 20;

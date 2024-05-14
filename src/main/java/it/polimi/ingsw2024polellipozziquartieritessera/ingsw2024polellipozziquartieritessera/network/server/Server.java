@@ -127,6 +127,14 @@ public class Server implements VirtualServer {
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();
+            } catch (EmptyDeckException e) {
+                try {
+                    client.printError("The deck is empty");
+                } catch (RemoteException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    return;
+                }
             }
         } else {
             try {
@@ -159,7 +167,11 @@ public class Server implements VirtualServer {
                     clientIterator.printMessage("The game has begun. Please choose the side of your starter card with the command " + Command.CHOOSESTARTER + " [Front / Back]");
                 }
             }
-            this.controller.startGame();
+            try {
+                this.controller.startGame();
+            } catch (EmptyDeckException e) {
+                client.printError("The deck is empty");
+            }
             this.controller.setGamePhase(GamePhase.CHOOSESTARTERSIDEPHASE);
         }
         else{
@@ -242,7 +254,11 @@ public class Server implements VirtualServer {
 
             if (numberAnswered == clients.size()) {
                 numberAnswered = 0;
-                controller.colorChoosed();
+                try {
+                    controller.colorChoosed();
+                } catch (EmptyDeckException e) {
+                    throw new RuntimeException(e);
+                }
                 try {
                     for (VirtualView clientIterator : this.clients.values()) {
                         getPlayerIndex(clientIterator);
@@ -316,7 +332,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void showHand(VirtualView client) throws RemoteException {
-        if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.COLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
+        /*if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.COLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
             if (ping(client)) {
                 int card1Id = controller.getHandId(getPlayerIndex(client)).get(0);
                 Side card1Side = controller.getHandSide(getPlayerIndex(client)).get(0);
@@ -332,6 +348,8 @@ public class Server implements VirtualServer {
                 client.printError("Your hand has not been inizialized");
             }
         }
+
+         */
     }
 
     @Override
@@ -440,6 +458,8 @@ public class Server implements VirtualServer {
                 }
             } catch (InvalidHandException e) {
                 client.printError("Too many cards in hand");
+            } catch (EmptyDeckException e) {
+                client.printError("The deck is empty");
             }
         }
         else{

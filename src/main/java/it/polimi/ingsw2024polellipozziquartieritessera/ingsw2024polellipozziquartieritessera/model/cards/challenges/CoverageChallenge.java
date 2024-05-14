@@ -9,7 +9,7 @@ public class CoverageChallenge extends Challenge{
 
     @Override
     public int getTimesWon(Player player, GoldCard card) {
-        ArrayList<Corner> uncoveredCorners = card.getUncoveredCorners(player.getPlacedCardsMap().get(card.getId()));
+        ArrayList<Corner> uncoveredCorners = card.getUncoveredCorners(player.getPlacedCardSide(card.getId()));
         int times = 0;
         for (int i = 0; i < uncoveredCorners.size(); i++) {
             Corner corner = uncoveredCorners.get(i);

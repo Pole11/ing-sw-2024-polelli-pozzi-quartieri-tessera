@@ -37,6 +37,7 @@ public class ElementChallenge extends Challenge {
             int min = Integer.MAX_VALUE;
         };
 
+        //finds all the elements of the challenge
         elements.stream().forEach((element)->{
             if (challengeElementsOccurences.containsKey(element)) {
                 challengeElementsOccurences.put(element, challengeElementsOccurences.get(element) + 1);
@@ -45,12 +46,17 @@ public class ElementChallenge extends Challenge {
             }
         });
 
+        //find the elements of the player that are in challengeElementOccurences
         challengeElementsOccurences.keySet().stream().forEach((element ->{
             playerElementsOccurences.put(element, player.getAllElements().get(element));
         }));
 
+
         challengeElementsOccurences.keySet().stream().forEach((element -> {
-            ref.min = playerElementsOccurences.get(element) / challengeElementsOccurences.get(element);
+            int min = playerElementsOccurences.get(element) / challengeElementsOccurences.get(element);
+            if (min < ref.min){
+                ref.min = min;
+            }
         }));
 
         return ref.min;

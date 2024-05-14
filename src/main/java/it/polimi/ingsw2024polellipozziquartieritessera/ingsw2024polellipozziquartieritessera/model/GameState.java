@@ -133,7 +133,7 @@ public class GameState {
     // un giocatore randomico per essere il blackPlayer (al momento sembra superflua)
 
 
-    public void startPhaseMethod() {
+    public void startPhaseMethod() throws EmptyDeckException {
         this.mainBoard.shuffleCards();
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
@@ -161,12 +161,12 @@ public class GameState {
 
     public void setStarterSide(int playerIndex, Side side){
         Player player = getPlayerByIndex(playerIndex);
-        player.getPlacedCardsMap().put(player.getStarterCard().getId(), side); // to fix the hash map obfuscation
+        player.addToPlacedCardsMap(player.getStarterCard().getId(), side);
 
         // add the initial elements of the starter card
         for (Element ele : player.getStarterCard().getUncoveredElements(side)) {
             int currentOccurencies = player.getAllElements().get(ele);
-            player.getAllElements().put(ele, currentOccurencies + 1);
+            player.addToAllElements(ele, currentOccurencies + 1);
         }
     }
 
@@ -180,16 +180,17 @@ public class GameState {
         player.setColor(color);
     }
 
-    public void setHands() {
+    public void setHands() throws EmptyDeckException {
         // popolate hands for every player
         for (int i = 0; i < getPlayers().size(); i++) {
-            GoldCard goldCard = mainBoard.getFromGoldDeck();
-            ResourceCard resourceCard1 = mainBoard.getFromResourceDeck();
-            ResourceCard resourceCard2 = mainBoard.getFromResourceDeck();
+            GoldCard goldCard = mainBoard.drawFromGoldDeck();
+            ResourceCard resourceCard1 = mainBoard.drawFromResourceDeck();
+            ResourceCard resourceCard2 = mainBoard.drawFromResourceDeck();
 
-            getPlayers().get(i).getHandCardsMap().put(goldCard.getId(), Side.FRONT); // default is front side
-            getPlayers().get(i).getHandCardsMap().put(resourceCard1.getId(), Side.FRONT); // default is front side
-            getPlayers().get(i).getHandCardsMap().put(resourceCard2.getId(), Side.FRONT); // default is front side
+
+            getPlayers().get(i).addToHandCardsMap(goldCard.getId(), Side.FRONT); // default is front side
+            getPlayers().get(i).addToHandCardsMap(resourceCard1.getId(), Side.FRONT); // default is front side
+            getPlayers().get(i).addToHandCardsMap(resourceCard2.getId(), Side.FRONT); // default is front side
         }
     }
 
@@ -213,8 +214,8 @@ public class GameState {
             players.get(i).setSecretObjectiveCardOptions(objectiveCards);
         }
 
-        mainBoard.getSharedObjectiveCards()[0] = (ObjectiveCard) cardsMap.get(randomKeysList.get(randomKeysList.size() - 2));
-        mainBoard.getSharedObjectiveCards()[1] = (ObjectiveCard) cardsMap.get(randomKeysList.getLast());
+        mainBoard.setSharedObjectiveCard(0, (ObjectiveCard) cardsMap.get(randomKeysList.get(randomKeysList.size() - 2)));
+        mainBoard.setSharedObjectiveCard(1, (ObjectiveCard) cardsMap.get(randomKeysList.getLast()));
     }
 
 
@@ -222,7 +223,7 @@ public class GameState {
     public void setSecretObjective (int playerIndex, int cardIndex) throws InvalidObjectiveCardException {
         Player player = getPlayerByIndex(playerIndex);
         if (cardIndex == 0 || cardIndex == 1){
-            player.setObjectiveCard(player.getObjectiveCardOptions()[cardIndex]);
+            player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
         } else {
             throw new InvalidObjectiveCardException("The card choosen was not in the options list");
         }
@@ -238,15 +239,15 @@ public class GameState {
             }
         }
         // cards ended?
-        if (this.getMainBoard().getResourceDeck().isEmpty()) {
+        if (this.getMainBoard().isResourceDeckEmpty()) {
             return true;
         }
-        return this.getMainBoard().getGoldDeck().isEmpty();
+        return this.getMainBoard().isGoldDeckEmpty();
     }
 
     void calculateFinalPoints() throws CardNotPlacedException, WrongInstanceTypeException {
-        ObjectiveCard sharedCard1 = this.mainBoard.getSharedObjectiveCards()[0];
-        ObjectiveCard sharedCard2 = this.mainBoard.getSharedObjectiveCards()[1];
+        ObjectiveCard sharedCard1 = this.mainBoard.getSharedObjectiveCard(0);
+        ObjectiveCard sharedCard2 = this.mainBoard.getSharedObjectiveCard(1);
 
         for (int i = 0; i < this.getPlayers().size(); i++) {
             Player player = this.getPlayers().get(i);
@@ -328,34 +329,33 @@ public class GameState {
 
 //--------------All draw cards called from controller------------------
 
-    public void drawGoldFromDeck(Board board, Player currentPlayer) {
+    public void drawGoldFromDeck(Board board, Player currentPlayer) throws EmptyDeckException {
         // get new card
-        GoldCard newGoldCard = board.getFromGoldDeck();
+        GoldCard newGoldCard = board.drawFromGoldDeck();
         // add card to player hand
-        currentPlayer.getHandCardsMap().put(newGoldCard.getId(), Side.FRONT); // the front side is the default
+        currentPlayer.addToHandCardsMap(newGoldCard.getId(), Side.FRONT); // the front side is the default
     }
 
-    public void drawGoldFromShared(Board board, Player currentPlayer, int index) {
+    public void drawResourceFromDeck(Board board, Player currentPlayer) throws EmptyDeckException {
+        // get new card
+        ResourceCard newResourceCard = board.drawFromResourceDeck();
+        // had card to player hand
+        currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
+    }
+
+    public void drawGoldFromShared(Board board, Player currentPlayer, int index) throws EmptyDeckException {
         // get new gold card
         GoldCard newGoldCard = board.drawSharedGoldCard(index);
-        currentPlayer.getHandCardsMap().put(newGoldCard.getId(), Side.FRONT);
-        // fill the gap
-        board.fillSharedCardsGap();
-    }
-
-    public void drawResourceFromDeck(Board board, Player currentPlayer) {
-        // get new card
-        ResourceCard newResourceCard = board.getFromResourceDeck();
         // had card to player hand
-        currentPlayer.getHandCardsMap().put(newResourceCard.getId(), Side.FRONT);
+        currentPlayer.addToHandCardsMap(newGoldCard.getId(), Side.FRONT);
     }
 
-    public void drawResourceFromShared(Board board, Player currentPlayer, int index) {
+
+    public void drawResourceFromShared(Board board, Player currentPlayer, int index) throws EmptyDeckException {
         // get new resource card
         ResourceCard newResourceCard = board.drawSharedResourceCard(index);
-        currentPlayer.getHandCardsMap().put(newResourceCard.getId(), Side.FRONT);
-        // fill the gap
-        board.fillSharedCardsGap();
+        // had card to player hand
+        currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
     }
 
 //----------------------------place Card--------------------------------
@@ -404,6 +404,7 @@ public class GameState {
                 }
             }
         }
+        updateElements(player, placingCard, placingCardSide);
     }
 
     private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {
@@ -423,11 +424,12 @@ public class GameState {
 
         // remove elements of the table card that are covered
         Element cornerEle = matrixCorner.getElement();
-        if (player.getAllElements().get(cornerEle) != null) {
+        if (player.getAllElements().containsKey(cornerEle)) {
             int currentOccurencies = player.getAllElements().get(cornerEle);
             if (currentOccurencies > 0)
-                player.getAllElements().put(cornerEle, currentOccurencies - 1);
+                player.removeFromAllElements(cornerEle);
         }
+
     }
 
 
@@ -436,7 +438,7 @@ public class GameState {
             if (player.getAllElements().get(ele) != null) {
                 int currentOccurencies = player.getAllElements().get(ele);
                 int newOccurencies = Collections.frequency(placingCard.getUncoveredElements(placingCardSide), ele);
-                player.getAllElements().put(ele, currentOccurencies + newOccurencies);
+                player.addToAllElements(ele, currentOccurencies + newOccurencies);
             }
         }
     }
@@ -451,7 +453,7 @@ public class GameState {
     public int getTurnTime(){
         return 0;
     }
-    }
+}
 
 
 /*

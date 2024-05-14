@@ -57,12 +57,16 @@ public class Controller {
     }
 
     public ObjectiveCard[] getObjectiveCardOptions(int playerId) {
-        return this.gameState.getPlayer(playerId).getObjectiveCardOptions();
+        ObjectiveCard[] objectiveCardsOptions = new ObjectiveCard[Config.N_OBJECTIVE_CARD_OPTIONS];
+        for (int i = 0; i < Config.N_OBJECTIVE_CARD_OPTIONS; i++) {
+            objectiveCardsOptions[i] = this.gameState.getPlayer(playerId).getObjectiveCardOption(i);
+        }
+        return objectiveCardsOptions;
     }
 
     //settare players
 
-    public void addPlayer(String nickname) throws NotUniquePlayerNicknameException {
+    public void addPlayer(String nickname) throws NotUniquePlayerNicknameException, EmptyDeckException {
         synchronized (this.gameState) {
             gameState.setPlayer(gameState.getPlayers().size(), new Player(nickname));
             if (gameState.getPlayers().size() >= Config.MAX_PLAYERS){
@@ -72,7 +76,7 @@ public class Controller {
     }
 
     //this is runned after gameState is populated with cards and players
-    public void startGame(){
+    public void startGame() throws EmptyDeckException {
         synchronized (this.gameState) {
             this.gameState.startPhaseMethod();
         }
@@ -100,7 +104,7 @@ public class Controller {
         }
     }
 
-    public void colorChoosed(){
+    public void colorChoosed() throws EmptyDeckException {
         synchronized (this.gameState) {
             gameState.setHands();
             gameState.setObjectives();
@@ -133,13 +137,13 @@ public class Controller {
 
 
             Corner placingCorner = placingCard.getCorners(placingCardSide).get(placingCornerPos.ordinal());
-            Corner tableCorner = tableCard.getCorners(player.getPlacedCardsMap().get(tableCardId)).get(tableCornerPos.ordinal());
+            Corner tableCorner = tableCard.getCorners(player.getPlacedCardSide(tableCardId)).get(tableCornerPos.ordinal());
 
-            if (!player.getHandCardsMap().containsKey(placingCardId)) throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
+            if (!player.handCardContains(placingCardId)) throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
 
             // controlla che la carta non sia già presente
-            for (Player p : gameState.getPlayers()) {
-                if (p.getPlacedCardsMap().get(placingCardId) != null) throw new CardAlreadPlacedException("you cannot place a card that is already placed");
+            for (Player playerIterator : gameState.getPlayers()) {
+                if (playerIterator.placedCardContains(placingCardId)) throw new CardAlreadPlacedException("you cannot place a card that is already placed");
             }
 
             if (tableCorner == null) throw new WrongPlacingPositionException("table corner is null");
@@ -151,9 +155,8 @@ public class Controller {
             if (!goldPlaceable(player, placingCard, placingCardSide)) throw new GoldCardCannotBePlacedException("You haven't the necessary resources to place the goldcard " + placingCardId);
 
             this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
-            player.placeCard(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
+            player.updatePlayerCardsMap(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
             player.updateBoard(placingCardId, tableCardId, tableCornerPos);
-            gameState.updateElements(player, placingCard, placingCardSide);
 
             int newPoints = placingCard.calculatePoints(player);
 
@@ -178,18 +181,14 @@ public class Controller {
     }
 
 
-    public void drawCard(DrawType drawType) throws InvalidHandException {
+    public void drawCard(DrawType drawType) throws InvalidHandException, EmptyDeckException {
         synchronized (this.gameState) {
-            // non so se vada messo qui
-            this.gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE); //dobbiamo valutare se si intende
-            // la fase che c'è dopo o da ora in poi
+            this.gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE);
             Board board = this.gameState.getMainBoard();
             Player currentPlayer = this.gameState.getCurrentPlayer();
 
-            if (currentPlayer.getHandCardsMap().values().size() >= Config.MAX_HAND_CARDS)
-                throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
+            if (currentPlayer.getHandSize() >= Config.MAX_HAND_CARDS) throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
 
-            //RICORDARSI DI CONTROLLARE SE LA CHIAMATA ARRIVA DAL CURRENT PLAYER
             switch (drawType) {
                 case DrawType.DECKGOLD:
                     this.gameState.drawGoldFromDeck(board, currentPlayer);
@@ -221,16 +220,15 @@ public class Controller {
         synchronized (this.gameState) {
             Player player = gameState.getPlayerByIndex(playerIndex);
             Side side;
-            if (!player.getHandCardsMap().containsKey(cardId)) {
+            if (!player.handCardContains(cardId)) {
                 throw new CardIsNotInHandException("The card" + cardId + " is not in the player" + playerIndex + "hand");
             }
-            if (player.getHandCardsMap().get(cardId).equals(Side.FRONT)) {
+            if (player.getHandCardSide(cardId).equals(Side.FRONT)) {
                 side = Side.BACK;
             } else {
                 side = Side.FRONT;
             }
-            player.getHandCardsMap().replace(cardId, side);
-        }
+            player.changeHandSide(cardId, side);}
     }
 
     public void openChat(){}
@@ -243,7 +241,7 @@ public class Controller {
             gameState.setPlayersConnected(index, connected);
         }
     }
-
+/*
     public ArrayList<Integer> getHandId(int playerIndex){
         ArrayList<Integer> cardHandId = new ArrayList<>();
         cardHandId.addAll(gameState.getPlayer(playerIndex).getHandCardsMap().keySet());
@@ -263,4 +261,6 @@ public class Controller {
 
         return cardHandsSide;
     }
+
+ */
 }

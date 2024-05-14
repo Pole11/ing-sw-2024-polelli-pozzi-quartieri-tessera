@@ -6,6 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 
+import java.security.interfaces.ECKey;
 import java.util.*;
 
 public class Player {
@@ -38,64 +39,82 @@ public class Player {
         this.handCardsMap = new HashMap<Integer, Side>();
         this.objectivesWon = 0;
         this.centerResource = new HashMap<>();
-        allElements = new HashMap<>();
+        this.allElements = new HashMap<>();
 
         for (Element element : Element.values()) {
-            allElements.put(element, 0);
+            this.allElements.put(element, 0);
         }
     }
 
     //GETTER
 
     public String getNickname() {
-        return nickname;
+        return this.nickname;
     }
 
     public Color getColor() {
-        return color;
+        return this.color;
     }
 
     public int getPoints() {
-        return points;
+        return this.points;
     }
 
     public StarterCard getStarterCard() {
-        return starterCard;
+        return this.starterCard;
     }
 
     public ObjectiveCard getObjectiveCard() {
-        return objectiveCard;
+        return this.objectiveCard;
     }
 
-    public HashMap<Integer, Side> getPlacedCardsMap() {
-        return placedCardsMap;
+    public Side getPlacedCardSide(Integer index){
+        return this.placedCardsMap.get(index);
     }
 
-    public HashMap<Integer, Side> getHandCardsMap() {
-        return handCardsMap;
+    public Side getHandCardSide(Integer index){
+        return this.handCardsMap.get(index);
     }
 
-    public ArrayList<ArrayList<Integer>> getPlayerBoard() {
-        return playerBoard;
+    public int getHandSize(){
+        return this.handCardsMap.size();
     }
 
     public int getObjectivesWon(){
-        return objectivesWon;
+        return this.objectivesWon;
     }
 
-    public HashMap<Integer, Element> getCenterResource() {
-        return centerResource;
+    public ObjectiveCard getObjectiveCardOption(int index) {
+        return this.objectiveCardOptions[index];
     }
+
+    public Element getCenterResource(int index) {
+        return centerResource.get(index);
+    }
+
+    //-----------collections copy----------------
 
     public HashMap<Element, Integer> getAllElements() {
-        return allElements;
+        return new HashMap<>(allElements);
     }
 
-    public ObjectiveCard[] getObjectiveCardOptions() {
-        return this.objectiveCardOptions;
+    public ArrayList<ArrayList<Integer>> getPlayerBoard() {
+        return new ArrayList<>(this.playerBoard);
     }
 
-//SETTER
+    //--------------contains-------------
+
+    public boolean placedCardContains(Integer index){
+        return this.placedCardsMap.containsKey(index);
+    }
+
+
+    public boolean handCardContains(Integer index){
+        return this.handCardsMap.containsKey(index);
+    }
+
+
+    //SETTER
 
     public void setObjectiveCard(ObjectiveCard objectiveCard) {
         this.objectiveCard = objectiveCard;
@@ -119,32 +138,58 @@ public class Player {
         this.points = points;
     }
 
-    //ADDER
+    //ADDER/REMOVER
+
     public void incrementObjectivesWon(){
-        objectivesWon ++;
+        this.objectivesWon ++;
     }
 
-    // METHODS
+    public void addToPlacedCardsMap(Integer index, Side side){
+        this.placedCardsMap.put(index, side);
+    }
+
+    public void addToHandCardsMap(Integer index, Side side){
+        this.handCardsMap.put(index, side);
+    }
+
+    public void removeFromHandCardsMap(Integer index){
+        this.handCardsMap.remove(index);
+    }
 
     public void addPoints(int points) {
         this.points += points;
     }
 
-    public Side getBoardSide(int cardId) {
-        return this.getPlacedCardsMap().get(cardId);
+    public void removeFromAllElements(Element cornerEle){
+        this.allElements.replace(cornerEle, allElements.get(cornerEle) - 1);
     }
 
-    public Side getHandSide(int cardId) {
-        return this.getHandCardsMap().get(cardId);
+    public void addToAllElements(Element element, int number) {
+        this.allElements.put(element, number);
+    }
+
+
+    //--------------MODIFIER/UPDATER--------------------
+
+    public void changeHandSide(Integer index, Side side){
+        this.handCardsMap.replace(index, side);
+    }
+
+
+    // METHODS
+
+    //usato dal controller, da cambiare nome, poco esplicativo (plurale)
+    public Side getBoardSide(int cardId) {
+        return this.placedCardsMap.get(cardId);
     }
 
 // -------------------Place Cards Map Managing-----------------
 
-    public void placeCard(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException {
+    public void updatePlayerCardsMap(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException {
         this.placedCardsMap.put(placingCardId, placingCardSide);
         this.handCardsMap.remove(placingCardId);
 
-        this.getCenterResource().put(placingCardId, placingCard.getResourceType());
+        this.centerResource.put(placingCardId, placingCard.getResourceType());
     }
 
     public static int getElementOccurencies(ArrayList<Element> elements, Element targetElement) {
@@ -160,18 +205,18 @@ public class Player {
 // -------------------Board Matrix Managing-----------------------
 
     public void initializeBoard(){
-        playerBoard.clear(); // re-initialize the board it is previously contained something
+        this.playerBoard.clear(); // re-initialize the board it is previously contained something
         // Initialization of player board as a 1x1 with the StarterCard in the center
         ArrayList<Integer> row = new ArrayList<>();
         row.add(getStarterCard().getId());
-        playerBoard.add(row);
+        this.playerBoard.add(row);
     }
 
     public void printBoard() {
-        for (int i = 0; i < playerBoard.size(); i++) {
-            ArrayList<Integer> row = playerBoard.get(i);
+        for (int i = 0; i < this.playerBoard.size(); i++) {
+            ArrayList<Integer> row = this.playerBoard.get(i);
             for (int j = 0; j < row.size(); j++) {
-                System.out.print(playerBoard.get(i).get(j) + " ");
+                System.out.print(this.playerBoard.get(i).get(j) + " ");
             }
             System.out.println("");
         }
@@ -182,8 +227,8 @@ public class Player {
         int colIndex = -1;
 
         // Find the coordinates of the existing card on the board
-        for (int i = 0; i < playerBoard.size(); i++) {
-            ArrayList<Integer> row = playerBoard.get(i);
+        for (int i = 0; i < this.playerBoard.size(); i++) {
+            ArrayList<Integer> row = this.playerBoard.get(i);
             for (int j = 0; j < row.size(); j++) {
                 if (row.get(j) == existingCard) {
                     rowIndex = i;
@@ -216,7 +261,7 @@ public class Player {
         }
 
         // Check if the new position is outside the bounds of the current matrix
-        if (rowIndex < 0 || rowIndex >= playerBoard.size() || colIndex < 0 || colIndex >= playerBoard.getFirst().size()) {
+        if (rowIndex < 0 || rowIndex >= this.playerBoard.size() || colIndex < 0 || colIndex >= this.playerBoard.getFirst().size()) {
             // Expand the matrix if necessary
             expandBoard(rowIndex, colIndex);
             if (rowIndex < 0){
@@ -226,28 +271,28 @@ public class Player {
             }
         }
         // Place the new card at the specified position
-        playerBoard.get(rowIndex).set(colIndex, newCard);
+        this.playerBoard.get(rowIndex).set(colIndex, newCard);
     }
 
     private void expandBoard(int rowIndex, int colIndex){
         // Expand the matrix to include the new position (remember that this supports only one update: row++/-- or col++/--)
         // Expand rows if needed
-        int rowDim = playerBoard.getFirst().size();
+        int rowDim = this.playerBoard.getFirst().size();
         if (rowIndex < 0) {
             ArrayList<Integer> newRow = new ArrayList<>();
             for (int i = 0; i < rowDim; i++) {
                 newRow.add(-1);
             }
-            playerBoard.addFirst(newRow);
-        } else if (rowIndex >= playerBoard.size()) {
+            this.playerBoard.addFirst(newRow);
+        } else if (rowIndex >= this.playerBoard.size()) {
             ArrayList<Integer> newRow = new ArrayList<>();
             for (int i = 0; i < rowDim; i++) {
                 newRow.add(-1);
             }
-            playerBoard.add(newRow);
+            this.playerBoard.add(newRow);
         }
         // Expand columns if needed
-        for (ArrayList<Integer> row : playerBoard) {
+        for (ArrayList<Integer> row : this.playerBoard) {
             if (colIndex < 0) {
                 row.add(0, -1); // Adding -1 if there is no card
             } else if (colIndex >= row.size()) {
