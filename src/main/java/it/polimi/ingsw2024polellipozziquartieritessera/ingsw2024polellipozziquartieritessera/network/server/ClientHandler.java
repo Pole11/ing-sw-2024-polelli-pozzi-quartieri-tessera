@@ -51,7 +51,14 @@ public class ClientHandler implements VirtualView {
                     break;
                 case Command.CHOOSESTARTER:
                     // TODO: check if message[1] exists
-                    server.chooseInitialStarterSide(this, message[1]);
+                    Side side = null;
+                    try {
+                        side = Side.valueOf(message[1].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Invalid side, please enter a valid side (Front / Back)");
+                        return;
+                    }
+                    server.chooseInitialStarterSide(this, side);
                     break;
                 case Command.CHOOSECOLOR:
                     // TODO: check if message[1] exists

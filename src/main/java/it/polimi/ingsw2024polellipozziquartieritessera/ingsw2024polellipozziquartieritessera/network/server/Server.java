@@ -177,17 +177,17 @@ public class Server implements VirtualServer {
     }
 
     @Override
-    public void chooseInitialStarterSide(VirtualView client, String sideValue) throws RemoteException {
+    public void chooseInitialStarterSide(VirtualView client, Side side) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
             int playerIndex = getPlayerIndex(client);
-            Side side = null;
+            /*Side side = null;
 
             try {
                 side = Side.valueOf(sideValue.toUpperCase());
             } catch (IllegalArgumentException e) {
                 client.printError("Invalid side, please enter a valid side (Front / Back)");
                 return;
-            }
+            }*/
 
             this.controller.chooseInitialStarterSide(playerIndex, side);
             this.numberAnswered++;
