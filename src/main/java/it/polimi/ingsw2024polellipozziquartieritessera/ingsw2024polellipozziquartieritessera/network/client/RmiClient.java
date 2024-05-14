@@ -70,16 +70,12 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     @Override
     public void printCard(int id1, Side side1, int id2, Side side2, int id3, Side side3) throws RemoteException {
-            System.out.print("\n");
-            Client.printCard(id1, side1);
-            Client.printCard(id2, side2);
-            Client.printCard(id3, side3);
-
-            System.out.print("\n> ");
+        Client.printCard(id1, side1, id2, side2, id3, side3);
     }
 
     @Override
     public void printCard(int id1, Side side1, int id2, Side side2) throws RemoteException {
+        Client.printCard(id1, side1, id2, side2);
     }
 
     @Override

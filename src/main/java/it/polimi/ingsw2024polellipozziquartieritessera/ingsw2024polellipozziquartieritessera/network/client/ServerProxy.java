@@ -62,6 +62,11 @@ public class ServerProxy implements VirtualServer {
         output.flush();
     }
 
+    public void showCommonObjectives(VirtualView client) {
+        output.println(Command.SHOWOBJECTIVES);
+        output.flush();
+    }
+
     @Override
     public void placeCard(VirtualView client, String placingCardId, String tableCardId, String tableCornerPos, String placingCardSide) throws RemoteException {
         output.println(Command.PLACECARD + "; " + "; " + placingCardId + "; " + tableCardId + "; " + tableCornerPos + "; " + placingCardSide);
