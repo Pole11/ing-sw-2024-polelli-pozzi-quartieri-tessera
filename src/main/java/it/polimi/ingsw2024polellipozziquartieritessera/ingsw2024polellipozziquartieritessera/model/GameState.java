@@ -98,6 +98,7 @@ public class GameState {
 
     //------disconnections managing-------------
 
+
     public void setPlayersConnected(int index, boolean connected){
         playersConnected.set(index, Boolean.valueOf(connected));
     }
@@ -115,6 +116,7 @@ public class GameState {
             }
         }
         players.add(index, player);
+        playersConnected.add(true);
     }
 
     public int getPlayersSize(){

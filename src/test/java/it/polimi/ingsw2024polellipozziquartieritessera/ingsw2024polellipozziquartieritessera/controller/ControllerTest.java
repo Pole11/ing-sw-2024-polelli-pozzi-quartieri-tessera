@@ -269,6 +269,12 @@ public class ControllerTest {
         gs.setPlayer(1, new Player("piergiorgio"));
         gs.setPlayer(2, new Player("fungiforme"));
         gs.setPlayer(3, new Player("paola"));
+
+        gs.setPlayersConnected(0, true);
+        gs.setPlayersConnected(1, true);
+        gs.setPlayersConnected(2, true);
+        gs.setPlayersConnected(3, true);
+
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();

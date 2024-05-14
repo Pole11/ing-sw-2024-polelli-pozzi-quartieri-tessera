@@ -235,7 +235,7 @@ public class Server implements VirtualServer {
                         throw new RuntimeException(e);
                     }
                 }
-                this.controller.setGamePhase(GamePhase.COLORPHASE);
+                this.controller.setGamePhase(GamePhase.CHOOSECOLORPHASE);
             }
         }
         else{
@@ -249,7 +249,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void chooseInitialColor(VirtualView client, Color color) throws RemoteException {
-        if (controller.getGamePhase().equals(GamePhase.COLORPHASE)) {
+        if (controller.getGamePhase().equals(GamePhase.CHOOSECOLORPHASE)) {
             int playerIndex = getPlayerIndex(client);
 
             try {
@@ -333,7 +333,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void showHand(VirtualView client) throws RemoteException {
-        /*if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.COLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
+        /*if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSECOLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
             if (ping(client)) {
                 int card1Id = controller.getHandId(getPlayerIndex(client)).get(0);
                 Side card1Side = controller.getHandSide(getPlayerIndex(client)).get(0);
@@ -355,7 +355,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void showCommonObjectives(VirtualView client) throws RemoteException {
-        if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.COLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)){
+        if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSECOLORPHASE) && !controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)){
             if (ping(client)){
                 // TODO: implement method in controller
                 // int card1Id = controller.getSharedObjectives().get(0);
