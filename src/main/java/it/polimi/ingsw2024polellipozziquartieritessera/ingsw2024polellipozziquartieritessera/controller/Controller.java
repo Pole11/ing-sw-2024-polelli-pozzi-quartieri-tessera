@@ -12,6 +12,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 public class Controller {
     GameState gameState;
+    public Thread timeoutThread = null;
+    public GamePhase prevGamePhase = null;
 
     public Controller(GameState gameState) {
         this.gameState = gameState;
@@ -211,8 +213,29 @@ public class Controller {
                 default:
             }
             this.gameState.setCurrentPlayerIndex(((this.gameState.getCurrentPlayerIndex() + 1) % this.gameState.getPlayers().size()));
-            //if (gameState.isConnected(getCurrentPlayerIndex()))
-            //da mettere in while, va al successivo giocatore se quello è disconnesso e controlla se sono tutti disconnessi, che stoppi il gioco
+            //check for disconnetions
+            int numberConnected = 0;
+            for (int i = 0; i< gameState.getPlayersSize() && numberConnected <= 1; i++){
+                if (!gameState.isConnected(getCurrentPlayerIndex())){
+                    this.gameState.setCurrentPlayerIndex(((this.gameState.getCurrentPlayerIndex() + 1) % this.gameState.getPlayers().size()));
+                } else {
+                    numberConnected ++;
+                }
+            }
+            if (numberConnected == 1){
+                this.prevGamePhase = gameState.getCurrentGamePhase();
+                this.setGamePhase(GamePhase.TIMEOUT);
+                timeoutThread = new Thread(() -> {
+                    try {
+                        startTimeout();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                timeoutThread.start();
+            } else if (numberConnected == 0){
+                //chiedere specifica
+            }
         }
     }
 
@@ -235,6 +258,10 @@ public class Controller {
 
     public void addMessage(int playerIndex, String content){}
 
+
+    public void startTimeout() throws InterruptedException {
+        Thread.sleep(60*1000);
+    }
 
     public void setConnected(int index, boolean connected){
         synchronized (this.gameState) {

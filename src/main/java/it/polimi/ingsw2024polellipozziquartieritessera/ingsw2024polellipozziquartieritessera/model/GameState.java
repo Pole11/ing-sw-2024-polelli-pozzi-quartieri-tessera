@@ -4,6 +4,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -95,6 +96,8 @@ public class GameState {
 
     // METHODS
 
+    //------disconnections managing-------------
+
     public void setPlayersConnected(int index, boolean connected){
         playersConnected.set(index, Boolean.valueOf(connected));
     }
@@ -103,6 +106,8 @@ public class GameState {
         return playersConnected.get(index);
     }
 
+
+
     public void setPlayer(int index, Player player) throws NotUniquePlayerNicknameException{
         for (int j = 0; j < players.size(); j++) {
             if (player.getNickname().equals(players.get(j).getNickname())) {
@@ -110,6 +115,10 @@ public class GameState {
             }
         }
         players.add(index, player);
+    }
+
+    public int getPlayersSize(){
+        return players.size();
     }
 
 
@@ -316,14 +325,6 @@ public class GameState {
 
     public Player getPlayerByIndex(int index){
         return this.getPlayers().get(index);
-    }
-
-    public void removeAllPlayers() {
-        this.players.clear();
-    }
-
-    public void removePlayer(int index) {
-        this.players.remove(index);
     }
 
 

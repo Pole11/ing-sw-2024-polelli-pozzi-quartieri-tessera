@@ -2,9 +2,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import com.google.gson.Gson;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
@@ -40,6 +38,10 @@ public class Client {
         String host = args[1];
         String port = args[2];
 
+        startClient(input, host, port);
+    }
+
+    public static void startClient(String input, String host, String port) throws IOException {
         if (input.equalsIgnoreCase("socket")) {
             SocketClient.execute(host, port);
         } else { //default rmi
@@ -122,7 +124,7 @@ public class Client {
                     try {
                         side = Side.valueOf(message[1].toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        client.printError("Invalid side, please enter a valid side (Front / Back)");
+                        System.err.println(("Invalid side, please enter a valid side (Front / Back)"));
                         return;
                     }
                     server.chooseInitialStarterSide(client, side);
@@ -133,7 +135,14 @@ public class Client {
                 break;
             case Command.CHOOSECOLOR:
                 try {
-                    server.chooseInitialColor(client, message[1]);
+                    Color color;
+                    try {
+                        color = Color.valueOf(message[1].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid color, please enter a valid color (Blue / Green / Yellow / Red)"));
+                        return;
+                    }
+                    server.chooseInitialColor(client, color);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.print("INVALID COMMAND\n> ");
                     return;
@@ -141,7 +150,14 @@ public class Client {
                 break;
             case Command.CHOOSEOBJECTIVE:
                 try {
-                    server.chooseInitialObjective(client, message[1]);
+                    int cardId;
+                    try {
+                        cardId = Integer.parseInt(message[1]);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid card id, please insert a valid card id"));
+                        return;
+                    }
+                    server.chooseInitialObjective(client, cardId);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.print("INVALID COMMAND\n> ");
                     return;
@@ -149,7 +165,35 @@ public class Client {
                 break;
             case Command.PLACECARD:
                 try {
-                    server.placeCard(client, message[1], message[2], message[3], message[4]);
+                    int placingCardId;
+                    int tableCardId;
+                    CornerPos tableCornerPos;
+                    Side placingCardSide;
+                    try {
+                        placingCardId = Integer.parseInt(message[1]);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid id of the placing card, please insert a valid id"));
+                        return;
+                    }
+                    try {
+                        tableCardId = Integer.parseInt(message[2]);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid id of the table card, please insert a valid id"));
+                        return;
+                    }
+                    try {
+                        tableCornerPos = CornerPos.valueOf(message[3].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid corner, please insert a valid corner position (Upleft / Upright / Downleft / Downright)"));
+                        return;
+                    }
+                    try {
+                        placingCardSide = Side.valueOf(message[4].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid side, please insert a valid side (Front / Back)"));
+                        return;
+                    }
+                    server.placeCard(client, placingCardId, tableCardId, tableCornerPos, placingCardSide);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.print("INVALID COMMAND\n> ");
                     return;
@@ -157,7 +201,14 @@ public class Client {
                 break;
             case Command.DRAWCARD:
                 try {
-                    server.drawCard(client, message[1]);
+                    DrawType drawType;
+                    try {
+                        drawType = DrawType.valueOf(message[1]);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid draw option, please choose a valid option (SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource)"));
+                        return;
+                    }
+                    server.drawCard(client, drawType);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.print("INVALID COMMAND\n> ");
                     return;
@@ -165,7 +216,14 @@ public class Client {
                 break;
             case Command.FLIPCARD:
                 try {
-                    server.flipCard(client, message[1]);
+                    int cardId;
+                    try {
+                        cardId = Integer.parseInt(message[1]);
+                    } catch (NumberFormatException e) {
+                        client.printError("Please enter a valid card id");
+                        return;
+                    }
+                    server.flipCard(client, cardId);
                 } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                     System.err.print("INVALID COMMAND\n> ");
                     return;

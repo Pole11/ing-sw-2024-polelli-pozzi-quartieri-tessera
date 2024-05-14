@@ -1,9 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.GamePhase;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -62,28 +60,86 @@ public class ClientHandler implements VirtualView {
                     break;
                 case Command.CHOOSECOLOR:
                     // TODO: check if message[1] exists
-                    server.chooseInitialColor(this, message[1]);
+                    Color color = null;
+                    try {
+                        color = Color.valueOf(message[1].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Invalid color, please enter a valid color (Blue / Green / Yellow / Red)");
+                        return;
+                    }
+                    server.chooseInitialColor(this, color);
                     break;
-                case Command.CHOOSEOBJECTIVE:
+                case Command.CHOOSEOBJECTIVE: {
                     // TODO: check if message[1] exists
-                    server.chooseInitialObjective(this, message[1]);
+                    int cardId;
+                    try {
+                        cardId = Integer.parseInt(message[1]);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Invalid card id, please enter a valid one");
+                        return;
+                    }
+                    server.chooseInitialObjective(this, cardId);
                     break;
+                }
                 case Command.SHOWHAND:
                     // TODO: check if message[1] exists
                     server.showHand(this);
                     break;
                 case Command.PLACECARD:
                     // TODO: check if message[1] exists
-                    server.placeCard(this, message[1], message[2], message[3], message[4]);
+                    int placingCardId;
+                    int tableCardId;
+                    CornerPos tableCornerPos;
+                    Side placingCardSide;
+                    try {
+                        placingCardId = Integer.parseInt(message[1]);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid id of the placing card, please insert a valid id"));
+                        return;
+                    }
+                    try {
+                        tableCardId = Integer.parseInt(message[2]);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid id of the table card, please insert a valid id"));
+                        return;
+                    }
+                    try {
+                        tableCornerPos = CornerPos.valueOf(message[3].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid corner, please insert a valid corner position (Upleft / Upright / Downleft / Downright)"));
+                        return;
+                    }
+                    try {
+                        placingCardSide = Side.valueOf(message[4].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println(("Invalid side, please insert a valid side (Front / Back)"));
+                        return;
+                    }
+                    server.placeCard(this, placingCardId, tableCardId, tableCornerPos, placingCardSide);
                     break;
                 case Command.DRAWCARD:
                     // TODO: check if message[1] exists
-                    server.drawCard(this, message[1]);
+                    DrawType drawType;
+                    try {
+                        drawType = DrawType.valueOf(message[1]);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Invalid draw option, please choose a valid option (SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource)");
+                        return;
+                    }
+                    server.drawCard(this, drawType);
                     break;
-                case Command.FLIPCARD:
+                case Command.FLIPCARD: {
                     // TODO: check if message[1] exists
-                    server.flipCard(this, message[1]);
+                    int cardId;
+                    try {
+                        cardId = Integer.parseInt(message[1]);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Please enter a valid card id");
+                        return;
+                    }
+                    server.flipCard(this, cardId);
                     break;
+                }
                 case Command.OPENCHAT:
                     // TODO: check if message[1] exists
                     server.openChat();

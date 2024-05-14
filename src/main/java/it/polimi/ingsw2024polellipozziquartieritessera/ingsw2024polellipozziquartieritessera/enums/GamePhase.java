@@ -9,5 +9,6 @@ public enum GamePhase {
     CHOOSEOBJECTIVEPHASE,
     MAINPHASE, // does it really need a description?
     ENDPHASE,  // last round(s)
-    FINALPHASE // calculate points and declare winner
+    FINALPHASE, // calculate points and declare winner
+    TIMEOUT //there is only one player connected
 }

@@ -32,6 +32,14 @@ public class Server implements VirtualServer {
     }
 
     public static void main(String[] argv) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
+        String host = argv[0];
+        int socketport = Integer.parseInt(argv[1]);
+        int rmiport = Integer.parseInt(argv[2]);
+
+        startServer(host, socketport, rmiport);
+    }
+
+    public static void startServer(String host, int socketport, int rmiport) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException{
         //setup gamestate
         GameState gameState = null;
         boolean store = Populate.existStore(); //FA persistance
@@ -40,23 +48,28 @@ public class Server implements VirtualServer {
         } else {
             gameState = Populate.populate();
         }
-        String host = argv[0];
-        int socketport = Integer.parseInt(argv[1]);
-        int rmiport = Integer.parseInt(argv[2]);
 
         // listen to socket
         ServerSocket listenSocket = new ServerSocket(socketport);
-        Server engine = new Server(listenSocket, new Controller(gameState));
+        Server server = new Server(listenSocket, new Controller(gameState));
 
         // listen to rmi
         System.setProperty("java.rmi.server.hostname", host);
         String name = "VirtualServer";
-        VirtualServer stub = (VirtualServer) UnicastRemoteObject.exportObject(engine, 0);
+        VirtualServer stub = (VirtualServer) UnicastRemoteObject.exportObject(server, 0);
         Registry registry = LocateRegistry.createRegistry(rmiport);
         registry.rebind(name, stub);
 
+        new Thread(() -> {
+            try {
+                server.periodicPing();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+
         //listen to socket
-        engine.runServer();
+        server.runServer();
     }
 
     private void runServer() throws IOException {
@@ -119,7 +132,19 @@ public class Server implements VirtualServer {
 
             } catch (NotUniquePlayerNicknameException e) {
                 try {
-                    client.printError("The nickname already exists, please enter a new one");
+                    //it is not safe because when someone is disconnected, it can be replaced by
+                    //another person, but without password it is the only way
+                    if (ping(client)){
+                        client.printError("The nickname already exists, please enter a new one");
+                    } else {
+                        client.printMessage("You successfully re-entered the game with the nickname " + nickname);
+                        if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
+                            controller.timeoutThread.interrupt();
+                            controller.setGamePhase(controller.prevGamePhase);
+                            controller.prevGamePhase = null;
+                        }
+                        updatePlayersConnected();
+                    }
                 } catch (RemoteException ex) {
                     ex.printStackTrace();
                 } finally {
@@ -192,14 +217,6 @@ public class Server implements VirtualServer {
     public void chooseInitialStarterSide(VirtualView client, Side side) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
             int playerIndex = getPlayerIndex(client);
-            /*Side side = null;
-
-            try {
-                side = Side.valueOf(sideValue.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                client.printError("Invalid side, please enter a valid side (Front / Back)");
-                return;
-            }*/
 
             this.controller.chooseInitialStarterSide(playerIndex, side);
             this.numberAnswered++;
@@ -231,17 +248,9 @@ public class Server implements VirtualServer {
     }
 
     @Override
-    public void chooseInitialColor(VirtualView client, String colorValue) throws RemoteException {
+    public void chooseInitialColor(VirtualView client, Color color) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.COLORPHASE)) {
             int playerIndex = getPlayerIndex(client);
-            Color color;
-
-            try {
-                color = Color.valueOf(colorValue.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                client.printMessage("Please select a valid color from one of the list [Blue, Green, Yellow, Red]");
-                return;
-            }
 
             try {
                 this.controller.chooseInitialColor(playerIndex, color);
@@ -281,17 +290,9 @@ public class Server implements VirtualServer {
     }
 
     @Override
-    public void chooseInitialObjective(VirtualView client, String cardIdString) throws RemoteException {
+    public void chooseInitialObjective(VirtualView client, int cardId) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.CHOOSEOBJECTIVEPHASE)) {
             int playerIndex = getPlayerIndex(client);
-            int cardId;
-
-            try {
-                cardId = Integer.parseInt(cardIdString);
-            } catch (NumberFormatException e) {
-                client.printError("Please enter a valid card ID");
-                return;
-            }
 
             try {
                 this.controller.chooseInitialObjective(playerIndex, cardId);
@@ -370,39 +371,15 @@ public class Server implements VirtualServer {
     }
 
     @Override
-    public void placeCard(VirtualView client, String placingCardIdString, String tableCardIdString, String tableCornerPos, String placingCardSideValue) throws RemoteException {
+    public void placeCard(VirtualView client, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws RemoteException {
         int playerIndex = getPlayerIndex(client);
 
         if (controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
             (controller.getTurnPhase().equals(TurnPhase.PLACINGPHASE)) &&
             (isRightTurn(playerIndex))){
-            int placingCardId;
-            int tableCardId;
-            Side placingCardSide;
-
-            try{
-                placingCardId = Integer.parseInt(placingCardIdString);
-            } catch (NumberFormatException e) {
-                client.printError("Please enter valid card id of placingCard");
-                return;
-            }
-
-            try{
-                tableCardId = Integer.parseInt(tableCardIdString);
-            } catch (NumberFormatException e) {
-                client.printError("Please enter valid card id of tableCard");
-                return;
-            }
-
-            try{
-                placingCardSide = Side.valueOf(placingCardSideValue.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                client.printError("Please enter a valid side (Front / Back)");
-                return;
-            }
 
             try {
-                this.controller.placeCard(playerIndex, placingCardId, tableCardId, CornerPos.valueOf(tableCornerPos), placingCardSide);
+                this.controller.placeCard(playerIndex, placingCardId, tableCardId, tableCornerPos, placingCardSide);
                 for (VirtualView clientIterator : this.clients.values()) {
                     if (client.equals(clientIterator)) {
                         if (ping(clientIterator)){
@@ -440,20 +417,12 @@ public class Server implements VirtualServer {
     }
 
     @Override
-    public void drawCard(VirtualView client, String drawTypeValue) throws RemoteException {
+    public void drawCard(VirtualView client, DrawType drawType) throws RemoteException {
         int playerIndex = getPlayerIndex(client);
 
         if (controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
             (controller.getTurnPhase().equals(TurnPhase.DRAWPHASE)) &&
             (isRightTurn(playerIndex))){
-            DrawType drawType;
-
-            try{
-                drawType = DrawType.valueOf(drawTypeValue.toUpperCase());
-            } catch (IllegalArgumentException e){
-                client.printError("Please enter a valid draw type");
-                return;
-            }
 
             try {
                 int playing_client_index = controller.getCurrentPlayerIndex();
@@ -489,16 +458,9 @@ public class Server implements VirtualServer {
     }
 
     @Override
-    public void flipCard(VirtualView client, String cardIdString) throws RemoteException {
+    public void flipCard(VirtualView client, int cardId) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.MAINPHASE)) {
             int playerIndex = getPlayerIndex(client);
-            int cardId;
-            try {
-                cardId = Integer.parseInt(cardIdString);
-            } catch (NumberFormatException e) {
-                client.printError("Please enter a valid card id");
-                return;
-            }
             try {
                 this.controller.flipCard(playerIndex, cardId);
             } catch (CardIsNotInHandException e) {
@@ -523,25 +485,7 @@ public class Server implements VirtualServer {
         this.controller.addMessage(getPlayerIndex(client), content);
     }
 
-    private boolean ping(VirtualView client){
-        try {
-            client.ping("ping");
-        } catch (RemoteException e) {
-            System.out.println("client" + getPlayerIndex(client) + "is disconnected");
-            return false;
-        }
-        return true;
-    }
 
-    private void updatePlayersConnected(){
-        AtomicInteger index = new AtomicInteger();
-        clients.values().stream().forEach(e->{
-            index.getAndIncrement();
-            ping(e);
-            boolean connected = true;
-            controller.setConnected(index.get(), connected);
-        });
-    }
 
     private int getPlayerIndex(VirtualView client) {
         for (int i : this.clients.keySet()) {
@@ -554,5 +498,57 @@ public class Server implements VirtualServer {
 
     private boolean isRightTurn(int playerIndex){
         return (controller.getCurrentPlayerIndex() == playerIndex);
+    }
+
+    //-----pinging-------
+
+    private void periodicPing() throws InterruptedException {
+        while (true){
+            if (controller.getGamePhase().equals(GamePhase.TIMEOUT)){
+                if (!controller.timeoutThread.isAlive()){
+                    //il bro ha vinto
+                }
+            } else {
+                updatePlayersConnected();
+                Thread.sleep(3000);
+            }
+        }
+    }
+
+    private void updatePlayersConnected(){
+        AtomicInteger index = new AtomicInteger();
+        AtomicInteger numberConnected = new AtomicInteger();
+        clients.values().stream().forEach(e->{
+            index.getAndIncrement();
+            boolean connected = false;
+            if (ping(e)){
+                connected = true;
+                numberConnected.getAndIncrement();
+            }
+            controller.setConnected(index.get(), connected);
+        });
+        if (numberConnected.get() == 0){
+            //chiedere specifica
+        } else if (numberConnected.get() == 1){
+            controller.setGamePhase(GamePhase.TIMEOUT);
+            controller.timeoutThread =  new Thread(() -> {
+                try {
+                    controller.startTimeout();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            controller.timeoutThread.start();
+        }
+    }
+
+    private boolean ping(VirtualView client){
+        try {
+            client.ping("ping");
+        } catch (RemoteException e) {
+            System.out.println("client" + getPlayerIndex(client) + "is disconnected");
+            return false;
+        }
+        return true;
     }
 }

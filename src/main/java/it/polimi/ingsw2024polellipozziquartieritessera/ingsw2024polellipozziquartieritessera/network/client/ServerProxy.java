@@ -45,13 +45,13 @@ public class ServerProxy implements VirtualServer {
     }
 
     @Override
-    public void chooseInitialColor(VirtualView client, String color) throws RemoteException {
-        output.println(Command.CHOOSECOLOR + "; " + color);
+    public void chooseInitialColor(VirtualView client, Color color) throws RemoteException {
+        output.println(Command.CHOOSECOLOR + "; " + color.toString());
         output.flush();
     }
 
     @Override
-    public void chooseInitialObjective(VirtualView client, String cardId) throws RemoteException {
+    public void chooseInitialObjective(VirtualView client, int cardId) throws RemoteException {
         output.println(Command.CHOOSEOBJECTIVE +"; " + cardId);
         output.flush();
     }
@@ -68,19 +68,19 @@ public class ServerProxy implements VirtualServer {
     }
 
     @Override
-    public void placeCard(VirtualView client, String placingCardId, String tableCardId, String tableCornerPos, String placingCardSide) throws RemoteException {
-        output.println(Command.PLACECARD + "; " + "; " + placingCardId + "; " + tableCardId + "; " + tableCornerPos + "; " + placingCardSide);
+    public void placeCard(VirtualView client, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws RemoteException {
+        output.println(Command.PLACECARD + "; " + "; " + placingCardId + "; " + tableCardId + "; " + tableCornerPos.toString() + "; " + placingCardSide.toString());
         output.flush();
     }
 
     @Override
-    public void drawCard(VirtualView client, String drawType) throws RemoteException {
+    public void drawCard(VirtualView client, DrawType drawType) throws RemoteException {
         output.println(Command.DRAWCARD + "; " + drawType);
         output.flush();
     }
 
     @Override
-    public void flipCard(VirtualView client, String cardId) throws RemoteException {
+    public void flipCard(VirtualView client, int cardId) throws RemoteException {
         output.println(Command.FLIPCARD + "; " + cardId);
         output.flush();
     }
