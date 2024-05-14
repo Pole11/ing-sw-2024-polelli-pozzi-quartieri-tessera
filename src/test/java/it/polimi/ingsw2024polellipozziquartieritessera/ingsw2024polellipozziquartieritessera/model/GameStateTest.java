@@ -22,7 +22,7 @@ public class GameStateTest {
         gs.setPlayer(2, new Player("fungiforme"));
         gs.setPlayer(3, new Player("paola"));
         gs.setObjectives();
-        assertNotEquals(gs.getMainBoard().getSharedObjectiveCards()[0], gs.getMainBoard().getSharedObjectiveCards()[1]);
+        assertNotEquals(gs.getMainBoard().getSharedObjectiveCard(0), gs.getMainBoard().getSharedObjectiveCard(1));
 
         gs.setSecretObjective(0, 0);
         gs.setSecretObjective(1,1);
@@ -30,7 +30,7 @@ public class GameStateTest {
         assertThrows(InvalidObjectiveCardException.class,()->gs.setSecretObjective(3,49));
         gs.setSecretObjective(3,0);
 
-        assertNotEquals(gs.getMainBoard().getSharedObjectiveCards()[1], gs.getPlayers().get(0).getObjectiveCard());
+        assertNotEquals(gs.getMainBoard().getSharedObjectiveCard(1), gs.getPlayers().get(0).getObjectiveCard());
         for (int i = 0; i < gs.getPlayers().size()-1; i++) {
             assertNotEquals(gs.getPlayers().get(i).getObjectiveCard(), gs.getPlayers().get(i+1).getObjectiveCard());
         }
@@ -50,7 +50,7 @@ public class GameStateTest {
     }
 
     @Test
-    void calculateFinalPointsTest() throws CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
+    void calculateFinalPointsTest() throws CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, EmptyDeckException {
 
 //-----------------------RECREATE SITUATION IN getCardPointsTest2-------------------------
 
@@ -268,8 +268,8 @@ public class GameStateTest {
         int sharedObj1 = 87;
         int sharedObj2 = 88;
         int secretObj = 89;
-        gs.getMainBoard().getSharedObjectiveCards()[0] = (ObjectiveCard) gs.getCard(sharedObj1);
-        gs.getMainBoard().getSharedObjectiveCards()[1] = (ObjectiveCard) gs.getCard(sharedObj2);
+        gs.getMainBoard().setSharedObjectiveCard(0, (ObjectiveCard) gs.getCard(sharedObj1));
+        gs.getMainBoard().setSharedObjectiveCard(1, (ObjectiveCard) gs.getCard(sharedObj2));
         player.setObjectiveCard( (ObjectiveCard) gs.getCard(secretObj));
         gs.calculateFinalPoints();
         assertEquals(15, player.getPoints());
@@ -277,8 +277,8 @@ public class GameStateTest {
         sharedObj1 = 90;
         sharedObj2 = 91;
         secretObj = 92;
-        gs.getMainBoard().getSharedObjectiveCards()[0] = (ObjectiveCard) gs.getCard(sharedObj1);
-        gs.getMainBoard().getSharedObjectiveCards()[1] = (ObjectiveCard) gs.getCard(sharedObj2);
+        gs.getMainBoard().setSharedObjectiveCard(0, (ObjectiveCard) gs.getCard(sharedObj1));
+        gs.getMainBoard().setSharedObjectiveCard(1, (ObjectiveCard) gs.getCard(sharedObj2));
         player.setObjectiveCard( (ObjectiveCard) gs.getCard(secretObj));
         gs.calculateFinalPoints();
         assertEquals(15, player.getPoints());
@@ -286,8 +286,8 @@ public class GameStateTest {
         sharedObj1 = 93;
         sharedObj2 = 94;
         secretObj = 95;
-        gs.getMainBoard().getSharedObjectiveCards()[0] = (ObjectiveCard) gs.getCard(sharedObj1);
-        gs.getMainBoard().getSharedObjectiveCards()[1] = (ObjectiveCard) gs.getCard(sharedObj2);
+        gs.getMainBoard().setSharedObjectiveCard(0, (ObjectiveCard) gs.getCard(sharedObj1));
+        gs.getMainBoard().setSharedObjectiveCard(1, (ObjectiveCard) gs.getCard(sharedObj2));
         player.setObjectiveCard( (ObjectiveCard) gs.getCard(secretObj));
         gs.calculateFinalPoints();
         assertEquals(15, player.getPoints());
@@ -295,8 +295,8 @@ public class GameStateTest {
         sharedObj1 = 96; //gives 2 points
         sharedObj2 = 97; //gives 0 points
         secretObj = 98; //gives 2 points
-        gs.getMainBoard().getSharedObjectiveCards()[0] = (ObjectiveCard) gs.getCard(sharedObj1);
-        gs.getMainBoard().getSharedObjectiveCards()[1] = (ObjectiveCard) gs.getCard(sharedObj2);
+        gs.getMainBoard().setSharedObjectiveCard(0, (ObjectiveCard) gs.getCard(sharedObj1));
+        gs.getMainBoard().setSharedObjectiveCard(1, (ObjectiveCard) gs.getCard(sharedObj2));
         player.setObjectiveCard( (ObjectiveCard) gs.getCard(secretObj));
         gs.calculateFinalPoints();
         assertEquals(19, player.getPoints());
@@ -304,15 +304,15 @@ public class GameStateTest {
         sharedObj1 = 99; //gives 3 points
         sharedObj2 = 100; //gives 0 points
         secretObj = 101; //gives 0 points
-        gs.getMainBoard().getSharedObjectiveCards()[0] = (ObjectiveCard) gs.getCard(sharedObj1);
-        gs.getMainBoard().getSharedObjectiveCards()[1] = (ObjectiveCard) gs.getCard(sharedObj2);
+        gs.getMainBoard().setSharedObjectiveCard(0, (ObjectiveCard) gs.getCard(sharedObj1));
+        gs.getMainBoard().setSharedObjectiveCard(1, (ObjectiveCard) gs.getCard(sharedObj2));
         player.setObjectiveCard( (ObjectiveCard) gs.getCard(secretObj));
         gs.calculateFinalPoints();
         assertEquals(22, player.getPoints());
 
         sharedObj1 = 102; //gives 0 points
-        gs.getMainBoard().getSharedObjectiveCards()[0] = (ObjectiveCard) gs.getCard(sharedObj1);
-        gs.getMainBoard().getSharedObjectiveCards()[1] = (ObjectiveCard) gs.getCard(sharedObj2);
+        gs.getMainBoard().setSharedObjectiveCard(0, (ObjectiveCard) gs.getCard(sharedObj1));
+        gs.getMainBoard().setSharedObjectiveCard(1, (ObjectiveCard) gs.getCard(sharedObj2));
         player.setObjectiveCard( (ObjectiveCard) gs.getCard(secretObj));
         gs.calculateFinalPoints();
         assertEquals(22, player.getPoints());
@@ -322,7 +322,7 @@ public class GameStateTest {
 
 
     @Test
-    void calculateFinalPointsTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException {
+    void calculateFinalPointsTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, EmptyDeckException {
 
         GameState gs = Populate.createCardsMap();
         gs.setPlayer(0, new Player("paolo"));
@@ -365,15 +365,15 @@ public class GameStateTest {
         int sharedObj1 = 87; //gives 2 points
         int sharedObj2 = 91; //gives 3 points
         int secretObj = 90; //gives 0 points
-        gs.getMainBoard().getSharedObjectiveCards()[0] = (ObjectiveCard) gs.getCard(sharedObj1);
-        gs.getMainBoard().getSharedObjectiveCards()[1] = (ObjectiveCard) gs.getCard(sharedObj2);
+        gs.getMainBoard().setSharedObjectiveCard(0, (ObjectiveCard) gs.getCard(sharedObj1));
+        gs.getMainBoard().setSharedObjectiveCard(1, (ObjectiveCard) gs.getCard(sharedObj2));
         player.setObjectiveCard( (ObjectiveCard) gs.getCard(secretObj));
         gs.calculateFinalPoints();
         assertEquals(5, player.getPoints());
     }
 
     @Test
-    void isGameEndedTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
+    void isGameEndedTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, EmptyDeckException {
         GameState gs = Populate.populate();
         gs.setPlayer(0, new Player("paolo"));
         gs.setPlayer(1, new Player("piergiorgio"));
@@ -389,20 +389,25 @@ public class GameStateTest {
         assertTrue(gs.isGameEnded());
 
         gs.getPlayers().get(0).setPoints(20);
-        gs.getMainBoard().getGoldDeck().removeAll(gs.getMainBoard().getGoldDeck());
-        assertTrue(gs.isGameEnded());
+        try {
+            gs.getMainBoard().drawFromGoldDeck();
+        } catch(EmptyDeckException e) {
+            assertTrue(gs.isGameEnded());
 
-        gs.getPlayers().get(0).setPoints(10);
-        assertTrue(gs.isGameEnded());
+            gs.getPlayers().get(0).setPoints(10);
+            assertTrue(gs.isGameEnded());
+        }
     }
 
     @Test
-    void isGameEndedTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
+    void isGameEndedTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, EmptyDeckException {
         GameState gs = Populate.populate();
         Controller c = new Controller(gs);
 
         assertFalse(gs.isGameEnded());
-        gs.getMainBoard().getResourceDeck().removeAll(gs.getMainBoard().getResourceDeck());
+        while (gs.getMainBoard().getResourceDeckSize() > 0) {
+            gs.getMainBoard().drawFromResourceDeck();
+        }
         assertTrue(gs.isGameEnded());
 
     }

@@ -23,7 +23,7 @@ public class PlayerTest {
     }
 
     @Test
-    void getCardPointsTest1() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
+    void getCardPointsTest1() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException, EmptyDeckException {
         int resourceCardId1 = 1;
         int resourceCardId2 = 13;
         int resourceCardId3 = 11;
@@ -64,7 +64,7 @@ public class PlayerTest {
 
     // check points and elements
     @Test
-    void getCardPointsTest2() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException {
+    void getCardPointsTest2() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException, EmptyDeckException {
         // create cards map
 
         int starterCardId = 81;
@@ -277,7 +277,7 @@ public class PlayerTest {
     }
 
     @Test
-    void getStructurePointsTest() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException {
+    void getStructurePointsTest() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException, EmptyDeckException {
         // create cards map
 
         int starterCardId = 81;

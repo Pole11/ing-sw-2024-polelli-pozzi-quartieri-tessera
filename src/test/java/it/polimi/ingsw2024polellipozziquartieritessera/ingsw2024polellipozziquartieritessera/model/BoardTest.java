@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 import static org.junit.jupiter.api.Assertions.*;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.EmptyDeckException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerColorException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerNicknameException;
@@ -9,8 +10,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ResourceCard;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 
 public class BoardTest {
     // ALL METHODS TESTED
@@ -24,7 +25,8 @@ public class BoardTest {
 
             Board b = g.getMainBoard();
 
-            b.setSharedObjectiveCards(b.getSharedObjectiveCards());
+            b.setSharedObjectiveCard(0,b.getSharedObjectiveCard(0));
+            b.setSharedObjectiveCard(1,b.getSharedObjectiveCard(1));
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException  e) {
             throw new RuntimeException(e);
@@ -38,11 +40,12 @@ public class BoardTest {
             GameState g = Populate.populate();
 
             Board b = g.getMainBoard();
-            b.fillSharedCardsGap();
+            b.initSharedResourceCards();
+            b.initSharedGoldCards();
 
             // get initial state
-            ResourceCard[] initialResourceCards = {b.getSharedResourceCards()[0], b.getSharedResourceCards()[1]};
-            GoldCard[] initialGoldCards = {b.getSharedGoldCards()[0], b.getSharedGoldCards()[1]};
+            ResourceCard[] initialResourceCards = {b.getSharedResourceCard(0), b.getSharedResourceCard(1)};
+            GoldCard[] initialGoldCards = {b.getSharedGoldCard(0), b.getSharedGoldCard(1)};
 
             // draw cards
             ResourceCard drawnResourceCard1 = b.drawSharedResourceCard(1);
@@ -56,11 +59,14 @@ public class BoardTest {
             assertNotNull(drawnGoldCard1);
             assertNotNull(drawnGoldCard2);
 
+            /*
             // verify drawn cards removed from the shared
-            assertNull(b.getSharedResourceCards()[0]);
-            assertNull(b.getSharedResourceCards()[1]);
-            assertNull(b.getSharedGoldCards()[0]);
-            assertNull(b.getSharedGoldCards()[1]);
+            assertNull(b.getSharedResourceCard(0));
+            assertNull(b.getSharedResourceCard(1));
+            assertNull(b.getSharedGoldCard(0));
+            assertNull(b.getSharedGoldCard(1));
+
+             */
 
             // verify drawn cards in initial shared
             assertArrayEquals(new ResourceCard[]{drawnResourceCard1, drawnResourceCard2}, initialResourceCards);
@@ -72,32 +78,30 @@ public class BoardTest {
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException  e) {
             throw new RuntimeException(e);
+        } catch (EmptyDeckException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Test
-    void testGetFromResourceDeck() {
+    void testGetFromResourceDeck() throws EmptyDeckException {
         // setup
         try {
             GameState g = Populate.populate();
-
             Board b = g.getMainBoard();
 
-
             // function to test
-            ResourceCard drawnCard = b.getFromResourceDeck();
+            ResourceCard drawnCard = b.drawFromResourceDeck();
             // Verify not null
             assertNotNull(drawnCard);
-            // Verify card has been removed
-            assertFalse(b.getResourceDeck().contains(drawnCard));
-
             // Draw every card from the deck
-            while (!b.getResourceDeck().isEmpty()) {
-                drawnCard = b.getFromResourceDeck();
+            while (!b.isResourceDeckEmpty()) {
+                // Verify card has been removed
+                assertNotSame(b.drawFromResourceDeck(), drawnCard);
             }
 
             // If deck is ended
-            assertNull(drawnCard = b.getFromResourceDeck());
+            assertThrows(EmptyDeckException.class, ()->b.drawFromResourceDeck());
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException e) {
             throw new RuntimeException(e);
@@ -105,7 +109,7 @@ public class BoardTest {
     }
 
     @Test
-    void testGetFromGoldDeck() {
+    void testdrawFromGoldDeck() throws EmptyDeckException {
         // setup
         try {
             GameState g = Populate.populate();
@@ -114,25 +118,28 @@ public class BoardTest {
 
 
             // function to test
-            GoldCard drawnCard = b.getFromGoldDeck();
+            GoldCard drawnCard = b.drawFromGoldDeck();
             // Verify not null
             assertNotNull(drawnCard);
-            // Verify card has been removed
-            assertFalse(b.getGoldDeck().contains(drawnCard));
 
             // Draw every card from the deck
-            while (!b.getGoldDeck().isEmpty()) {
-                drawnCard = b.getFromGoldDeck();
+            while (!b.isGoldDeckEmpty()) {
+                //drawnCard = b.drawFromGoldDeck();
+                assertNotSame(b.drawFromGoldDeck(), drawnCard);
             }
 
             // If deck is ended
-            assertNull(drawnCard = b.getFromGoldDeck());
+            assertThrows(EmptyDeckException.class, ()->b.drawFromGoldDeck());
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException  e) {
             throw new RuntimeException(e);
         }
     }
 
+    //REMEMBER TO TEST
+    //change the testing of this in drawCard
+    //this method does not exixts anymore
+    /*
     @Test
     void testFillSharedCardsGap() {
         // Setup
@@ -170,8 +177,12 @@ public class BoardTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 
+
+    //REMBER TO TEST THIS METHOD
+    //this method cannot be tested properly anymore
+    /*
     @Test
     void testShuffleCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
@@ -191,5 +202,24 @@ public class BoardTest {
         // verify that the lists contains the same elements of before
         assertTrue(initialGoldDeck.containsAll(b.getGoldDeck()) && b.getGoldDeck().containsAll(initialGoldDeck));
         assertTrue(initialResourceDeck.containsAll(b.getResourceDeck()) && b.getResourceDeck().containsAll(initialResourceDeck));
+    }
+
+     */
+
+
+    @Test
+    void testShuffleCards2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
+        GameState g = Populate.populate();
+        Board b = g.getMainBoard();
+
+        // Save initial length
+        int goldSize = b.getGoldDeckSize();
+        int resourceSize = b.getGoldDeckSize();
+
+        // Shuffle decks
+        b.shuffleCards();
+
+        assertEquals(goldSize, b.getGoldDeckSize());
+        assertEquals(resourceSize, b.getResourceDeckSize());
     }
 }

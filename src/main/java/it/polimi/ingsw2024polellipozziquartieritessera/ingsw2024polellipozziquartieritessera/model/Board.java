@@ -4,6 +4,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Board {
@@ -68,7 +69,7 @@ public class Board {
     }
 
     public boolean isGoldDeckEmpty(){
-        return resourceDeck.isEmpty();
+        return goldDeck.isEmpty();
     }
 
 
@@ -194,7 +195,7 @@ public class Board {
 
     //return and remove
     public GoldCard drawFromGoldDeck() throws EmptyDeckException {
-        if (resourceDeck.isEmpty()) throw new EmptyDeckException("The gold deck is empty");
+        if (goldDeck.isEmpty()) throw new EmptyDeckException("The gold deck is empty");
         GoldCard drawnCard = this.goldDeck.getLast();
         goldDeck.removeLast();
         return drawnCard;
