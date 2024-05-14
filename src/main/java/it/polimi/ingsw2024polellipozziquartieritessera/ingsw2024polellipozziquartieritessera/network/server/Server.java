@@ -24,11 +24,13 @@ public class Server implements VirtualServer {
     final Controller controller;
     final HashMap<Integer, VirtualView> clients = new HashMap<>();
     final ServerSocket listenSocket;
-    int numberAnswered = 0;
+    final HashMap<Integer, Boolean> answered;
 
     public Server(ServerSocket listenSocket, Controller controller) {
         this.listenSocket = listenSocket;
         this.controller = controller;
+        this.answered = new HashMap<>();
+        resetAnswered();
     }
 
     public static void main(String[] argv) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
@@ -37,6 +39,21 @@ public class Server implements VirtualServer {
         int rmiport = Integer.parseInt(argv[2]);
 
         startServer(host, socketport, rmiport);
+    }
+
+    private void resetAnswered() {
+        this.answered.put(0, false);
+        this.answered.put(1, false);
+        this.answered.put(2, false);
+        this.answered.put(3, false);
+    }
+
+    private int numberAnswered() {
+        int res = 0;
+        for (boolean v : this.answered.values()) {
+            if (v) { res++; }
+        }
+        return res;
     }
 
     public static void startServer(String host, int socketport, int rmiport) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException{
@@ -226,16 +243,21 @@ public class Server implements VirtualServer {
         if (controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
             int playerIndex = getPlayerIndex(client);
 
+            if (this.answered.get(playerIndex)) {
+                client.printError("You alreaedy selected the starter card");
+                return;
+            }
+
             this.controller.chooseInitialStarterSide(playerIndex, side);
-            this.numberAnswered++;
+
             try {
                 client.printMessage("Thank you!");
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
-
-            if (numberAnswered == clients.size()) {
-                numberAnswered = 0;
+            this.answered.put(playerIndex, true);
+            if (numberAnswered() == clients.size()) {
+                resetAnswered();
                 for (VirtualView clientIterator : this.clients.values()) {
                     try {
                         clientIterator.changePhase(GamePhase.CHOOSECOLORPHASE.toString());
@@ -261,17 +283,22 @@ public class Server implements VirtualServer {
         if (controller.getGamePhase().equals(GamePhase.CHOOSECOLORPHASE)) {
             int playerIndex = getPlayerIndex(client);
 
+            if (this.answered.get(playerIndex)) {
+                client.printError("You alreaedy selected the color");
+                return;
+            }
+
             try {
                 this.controller.chooseInitialColor(playerIndex, color);
                 client.printMessage("Thank you for selecting the color!");
-                numberAnswered ++;
+                this.answered.put(playerIndex, true);
             } catch (NotUniquePlayerColorException e) {
                 client.printError("The color was already selected by another user, please select a new one ;)");
                 return;
             }
 
-            if (numberAnswered == clients.size()) {
-                numberAnswered = 0;
+            if (numberAnswered() == clients.size()) {
+                resetAnswered();
                 try {
                     controller.colorChoosed();
                 } catch (EmptyDeckException e) {
@@ -304,17 +331,22 @@ public class Server implements VirtualServer {
         if (controller.getGamePhase().equals(GamePhase.CHOOSEOBJECTIVEPHASE)) {
             int playerIndex = getPlayerIndex(client);
 
-            try {
-                this.controller.chooseInitialObjective(playerIndex, cardId);
-                client.printMessage("Thank you!");
-                numberAnswered++;
-            } catch (InvalidObjectiveCardException e) {
-                client.printError("The objective card you selected was invalid, please try again");
+            if (this.answered.get(playerIndex)) {
+                client.printError("You alreaedy selected the objective card");
                 return;
             }
 
-            if (numberAnswered == clients.size()) {
-                numberAnswered = 0;
+            try {
+                this.controller.chooseInitialObjective(playerIndex, cardId);
+                client.printMessage("Thank you!");
+                this.answered.put(playerIndex, true);
+            } catch (InvalidObjectiveCardException e) {
+                client.printError("The objective card you selected was invalid, please try again");starte
+                return;
+            }
+
+            if (numberAnswered() == clients.size()) {
+                resetAnswered();
                 try {
                     for (VirtualView clientIterator : this.clients.values()) {
                         if (clients.get(controller.getCurrentPlayerIndex()).equals(clientIterator)) {
