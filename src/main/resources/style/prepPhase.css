@@ -1,0 +1,35 @@
+@font-face {
+    font-family: 'ComicNeue';
+    src: url("../fonts/Comic_Neue/ComicNeue-Regular.ttf");
+}
+
+* {
+    -fx-wrap-text: true;
+}
+
+GridPane {
+    -fx-background-image: url("../img/bg.png");
+    -fx-background-position: center center;
+    -fx-font-size: 16px;
+    -fx-font-family: 'ComicNeue';
+}
+
+VBox {
+    -fx-background-color: rgb(255, 245, 220);
+    -fx-padding: 20px;
+    -fx-background-radius: 10px;
+    -fx-pref-width: 500px;
+}
+
+.serverMessage {
+    --body-text-color: green;
+}
+
+.serverError {
+    --body-text-color: red;
+}
+
+.title {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}

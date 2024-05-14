@@ -14,16 +14,12 @@
 <!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
 <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml">
     <padding>
-        <Insets top="50" right="50" bottom="50" left="50"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
-    <Button text="Start Game"
-            GridPane.columnIndex="0" GridPane.rowIndex="5"
-            onAction="#handleStartGame"/>
-    <Label
-            fx:id="serverMessageLabel"
-            GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-    <Label
-            fx:id="serverErrorLabel"
-            GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+    <VBox>
+
+
+    </VBox>
+
 </GridPane>
