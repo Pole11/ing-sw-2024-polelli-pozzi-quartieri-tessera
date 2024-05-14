@@ -12,20 +12,19 @@
 <?import javafx.scene.text.Text?>
 
 <!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
-<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml">
+<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" stylesheets="@../style/prepPhase.css">
     <padding>
         <Insets top="50" right="50" bottom="50" left="50"/>
     </padding>
 
     <VBox>
         <Button text="Start Game"
-                GridPane.columnIndex="0" GridPane.rowIndex="5"
                 onAction="#handleStartGame"/>
         <Label
                 fx:id="serverMessageLabel"
-                GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                styleClass="serverMessage"/>
         <Label
                 fx:id="serverErrorLabel"
-                GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                styleClass="serverError"/>
     </VBox>
 </GridPane>

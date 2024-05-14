@@ -12,29 +12,25 @@
 <?import javafx.scene.text.Text?>
 
 <!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
-<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml">
+<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" stylesheets="@../style/prepPhase.css">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
     <VBox>
-        <Text text="Choose the starter side"
-              GridPane.columnIndex="0" GridPane.rowIndex="0"
-              GridPane.columnSpan="2"/>
+        <Text styleClass="title">Choose the starter side</Text>
 
         <Button text="Front Side"
-                GridPane.columnIndex="0" GridPane.rowIndex="2"
                 onAction="#chooseFrontStarter"/>
 
         <Button text="Back Side"
-                GridPane.columnIndex="1" GridPane.rowIndex="2"
                 onAction="#chooseBackStarter"/>
 
         <Label
                 fx:id="serverMessageLabel"
-                GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                styleClass="serverMessage"/>
         <Label
                 fx:id="serverErrorLabel"
-                GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                styleClass="serverError"/>
     </VBox>
 </GridPane>

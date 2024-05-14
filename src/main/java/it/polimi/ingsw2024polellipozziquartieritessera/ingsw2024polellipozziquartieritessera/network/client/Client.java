@@ -55,18 +55,19 @@ public class Client {
         boolean running = true;
         Scanner scan = new Scanner(System.in);
         System.out.println("Please enter a nickname to start, with the command ADDUSER <nickname>");
-        System.out.print("> ");
+
+        System.out.print("> "); // print phase
         while (running) {
             String line = scan.nextLine();
             String[] message = line.split(" ");
             if (line != null && !line.isEmpty() && !line.isBlank() && !line.equals("")) {
                 try {
-                    manageInput(server, message, client);
+                    manageInputCli(server, message, client);
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
             } else if (line != null){
-                System.out.print("> ");
+                System.out.print("> "); // print phase
             }
         }
     }
@@ -76,8 +77,8 @@ public class Client {
 
         guiApplication = new GUIApplication();
 
-        guiApplication.setServer(server);
-        guiApplication.setClient(client);
+        //guiApplication.setServer(server);
+        //guiApplication.setClient(client);
 
         // il punto è che dovresti fare questo ma dopo il runGui
         //guiController = guiApplication.getGUIController();
@@ -87,7 +88,7 @@ public class Client {
         guiApplication.runGui(guiController);
     }
 
-    public static void manageInput(VirtualServer server, String[] message, VirtualView client) throws RemoteException {
+    public static void manageInputCli(VirtualServer server, String[] message, VirtualView client) throws RemoteException {
         try {
             Command.valueOf(message[0].toUpperCase());
         } catch(IllegalArgumentException e) {
@@ -542,6 +543,9 @@ public class Client {
     }
 
     public static void changePhase(String nextGamePhaseString) {
+        if (!meDoGui) {
+            return;
+        }
         GamePhase nextGamePhase = null;
         try {
             nextGamePhase = GamePhase.valueOf(nextGamePhaseString);
@@ -553,24 +557,24 @@ public class Client {
 
         switch (nextGamePhase) {
             case GamePhase.NICKNAMEPHASE -> {
-                guiController.goToScene("/start.fxml");
+                guiController.goToScene("/fxml/start.fxml");
             }
             case GamePhase.CHOOSESTARTERSIDEPHASE -> {
-                guiController.goToScene("/chooseStarter.fxml");
+                guiController.goToScene("/fxml/chooseStarter.fxml");
             }
             case GamePhase.CHOOSECOLORPHASE -> {
-                guiController.goToScene("/chooseColor.fxml");
+                guiController.goToScene("/fxml/chooseColor.fxml");
             }
             case GamePhase.CHOOSEOBJECTIVEPHASE -> {
-                guiController.goToScene("/chooseObjective.fxml");
+                guiController.goToScene("/fxml/chooseObjective.fxml");
             }
             case GamePhase.MAINPHASE -> {
-                guiController.goToScene("/game.fxml");
+                guiController.goToScene("/fxml/game.fxml");
             }
             case GamePhase.ENDPHASE -> {
             }
             case GamePhase.FINALPHASE -> {
-                guiController.goToScene("/final.fxml");
+                guiController.goToScene("/fxml/final.fxml");
             }
         }
 

@@ -34,7 +34,7 @@ public class GUIController {
     public void handleAddUser(ActionEvent event) {
         String message = Command.ADDUSER + " " + nicknameTextField.getText();
         try {
-            Client.manageInput(this.server, message.split(" "), this.client);
+            Client.manageInputCli(this.server, message.split(" "), this.client);
         } catch (RemoteException e) {
             e.printStackTrace(); // TODO: remove on prod
             serverMessageLabel.setText("There was an error while adding a user");
@@ -45,7 +45,7 @@ public class GUIController {
     public void handleStartGame(ActionEvent event) {
         String message = Command.START.toString();
         try {
-            Client.manageInput(this.server, message.split(" "), this.client);
+            Client.manageInputCli(this.server, message.split(" "), this.client);
         } catch (RemoteException e) {
             e.printStackTrace(); // TODO: remove on prod
             serverMessageLabel.setText("There was an error while adding a user");
@@ -67,7 +67,7 @@ public class GUIController {
     private void chooseSideStarter(Side side) {
         String message = Command.CHOOSESTARTER + " " + side;
         try {
-            Client.manageInput(this.server, message.split(" "), this.client);
+            Client.manageInputCli(this.server, message.split(" "), this.client);
         } catch (RemoteException e) {
             e.printStackTrace(); // TODO: remove on prod
             serverMessageLabel.setText("There was an error while choosing the starter side");
@@ -97,7 +97,7 @@ public class GUIController {
     private void chooseColor(Color color) {
         String message = Command.CHOOSECOLOR + " " + color;
         try {
-            Client.manageInput(this.server, message.split(" "), this.client);
+            Client.manageInputCli(this.server, message.split(" "), this.client);
         } catch (RemoteException e) {
             e.printStackTrace(); // TODO: remove on prod
             serverMessageLabel.setText("There was an error while adding a user");
@@ -130,7 +130,7 @@ public class GUIController {
     public void chooseObjective(int index) {
         String message = Command.CHOOSEOBJECTIVE + " " + index;
         try {
-            Client.manageInput(this.server, message.split(" "), this.client);
+            Client.manageInputCli(this.server, message.split(" "), this.client);
         } catch (RemoteException e) {
             e.printStackTrace(); // TODO: remove on prod
             serverMessageLabel.setText("There was an error while adding a user");

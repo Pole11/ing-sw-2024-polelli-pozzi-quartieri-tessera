@@ -1,6 +1,9 @@
 @font-face {
-    font-family: 'ComicNeue';
     src: url("../fonts/Comic_Neue/ComicNeue-Regular.ttf");
+}
+
+@font-face {
+    src: url("../fonts/Comic_Neue/ComicNeue-Bold.ttf");
 }
 
 * {
@@ -11,7 +14,7 @@ GridPane {
     -fx-background-image: url("../img/bg.png");
     -fx-background-position: center center;
     -fx-font-size: 16px;
-    -fx-font-family: 'ComicNeue';
+    -fx-font-family: 'Comic Neue';
 }
 
 VBox {
@@ -19,14 +22,16 @@ VBox {
     -fx-padding: 20px;
     -fx-background-radius: 10px;
     -fx-pref-width: 500px;
+    -fx-alignment: CENTER;
+    -fx-padding: 5px;
 }
 
 .serverMessage {
-    --body-text-color: green;
+    -fx-text-fill: green;
 }
 
 .serverError {
-    --body-text-color: red;
+    -fx-text-fill: red;
 }
 
 .title {

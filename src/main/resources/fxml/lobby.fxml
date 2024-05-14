@@ -1,38 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Button?>
-<?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.text.Text?>
 
 <!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
-<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml">
+
+<?import javafx.scene.text.Text?>
+<GridPane alignment="CENTER" hgap="10" stylesheets="@../style/prepPhase.css" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea">
     <padding>
-        <Insets top="50" right="50" bottom="50" left="50"/>
+        <Insets bottom="50" left="50" right="50" top="50" />
     </padding>
 
     <VBox>
-        <Text text="Welcome to Codex Naturalis"
-              GridPane.columnIndex="0" GridPane.rowIndex="0"
-              GridPane.columnSpan="2"/>
+        <Text styleClass="title">Welcome to Codex Naturalis</Text>
 
-        <Label text="Nickname:"
-               GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-        <TextField
-                fx:id="nicknameTextField"
-                GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-        <Button text="Register"
-                GridPane.columnIndex="0" GridPane.rowIndex="2"
-                onAction="#handleAddUser"/>
+        <Label text="Nickname:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="nicknameTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <Button onAction="#handleAddUser" text="Register" GridPane.columnIndex="0" GridPane.rowIndex="2" />
         <Label
-                fx:id="serverMessageLabel"/>
+                fx:id="serverMessageLabel"
+                styleClass="serverMessage"/>
         <Label
-                fx:id="serverErrorLabel"/>
+                fx:id="serverErrorLabel"
+                styleClass="serverError"/>
     </VBox>
 </GridPane>
