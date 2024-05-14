@@ -3,6 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.application.*;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
 import javafx.stage.*;
@@ -44,6 +45,15 @@ public class GUIApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 920, 920);
         stage.setTitle("Codex Naturalis");
         stage.setScene(scene);
+
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent t) {
+                Platform.exit();
+                System.exit(0);
+            }
+        });
+
         stage.show();
     }
 

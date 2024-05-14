@@ -25,7 +25,7 @@ public class Server implements VirtualServer {
     final HashMap<Integer, VirtualView> clients = new HashMap<>();
     final ServerSocket listenSocket;
     int numberAnswered = 0;
-    
+
     public Server(ServerSocket listenSocket, Controller controller) {
         this.listenSocket = listenSocket;
         this.controller = controller;
@@ -98,7 +98,8 @@ public class Server implements VirtualServer {
 
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) {
-        if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
+        System.out.println(controller.getGamePhase().toString());
+        if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) || controller.getGamePhase().equals(GamePhase.TIMEOUT)){
             try {
                 if (this.clients.size() >= Config.MAX_PLAYERS) {
                     client.printError("The game is full");
@@ -114,12 +115,14 @@ public class Server implements VirtualServer {
                 System.out.println("New player connected!");
                 if (clients.size()==1){
                     if(ping(client)){
+                        client.changePhase(GamePhase.NICKNAMEPHASE.toString());
                         client.printMessage("you successfully entered the game with the nickname " + nickname + ", wait for at least two players to start the game");
                     }
                 } else {
                     for (VirtualView clientIterator : this.clients.values()) {
                         if (clientIterator.equals(client)){
                             if(ping(clientIterator)){
+                                client.changePhase(GamePhase.NICKNAMEPHASE.toString());
                                 clientIterator.printMessage("you successfully entered the game with the nickname " + nickname + ", there are " + clients.size() + " players connected, to start the game type START");
                             }
                         } else {
@@ -138,7 +141,7 @@ public class Server implements VirtualServer {
                         client.printError("The nickname already exists, please enter a new one");
                     } else {
                         client.printMessage("You successfully re-entered the game with the nickname " + nickname);
-                        if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
+                        if (controller.getGamePhase().equals(GamePhase.TIMEOUT)){
                             controller.timeoutThread.interrupt();
                             controller.setGamePhase(controller.prevGamePhase);
                             controller.prevGamePhase = null;
@@ -185,10 +188,15 @@ public class Server implements VirtualServer {
 
     @Override
     public void startGame(VirtualView client) throws RemoteException{
+        if (!clients.values().contains(client)) {
+            client.printError("Please register before starting the game");
+            return;
+        }
         if (clients.size() >= 2) {
             System.out.println("Starting game");
             for (VirtualView clientIterator : this.clients.values()) {
                 if (ping(clientIterator)){
+                    clientIterator.changePhase(GamePhase.CHOOSESTARTERSIDEPHASE.toString());
                     clientIterator.printMessage("The game has begun. Please choose the side of your starter card with the command " + Command.CHOOSESTARTER + " [Front / Back]");
                 }
             }
@@ -230,6 +238,7 @@ public class Server implements VirtualServer {
                 numberAnswered = 0;
                 for (VirtualView clientIterator : this.clients.values()) {
                     try {
+                        clientIterator.changePhase(GamePhase.CHOOSECOLORPHASE.toString());
                         clientIterator.printMessage("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]");
                     } catch (RemoteException e) {
                         throw new RuntimeException(e);
@@ -254,7 +263,7 @@ public class Server implements VirtualServer {
 
             try {
                 this.controller.chooseInitialColor(playerIndex, color);
-                client.printMessage("Thank you!");
+                client.printMessage("Thank you for selecting the color!");
                 numberAnswered ++;
             } catch (NotUniquePlayerColorException e) {
                 client.printError("The color was already selected by another user, please select a new one ;)");
@@ -271,6 +280,7 @@ public class Server implements VirtualServer {
                 try {
                     for (VirtualView clientIterator : this.clients.values()) {
                         getPlayerIndex(clientIterator);
+                        clientIterator.changePhase(GamePhase.CHOOSEOBJECTIVEPHASE.toString());
                         clientIterator.printMessage("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1]: " + this.controller.getObjectiveCardOptions(playerIndex)[0].getId() + ", " + this.controller.getObjectiveCardOptions(playerIndex)[1].getId());
                         this.controller.setGamePhase(GamePhase.CHOOSEOBJECTIVEPHASE);
                         this.showHand(clientIterator);
@@ -314,6 +324,7 @@ public class Server implements VirtualServer {
                         } else {
                             clientIterator.printMessage("The preparation phase is over, it's now the turn of " + controller.getPlayerNickname(controller.getCurrentPlayerIndex()) + " to play as first");
                         }
+                        clientIterator.changePhase(GamePhase.MAINPHASE.toString());
                         this.showHand(clientIterator);
                     }
                 } catch (RemoteException e) {
@@ -519,26 +530,28 @@ public class Server implements VirtualServer {
         AtomicInteger index = new AtomicInteger();
         AtomicInteger numberConnected = new AtomicInteger();
         clients.values().stream().forEach(e->{
-            index.getAndIncrement();
             boolean connected = false;
             if (ping(e)){
                 connected = true;
                 numberConnected.getAndIncrement();
             }
             controller.setConnected(index.get(), connected);
+            index.getAndIncrement();
         });
-        if (numberConnected.get() == 0){
-            //chiedere specifica
-        } else if (numberConnected.get() == 1){
-            controller.setGamePhase(GamePhase.TIMEOUT);
-            controller.timeoutThread =  new Thread(() -> {
-                try {
-                    controller.startTimeout();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            controller.timeoutThread.start();
+        if (!controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)) {
+            if (numberConnected.get() == 0){
+                //chiedere specifica
+            } else if (numberConnected.get() == 1){
+                controller.setGamePhase(GamePhase.TIMEOUT);
+                controller.timeoutThread =  new Thread(() -> {
+                    try {
+                        controller.startTimeout();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                controller.timeoutThread.start();
+            }
         }
     }
 
