@@ -10,14 +10,24 @@
     -fx-wrap-text: true;
 }
 
-GridPane {
+Separator {
+    -fx-padding: 10px;
+}
+
+TextField {
+    -fx-border-color: black;
+    -fx-border-width: 4px;
+    -fx-border-radius: 4px;
+}
+
+.root {
     -fx-background-image: url("../img/bg.png");
     -fx-background-position: center center;
     -fx-font-size: 16px;
     -fx-font-family: 'Comic Neue';
 }
 
-VBox {
+.mainContainer {
     -fx-background-color: rgb(255, 245, 220);
     -fx-padding: 20px;
     -fx-background-radius: 10px;
@@ -38,3 +48,50 @@ VBox {
     -fx-font-size: 30px;
     -fx-font-weight: bold;
 }
+
+.starterCardImageContainer, .objectiveCardImageContainer {
+    -fx-padding: 10px;
+    -fx-background-radius: 10px;
+}
+
+.greenBackground {
+    -fx-background-image: none;
+    -fx-background-color: green;
+}
+
+.greenBorder {
+    -fx-border-style: solid;
+    -fx-border-width: 8px;
+    -fx-border-color: green;
+    -fx-border-radius: 4px;
+}
+
+.blueBorder {
+    -fx-border-style: solid;
+    -fx-border-width: 8px;
+    -fx-border-color: blue;
+    -fx-border-radius: 4px;
+}
+
+.redBorder {
+    -fx-border-style: solid;
+    -fx-border-width: 8px;
+    -fx-border-color: red;
+    -fx-border-radius: 4px;
+}
+
+.yellowBorder {
+    -fx-border-style: solid;
+    -fx-border-width: 8px;
+    -fx-border-color: yellow;
+    -fx-border-radius: 4px;
+}
+
+.colorButton {
+    -fx-pref-width: 100px;
+    -fx-pref-height: 100px;
+    -fx-background-radius: 0px;
+    -fx-border-color: black;
+    -fx-border-width:  5px 5px 5px 5px;
+}
+

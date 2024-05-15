@@ -11,18 +11,8 @@ import javafx.stage.*;
 import java.io.*;
 
 public class GUIApplication extends Application {
-    private static VirtualServer server;
-    private static VirtualView client;
     private static GUIController guiController;
     private static Stage mainStage;
-
-    public void setServer(VirtualServer server) {
-        this.server = server;
-    }
-
-    public void setClient(VirtualView client) {
-        this.client = client;
-    }
 
     public GUIController getGUIController() {
         return this.guiController;

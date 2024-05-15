@@ -3,11 +3,6 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import com.google.gson.Gson;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
@@ -20,18 +15,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
-import java.lang.reflect.Array;
-import java.net.Socket;
-import java.rmi.NotBoundException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
 public class Client {
     private static boolean meDoGui;
-    private static GUIApplication guiApplication;
-    private static GUIController guiController;
+    public static GUIApplication guiApplication; // TODO: public only for testing purpose, put private after finished testing
+    public static GUIController guiController; // TODO: public only for testing purpose, put private after finished testing
     private static GamePhase currentGamePhase;
 
     public static void main(String[] args) throws IOException {
@@ -530,6 +519,7 @@ public class Client {
     public static void printMessage(String msg) {
         if (meDoGui) {
             guiController.setServerMessage(msg);
+            guiController.clearServerError();
         }
         System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
@@ -537,6 +527,7 @@ public class Client {
     public static void printError(String msg) {
         if (meDoGui) {
             guiController.setServerError(msg);
+            guiController.clearServerMessage();
         }
         System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
 
@@ -557,16 +548,18 @@ public class Client {
 
         switch (nextGamePhase) {
             case GamePhase.NICKNAMEPHASE -> {
-                guiController.goToScene("/fxml/start.fxml");
+                guiController.goToScene("/fxml/startGame.fxml");
             }
             case GamePhase.CHOOSESTARTERSIDEPHASE -> {
                 guiController.goToScene("/fxml/chooseStarter.fxml");
+                guiController.setStarterCardImage(84); // TODO: FORCED: change
             }
             case GamePhase.CHOOSECOLORPHASE -> {
                 guiController.goToScene("/fxml/chooseColor.fxml");
             }
             case GamePhase.CHOOSEOBJECTIVEPHASE -> {
                 guiController.goToScene("/fxml/chooseObjective.fxml");
+                guiController.setObjectiveCardImages(90, 91); // TODO: FORCED: change
             }
             case GamePhase.MAINPHASE -> {
                 guiController.goToScene("/fxml/game.fxml");

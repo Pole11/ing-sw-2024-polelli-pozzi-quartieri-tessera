@@ -12,12 +12,12 @@
 <?import javafx.scene.text.Text?>
 
 <!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
-<VBox xmlns:fx="http://javafx.com/fxml" alignment="center" spacing="10" padding="20" stylesheets="@../style/prepPhase.css">
+<VBox xmlns:fx="http://javafx.com/fxml" alignment="center" spacing="10" padding="20" stylesheets="@../style/prepPhase.css" styleClass="root">
     <padding>
         <Insets top="50" right="50" bottom="50" left="50"/>
     </padding>
 
-    <VBox>
+    <VBox styleClass="mainContainer">
         <Label text="Game Finished"/>
         <Label
                 fx:id="serverMessageLabel"

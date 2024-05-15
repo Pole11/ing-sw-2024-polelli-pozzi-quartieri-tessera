@@ -12,29 +12,43 @@
 <?import javafx.scene.text.Text?>
 
 <!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
-<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" stylesheets="@../style/prepPhase.css">
+<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" stylesheets="@../style/prepPhase.css" styleClass="root">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
-    <VBox>
+    <VBox styleClass="mainContainer" fx:id="mainContainer">
         <Text styleClass="title">Choose the Color</Text>
 
-        <Button text="Blue"
-                GridPane.columnIndex="0" GridPane.rowIndex="1"
-                onAction="#chooseBlueColor"/>
+        <GridPane alignment="CENTER">
+            <Button text="Blue"
+                    fx:id="blueButton"
+                    style="-fx-background-color: blue"
+                    styleClass="colorButton"
+                    GridPane.columnIndex="0" GridPane.rowIndex="0"
+                    onAction="#handleChooseBlueColor"/>
 
-        <Button text="Green"
-                GridPane.columnIndex="1" GridPane.rowIndex="1"
-                onAction="#chooseGreenColor"/>
+            <Button text="Green"
+                    fx:id="greenButton"
+                    style="-fx-background-color: green"
+                    styleClass="colorButton"
+                    GridPane.columnIndex="0" GridPane.rowIndex="1"
+                    onAction="#handleChooseGreenColor"/>
 
-        <Button text="Yellow"
-                GridPane.columnIndex="2" GridPane.rowIndex="1"
-                onAction="#chooseYellowColor"/>
+            <Button text="Yellow"
+                    fx:id="yellowButton"
+                    style="-fx-background-color: yellow"
+                    styleClass="colorButton"
+                    GridPane.columnIndex="1" GridPane.rowIndex="0"
+                    onAction="#handleChooseYellowColor"/>
 
-        <Button text="Red"
-                GridPane.columnIndex="3" GridPane.rowIndex="1"
-                onAction="#chooseRedColor"/>
+            <Button text="Red"
+                    fx:id="redButton"
+                    style="-fx-background-color: red"
+                    styleClass="colorButton"
+                    GridPane.columnIndex="1" GridPane.rowIndex="1"
+                    onAction="#handleChooseRedColor"/>
+        </GridPane>
 
         <Label
                 fx:id="serverMessageLabel"

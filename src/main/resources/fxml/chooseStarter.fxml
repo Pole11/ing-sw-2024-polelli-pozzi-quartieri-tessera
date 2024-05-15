@@ -1,36 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Button?>
-<?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?import javafx.scene.text.Text?>
 
 <!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
-<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" stylesheets="@../style/prepPhase.css">
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<GridPane alignment="CENTER" hgap="10" stylesheets="@../style/prepPhase.css" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea" styleClass="root">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <VBox>
+    <VBox styleClass="mainContainer" alignment="CENTER">
         <Text styleClass="title">Choose the starter side</Text>
-
-        <Button text="Front Side"
-                onAction="#chooseFrontStarter"/>
-
-        <Button text="Back Side"
-                onAction="#chooseBackStarter"/>
-
-        <Label
-                fx:id="serverMessageLabel"
-                styleClass="serverMessage"/>
-        <Label
-                fx:id="serverErrorLabel"
-                styleClass="serverError"/>
+        <Label>Front:</Label>
+        <StackPane styleClass="starterCardImageContainer" fx:id="starterCardImageContainerFront" >
+        </StackPane>
+        <Label>Back:</Label>
+        <StackPane styleClass="starterCardImageContainer" fx:id="starterCardImageContainerBack">
+        </StackPane>
+        <Label fx:id="serverMessageLabel" styleClass="serverMessage" />
+        <Label fx:id="serverErrorLabel" styleClass="serverError" />
     </VBox>
 </GridPane>
