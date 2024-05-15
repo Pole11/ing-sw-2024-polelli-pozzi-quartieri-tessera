@@ -561,6 +561,7 @@ public class Client {
             }
             case GamePhase.MAINPHASE -> {
                 guiController.goToScene("/fxml/game.fxml");
+                guiController.initTable(4, 61, 11, 42, 27, 63, 3);
             }
             case GamePhase.ENDPHASE -> {
             }

@@ -1,0 +1,38 @@
+@font-face {
+    src: url("../fonts/Comic_Neue/ComicNeue-Regular.ttf");
+}
+
+@font-face {
+    src: url("../fonts/Comic_Neue/ComicNeue-Bold.ttf");
+}
+
+* {
+    -fx-wrap-text: true;
+}
+
+.root {
+    -fx-background-color: rgb(220, 200, 60);
+    -fx-border-width: 10px;
+    -fx-border-style: solid;
+    -fx-border-color: rgb(180, 160, 30);
+    -fx-font-size: 16px;
+    -fx-font-family: 'Comic Neue';
+}
+
+.cardDeck {
+    -fx-border-width: 0px 3px 3px 0px;
+    -fx-border-style: solid;
+    -fx-border-color: rgb(140, 120, 0);
+}
+
+.plateauContainerGame {
+    -fx-padding: 10px;
+}
+
+.rotate10 {
+    -fx-rotate: 10deg;
+}
+
+.rotate0 {
+    -fx-rotate: 0deg;
+}

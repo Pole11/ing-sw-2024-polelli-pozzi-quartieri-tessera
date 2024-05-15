@@ -15,9 +15,10 @@ Separator {
 }
 
 TextField {
-    -fx-border-color: black;
-    -fx-border-width: 4px;
-    -fx-border-radius: 4px;
+    -fx-border-color: rgb(200, 160, 30);
+    -fx-border-width: 2px;
+    -fx-focus-color: rgb(200, 160, 30);
+    -fx-faint-focus-color: rgb(200, 160, 30);
 }
 
 Button {
@@ -25,10 +26,13 @@ Button {
 }
 
 .root {
-    -fx-background-image: url("../img/bg.png");
+    -fx-background-image: url("../img/bg-blur.png");
     -fx-background-position: center center;
     -fx-font-size: 16px;
     -fx-font-family: 'Comic Neue';
+    -fx-border-width: 10px;
+    -fx-border-style: solid;
+    -fx-border-color: rgb(180, 160, 30);
 }
 
 .mainContainer {
@@ -37,7 +41,9 @@ Button {
     -fx-background-radius: 10px;
     -fx-pref-width: 500px;
     -fx-alignment: CENTER;
-    -fx-padding: 5px;
+    -fx-border-width: 10px;
+    -fx-border-style: solid;
+    -fx-border-color: rgb(180, 160, 30);
 }
 
 .serverMessage {
@@ -55,7 +61,6 @@ Button {
 
 .starterCardImageContainer, .objectiveCardImageContainer {
     -fx-padding: 10px;
-    -fx-background-radius: 10px;
 }
 
 .greenBackground {
@@ -67,28 +72,24 @@ Button {
     -fx-border-style: solid;
     -fx-border-width: 8px;
     -fx-border-color: green;
-    -fx-border-radius: 4px;
 }
 
 .blueBorder {
     -fx-border-style: solid;
     -fx-border-width: 8px;
     -fx-border-color: blue;
-    -fx-border-radius: 4px;
 }
 
 .redBorder {
     -fx-border-style: solid;
     -fx-border-width: 8px;
     -fx-border-color: red;
-    -fx-border-radius: 4px;
 }
 
 .yellowBorder {
     -fx-border-style: solid;
     -fx-border-width: 8px;
     -fx-border-color: yellow;
-    -fx-border-radius: 4px;
 }
 
 .colorButton {
