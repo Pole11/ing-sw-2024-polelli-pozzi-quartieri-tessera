@@ -519,7 +519,6 @@ public class Client {
     public static void printMessage(String msg) {
         if (meDoGui) {
             guiController.setServerMessage(msg);
-            guiController.clearServerError();
         }
         System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
@@ -527,7 +526,6 @@ public class Client {
     public static void printError(String msg) {
         if (meDoGui) {
             guiController.setServerError(msg);
-            guiController.clearServerMessage();
         }
         System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
 

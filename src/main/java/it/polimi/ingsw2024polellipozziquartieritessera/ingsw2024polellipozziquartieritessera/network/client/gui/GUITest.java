@@ -25,7 +25,7 @@ public class GUITest extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         //FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource("/it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui/lobby.fxml"));
-        FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource("/fxml/chooseColor.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource("/fxml/lobby.fxml"));
 
         VirtualServer server = null;
         VirtualView client = null;

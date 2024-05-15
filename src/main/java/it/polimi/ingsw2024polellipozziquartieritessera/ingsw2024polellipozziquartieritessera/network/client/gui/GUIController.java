@@ -12,7 +12,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.event.*;
 import javafx.scene.image.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
 import java.io.IOException;
@@ -109,7 +108,7 @@ public class GUIController {
     }
 
     private void handleChooseColor(Color color) {
-        changeChooseColorBorder(color);
+        changeMainContainerBorder(color); // TODO: move from here, put it in the client so that the color is changed only one single time
 
         String message = Command.CHOOSECOLOR + " " + color;
         try {
@@ -120,12 +119,12 @@ public class GUIController {
         }
     }
 
-    private void changeChooseColorBorder(Color color) {
+    private void changeMainContainerBorder(Color color) {
         for (Color colorIterator : Color.values()) { mainContainer.getStyleClass().remove(colorIterator.toString().toLowerCase() + "Border"); }
         mainContainer.getStyleClass().add(color.toString().toLowerCase() + "Border");
     }
 
-    private void disableChooseColorBtns(Color color) { // TODO: call this method when the ack from the server that the color is correct
+    private void disableChooseColorBtns(Color color) { // TODO: call this method when the ack from the server that the color is correct, but it is not mandatory, !!! even without it works great !!!
         for (Color colorIterator : Color.values()) {
             Node button = mainContainer.lookup("#" + colorIterator.toString().toLowerCase() + "Button");
             if (button != null) ((Button) button).setOnAction(null);
@@ -188,13 +187,21 @@ public class GUIController {
             @Override
             public void run() {
                 starterCardImageViewFront.setOnMouseClicked(mouseEvent -> {
-                    starterCardImageViewFront.getParent().getStyleClass().add("greenBackground");
-                    starterCardImageViewBack.setOnMouseClicked(null);
+                    // OPZIONE 1
+                    if (!starterCardImageViewBack.getParent().getStyleClass().contains("greenBackground"))
+                        starterCardImageViewFront.getParent().getStyleClass().add("greenBackground");
+                    // OPZIONE 2
+                    //starterCardImageViewFront.setOnMouseClicked(null);
+                    //starterCardImageViewBack.setOnMouseClicked(null);
                     handleChooseSideStarter(Side.FRONT);
                 });
                 starterCardImageViewBack.setOnMouseClicked(mouseEvent -> {
-                    starterCardImageViewBack.getParent().getStyleClass().add("greenBackground");
-                    starterCardImageViewFront.setOnMouseClicked(null);
+                    // OPZIONE 1
+                    if (!starterCardImageViewFront.getParent().getStyleClass().contains("greenBackground"))
+                        starterCardImageViewBack.getParent().getStyleClass().add("greenBackground");
+                    // OPZIONE 2
+                    //starterCardImageViewFront.setOnMouseClicked(null);
+                    //starterCardImageViewBack.setOnMouseClicked(null);
                     handleChooseSideStarter(Side.BACK);
 
                 });
@@ -212,13 +219,21 @@ public class GUIController {
             @Override
             public void run() {
                 firstObjectiveImageView.setOnMouseClicked(mouseEvent -> {
-                    firstObjectiveImageView.getParent().getStyleClass().add("greenBackground");
-                    secondObjectiveImageView.setOnMouseClicked(null);
+                    // OPZIONE 1
+                    if (!secondObjectiveImageView.getParent().getStyleClass().contains("greenBackground"))
+                        firstObjectiveImageView.getParent().getStyleClass().add("greenBackground");
+                    // OPZIONE 2
+                    //firstObjectiveImageView.setOnMouseClicked(null);
+                    //secondObjectiveImageView.setOnMouseClicked(null);
                     handleChooseObjective(0);
                 });
                 secondObjectiveImageView.setOnMouseClicked(mouseEvent -> {
-                    secondObjectiveImageView.getParent().getStyleClass().add("greenBackground");
-                    firstObjectiveImageView.setOnMouseClicked(null);
+                    // OPZIONE 1
+                    if (!firstObjectiveImageView.getParent().getStyleClass().contains("greenBackground"))
+                        secondObjectiveImageView.getParent().getStyleClass().add("greenBackground");
+                    // OPZIONE 2
+                    //firstObjectiveImageView.setOnMouseClicked(null);
+                    //secondObjectiveImageView.setOnMouseClicked(null);
                     handleChooseObjective(1);
 
                 });
@@ -228,8 +243,72 @@ public class GUIController {
         });
     }
 
+    public void createPanes(int numPlayers) {
+
+    }
+
+    public void changeGamePane(int idCurrentPlayer) {
+
+    }
+
+    public void printPlayerHand(int idCurrentPlayer, int idFirstCard, int idSecondCard, int idThirdCard) {
+
+    }
+
+    public void printGoldDeck(int topCard) {
+        if (topCard <= 0) {
+
+        }
+    }
+
+    public void printResourceDeck(int topCard) {
+        if (topCard <= 0) {
+
+        }
+    }
+
+    public void printBoard() {
+
+    }
+
+    @FXML
+    public void handlePlaceCard(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void handleDrawFirstGoldSharedCard(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void handleDrawSecondGoldSharedCard(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void handleDrawFirstResourceSharedCard(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void handleDrawSecondResourceSharedCard(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void handleDrawGoldDeckCard(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void handleDrawResourceDeckCard(ActionEvent event) {
+
+    }
+
     @FXML
     public void setServerMessage(String serverMessage) {
+        clearServerError();
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
@@ -238,9 +317,9 @@ public class GUIController {
             }
         });
     }
-
     @FXML
     public void setServerError(String serverMessage) {
+        clearServerMessage();
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {

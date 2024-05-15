@@ -20,6 +20,10 @@ TextField {
     -fx-border-radius: 4px;
 }
 
+Button {
+    -fx-background-color: rgb(200, 200, 220);
+}
+
 .root {
     -fx-background-image: url("../img/bg.png");
     -fx-background-position: center center;
