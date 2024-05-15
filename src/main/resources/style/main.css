@@ -14,10 +14,14 @@ Separator {
     -fx-padding: 10px;
 }
 
-.rotate10 {
-    -fx-rotate: 10deg;
+.rotateYes {
+    -fx-rotate: 3deg;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
 }
 
-.rotate0 {
+.rotateNo {
     -fx-rotate: 0deg;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
 }

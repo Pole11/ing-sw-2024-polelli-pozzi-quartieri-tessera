@@ -17,7 +17,7 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
-    <VBox styleClass="mainContainer" fx:id="mainContainer">
+    <VBox styleClass="mainContainer" fx:id="mainContainerPrep">
         <Text styleClass="title">Choose the Color</Text>
 
         <GridPane alignment="CENTER">

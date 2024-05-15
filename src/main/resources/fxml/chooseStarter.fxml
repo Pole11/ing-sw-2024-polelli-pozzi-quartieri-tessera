@@ -14,7 +14,7 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <VBox styleClass="mainContainer" alignment="CENTER">
+    <VBox styleClass="mainContainer" fx:id="mainContainerPrep" alignment="CENTER">
         <Text styleClass="title">Choose the starter side</Text>
         <Label>Front:</Label>
         <StackPane styleClass="starterCardImageContainer" fx:id="starterCardImageContainerFront" >

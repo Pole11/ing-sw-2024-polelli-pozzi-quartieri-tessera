@@ -77,6 +77,7 @@ public class Client {
         guiApplication.runGui(guiController);
     }
 
+    // TODO: refactor with multiple methods
     public static void manageInputCli(VirtualServer server, String[] message, VirtualView client) throws RemoteException {
         try {
             Command.valueOf(message[0].toUpperCase());
@@ -260,7 +261,6 @@ public class Client {
         }
         Gson gson = new Gson();
         Map cards = gson.fromJson(jsonString, Map.class);
-
 
         for (Object key : cards.keySet()){
             Map card = gson.fromJson(cards.get(key).toString(), Map.class);

@@ -10,7 +10,8 @@ Button {
 }
 
 .root {
-    -fx-background-image: url("../img/bg-blur.png");
+    -fx-background-image: url("../img/bg-nologo.png");
+    -fx-background-size: 1290;
     -fx-background-position: center center;
     -fx-font-size: 16px;
     -fx-font-family: 'Comic Neue';

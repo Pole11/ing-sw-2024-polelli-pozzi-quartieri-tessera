@@ -17,3 +17,26 @@
     -fx-padding: 10px;
 }
 
+.blueBackground {
+    -fx-background-color: rgba(0, 0, 255, 0.4);
+}
+
+.greenBackground {
+    -fx-background-color: rgba(0, 128, 0, 0.4);
+}
+
+.redBackground {
+    -fx-background-color: rgba(255, 0, 0, 0.4);
+}
+
+.yellowBackground {
+    -fx-background-color: rgba(255, 255, 0, 0.4);
+}
+
+.horizontalPlayerContainer {
+    -fx-padding: 30px;
+}
+
+.verticalPlayerContainer {
+    -fx-padding: 30px;
+}

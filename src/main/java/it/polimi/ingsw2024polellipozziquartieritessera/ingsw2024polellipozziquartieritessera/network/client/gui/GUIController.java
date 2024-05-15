@@ -4,7 +4,6 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.DrawType;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Board;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
@@ -19,9 +18,11 @@ import javafx.scene.text.Text;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 
 public class GUIController {
-    @FXML private VBox mainContainer;
+    @FXML private VBox mainContainerPrep;
+    @FXML private BorderPane mainContainerGame;
     @FXML private VBox sharedGoldContainerGame;
     @FXML private VBox plateauContainerGame;
     @FXML private VBox sharedResourceContainerGame;
@@ -39,6 +40,7 @@ public class GUIController {
     public GUIController(VirtualView client, VirtualServer server) {
         this.client = client;
         this.server = server;
+        // add the view model
     }
 
     @FXML
@@ -113,20 +115,24 @@ public class GUIController {
             Client.manageInputCli(this.server, message.split(" "), this.client);
         } catch (RemoteException e) {
             e.printStackTrace(); // TODO: remove on prod
-            serverMessageLabel.setText("There was an error while selecting a color");
+            Platform.runLater(() -> serverMessageLabel.setText("There was an error while selecting a color"));
         }
     }
 
     private void changeMainContainerBorder(Color color) {
-        for (Color colorIterator : Color.values()) { mainContainer.getStyleClass().remove(colorIterator.toString().toLowerCase() + "Border"); }
-        mainContainer.getStyleClass().add(color.toString().toLowerCase() + "Border");
+        Platform.runLater(() -> {
+            for (Color colorIterator : Color.values()) { mainContainerPrep.getStyleClass().remove(colorIterator.toString().toLowerCase() + "Border"); }
+            mainContainerPrep.getStyleClass().add(color.toString().toLowerCase() + "Border");
+        });
     }
 
     private void disableChooseColorBtns(Color color) { // TODO: call this method when the ack from the server that the color is correct, but it is not mandatory, !!! even without it works great !!!
-        for (Color colorIterator : Color.values()) {
-            Node button = mainContainer.lookup("#" + colorIterator.toString().toLowerCase() + "Button");
-            if (button != null) ((Button) button).setOnAction(null);
-        }
+        Platform.runLater(() -> {
+            for (Color colorIterator : Color.values()) {
+                Node button = mainContainerPrep.lookup("#" + colorIterator.toString().toLowerCase() + "Button");
+                if (button != null) ((Button) button).setOnAction(null);
+            }
+        });
     }
 
     public void goToScene(String fxml) {
@@ -158,7 +164,7 @@ public class GUIController {
             Client.manageInputCli(this.server, message.split(" "), this.client);
         } catch (RemoteException e) {
             e.printStackTrace(); // TODO: remove on prod
-            serverMessageLabel.setText("There was an error selecting the secret objective card");
+            Platform.runLater(() -> serverMessageLabel.setText("There was an error selecting the secret objective card") );
         }
     }
 
@@ -195,7 +201,6 @@ public class GUIController {
     public void setStarterCardImage(int id) {
         ImageView starterCardImageViewFront = createCardImageView("/img/carte_fronte/" + id + ".jpg", 180);
         ImageView starterCardImageViewBack = createCardImageView("/img/carte_retro/" + id + ".jpg", 180);
-
 
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
@@ -263,10 +268,17 @@ public class GUIController {
     }
 
     public void initTable(int numPlayers, int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId) {
-        initDecks(firstGoldDeckCardId, firstResourceDeckCardId, firstSharedGoldCardId, firstSharedResourceCardId, secondSharedGoldCardId, secondSharedResourceCardId);
+        printDecks(firstGoldDeckCardId, firstResourceDeckCardId, firstSharedGoldCardId, firstSharedResourceCardId, secondSharedGoldCardId, secondSharedResourceCardId);
+
+        // TODO: get the player hand
+        HashMap<Integer, Side> playerHandCards = new HashMap<>();
+        playerHandCards.put(30, Side.FRONT);
+        playerHandCards.put(3, Side.BACK);
+        playerHandCards.put(45, Side.FRONT);
+        for (int i = 1; i <= numPlayers; i++) printPlayerHand(i, playerHandCards);
     }
 
-    public void initDecks(int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId) {
+    public void printDecks(int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId) {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
@@ -321,28 +333,125 @@ public class GUIController {
     }
 
     public void addHover(Node node) {
-        node.setOnMouseEntered(mouseEvent -> { node.getStyleClass().add("rotate10"); node.getStyleClass().remove("rotate0"); });
-        node.setOnMouseExited(mouseEvent -> { node.getStyleClass().add("rotate0"); node.getStyleClass().remove("rotate10"); });
+        Platform.runLater(() -> {
+            node.setOnMouseEntered(mouseEvent -> { node.getStyleClass().add("rotateYes"); node.getStyleClass().remove("rotateNo"); });
+            node.setOnMouseExited(mouseEvent -> { node.getStyleClass().add("rotateNo"); node.getStyleClass().remove("rotateYes"); });
+        });
     }
 
-    public void highlightCurrentPlayerTable(int idCurrentPlayer) {
+    public void highlightCurrentPlayerTable() {
+        // TODO: get current player id
+        int idCurrentPlayer = 3;
+        Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame");
 
+        // TODO: get current player color
+        Color currentPlayerColor = Color.BLUE;
+        currentPlayerHBox.getStyleClass().add(currentPlayerColor.toString().toLowerCase() + "Background");
     }
 
-    public void printPlayerHand(int idCurrentPlayer, int idFirstCard, int idSecondCard, int idThirdCard) {
+    public void printPlayerHand(int playerId, HashMap<Integer, Side> playerHandCards) {
+        HBox handContainerHBox = null;
+        VBox handContainerVBox = null;
+        VBox playerContainer;
 
-    }
-
-    public void printGoldDeck(int topCard) {
-        if (topCard <= 0) {
-
+        if (playerId == 1 || playerId == 2) {
+            handContainerHBox = (HBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
+            playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+        } else {
+            handContainerVBox = (VBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
+            playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
         }
+
+        // TODO: get player nickname
+        String currentPlayerNickname = "Player nickname " + playerId;
+        playerContainer.getChildren().add(new Text(currentPlayerNickname));
+        Button expandButton = new Button("Expand Board");
+        playerContainer.getChildren().add(expandButton);
+
+        // TODO: get my player id
+        int meId = 1;
+
+        for (Integer cardId : playerHandCards.keySet()) {
+            ImageView tempImageView;
+            if ((playerId == meId && playerHandCards.get(cardId) == Side.FRONT) || (playerId != meId && playerHandCards.get(cardId) == Side.BACK)) {
+                tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+            } else {
+                tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
+            }
+            if (playerId == 1 || playerId == 2) {
+                handContainerHBox.getChildren().add(tempImageView);
+            } else {
+                handContainerVBox.getChildren().add(tempImageView);
+            }
+        }
+
+        /*if (playerId == 1 || playerId == 2) {
+            HBox handContainer = (HBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
+            VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+
+            // TODO: get player nickname
+            String currentPlayerNickname = "Player nickname " + playerId;
+            playerContainer.getChildren().add(new Text(currentPlayerNickname));
+
+            // TODO: get my player id
+            int meId = 1;
+            if (playerId == meId) {
+                for (Integer cardId : playerHandCards.keySet()) {
+                    ImageView tempImageView;
+                    if (playerHandCards.get(cardId) == Side.FRONT) {
+                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+                    } else {
+                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
+                    }
+                    handContainer.getChildren().add(tempImageView);
+                }
+            } else {
+                for (Integer cardId : playerHandCards.keySet()) {
+                    ImageView tempImageView;
+                    if (playerHandCards.get(cardId) == Side.FRONT) {
+                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
+                    } else {
+                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+                    }
+                    handContainer.getChildren().add(tempImageView);
+                }
+            }
+        } else {
+            VBox handContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
+            VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+
+            // TODO: get player nickname
+            String currentPlayerNickname = "Player nickname " + playerId;
+            playerContainer.getChildren().add(new Text(currentPlayerNickname));
+
+            // TODO: get my player id
+            int meId = 1;
+            if (playerId == meId) {
+                for (Integer cardId : playerHandCards.keySet()) {
+                    ImageView tempImageView;
+                    if (playerHandCards.get(cardId) == Side.FRONT) {
+                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+                    } else {
+                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
+                    }
+                    handContainer.getChildren().add(tempImageView);
+                }
+            } else {
+                for (Integer cardId : playerHandCards.keySet()) {
+                    ImageView tempImageView;
+                    if (playerHandCards.get(cardId) == Side.FRONT) {
+                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
+                    } else {
+                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+                    }
+                    handContainer.getChildren().add(tempImageView);
+                }
+            }
+        }*/
     }
 
-    public void printResourceDeck(int topCard) {
-        if (topCard <= 0) {
+    public void flipCard() {
 
-        }
     }
 
     public void printBoard() {
@@ -383,9 +492,8 @@ public class GUIController {
             }
         });
     }
-
     public void clearServerError() {
-                Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
                 serverErrorLabel.setText("");
@@ -393,7 +501,7 @@ public class GUIController {
         });
     }
     public void clearServerMessage() {
-                Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
                 serverMessageLabel.setText("");

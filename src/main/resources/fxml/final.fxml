@@ -17,7 +17,7 @@
         <Insets top="50" right="50" bottom="50" left="50"/>
     </padding>
 
-    <VBox styleClass="mainContainer">
+    <VBox styleClass="mainContainer" fx:id="mainContainerPrep">
         <Label text="Game Finished"/>
         <Label
                 fx:id="serverMessageLabel"
