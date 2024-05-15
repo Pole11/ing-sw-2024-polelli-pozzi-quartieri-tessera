@@ -196,6 +196,7 @@ public class GUIController {
         ImageView starterCardImageViewFront = createCardImageView("/img/carte_fronte/" + id + ".jpg", 180);
         ImageView starterCardImageViewBack = createCardImageView("/img/carte_retro/" + id + ".jpg", 180);
 
+
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
@@ -220,6 +221,8 @@ public class GUIController {
                 });
                 starterCardImageContainerFront.getChildren().add(starterCardImageViewFront);
                 starterCardImageContainerBack.getChildren().add(starterCardImageViewBack);
+                addHover(starterCardImageViewFront);
+                addHover(starterCardImageViewBack);
             }
         });
     }
@@ -227,6 +230,9 @@ public class GUIController {
     public void setObjectiveCardImages(int id1, int id2) {
         ImageView firstObjectiveImageView = createCardImageView("/img/carte_fronte/" + id1 + ".jpg", 180);
         ImageView secondObjectiveImageView = createCardImageView("/img/carte_fronte/" + id2 + ".jpg", 180);
+
+        addHover(firstObjectiveImageView);
+        addHover(secondObjectiveImageView);
 
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
@@ -261,7 +267,6 @@ public class GUIController {
     }
 
     public void initDecks(int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId) {
-
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {

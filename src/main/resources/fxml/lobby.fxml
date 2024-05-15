@@ -8,7 +8,7 @@
 
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.shape.Line?>
-<GridPane alignment="CENTER" hgap="10" stylesheets="@../style/prepPhase.css" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea" styleClass="root">
+<GridPane alignment="CENTER" hgap="10" stylesheets="@../style/prepPhase.css, @../style/main.css" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea" styleClass="root">
     <padding>
         <Insets bottom="50" left="50" right="50" top="50" />
     </padding>

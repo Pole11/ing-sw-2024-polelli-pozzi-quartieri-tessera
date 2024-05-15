@@ -1,0 +1,23 @@
+@font-face {
+    src: url("../fonts/Comic_Neue/ComicNeue-Regular.ttf");
+}
+
+@font-face {
+    src: url("../fonts/Comic_Neue/ComicNeue-Bold.ttf");
+}
+
+* {
+    -fx-wrap-text: true;
+}
+
+Separator {
+    -fx-padding: 10px;
+}
+
+.rotate10 {
+    -fx-rotate: 10deg;
+}
+
+.rotate0 {
+    -fx-rotate: 0deg;
+}
