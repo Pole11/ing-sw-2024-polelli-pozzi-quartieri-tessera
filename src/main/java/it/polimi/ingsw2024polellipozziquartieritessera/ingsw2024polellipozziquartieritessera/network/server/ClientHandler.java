@@ -152,18 +152,28 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
-    public void printMessage(String message) throws RemoteException {
-        view.printMessage(message);
+    public void sendMessage(String message) throws RemoteException {
+        view.sendMessage(message);
     }
 
     @Override
-    public void printError(String error) throws RemoteException {
-        view.printError(error);
+    public void sendError(String error) throws RemoteException {
+        view.sendError(error);
     }
 
     @Override
     public void ping(String ping) throws RemoteException {
         view.ping(ping);
+    }
+
+    @Override
+    public void nicknameUpdate(int index, String nickname) throws RemoteException {
+
+    }
+
+    @Override
+    public void sendIndex(int index) throws RemoteException {
+
     }
 
     @Override

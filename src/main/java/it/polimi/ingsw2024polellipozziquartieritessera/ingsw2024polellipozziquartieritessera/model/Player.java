@@ -5,6 +5,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 import java.security.interfaces.ECKey;
 import java.util.*;
@@ -20,16 +21,18 @@ public class Player {
     private int objectivesWon;
     private StarterCard starterCard; // it is the most important card because it is used to create all the composition of the cards
     private ObjectiveCard objectiveCard; // it is the secret objective
+    private ObjectiveCard[] objectiveCardOptions; // it is the  array of the choice for secret objective
 
     private final HashMap<Integer, Element> centerResource;
     private final HashMap<Element, Integer> allElements;
 
-    //per ora objectiveCardOptions serve, poi secondo me si potrà rimuovere
-    private ObjectiveCard[] objectiveCardOptions; // it is the  array of the choice for secret objective
+    private boolean connected;
+    private VirtualView client;
 
-    public Player(String nickname){
+    public Player(String nickname, VirtualView client){
         this.points = 0;
         this.nickname = nickname;
+        this.client = client;
 
         this.color = null;
         this.objectiveCard = null;
@@ -39,11 +42,13 @@ public class Player {
         this.handCardsMap = new HashMap<Integer, Side>();
         this.objectivesWon = 0;
         this.centerResource = new HashMap<>();
-        this.allElements = new HashMap<>();
 
+        this.allElements = new HashMap<>();
         for (Element element : Element.values()) {
             this.allElements.put(element, 0);
         }
+
+        this.connected = true;
     }
 
     //GETTER
@@ -76,10 +81,6 @@ public class Player {
         return this.handCardsMap.get(index);
     }
 
-    public int getHandSize(){
-        return this.handCardsMap.size();
-    }
-
     public int getObjectivesWon(){
         return this.objectivesWon;
     }
@@ -91,6 +92,21 @@ public class Player {
     public Element getCenterResource(int index) {
         return centerResource.get(index);
     }
+
+    public VirtualView getClient(){
+        return this.client;
+    }
+
+    public boolean isConnected(){
+        return this.connected;
+    }
+
+    //--------size------------
+
+    public int getHandSize(){
+        return this.handCardsMap.size();
+    }
+
 
     //-----------collections copy----------------
 
@@ -136,6 +152,10 @@ public class Player {
 
     public void setPoints(int points) {
         this.points = points;
+    }
+
+    public void setConnected(boolean connected){
+        this.connected = connected;
     }
 
     //ADDER/REMOVER
@@ -275,7 +295,7 @@ public class Player {
     }
 
     private void expandBoard(int rowIndex, int colIndex){
-        // Expand the matrix to include the new position (remember that this supports only one update: row++/-- or col++/--)
+        // Expand the matrix to include the new position (remember that this supports only one execute: row++/-- or col++/--)
         // Expand rows if needed
         int rowDim = this.playerBoard.getFirst().size();
         if (rowIndex < 0) {

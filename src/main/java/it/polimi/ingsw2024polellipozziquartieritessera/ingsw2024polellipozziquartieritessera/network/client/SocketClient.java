@@ -1,9 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
-
 
 
 import java.io.*;
@@ -63,10 +60,10 @@ public class SocketClient implements VirtualView {
             String[] message = line.split("; ");
             switch (message[0]) {
                 case "MESSAGE":
-                    this.printMessage(message[1]);
+                    this.sendMessage(message[1]);
                     break;
                 case "ERROR":
-                    this.printError(message[1]);
+                    this.sendError(message[1]);
                     break;
                 case "PING":
                     this.ping(message[1]);
@@ -82,19 +79,27 @@ public class SocketClient implements VirtualView {
     }
 
     @Override
-    public void printMessage(String msg) {
+    public void sendMessage(String msg) {
         Client.printMessage(msg);
-        //System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
 
     @Override
-    public void printError(String msg) throws RemoteException {
+    public void sendError(String msg) throws RemoteException {
         Client.printError(msg);
-        //System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
     }
 
     @Override
     public void ping(String ping) throws RemoteException {
+
+    }
+
+    @Override
+    public void nicknameUpdate(int index, String nickname) throws RemoteException {
+        Client.nicknameUpdate(index, nickname);
+    }
+
+    @Override
+    public void sendIndex(int index) throws RemoteException {
 
     }
 

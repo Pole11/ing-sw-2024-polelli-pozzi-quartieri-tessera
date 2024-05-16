@@ -7,10 +7,12 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.SocketClient;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 
 public class PlayerTest {
@@ -18,7 +20,7 @@ public class PlayerTest {
     void playerTestConstructor() {
         for (Color c : Color.values()){
             // TODO: test with different nickname lengths
-            assertAll(() -> new Player("Nickname"));
+            assertAll(() -> new Player("Nickname", null));
         }
     }
 
@@ -29,14 +31,18 @@ public class PlayerTest {
         int resourceCardId3 = 11;
         int resourceCardId4 = 18;
         int goldCardId1 = 56;
+        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
 
 
         // create game state
         GameState gs = Populate.createCardsMap();
-        gs.setPlayer(0, new Player("Nickname"));
+        gs.addPlayer(new Player("Nickname", client));
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
-        c.startGame();
+        gs.getMainBoard().shuffleCards();
+        gs.getMainBoard().initSharedGoldCards();
+        gs.getMainBoard().initSharedResourceCards();
+        gs.initStarters(); // set the starters cards for every player
         c.chooseInitialStarterSide(0, Side.BACK);
 
 
@@ -82,10 +88,11 @@ public class PlayerTest {
         int goldCardId4 = 54;
         int resourceCardId9 = 12;
         int goldCardId5 = 58;
+        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
 
         // create game state
         GameState gs = Populate.createCardsMap();
-        gs.setPlayer(0, new Player("jhonny"));
+        gs.addPlayer(new Player("jhonny", client));
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
@@ -288,8 +295,10 @@ public class PlayerTest {
         int objectiveCardId2 = 90;
 
         // create game state
+        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
+
         GameState gs = Populate.createCardsMap();
-        gs.setPlayer(0, new Player("test"));
+        gs.addPlayer(new Player("test", client));
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();

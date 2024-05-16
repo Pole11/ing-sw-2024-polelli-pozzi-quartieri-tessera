@@ -52,7 +52,7 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     }
 
     @Override
-    public void printMessage(String msg) {
+    public void sendMessage(String msg) {
         // check if there is gui and if so show the message on the gui
         Client.printMessage(msg);
         //System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
@@ -60,7 +60,7 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     }
 
     @Override
-    public void printError(String msg) throws RemoteException {
+    public void sendError(String msg) throws RemoteException {
         Client.printError(msg);
         //System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
 
@@ -68,6 +68,16 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     @Override
     public void ping(String ping) throws RemoteException {
+    }
+
+    @Override
+    public void nicknameUpdate(int index, String nickname) throws RemoteException {
+        Client.nicknameUpdate(index, nickname);
+    }
+
+    @Override
+    public void sendIndex(int index) throws RemoteException {
+
     }
 
     @Override

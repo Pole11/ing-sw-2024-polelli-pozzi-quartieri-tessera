@@ -15,12 +15,12 @@ public class ClientProxy implements VirtualView {
     }
 
     @Override
-    public void printMessage(String message) throws RemoteException {
+    public void sendMessage(String message) throws RemoteException {
         output.println("MESSAGE; " + message);
         output.flush();
     }
 
-    public void printError(String error) throws RemoteException {
+    public void sendError(String error) throws RemoteException {
         output.println("ERROR; " + error);
         output.flush();
     }
@@ -29,6 +29,16 @@ public class ClientProxy implements VirtualView {
     public void ping(String ping) throws RemoteException {
         output.println("PING; " + ping);
         output.flush();
+    }
+
+    @Override
+    public void nicknameUpdate(int index, String nickname) throws RemoteException {
+
+    }
+
+    @Override
+    public void sendIndex(int index) throws RemoteException {
+
     }
 
     @Override

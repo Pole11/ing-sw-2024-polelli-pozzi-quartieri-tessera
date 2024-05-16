@@ -4,10 +4,12 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.SocketClient;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -38,11 +40,14 @@ public class ControllerTest {
         // create game state
         Populate.populate();
 
+        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
+
+
         GameState gs = Populate.populate();
-        gs.setPlayer(0, new Player("paolo"));
-        gs.setPlayer(1, new Player("piergiorgio"));
-        gs.setPlayer(2, new Player("fungiforme"));
-        gs.setPlayer(3, new Player("paola"));
+        gs.addPlayer(new Player("paolo", client));
+        gs.addPlayer(new Player("piergiorgio", client));
+        gs.addPlayer(new Player("fungiforme", client));
+        gs.addPlayer(new Player("paola",  client));
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
@@ -263,12 +268,14 @@ public class ControllerTest {
 
         int starterCardId = 81;
 
+        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
+
         // create game state
         GameState gs = Populate.populate();
-        gs.setPlayer(0, new Player("paolo"));
-        gs.setPlayer(1, new Player("piergiorgio"));
-        gs.setPlayer(2, new Player("fungiforme"));
-        gs.setPlayer(3, new Player("paola"));
+        gs.addPlayer(new Player("paolo", client));
+        gs.addPlayer(new Player("piergiorgio", client));
+        gs.addPlayer(new Player("fungiforme", client));
+        gs.addPlayer(new Player("paola", client));
 
         gs.setPlayersConnected(0, true);
         gs.setPlayersConnected(1, true);
@@ -368,19 +375,22 @@ public class ControllerTest {
 
     @Test
     void flipCardTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardIsNotInHandException {
+        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
+
+
         GameState gs = Populate.populate();
-        gs.setPlayer(0, new Player("paolo"));
-        gs.setPlayer(1, new Player("piergiorgio"));
-        gs.setPlayer(2, new Player("fungiforme"));
-        gs.setPlayer(3, new Player("paola"));
+        gs.addPlayer(new Player("paolo", client));
+        gs.addPlayer(new Player("piergiorgio", client));
+        gs.addPlayer(new Player("fungiforme", client));
+        gs.addPlayer(new Player("paola", client));
         Controller c = new Controller(gs);
 
-        gs.getPlayers().get(0).addToHandCardsMap(1, Side.FRONT);
-        assertEquals(Side.FRONT, gs.getPlayers().get(0).getHandCardSide(1));
+        gs.getPlayer(0).addToHandCardsMap(1, Side.FRONT);
+        assertEquals(Side.FRONT, gs.getPlayer(0).getHandCardSide(1));
         c.flipCard(0, 1);
-        assertEquals(Side.BACK, gs.getPlayers().get(0).getHandCardSide(1));
+        assertEquals(Side.BACK, gs.getPlayer(0).getHandCardSide(1));
         c.flipCard(0, 1);
-        assertEquals(Side.FRONT, gs.getPlayers().get(0).getHandCardSide(1));
+        assertEquals(Side.FRONT, gs.getPlayer(0).getHandCardSide(1));
 
 
     }

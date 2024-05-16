@@ -10,7 +10,7 @@ public class MessageTest {
     void messageTestConstructor() {
         int k = 1000;
 
-        Player author = new Player("Author Name");
+        Player author = new Player("Author Name", null);
         LocalDateTime dt = LocalDateTime.now();
 
         ArrayList<Message> messages = new ArrayList<Message>();
