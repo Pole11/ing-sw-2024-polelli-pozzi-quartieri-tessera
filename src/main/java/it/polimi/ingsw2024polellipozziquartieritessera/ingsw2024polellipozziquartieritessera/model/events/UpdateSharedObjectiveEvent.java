@@ -1,17 +1,17 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.GamePhase;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ObjectiveCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 import java.util.ArrayList;
 
-public class ChangePhaseEvent extends Event{
-    private final GamePhase gamePhase;
+public class UpdateSharedObjectiveEvent extends Event{
+    private final ObjectiveCard objectiveCard;
 
-    public ChangePhaseEvent(GameState gameState, ArrayList<VirtualView> clients, GamePhase gamePhase) {
+    public UpdateSharedObjectiveEvent(GameState gameState, ArrayList<VirtualView> clients, ObjectiveCard objectiveCard) {
         super(gameState, clients);
-        this.gamePhase = gamePhase;
+        this.objectiveCard = objectiveCard;
     }
 
     @Override

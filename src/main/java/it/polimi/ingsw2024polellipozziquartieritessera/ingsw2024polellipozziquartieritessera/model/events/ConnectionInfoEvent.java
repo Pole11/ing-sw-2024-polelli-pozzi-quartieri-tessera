@@ -6,8 +6,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.util.ArrayList;
 
 public class ConnectionInfoEvent extends Event{
-    String nickname;
-    boolean connected;
+    private final String nickname;
+    private final boolean connected;
 
     public ConnectionInfoEvent(GameState gameState, ArrayList<VirtualView> clients, String nickname, boolean connected) {
         super(gameState, clients);

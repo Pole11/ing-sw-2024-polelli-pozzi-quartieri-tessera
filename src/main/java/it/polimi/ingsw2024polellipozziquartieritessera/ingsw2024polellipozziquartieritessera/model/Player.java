@@ -27,7 +27,7 @@ public class Player {
     private final HashMap<Element, Integer> allElements;
 
     private boolean connected;
-    private VirtualView client;
+    private final VirtualView client;
 
     public Player(String nickname, VirtualView client){
         this.points = 0;

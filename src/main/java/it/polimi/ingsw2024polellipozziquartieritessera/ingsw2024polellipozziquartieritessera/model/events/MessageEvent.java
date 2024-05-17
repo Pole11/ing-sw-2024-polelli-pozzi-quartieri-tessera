@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class MessageEvent extends Event {
-    private String message;
+    private final String message;
 
     public MessageEvent(GameState gameState, ArrayList<VirtualView> clients, String message) {
         super(gameState, clients);

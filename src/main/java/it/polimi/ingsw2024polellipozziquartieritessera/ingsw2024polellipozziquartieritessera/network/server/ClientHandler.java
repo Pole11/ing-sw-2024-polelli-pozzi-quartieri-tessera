@@ -26,8 +26,6 @@ public class ClientHandler implements VirtualView {
         while ((line = input.readLine()) != null) {
             System.out.println(line);
             String[] message = line.split("; ");
-            // TODO: check if message[0] exists
-            // Read message and perform action
             Command command = null;
             try {
                 command = Command.valueOf(message[0].toUpperCase());
@@ -36,19 +34,12 @@ public class ClientHandler implements VirtualView {
             }
             switch (command) {
                 case Command.ADDUSER:
-                    // TODO: check if message[1] exists
                     server.addConnectedPlayer(this, message[1]);
                     break;
-                case Command.SHOWNICKNAME:
-                    // TODO: check if message[1] exists
-                    server.showNickname(this);
-                    break;
                 case Command.START:
-                    // TODO: check if message[1] exists
                     server.startGame(this);
                     break;
                 case Command.CHOOSESTARTER:
-                    // TODO: check if message[1] exists
                     Side side = null;
                     try {
                         side = Side.valueOf(message[1].toUpperCase());
@@ -59,7 +50,6 @@ public class ClientHandler implements VirtualView {
                     server.chooseInitialStarterSide(this, side);
                     break;
                 case Command.CHOOSECOLOR:
-                    // TODO: check if message[1] exists
                     Color color = null;
                     try {
                         color = Color.valueOf(message[1].toUpperCase());
@@ -70,7 +60,6 @@ public class ClientHandler implements VirtualView {
                     server.chooseInitialColor(this, color);
                     break;
                 case Command.CHOOSEOBJECTIVE: {
-                    // TODO: check if message[1] exists
                     int cardId;
                     try {
                         cardId = Integer.parseInt(message[1]);
@@ -81,12 +70,7 @@ public class ClientHandler implements VirtualView {
                     server.chooseInitialObjective(this, cardId);
                     break;
                 }
-                case Command.SHOWHAND:
-                    // TODO: check if message[1] exists
-                    server.showHand(this);
-                    break;
                 case Command.PLACECARD:
-                    // TODO: check if message[1] exists
                     int placingCardId;
                     int tableCardId;
                     CornerPos tableCornerPos;
@@ -118,7 +102,6 @@ public class ClientHandler implements VirtualView {
                     server.placeCard(this, placingCardId, tableCardId, tableCornerPos, placingCardSide);
                     break;
                 case Command.DRAWCARD:
-                    // TODO: check if message[1] exists
                     DrawType drawType;
                     try {
                         drawType = DrawType.valueOf(message[1]);
@@ -129,7 +112,6 @@ public class ClientHandler implements VirtualView {
                     server.drawCard(this, drawType);
                     break;
                 case Command.FLIPCARD: {
-                    // TODO: check if message[1] exists
                     int cardId;
                     try {
                         cardId = Integer.parseInt(message[1]);
@@ -141,7 +123,6 @@ public class ClientHandler implements VirtualView {
                     break;
                 }
                 case Command.OPENCHAT:
-                    // TODO: check if message[1] exists
                     server.openChat();
                     break;
                 default:
@@ -149,6 +130,11 @@ public class ClientHandler implements VirtualView {
                     break;
             }
         }
+    }
+
+    @Override
+    public void ping(String ping) throws RemoteException {
+        view.ping(ping);
     }
 
     @Override
@@ -162,31 +148,13 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
-    public void ping(String ping) throws RemoteException {
-        view.ping(ping);
-    }
-
-    @Override
     public void nicknameUpdate(int index, String nickname) throws RemoteException {
-
+        view.nicknameUpdate(index, nickname);
     }
 
     @Override
     public void sendIndex(int index) throws RemoteException {
-
-    }
-
-    @Override
-    public void printCard(int id1, Side side1, int id2, Side side2, int id3, Side side3) throws RemoteException {
-        view.printCard(id1, side1, id2, side2, id3, side3);
-    }
-    @Override
-    public void printCard(int id1, Side side1, int id2, Side side2) throws RemoteException {
-        view.printCard(id1, side1, id2, side2);
-    }
-    @Override
-    public void printCard(int id, Side side) throws RemoteException {
-        view.printCard(id, side);
+        view.sendIndex(index);
     }
 
     @Override

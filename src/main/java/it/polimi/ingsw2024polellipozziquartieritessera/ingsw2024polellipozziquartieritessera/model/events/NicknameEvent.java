@@ -8,7 +8,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class NicknameEvent extends Event{
-    String nickname;
+    private final String nickname;
 
     public NicknameEvent(GameState gameState, ArrayList<VirtualView> clients, String nickname) {
         super(gameState, clients);
@@ -18,7 +18,6 @@ public class NicknameEvent extends Event{
     @Override
     public void execute() {
         VirtualView client = clients.getLast();
-        System.out.println("erjmd");
 
         try {
             client.changePhase(GamePhase.NICKNAMEPHASE.toString());

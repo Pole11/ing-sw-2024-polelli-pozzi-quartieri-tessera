@@ -96,13 +96,13 @@ public class Controller {
         }
     }
 
-    public void chooseInitialColor(int playerIndex, Color color) throws NotUniquePlayerColorException {
+    public void chooseInitialColor(int playerIndex, Color color) {
         synchronized (this.gameState) {
             gameState.setColor(playerIndex, color);
         }
     }
 
-    public void chooseInitialObjective(int playerIndex, int cardIndex) throws InvalidObjectiveCardException {
+    public void chooseInitialObjective(int playerIndex, int cardIndex) {
         synchronized (this.gameState) {
             //cardId is 0 or 1, index of CardObjectiveOptions
             gameState.setSecretObjective(playerIndex, cardIndex);
@@ -154,8 +154,7 @@ public class Controller {
             for (Player playerIterator : gameState.getPlayers()) {
                 if (playerIterator.placedCardContains(placingCardId)) throw new CardAlreadPlacedException("you cannot place a card that is already placed");
             }
-
-             */
+            */
 
             if (tableCorner == null) throw new WrongPlacingPositionException("table corner is null");
             if (tableCorner.getLinkedCorner() != null) throw new CardAlreadyPresentOnTheCornerException("you cannot place a card here, the corner is already linked");

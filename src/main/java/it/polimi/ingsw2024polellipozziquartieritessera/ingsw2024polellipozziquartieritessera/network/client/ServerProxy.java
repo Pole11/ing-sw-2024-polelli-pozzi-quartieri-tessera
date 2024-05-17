@@ -27,12 +27,6 @@ public class ServerProxy implements VirtualServer {
     }
 
     @Override
-    public void showNickname(VirtualView client) throws RemoteException {
-        output.println(Command.SHOWNICKNAME);
-        output.flush();
-    }
-
-    @Override
     public void startGame(VirtualView client) throws RemoteException {
         output.println(Command.START);
         output.flush();
@@ -53,12 +47,6 @@ public class ServerProxy implements VirtualServer {
     @Override
     public void chooseInitialObjective(VirtualView client, int cardId) throws RemoteException {
         output.println(Command.CHOOSEOBJECTIVE +"; " + cardId);
-        output.flush();
-    }
-
-    @Override
-    public void showHand(VirtualView client) {
-        output.println(Command.SHOWHAND);
         output.flush();
     }
 

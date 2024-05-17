@@ -8,10 +8,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class GameState {
@@ -28,9 +26,12 @@ public class GameState {
 
     private final ArrayDeque<Event> eventQueue;
     private Thread executeEvents;
+    private final HashMap<Integer, Boolean> answered;
 
     private Thread timeoutThread;
     private GamePhase prevGamePhase;
+
+
 
 
     // CONSTRUCTOR
@@ -51,11 +52,10 @@ public class GameState {
 
         this.timeoutThread = null;
 
-        this.executeEvents = new Thread(() -> {
-            System.out.println("hellothere");
-            executeEventsRunnable();
-        });
+        this.executeEvents = new Thread(this::executeEventsRunnable);
         this.executeEvents.start();
+        this.answered = new HashMap<>();
+        resetAnswered();
 
     }
 
@@ -115,7 +115,21 @@ public class GameState {
 
     //EVENTQUEUE
 
+    //even if there aren't always 4 players
+    private void resetAnswered() {
+        this.answered.put(0, false);
+        this.answered.put(1, false);
+        this.answered.put(2, false);
+        this.answered.put(3, false);
+    }
+
+    private int numberAnswered() {
+        //controllare se funziona
+        return this.answered.values().stream().mapToInt(e-> e ? 1 : 0).sum();
+    }
+
     private void executeEventsRunnable() {
+        //non so se sia bello
         while (true){
             synchronized (eventQueue) {
                 while (eventQueue.isEmpty()) {
@@ -124,10 +138,7 @@ public class GameState {
                     } catch (InterruptedException e) {
                     }
                 }
-                System.out.println("loop");
-                System.out.println("evenetququqquq" + eventQueue.size());
                 eventQueue.remove().execute();
-                //NON VA, A VOLTE LA SIZE E' GIUSTA MA NON RIMUOVE ED ESEGUE
             }
         }
     }
@@ -174,7 +185,7 @@ public class GameState {
                 } else {
                     //only to the client
                     synchronized (eventQueue){
-                        eventQueue.add(new ErrorEvent(this, singleClient(player.getClient())));
+                        eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The nickname is already used, please choose another one"));
                         eventQueue.notifyAll();
                     }
                 }
@@ -188,9 +199,7 @@ public class GameState {
             //to all the other clients gives the nickname so that they can execute their model
             eventQueue.add(new NicknameEvent(this, allClients(), player.getNickname()));
             eventQueue.notifyAll();
-            System.out.println("gg");
         }
-        System.out.println(eventQueue.getLast());
     }
     
 
@@ -271,9 +280,11 @@ public class GameState {
         this.mainBoard.initSharedResourceCards();
         this.initStarters(); // set the starters cards for every player
         System.out.println("Starting game");
+        this.currentGamePhase = GamePhase.CHOOSESTARTERSIDEPHASE;
         synchronized (eventQueue){
             //remember to changePhase
             eventQueue.add(new StartEvent(this, allClients()));
+            eventQueue.add(new ChangePhaseEvent(this, allClients(), GamePhase.CHOOSESTARTERSIDEPHASE));
             eventQueue.notifyAll();
 
         }
@@ -299,23 +310,88 @@ public class GameState {
 
     public void setStarterSide(int playerIndex, Side side){
         Player player = this.players.get(playerIndex);
-        player.addToPlacedCardsMap(player.getStarterCard().getId(), side);
+        if (this.answered.get(playerIndex)) {
+            synchronized (eventQueue){
+                eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "You already selected the starter card"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+        StarterCard playerStarterCard = player.getStarterCard();
+        player.addToPlacedCardsMap(playerStarterCard.getId(), side);
 
         // add the initial elements of the starter card
         for (Element ele : player.getStarterCard().getUncoveredElements(side)) {
-            int currentOccurencies = player.getAllElements().get(ele);
-            player.addToAllElements(ele, currentOccurencies + 1);
+            int currentOccurrences = player.getAllElements().get(ele);
+            player.addToAllElements(ele, currentOccurrences + 1);
+        }
+
+        synchronized (eventQueue){
+            eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "Thank you for the side of your starter card"));
+            eventQueue.add(new UpdateBoardEvent(this, allClients(), playerIndex, playerStarterCard, player.getPlacedCardSide(playerStarterCard.getId())));
+            eventQueue.notifyAll();
+        }
+        this.answered.put(playerIndex, true);
+
+        //notify him and all the others about the change
+        if (numberAnswered() == players.size()){
+            this.currentGamePhase = GamePhase.CHOOSECOLORPHASE;
+            synchronized (eventQueue){
+                eventQueue.add(new ChangePhaseEvent(this, allClients(), GamePhase.CHOOSECOLORPHASE));
+                eventQueue.add(new MessageEvent(this, allClients(), "Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]"));
+                eventQueue.notifyAll();
+            }
+            resetAnswered();
         }
     }
 
-    public void setColor(int playerIndex, Color color) throws NotUniquePlayerColorException {//method called by view when the player chooses the side
+    public void setColor(int playerIndex, Color color) {//method called by view when the player chooses the side
+        Player player = this.players.get(playerIndex);
+        if (this.answered.get(playerIndex)) {
+            synchronized (eventQueue){
+                eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "You already selected the color"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+
         for (int j = 0; j < players.size(); j++) {
             if (color.equals(players.get(j).getColor())) {
-                throw new NotUniquePlayerColorException("While creating the GameState Object I encountered a problem regarding the creation of players with the same color");
+                synchronized (eventQueue){
+                    eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The color was already selected by another user, please select a new one"));
+                    eventQueue.notifyAll();
+                }
             }
         }
-        Player player = this.players.get(playerIndex);
         player.setColor(color);
+        synchronized (eventQueue){
+            //TODO: notify the others
+            eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "Thank you for selecting the color"));
+            eventQueue.notifyAll();
+        }
+        this.answered.put(playerIndex, true);
+
+
+        if (numberAnswered() == players.size()) {
+            resetAnswered();
+            try {
+                //send also the cards to the view
+                this.setHands();
+            } catch (EmptyDeckException e) {
+                // if in this moment of the game the deck is empty it's a programming mistake
+                throw new RuntimeException(e);
+            }
+            //send also the cards to the view
+            this.setObjectives();
+            this.currentGamePhase = GamePhase.CHOOSEOBJECTIVEPHASE;
+            synchronized (eventQueue){
+                eventQueue.add(new ChangePhaseEvent(this, allClients(), GamePhase.CHOOSEOBJECTIVEPHASE));
+                eventQueue.add(new MessageEvent(this, allClients(), "Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1], to see your card use the command SHOWOBJECTIVE" ));
+                eventQueue.notifyAll();
+            }
+        }
+
+
     }
 
     public void setHands() throws EmptyDeckException {
@@ -325,10 +401,15 @@ public class GameState {
             ResourceCard resourceCard1 = mainBoard.drawFromResourceDeck();
             ResourceCard resourceCard2 = mainBoard.drawFromResourceDeck();
 
-
             players.get(i).addToHandCardsMap(goldCard.getId(), Side.FRONT); // default is front side
             players.get(i).addToHandCardsMap(resourceCard1.getId(), Side.FRONT); // default is front side
             players.get(i).addToHandCardsMap(resourceCard2.getId(), Side.FRONT); // default is front side
+            synchronized (eventQueue){
+                eventQueue.add(new UpdateAddHandEvent(this, allClients(), i, goldCard));
+                eventQueue.add(new UpdateAddHandEvent(this, allClients(), i, resourceCard1));
+                eventQueue.add(new UpdateAddHandEvent(this, allClients(), i, resourceCard2));
+                eventQueue.notifyAll();
+            }
         }
     }
 
@@ -350,20 +431,72 @@ public class GameState {
             objectiveCards[1] = objectiveCard1;
 
             players.get(i).setSecretObjectiveCardOptions(objectiveCards);
+
+            //DA CAMBIARE ASIMMETRIA ARRAYLIST E ARRAY (VORREI TOGLIERE OBJECTIVECARDSOPTIONS)
+
+            synchronized (eventQueue){
+                ArrayList<ObjectiveCard> objectiveCardsList = new ArrayList<>();
+                objectiveCardsList.add(objectiveCard0);
+                objectiveCardsList.add(objectiveCard1);
+                eventQueue.add(new UpdateSecretObjectiveEvent(this, singleClient(players.get(i).getClient()), objectiveCardsList));
+                eventQueue.notifyAll();
+            }
         }
 
-        mainBoard.setSharedObjectiveCard(0, (ObjectiveCard) cardsMap.get(randomKeysList.get(randomKeysList.size() - 2)));
-        mainBoard.setSharedObjectiveCard(1, (ObjectiveCard) cardsMap.get(randomKeysList.getLast()));
+        ObjectiveCard objectiveCard0 = (ObjectiveCard) cardsMap.get(randomKeysList.get(randomKeysList.size() - 2));
+        ObjectiveCard objectiveCard1 = (ObjectiveCard) cardsMap.get(randomKeysList.getLast());
+
+        mainBoard.setSharedObjectiveCard(0,  objectiveCard0);
+        mainBoard.setSharedObjectiveCard(1, objectiveCard1);
+
+        synchronized (eventQueue){
+            eventQueue.add(new UpdateSharedObjectiveEvent(this, allClients(), objectiveCard0));
+            eventQueue.add(new UpdateSharedObjectiveEvent(this, allClients(), objectiveCard1));
+            eventQueue.notifyAll();
+        }
     }
 
 
     //called from controller
-    public void setSecretObjective (int playerIndex, int cardIndex) throws InvalidObjectiveCardException {
+    public void setSecretObjective (int playerIndex, int cardIndex) {
         Player player = this.players.get(playerIndex);
-        if (cardIndex == 0 || cardIndex == 1){
-            player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
-        } else {
-            throw new InvalidObjectiveCardException("The card choosen was not in the options list");
+        if (this.answered.get(playerIndex)) {
+            synchronized (eventQueue){
+                eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "You already selected the objective card"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+
+        if (cardIndex != 0 && cardIndex != 1) {
+            synchronized (eventQueue){
+                eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The card chosen was not in the options list"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+
+        player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
+
+        synchronized (eventQueue){
+            ArrayList<ObjectiveCard> objectiveCards = new ArrayList<>();
+            objectiveCards.add(player.getObjectiveCardOption(cardIndex));
+            eventQueue.add(new UpdateSecretObjectiveEvent(this, singleClient(player.getClient()), objectiveCards));
+            eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "Thank you for selecting the objective card"));
+            eventQueue.notifyAll();
+        }
+        this.answered.put(playerIndex, true);
+
+
+        if (numberAnswered() == players.size()) {
+            resetAnswered();
+            currentGamePhase = GamePhase.MAINPHASE;
+            synchronized (eventQueue){
+                eventQueue.add(new ChangePhaseEvent(this, allClients(), GamePhase.MAINPHASE));
+                eventQueue.add(new MessageEvent(this, singleClient(getCurrentPlayer().getClient()), "The preparation phase is over, it's your turn to play as first, use the command PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)] to place your card"));
+                eventQueue.add(new MessageEvent(this, otherClients(getCurrentPlayer().getClient()), "The preparation phase is over, it's now the turn of " + getCurrentPlayer().getNickname() + " to play as first"));
+                eventQueue.notifyAll();
+            }
         }
     }
 

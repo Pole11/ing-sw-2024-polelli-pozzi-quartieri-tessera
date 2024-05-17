@@ -104,21 +104,6 @@ public class SocketClient implements VirtualView {
     }
 
     @Override
-    public void printCard(int id1, Side side1, int id2, Side side2, int id3, Side side3) throws RemoteException {
-
-    }
-
-    @Override
-    public void printCard(int id1, Side side1, int id2, Side side2) throws RemoteException {
-
-    }
-
-    @Override
-    public void printCard(int id, Side side) throws RemoteException {
-
-    }
-
-    @Override
     public void changePhase(String nextGamePhaseString) {
         Client.changePhase(nextGamePhaseString);
         /*
