@@ -97,17 +97,8 @@ public class Client {
                     return;
                 }
                 break;
-            case Command.SHOWNICKNAME:
-                server.showNickname(client);
-                break;
             case Command.START:
                 server.startGame(client);
-                break;
-            case Command.SHOWHAND:
-                server.showHand(client);
-                break;
-            case Command.SHOWOBJECTIVES:
-                server.showCommonObjectives(client);
                 break;
             case Command.CHOOSESTARTER:
                 try {

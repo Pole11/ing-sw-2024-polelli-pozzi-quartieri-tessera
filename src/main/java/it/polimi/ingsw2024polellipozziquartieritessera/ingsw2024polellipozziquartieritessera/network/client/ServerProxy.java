@@ -50,10 +50,6 @@ public class ServerProxy implements VirtualServer {
         output.flush();
     }
 
-    public void showCommonObjectives(VirtualView client) {
-        output.println(Command.SHOWOBJECTIVES);
-        output.flush();
-    }
 
     @Override
     public void placeCard(VirtualView client, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws RemoteException {
