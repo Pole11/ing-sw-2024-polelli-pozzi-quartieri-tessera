@@ -9,18 +9,24 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.application.*;
 import javafx.fxml.*;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.event.*;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class GUIController {
@@ -41,12 +47,16 @@ public class GUIController {
     private VirtualServer server;
     private HashMap<Integer, Side> playerHandCards;
     int meId;
+    private ArrayList<ArrayList<Integer>> playerBoard;
+    private HashMap<Integer, Side> placedSideMap;
 
     public GUIController(VirtualView client, VirtualServer server) {
         this.client = client;
         this.server = server;
         // add the view model
         playerHandCards = new HashMap<>();
+        playerBoard = new ArrayList<>();
+        placedSideMap = new HashMap<>();
         meId = 1;
     }
 
@@ -361,6 +371,9 @@ public class GUIController {
         String currentPlayerNickname = "Player nickname " + playerId;
         Text nicknameText = new Text(currentPlayerNickname);
         Button expandButton = new Button("Expand Board");
+        expandButton.setOnAction(mouseEvent -> {
+            printBoard(playerId);
+        });
         infoContainerVBox.getChildren().addAll(nicknameText, expandButton);
         infoContainerVBox.setAlignment(Pos.CENTER);
 
@@ -397,6 +410,7 @@ public class GUIController {
                 tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
             }
             tempImageView.setId("player" + playerId + "card" + cardId);
+            tempImageView.getStyleClass().add("imageWithBorder");
             if (playerId == 1 || playerId == 2) {
                 handContainerHBox.getChildren().add(tempImageView);
             } else {
@@ -449,7 +463,50 @@ public class GUIController {
         }
     }
 
-    public void printBoard() {
+    public void printBoard(int playerId) {
+        final Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.initOwner(GUIApplication.getMainStage());
+        VBox dialogVbox = new VBox(20);
+
+
+        playerBoard.add(new ArrayList<>(Arrays.asList(null, 2, 6, null)));
+        playerBoard.add(new ArrayList<>(Arrays.asList(3, 1, 4, 5)));
+        playerBoard.add(new ArrayList<>(Arrays.asList(null, 7, 66, null)));
+
+        placedSideMap.put(2, Side.FRONT);
+        placedSideMap.put(6, Side.BACK);
+        placedSideMap.put(3, Side.FRONT);
+        placedSideMap.put(1, Side.FRONT);
+        placedSideMap.put(4, Side.BACK);
+        placedSideMap.put(5, Side.FRONT);
+        placedSideMap.put(7, Side.FRONT);
+        placedSideMap.put(66, Side.BACK);
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(-30); // Spacing orizzontale
+        gridPane.setVgap(-40); // Spacing verticale
+        gridPane.setPadding(new Insets(50)); // Margine di 20 pixel su tutti i lati
+        for(ArrayList<Integer> row : playerBoard) {
+            for (Integer ele : row) {
+                if (ele != null) {
+                    ImageView tempImageView;
+                    if (placedSideMap.get(ele) == Side.FRONT) {
+                        tempImageView = createCardImageView("/img/carte_fronte/" + ele + ".jpg", 100);
+                    } else {
+                        tempImageView = createCardImageView("/img/carte_retro/" + ele + ".jpg", 100);
+                    }
+                    tempImageView.getStyleClass().add("imageWithBorder");
+                    gridPane.add(tempImageView, playerBoard.indexOf(row), ele.intValue());
+                }
+            }
+        }
+
+        dialogVbox.getChildren().add(gridPane);
+        Scene dialogScene = new Scene(dialogVbox, 300, 200);
+        dialogScene.getStylesheets().add(getClass().getResource("/style/game.css").toExternalForm());
+        dialog.setScene(dialogScene);
+        dialog.show();
     }
 
     @FXML

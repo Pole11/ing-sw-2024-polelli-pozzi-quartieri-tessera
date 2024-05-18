@@ -14,8 +14,12 @@ public class GUIApplication extends Application {
     private static GUIController guiController;
     private static Stage mainStage;
 
-    public GUIController getGUIController() {
-        return this.guiController;
+    public static GUIController getGUIController() {
+        return guiController;
+    }
+
+    public static Stage getMainStage() {
+        return mainStage;
     }
 
     public static void changeScene(String fxml) throws IOException {
