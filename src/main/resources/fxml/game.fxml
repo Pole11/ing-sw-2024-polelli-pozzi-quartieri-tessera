@@ -7,14 +7,14 @@
 <?import javafx.scene.control.Button?>
 <BorderPane styleClass="root" fx:id="mainContainerGame" stylesheets="@../style/game.css, @../style/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
     <top>
-        <VBox alignment="TOP_CENTER" id="player1ContainerGame" styleClass="horizontalPlayerContainer">
+        <HBox alignment="TOP_CENTER" id="player1ContainerGame" styleClass="horizontalPlayerContainer">
             <HBox alignment="CENTER" id="player1HandContainerGame"></HBox>
-        </VBox>
+        </HBox>
     </top>
     <bottom>
-        <VBox alignment="BASELINE_CENTER" id="player2ContainerGame"  styleClass="horizontalPlayerContainer">
+        <HBox alignment="TOP_CENTER" id="player2ContainerGame"  styleClass="horizontalPlayerContainer">
             <HBox alignment="CENTER" id="player2HandContainerGame"></HBox>
-        </VBox>
+        </HBox>
     </bottom>
     <left>
         <VBox alignment="CENTER_LEFT" id="player3ContainerGame"  styleClass="verticalPlayerContainer">

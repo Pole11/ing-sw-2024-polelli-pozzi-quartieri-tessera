@@ -9,10 +9,13 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.application.*;
 import javafx.fxml.*;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.event.*;
 import javafx.scene.image.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 
@@ -36,11 +39,15 @@ public class GUIController {
 
     private VirtualView client;
     private VirtualServer server;
+    private HashMap<Integer, Side> playerHandCards;
+    int meId;
 
     public GUIController(VirtualView client, VirtualServer server) {
         this.client = client;
         this.server = server;
         // add the view model
+        playerHandCards = new HashMap<>();
+        meId = 1;
     }
 
     @FXML
@@ -271,11 +278,10 @@ public class GUIController {
         printDecks(firstGoldDeckCardId, firstResourceDeckCardId, firstSharedGoldCardId, firstSharedResourceCardId, secondSharedGoldCardId, secondSharedResourceCardId);
 
         // TODO: get the player hand
-        HashMap<Integer, Side> playerHandCards = new HashMap<>();
         playerHandCards.put(30, Side.FRONT);
         playerHandCards.put(3, Side.BACK);
         playerHandCards.put(45, Side.FRONT);
-        for (int i = 1; i <= numPlayers; i++) printPlayerHand(i, playerHandCards);
+        for (int i = 1; i <= numPlayers; i++) initPlayerHand(i, playerHandCards, 90);
     }
 
     public void printDecks(int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId) {
@@ -349,28 +355,40 @@ public class GUIController {
         currentPlayerHBox.getStyleClass().add(currentPlayerColor.toString().toLowerCase() + "Background");
     }
 
-    public void printPlayerHand(int playerId, HashMap<Integer, Side> playerHandCards) {
+    public void initPlayerHand(int playerId, HashMap<Integer, Side> playerHandCards, int secreteObjCardId) {
+        // TODO: get player nickname
+        VBox infoContainerVBox = new VBox();
+        String currentPlayerNickname = "Player nickname " + playerId;
+        Text nicknameText = new Text(currentPlayerNickname);
+        Button expandButton = new Button("Expand Board");
+        infoContainerVBox.getChildren().addAll(nicknameText, expandButton);
+        infoContainerVBox.setAlignment(Pos.CENTER);
+
+        if (playerId == 1 || playerId == 2) {
+            HBox playerContainer = (HBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+            playerContainer.getChildren().add(infoContainerVBox);
+        } else {
+            VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+            playerContainer.getChildren().add(infoContainerVBox);
+        }
+
+        updatePlayerHand(playerId, playerHandCards);
+        if (meId == playerId) printPrivateObjective(playerId, secreteObjCardId);
+    }
+
+    public void updatePlayerHand(int playerId, HashMap<Integer, Side> playerHandCards) {
         HBox handContainerHBox = null;
         VBox handContainerVBox = null;
-        VBox playerContainer;
 
         if (playerId == 1 || playerId == 2) {
             handContainerHBox = (HBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
-            playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+            if (handContainerHBox != null) { handContainerHBox.getChildren().clear(); }
         } else {
             handContainerVBox = (VBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
-            playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+            if (handContainerVBox != null) { handContainerVBox.getChildren().clear(); }
         }
 
-        // TODO: get player nickname
-        String currentPlayerNickname = "Player nickname " + playerId;
-        playerContainer.getChildren().add(new Text(currentPlayerNickname));
-        Button expandButton = new Button("Expand Board");
-        playerContainer.getChildren().add(expandButton);
-
         // TODO: get my player id
-        int meId = 1;
-
         for (Integer cardId : playerHandCards.keySet()) {
             ImageView tempImageView;
             if ((playerId == meId && playerHandCards.get(cardId) == Side.FRONT) || (playerId != meId && playerHandCards.get(cardId) == Side.BACK)) {
@@ -378,15 +396,57 @@ public class GUIController {
             } else {
                 tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
             }
+            tempImageView.setId("player" + playerId + "card" + cardId);
             if (playerId == 1 || playerId == 2) {
                 handContainerHBox.getChildren().add(tempImageView);
             } else {
                 handContainerVBox.getChildren().add(tempImageView);
             }
+            if (playerId == meId) {
+                tempImageView.setOnMouseClicked(mouseEvent -> {
+                    if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                        flipCard(playerId, cardId);
+                    } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                        Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
+                        int cornerId;
+                        if (mouseEvent.getSceneX() < tempImageViewPosition.getX() + tempImageView.getBoundsInLocal().getWidth()/2) { // left
+                            if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top left
+                                cornerId = 0;
+                            } else { // down left
+                                cornerId = 3;
+                            }
+                        } else { // right
+                            if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top right
+                                cornerId = 1;
+                            } else { // down right
+                                cornerId = 2;
+                            }
+                        }
+
+                    }
+                });
+            }
         }
     }
 
-    public void flipCard() {
+    public void flipCard(int playerId, int cardId) {
+        if (playerHandCards.get(cardId) == Side.FRONT) {
+            playerHandCards.put(cardId, Side.BACK);
+        } else {
+            playerHandCards.put(cardId, Side.FRONT);
+        }
+        updatePlayerHand(playerId, playerHandCards);
+    }
+
+    public void printPrivateObjective(int playerId, int cardId) {
+        ImageView tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+        if (playerId == 1 || playerId == 2) {
+            HBox playerContainer = (HBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+            playerContainer.getChildren().add(tempImageView);
+        } else {
+            VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+            playerContainer.getChildren().add(tempImageView);
+        }
     }
 
     public void printBoard() {
