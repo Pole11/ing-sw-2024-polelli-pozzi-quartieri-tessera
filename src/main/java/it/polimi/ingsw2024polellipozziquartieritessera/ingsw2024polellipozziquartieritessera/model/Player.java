@@ -231,7 +231,6 @@ public class Player {
         }
     }
 
-
     // METHODS
 
     //usato dal controller, da cambiare nome, poco esplicativo (plurale)
