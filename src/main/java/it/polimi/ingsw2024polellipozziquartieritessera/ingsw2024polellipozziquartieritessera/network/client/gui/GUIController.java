@@ -384,78 +384,12 @@ public class GUIController {
                 handContainerVBox.getChildren().add(tempImageView);
             }
         }
-
-        /*if (playerId == 1 || playerId == 2) {
-            HBox handContainer = (HBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
-            VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
-
-            // TODO: get player nickname
-            String currentPlayerNickname = "Player nickname " + playerId;
-            playerContainer.getChildren().add(new Text(currentPlayerNickname));
-
-            // TODO: get my player id
-            int meId = 1;
-            if (playerId == meId) {
-                for (Integer cardId : playerHandCards.keySet()) {
-                    ImageView tempImageView;
-                    if (playerHandCards.get(cardId) == Side.FRONT) {
-                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
-                    } else {
-                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
-                    }
-                    handContainer.getChildren().add(tempImageView);
-                }
-            } else {
-                for (Integer cardId : playerHandCards.keySet()) {
-                    ImageView tempImageView;
-                    if (playerHandCards.get(cardId) == Side.FRONT) {
-                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
-                    } else {
-                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
-                    }
-                    handContainer.getChildren().add(tempImageView);
-                }
-            }
-        } else {
-            VBox handContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
-            VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
-
-            // TODO: get player nickname
-            String currentPlayerNickname = "Player nickname " + playerId;
-            playerContainer.getChildren().add(new Text(currentPlayerNickname));
-
-            // TODO: get my player id
-            int meId = 1;
-            if (playerId == meId) {
-                for (Integer cardId : playerHandCards.keySet()) {
-                    ImageView tempImageView;
-                    if (playerHandCards.get(cardId) == Side.FRONT) {
-                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
-                    } else {
-                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
-                    }
-                    handContainer.getChildren().add(tempImageView);
-                }
-            } else {
-                for (Integer cardId : playerHandCards.keySet()) {
-                    ImageView tempImageView;
-                    if (playerHandCards.get(cardId) == Side.FRONT) {
-                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
-                    } else {
-                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
-                    }
-                    handContainer.getChildren().add(tempImageView);
-                }
-            }
-        }*/
     }
 
     public void flipCard() {
-
     }
 
     public void printBoard() {
-
     }
 
     @FXML
