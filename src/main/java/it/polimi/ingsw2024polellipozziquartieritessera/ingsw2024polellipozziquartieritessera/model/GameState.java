@@ -92,6 +92,10 @@ public class GameState {
         return this.players.size();
     }
 
+    public ArrayDeque<Event> getEventQueue() {
+        return eventQueue;
+    }
+
     // SETTER
     public void setCurrentPlayerIndex(int currentPlayerIndex) {
         this.currentPlayerIndex = currentPlayerIndex;
@@ -105,11 +109,14 @@ public class GameState {
         this.currentGameTurn = currentGameTurn;
     }
 
-
     //ADDER
 
     public void addCardToCardsMap(int cardId, Card card) {
         this.cardsMap.put(cardId, card);
+    }
+
+    public void addToEventQueue(Event event) {
+        this.eventQueue.add(event);
     }
 
 
@@ -144,13 +151,13 @@ public class GameState {
     }
 
 
-    private ArrayList<VirtualView> singleClient(VirtualView client){
+    public ArrayList<VirtualView> singleClient(VirtualView client){
         ArrayList<VirtualView> clients = new ArrayList<>();
         clients.add(client);
         return clients;
     }
 
-    private ArrayList<VirtualView> otherClients(VirtualView client){
+    public ArrayList<VirtualView> otherClients(VirtualView client){
         ArrayList<VirtualView> clients = new ArrayList<>();
         for (Player playerIterator : players) {
             if (!client.equals(playerIterator.getClient())) {
@@ -160,51 +167,69 @@ public class GameState {
         return clients;
     }
 
-    private ArrayList<VirtualView> allClients(){
+    public ArrayList<VirtualView> allClients(){
         return (ArrayList<VirtualView>) players.stream().map(Player::getClient).collect(Collectors.toList());
     }
 
 
-    //PLAYERS MANAGING
+    //DISCONNECTIONS
 
-    public void addPlayer(Player player) {
-        for (int j = 0; j < players.size(); j++) {
-            if (player.getNickname().equals(players.get(j).getNickname())) {
-                //takes for granted that player connection is updated
-                //if the player is not connected but the gameState doesn't know, the following code fails
-                if (!players.get(j).isConnected()){
-                    this.manageReconnection();
-                    synchronized (eventQueue){
-                        //only to the client
-                        eventQueue.add(new ChangePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
-                        eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "you re-connected to the game"));
-                        //to all the other clients says that a client reconnected
-                        eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player.getNickname(), true));
-                        eventQueue.notifyAll();
-                    }
-                } else {
-                    //only to the client
-                    synchronized (eventQueue){
-                        eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The nickname is already used, please choose another one"));
-                        eventQueue.notifyAll();
-                    }
-                }
-                return;
+    public void setPlayersConnected(int index, boolean connected){
+        players.get(index).setConnected(connected);
+    }
+
+
+    private void manageReconnection(){
+        if (this.currentGamePhase.equals(GamePhase.TIMEOUT)){
+            this.timeoutThread.interrupt();
+            currentGamePhase = prevGamePhase;
+            prevGamePhase = null;
+        }
+        //updatePlayersConnected();
+    }
+
+    public void restoreView(){
+
+    }
+
+
+    public void startTimeout() throws InterruptedException {
+        Thread.sleep(60*1000);
+    }
+
+    public void changeCurrentPlayer(){
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        //check for disconnetions
+        int numberConnected = 0;
+        for (int i = 0; i< players.size() && numberConnected <= 1; i++){
+            if (!getPlayer(getCurrentPlayerIndex()).isConnected()){
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+            } else {
+                numberConnected ++;
             }
         }
-        players.add(player);
-        synchronized (eventQueue){
-            eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
-            eventQueue.add(new ChangePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
-            //to all the other clients gives the nickname so that they can execute their model
-            eventQueue.add(new NicknameEvent(this, allClients(), player.getNickname()));
-            eventQueue.notifyAll();
+        if (numberConnected == 1){
+            this.prevGamePhase = currentGamePhase;
+            this.currentGamePhase = GamePhase.TIMEOUT;
+            timeoutThread = new Thread(() -> {
+                try {
+                    startTimeout();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            timeoutThread.start();
+        } else if (numberConnected == 0){
+            //chiedere specifica
         }
     }
-    
+
+    //TODO: resilienza clients: bisogna mandare un ping a tutti i client e fare partire un timeout per ogni client, poi si aspetta una risposta da un client, che se non arriva si mette setta a disconesso, altrimenti si setta a connesso, questo ping va poi wrappato in un thread che esegue in modo periodico
 
 
-    // return the current player
+
+    //PLAYERS MANAGING
+
     public Player getCurrentPlayer() {
         return players.get(this.currentPlayerIndex);
     }
@@ -236,24 +261,42 @@ public class GameState {
     }
 
 
-
-    //---------manage disconnections----------
-
-    public void setPlayersConnected(int index, boolean connected){
-        players.get(index).setConnected(connected);
-    }
-
-
-    private void manageReconnection(){
-        if (this.currentGamePhase.equals(GamePhase.TIMEOUT)){
-            this.timeoutThread.interrupt();
-            currentGamePhase = prevGamePhase;
-            prevGamePhase = null;
+    public void addPlayer(String nickname, VirtualView client) {
+        Player player = new Player(nickname, client, this);
+        for (int j = 0; j < players.size(); j++) {
+            if (player.getNickname().equals(players.get(j).getNickname())) {
+                //takes for granted that player connection is updated
+                //if the player is not connected but the gameState doesn't know, the following code fails
+                if (!players.get(j).isConnected()){
+                    this.manageReconnection();
+                    synchronized (eventQueue){
+                        //only to the client
+                        this.restoreView();
+                        eventQueue.add(new ChangePhaseEvent(this, singleClient(player.getClient()), this.currentGamePhase));
+                        eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "you re-connected to the game"));
+                        //to all the other clients says that a client reconnected
+                        eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player.getNickname(), true));
+                        eventQueue.notifyAll();
+                    }
+                } else {
+                    //only to the client
+                    synchronized (eventQueue){
+                        eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The nickname is already used, please choose another one"));
+                        eventQueue.notifyAll();
+                    }
+                }
+                return;
+            }
         }
-        //updatePlayersConnected();
+        players.add(player);
+        synchronized (eventQueue){
+            eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
+            eventQueue.add(new ChangePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
+            //to all the other clients gives the nickname so that they can execute their model
+            eventQueue.add(new NicknameEvent(this, allClients(), player.getNickname()));
+            eventQueue.notifyAll();
+        }
     }
-
-    //TODO: resilienza clients: bisogna mandare un ping a tutti i client e fare partire un timeout per ogni client, poi si aspetta una risposta da un client, che se non arriva si mette setta a disconesso, altrimenti si setta a connesso, questo ping va poi wrappato in un thread che esegue in modo periodico
 
 
     //STARTING PHASE SETTERS
@@ -274,6 +317,8 @@ public class GameState {
     // un giocatore randomico per essere il blackPlayer (al momento sembra superflua)
 
 
+
+
     public void startGame() throws EmptyDeckException {
         this.mainBoard.shuffleCards();
         this.mainBoard.initSharedGoldCards();
@@ -286,7 +331,6 @@ public class GameState {
             eventQueue.add(new StartEvent(this, allClients()));
             eventQueue.add(new ChangePhaseEvent(this, allClients(), GamePhase.CHOOSESTARTERSIDEPHASE));
             eventQueue.notifyAll();
-
         }
     }
 
@@ -328,7 +372,6 @@ public class GameState {
 
         synchronized (eventQueue){
             eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "Thank you for the side of your starter card"));
-            eventQueue.add(new UpdateBoardEvent(this, allClients(), playerIndex, playerStarterCard, player.getPlacedCardSide(playerStarterCard.getId())));
             eventQueue.notifyAll();
         }
         this.answered.put(playerIndex, true);
@@ -365,12 +408,10 @@ public class GameState {
         }
         player.setColor(color);
         synchronized (eventQueue){
-            //TODO: notify the others
             eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "Thank you for selecting the color"));
             eventQueue.notifyAll();
         }
         this.answered.put(playerIndex, true);
-
 
         if (numberAnswered() == players.size()) {
             resetAnswered();
@@ -390,8 +431,6 @@ public class GameState {
                 eventQueue.notifyAll();
             }
         }
-
-
     }
 
     public void setHands() throws EmptyDeckException {
@@ -404,12 +443,6 @@ public class GameState {
             players.get(i).addToHandCardsMap(goldCard.getId(), Side.FRONT); // default is front side
             players.get(i).addToHandCardsMap(resourceCard1.getId(), Side.FRONT); // default is front side
             players.get(i).addToHandCardsMap(resourceCard2.getId(), Side.FRONT); // default is front side
-            synchronized (eventQueue){
-                eventQueue.add(new UpdateAddHandEvent(this, allClients(), i, goldCard));
-                eventQueue.add(new UpdateAddHandEvent(this, allClients(), i, resourceCard1));
-                eventQueue.add(new UpdateAddHandEvent(this, allClients(), i, resourceCard2));
-                eventQueue.notifyAll();
-            }
         }
     }
 
@@ -431,16 +464,6 @@ public class GameState {
             objectiveCards[1] = objectiveCard1;
 
             players.get(i).setSecretObjectiveCardOptions(objectiveCards);
-
-            //DA CAMBIARE ASIMMETRIA ARRAYLIST E ARRAY (VORREI TOGLIERE OBJECTIVECARDSOPTIONS)
-
-            synchronized (eventQueue){
-                ArrayList<ObjectiveCard> objectiveCardsList = new ArrayList<>();
-                objectiveCardsList.add(objectiveCard0);
-                objectiveCardsList.add(objectiveCard1);
-                eventQueue.add(new UpdateSecretObjectiveEvent(this, singleClient(players.get(i).getClient()), objectiveCardsList));
-                eventQueue.notifyAll();
-            }
         }
 
         ObjectiveCard objectiveCard0 = (ObjectiveCard) cardsMap.get(randomKeysList.get(randomKeysList.size() - 2));
@@ -478,10 +501,8 @@ public class GameState {
 
         player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
 
+        //considerare se spostare
         synchronized (eventQueue){
-            ArrayList<ObjectiveCard> objectiveCards = new ArrayList<>();
-            objectiveCards.add(player.getObjectiveCardOption(cardIndex));
-            eventQueue.add(new UpdateSecretObjectiveEvent(this, singleClient(player.getClient()), objectiveCards));
             eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "Thank you for selecting the objective card"));
             eventQueue.notifyAll();
         }
@@ -503,37 +524,6 @@ public class GameState {
 
     //GAMEPHASE
 
-
-    public void startTimeout() throws InterruptedException {
-        Thread.sleep(60*1000);
-    }
-
-    public void changeCurrentPlayer(){
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-        //check for disconnetions
-        int numberConnected = 0;
-        for (int i = 0; i< players.size() && numberConnected <= 1; i++){
-            if (!getPlayer(getCurrentPlayerIndex()).isConnected()){
-                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-            } else {
-                numberConnected ++;
-            }
-        }
-        if (numberConnected == 1){
-            this.prevGamePhase = currentGamePhase;
-            this.currentGamePhase = GamePhase.TIMEOUT;
-            timeoutThread = new Thread(() -> {
-                try {
-                    startTimeout();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            timeoutThread.start();
-        } else if (numberConnected == 0){
-            //chiedere specifica
-        }
-    }
 
 
 //----------------------------place Card--------------------------------
@@ -583,6 +573,12 @@ public class GameState {
             }
         }
         updateElements(player, placingCard, placingCardSide);
+        //NON MI PIACE MESSA QUI PERCHE NON E' L'ULTIMA AZIONE DEL CONTROLLER, CERCARE DI CAPIRE COME MODIFIFCARE
+        synchronized (eventQueue){
+            eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "you placed your card, now you have to draw your card with DRAW [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]"));
+            eventQueue.add(new MessageEvent(this, otherClients(player.getClient()), getCurrentPlayer().getNickname() + "placed his card"));
+            eventQueue.notifyAll();
+        }
     }
 
     private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {

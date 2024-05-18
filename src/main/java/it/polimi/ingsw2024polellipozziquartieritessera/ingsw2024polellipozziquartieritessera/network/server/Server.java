@@ -194,41 +194,17 @@ public class Server implements VirtualServer {
             (controller.getTurnPhase().equals(TurnPhase.PLACINGPHASE)) &&
             (isRightTurn(playerIndex))){
 
+
             try {
                 this.controller.placeCard(playerIndex, placingCardId, tableCardId, tableCornerPos, placingCardSide);
-                for (VirtualView clientIterator : this.clients.values()) {
-                    if (client.equals(clientIterator)) {
-                        if (ping(clientIterator)){
-                            clientIterator.sendMessage("you placed your card, now you have to draw your card with DRAW [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]");
-                        }
-                    } else {
-                        if (ping(clientIterator)){
-                            clientIterator.sendMessage(controller.getPlayerNickname(controller.getCurrentPlayerIndex()) + "placed his card");
-                        }
-                    }
-                }
+            } catch (WrongInstanceTypeException | CardIsNotInHandException | CardAlreadPlacedException | CardAlreadyPresentOnTheCornerException | PlacingOnHiddenCornerException | GoldCardCannotBePlacedException e){
+                client.sendError(e.getMessage());
+            } catch (WrongPlacingPositionException | CardNotPlacedException e) {
+                throw new RuntimeException();
+            }
 
-            } catch (CardNotPlacedException | WrongInstanceTypeException e) {
-                throw new RuntimeException(e);
-            } catch (CardIsNotInHandException e) {
-                client.sendError("Sorry, but the card is not in your hand");
-            } catch (WrongPlacingPositionException e) {
-                client.sendError("");
-            } catch (PlacingOnHiddenCornerException e) {
-                client.sendError("The selected corner does not exist, please select an existing corner");
-            } catch (CardAlreadyPresentOnTheCornerException e) {
-                client.sendError("The selected corner was already connected to another card");
-            } catch (GoldCardCannotBePlacedException e) {
-                client.sendError("You don't have the elements to place this card");
-            } catch (CardAlreadPlacedException e) {
-                client.sendError("... You are certainly hacking ...");
-            }
-        } else {
-            try {
-                client.sendError("You cannot do this action now");
-            } catch (RemoteException e) {
-                throw new RuntimeException(e);
-            }
+        } else{
+            client.sendError("You cannot do this action now");
         }
     }
 
@@ -364,7 +340,7 @@ public class Server implements VirtualServer {
         }
     }
 
-     */
+
 
     private boolean ping(VirtualView client){
         try {
@@ -375,4 +351,6 @@ public class Server implements VirtualServer {
         }
         return true;
     }
+
+     */
 }

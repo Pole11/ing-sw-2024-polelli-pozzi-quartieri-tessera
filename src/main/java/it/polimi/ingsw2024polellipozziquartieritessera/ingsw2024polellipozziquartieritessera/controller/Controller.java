@@ -74,7 +74,7 @@ public class Controller {
 
     public void addPlayer(VirtualView client, String nickname) {
         synchronized (this.gameState) {
-            gameState.addPlayer(new Player(nickname, client));
+            gameState.addPlayer(nickname, client);
         }
     }
 
@@ -109,16 +109,37 @@ public class Controller {
         }
     }
 
-    public void colorChoosed() throws EmptyDeckException {
-        synchronized (this.gameState) {
-            gameState.setHands();
-            gameState.setObjectives();
-        }
-    }
-
     //----------------place, draw, flip-----------------------
 
-    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException, WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException {
+    private void placeCardCheckings(Player player, CornerCard placingCard, int placingCardId,  Corner tableCorner, Corner placingCorner, Side placingCardSide) throws WrongInstanceTypeException, CardIsNotInHandException, CardAlreadPlacedException, WrongPlacingPositionException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, GoldCardCannotBePlacedException {
+
+        //sent to client
+        if (placingCard instanceof StarterCard) throw new WrongInstanceTypeException("you cannot place a starter card in the middle of the game");
+
+        //FORSE da togliere se mettiamo controllo su client, è un errore che può arrivare solo da cli
+        if (!player.handCardContains(placingCardId)) throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
+
+        //check that the card is not already placed
+        //FORSE da togliere se mettiamo controllo su client, è un errore che può arrivare solo da cli
+        for (int i = 0; i < gameState.getPlayersSize(); i++){
+            if (gameState.getPlayer(i).placedCardContains(placingCardId)) throw new CardAlreadPlacedException("you cannot place a card that is already placed");
+        }
+
+        //thrown as runtimeException in server
+        if (tableCorner == null) throw new WrongPlacingPositionException("table corner is null");
+        if (placingCorner == null) throw new WrongPlacingPositionException("placing corner is null");
+
+        //sent to client
+        if (tableCorner.getLinkedCorner() != null) throw new CardAlreadyPresentOnTheCornerException("you cannot place a card here, the corner is already linked");
+        if (tableCorner.getHidden()) throw new PlacingOnHiddenCornerException("you cannot place a card on a hidden corner");
+
+        // execute this block if the card is gold and has a challenge (is front)
+        //sent to client
+        if (!goldPlaceable(player, placingCard, placingCardSide)) throw new GoldCardCannotBePlacedException("You haven't the necessary resources to place the goldcard " + placingCardId);
+    }
+
+
+    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException, WrongInstanceTypeException {
         synchronized (this.gameState) {
             Player player = gameState.getPlayer(playerIndex);
             // check that the card is in the hand of the player
@@ -131,46 +152,32 @@ public class Controller {
 
             CornerCard placingCard = null;
             CornerCard tableCard = null;
+
             try {
                 placingCard = (CornerCard) gameState.getCard(placingCardId);
                 tableCard = (CornerCard) gameState.getCard(tableCardId);
             } catch (ClassCastException e){
+                //sent to client
                 throw new WrongInstanceTypeException("the card you selected is not a CornerCard");
             }
-
-            if (placingCard instanceof StarterCard) throw new WrongInstanceTypeException("you cannot place a starter card in the middle of the game");
-
 
             Corner placingCorner = placingCard.getCorners(placingCardSide).get(placingCornerPos.ordinal());
             Corner tableCorner = tableCard.getCorners(player.getPlacedCardSide(tableCardId)).get(tableCornerPos.ordinal());
 
-            if (!player.handCardContains(placingCardId)) throw new CardIsNotInHandException("the card you are trying to place is not in your hand");
-
-            // controlla che la carta non sia già presente
-            for (int i = 0; i < gameState.getPlayersSize(); i++){
-                if (gameState.getPlayer(i).placedCardContains(placingCardId)) throw new CardAlreadPlacedException("you cannot place a card that is already placed");
-            }
-            /*
-            for (Player playerIterator : gameState.getPlayers()) {
-                if (playerIterator.placedCardContains(placingCardId)) throw new CardAlreadPlacedException("you cannot place a card that is already placed");
-            }
-            */
-
-            if (tableCorner == null) throw new WrongPlacingPositionException("table corner is null");
-            if (tableCorner.getLinkedCorner() != null) throw new CardAlreadyPresentOnTheCornerException("you cannot place a card here, the corner is already linked");
-            if (tableCorner.getHidden()) throw new PlacingOnHiddenCornerException("you cannot place a card on a hidden corner");
-            if (placingCorner == null) throw new WrongPlacingPositionException("placing corner is null");
-
-            // execute this block if the card is gold and has a challenge (is front)
-            if (!goldPlaceable(player, placingCard, placingCardSide)) throw new GoldCardCannotBePlacedException("You haven't the necessary resources to place the goldcard " + placingCardId);
+            placeCardCheckings(player, placingCard, placingCardId, tableCorner, placingCorner, placingCardSide);
 
             this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
-            player.updatePlayerCardsMap(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
+
+            try {
+                player.updatePlayerCardsMap(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
+            } catch (WrongInstanceTypeException e) {
+                //throw exception if placingCard is a starter card, it is already checked so if it happens here it's a programming mistake
+                throw new RuntimeException(e);
+            }
+
             player.updateBoard(placingCardId, tableCardId, tableCornerPos);
+            player.addPoints(placingCard.calculatePoints(player));
 
-            int newPoints = placingCard.calculatePoints(player);
-
-            player.setPoints(player.getPoints() + newPoints);
             gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE);
         }
     }
@@ -252,12 +259,13 @@ public class Controller {
 
     public void addMessage(int playerIndex, String content){}
 
+/*
     public void setConnected(int index, boolean connected){
         synchronized (this.gameState) {
             gameState.setPlayersConnected(index, connected);
         }
     }
-/*
+
     public ArrayList<Integer> getHandId(int playerIndex){
         ArrayList<Integer> cardHandId = new ArrayList<>();
         cardHandId.addAll(gameState.getPlayer(playerIndex).getHandCardsMap().keySet());

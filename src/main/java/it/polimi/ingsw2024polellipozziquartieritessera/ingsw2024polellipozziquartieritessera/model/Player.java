@@ -1,13 +1,14 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.ConnectionInfoEvent;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateAddHandEvent;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateBoardEvent;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateSecretObjectiveEvent;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
-import java.security.interfaces.ECKey;
 import java.util.*;
 
 public class Player {
@@ -28,8 +29,11 @@ public class Player {
 
     private boolean connected;
     private final VirtualView client;
+    private final GameState gameState;
 
-    public Player(String nickname, VirtualView client){
+    public Player(String nickname, VirtualView client, GameState gameState){
+        this.gameState = gameState;
+
         this.points = 0;
         this.nickname = nickname;
         this.client = client;
@@ -134,28 +138,45 @@ public class Player {
 
     public void setObjectiveCard(ObjectiveCard objectiveCard) {
         this.objectiveCard = objectiveCard;
+        synchronized (gameState.getEventQueue()){
+            //RIGUARDARE SE VA BENE PASSARE DA ARRAY A ARRAYLIST, NON E TANTO BELLO
+            gameState.addToEventQueue(new UpdateSecretObjectiveEvent(gameState, gameState.singleClient(this.getClient()), new ArrayList<>(List.of(objectiveCard))));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     public void setStarterCard(StarterCard starterCard) {
         this.starterCard = starterCard;
         this.placedCardsMap.put(this.getStarterCard().getId(), Side.FRONT); // also set the default side to FRONT
-        // !!! add elements
+        synchronized (gameState.getEventQueue()){
+            gameState.addToEventQueue(new UpdateStarterCardEvent(gameState, gameState.allClients(), starterCard.getId()));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     public void setSecretObjectiveCardOptions(ObjectiveCard[] objectiveCards) {
         this.objectiveCardOptions = objectiveCards;
+        synchronized (gameState.getEventQueue()){
+            //RIGUARDARE SE VA BENE PASSARE DA ARRAY A ARRAYLIST, NON E TANTO BELLO
+            gameState.addToEventQueue(new UpdateSecretObjectiveEvent(gameState, gameState.singleClient(this.getClient()), new ArrayList<>(List.of(objectiveCards))));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     public void setColor(Color color){
         this.color = color;
-    }
-
-    public void setPoints(int points) {
-        this.points = points;
+        synchronized (gameState.getEventQueue()){
+            gameState.addToEventQueue(new UpdateColorEvent(gameState, gameState.allClients(), this, color));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     public void setConnected(boolean connected){
         this.connected = connected;
+        synchronized (gameState.getEventQueue()){
+            gameState.addToEventQueue(new ConnectionInfoEvent(gameState, gameState.allClients(), this, connected));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     //ADDER/REMOVER
@@ -170,14 +191,26 @@ public class Player {
 
     public void addToHandCardsMap(Integer index, Side side){
         this.handCardsMap.put(index, side);
+        synchronized (gameState.getEventQueue()){
+            gameState.addToEventQueue(new UpdateAddHandEvent(gameState, gameState.allClients(), this, index, side));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     public void removeFromHandCardsMap(Integer index){
         this.handCardsMap.remove(index);
+        synchronized (gameState.getEventQueue()){
+            gameState.addToEventQueue(new UpdateRemoveHandEvent(gameState, gameState.allClients(), this, index));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     public void addPoints(int points) {
         this.points += points;
+        synchronized (gameState.getEventQueue()){
+            gameState.addToEventQueue(new UpdatePointsEvent(gameState, gameState.allClients(), this, points));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     public void removeFromAllElements(Element cornerEle){
@@ -193,6 +226,9 @@ public class Player {
 
     public void changeHandSide(Integer index, Side side){
         this.handCardsMap.replace(index, side);
+        synchronized (gameState.getEventQueue()){
+            gameState.addToEventQueue(new UpdateHandSide(gameState, gameState.singleClient(this.getClient()), index, side));
+        }
     }
 
 
@@ -206,8 +242,8 @@ public class Player {
 // -------------------Place Cards Map Managing-----------------
 
     public void updatePlayerCardsMap(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException {
-        this.placedCardsMap.put(placingCardId, placingCardSide);
-        this.handCardsMap.remove(placingCardId);
+        addToPlacedCardsMap(placingCardId, placingCardSide);
+        removeFromHandCardsMap(placingCardId);
 
         this.centerResource.put(placingCardId, placingCard.getResourceType());
     }
@@ -242,7 +278,7 @@ public class Player {
         }
     }
 
-    public void updateBoard(int newCard, int existingCard, CornerPos existingCornerPos){
+    public void updateBoard(int placingCardId, int tableCardId, CornerPos tableCornerPos){
         int rowIndex = -1;
         int colIndex = -1;
 
@@ -250,10 +286,10 @@ public class Player {
         for (int i = 0; i < this.playerBoard.size(); i++) {
             ArrayList<Integer> row = this.playerBoard.get(i);
             for (int j = 0; j < row.size(); j++) {
-                if (row.get(j) == existingCard) {
+                if (row.get(j) == tableCardId) {
                     rowIndex = i;
                     colIndex = j;
-                } else if (row.get(j) == newCard) {
+                } else if (row.get(j) == placingCardId) {
                     // la carta è già piazzata, esci subito
                     return;
                 }
@@ -265,7 +301,7 @@ public class Player {
         }
 
         // Define the position of the new card
-        switch(existingCornerPos) {
+        switch(tableCornerPos) {
             case CornerPos.UPLEFT:
                 rowIndex--;
                 break;
@@ -291,7 +327,12 @@ public class Player {
             }
         }
         // Place the new card at the specified position
-        this.playerBoard.get(rowIndex).set(colIndex, newCard);
+        this.playerBoard.get(rowIndex).set(colIndex, placingCardId);
+
+        synchronized (gameState.getEventQueue()){
+            gameState.addToEventQueue(new UpdateBoardEvent(gameState, gameState.allClients(), this, placingCardId, tableCardId, tableCornerPos));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     private void expandBoard(int rowIndex, int colIndex){
