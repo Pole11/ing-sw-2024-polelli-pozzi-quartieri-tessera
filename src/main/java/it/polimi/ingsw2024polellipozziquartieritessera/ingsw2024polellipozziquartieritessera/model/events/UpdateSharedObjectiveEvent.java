@@ -7,11 +7,11 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.util.ArrayList;
 
 public class UpdateSharedObjectiveEvent extends Event{
-    private final ObjectiveCard objectiveCard;
+    private final ArrayList<ObjectiveCard> objectiveCards;
 
-    public UpdateSharedObjectiveEvent(GameState gameState, ArrayList<VirtualView> clients, ObjectiveCard objectiveCard) {
+    public UpdateSharedObjectiveEvent(GameState gameState, ArrayList<VirtualView> clients, ArrayList<ObjectiveCard> objectiveCards) {
         super(gameState, clients);
-        this.objectiveCard = objectiveCard;
+        this.objectiveCards = objectiveCards;
     }
 
     @Override

@@ -32,7 +32,8 @@ public class ViewModel {
         nicknamesMap = new HashMap<>();
         handsSideMap = new HashMap<>();
         placedSideMap = new HashMap<>();
-        objectives = new int[3];
+        //contains also the secretOptions, when the objective is decided the [3] is -1
+        objectives = new int[4];
         Arrays.fill(objectives, -1);
         sharedCards = new int[4];
         Arrays.fill(sharedCards, -1);

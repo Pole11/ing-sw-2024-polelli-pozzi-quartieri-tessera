@@ -475,10 +475,12 @@ public class GameState {
 
         mainBoard.setSharedObjectiveCard(0,  objectiveCard0);
         mainBoard.setSharedObjectiveCard(1, objectiveCard1);
+        ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();
+        sharedObjectives.add(objectiveCard0);
+        sharedObjectives.add(objectiveCard1);
 
         synchronized (eventQueue){
-            eventQueue.add(new UpdateSharedObjectiveEvent(this, allClients(), objectiveCard0));
-            eventQueue.add(new UpdateSharedObjectiveEvent(this, allClients(), objectiveCard1));
+            eventQueue.add(new UpdateSharedObjectiveEvent(this, allClients(), sharedObjectives));
             eventQueue.notifyAll();
         }
     }

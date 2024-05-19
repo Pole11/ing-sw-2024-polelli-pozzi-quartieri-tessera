@@ -20,8 +20,6 @@ public class NicknameEvent extends Event{
         VirtualView client = clients.getLast();
 
         try {
-            client.changePhase(GamePhase.NICKNAMEPHASE.toString());
-
             if (clients.size() == 1) {
                 client.sendMessage("you successfully entered the game with the nickname " + nickname + ", wait for at least two players to start the game");
             } else {

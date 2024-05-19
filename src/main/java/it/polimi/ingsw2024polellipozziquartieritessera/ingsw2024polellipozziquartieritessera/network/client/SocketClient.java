@@ -69,7 +69,7 @@ public class SocketClient implements VirtualView {
                     this.ping(message[1]);
                     break;
                 case "PHASE":
-                    this.changePhase(message[1]);
+                    this.changePhase(GamePhase.valueOf(message[1]));
                     break;
                 default:
                     System.err.println("[5xx INVALID MESSAGE FROM SERVER]");
@@ -104,7 +104,7 @@ public class SocketClient implements VirtualView {
     }
 
     @Override
-    public void changePhase(String nextGamePhaseString) {
+    public void changePhase(GamePhase nextGamePhaseString) {
         Client.changePhase(nextGamePhaseString);
         /*
         try {
@@ -115,6 +115,61 @@ public class SocketClient implements VirtualView {
             e.printStackTrace();
             System.err.println("Invalid game phase");
         }*/
+    }
+
+    @Override
+    public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
+
+    }
+
+    @Override
+    public void updateAddEnd(int playerIndex, int cardIndex, Side side) throws RemoteException {
+
+    }
+
+    @Override
+    public void updateRemoveHand(int playerIndex, int cardIndex, Side side) throws RemoteException {
+
+    }
+
+    @Override
+    public void updateBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos) throws RemoteException {
+
+    }
+
+    @Override
+    public void updateColor(int playerIndex, Color color) throws RemoteException {
+
+    }
+
+    @Override
+    public void updateCurrentPlayer(int currentPlayerIndex) throws RemoteException {
+
+    }
+
+    @Override
+    public void updateHandSide(int playerIndex, Side side) throws RemoteException {
+
+    }
+
+    @Override
+    public void updatePoints(int playerIndex, int points) throws RemoteException {
+
+    }
+
+    @Override
+    public void updateSecretObjective(int objectiveCardId1, int objectiveCardId2) throws RemoteException {
+
+    }
+
+    @Override
+    public void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
+
+    }
+
+    @Override
+    public void updateStarteCard(int cardId1) throws RemoteException {
+
     }
 
 }

@@ -1,5 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums;
 
+import java.rmi.RemoteException;
+
 public enum Messages {
     CHANGEPHASE,
     CONNECTIONINFO,
@@ -8,5 +10,15 @@ public enum Messages {
     NICKNAME,
     PING,
     SENDINDEX,
-    START
+    START,
+    ADDHAND,
+    REMOVEHAND,
+    UPDATEBOARD,
+    UPDATECOLOR,
+    UPDATECURRENTPLAYER,
+    UPDATEHANDSIDE,
+    UPDATEPOINTS,
+    UPDATESECRETOBJECTIVE,
+    UPDATESHAREDOBJECTIVE,
+    UPDATESTARTER
 }

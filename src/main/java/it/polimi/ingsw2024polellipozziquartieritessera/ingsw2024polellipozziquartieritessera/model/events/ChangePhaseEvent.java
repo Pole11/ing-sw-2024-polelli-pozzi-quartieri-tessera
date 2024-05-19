@@ -4,6 +4,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class ChangePhaseEvent extends Event{
@@ -16,6 +17,12 @@ public class ChangePhaseEvent extends Event{
 
     @Override
     public void execute() {
-
+        for (VirtualView client: clients) {
+            try {
+                client.changePhase(gamePhase);
+            } catch (RemoteException e) {
+                playerDisconnected(client);
+            }
+        }
     }
 }

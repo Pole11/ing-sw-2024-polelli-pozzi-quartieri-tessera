@@ -522,15 +522,9 @@ public class Client {
 
     }
 
-    public static void changePhase(String nextGamePhaseString) {
+    public static void changePhase(GamePhase nextGamePhase) {
         if (!meDoGui) {
             return;
-        }
-        GamePhase nextGamePhase = null;
-        try {
-            nextGamePhase = GamePhase.valueOf(nextGamePhaseString);
-        } catch (Exception e) {
-            System.err.println("Invalid game phase");
         }
 
         currentGamePhase = nextGamePhase;
