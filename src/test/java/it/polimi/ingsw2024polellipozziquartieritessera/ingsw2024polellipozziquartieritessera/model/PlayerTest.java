@@ -20,7 +20,7 @@ public class PlayerTest {
     void playerTestConstructor() {
         for (Color c : Color.values()){
             // TODO: test with different nickname lengths
-            assertAll(() -> new Player("Nickname", null));
+            assertAll(() -> new Player("Nickname", null, null));
         }
     }
 
@@ -36,7 +36,7 @@ public class PlayerTest {
 
         // create game state
         GameState gs = Populate.createCardsMap();
-        gs.addPlayer(new Player("Nickname", client));
+        gs.addPlayer("Nickname", client);
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
@@ -92,7 +92,7 @@ public class PlayerTest {
 
         // create game state
         GameState gs = Populate.createCardsMap();
-        gs.addPlayer(new Player("jhonny", client));
+        gs.addPlayer("jhonny", client);
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
@@ -298,7 +298,7 @@ public class PlayerTest {
         VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
 
         GameState gs = Populate.createCardsMap();
-        gs.addPlayer(new Player("test", client));
+        gs.addPlayer("test", client);
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();

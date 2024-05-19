@@ -21,10 +21,10 @@ public class GameStateTest {
         VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
 
         GameState gs = Populate.populate();
-        gs.addPlayer(new Player("paolo", client));
-        gs.addPlayer(new Player("piergiorgio", client));
-        gs.addPlayer(new Player("fungiforme", client));
-        gs.addPlayer(new Player("paola", client));
+        gs.addPlayer("paolo", client);
+        gs.addPlayer("piergiorgio", client);
+        gs.addPlayer("fungiforme", client);
+        gs.addPlayer("paola", client);
         gs.setObjectives();
         assertNotEquals(gs.getMainBoard().getSharedObjectiveCard(0), gs.getMainBoard().getSharedObjectiveCard(1));
 
@@ -47,9 +47,9 @@ public class GameStateTest {
         VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
 
         GameState gs = Populate.createCardsMap();
-        gs.addPlayer(new Player("nick1", client));
+        gs.addPlayer("paolo", client);
+        gs.addPlayer("piergiorgio", client);
         //assertThrows(NotUniquePlayerNicknameException.class, ()-> gs.addPlayer(new Player("nick1", client)));
-        gs.addPlayer(new Player("nick2", client));
         gs.setColor(0, Color.BLUE);
         //assertThrows(NotUniquePlayerColorException.class, ()-> gs.setColor(0, Color.BLUE));
         gs.setColor(0, Color.YELLOW);
@@ -64,7 +64,7 @@ public class GameStateTest {
 
 
         GameState gs = Populate.createCardsMap();
-        gs.addPlayer(new Player("paolo", client));
+        gs.addPlayer("paolo", client);
         Controller c = new Controller(gs);
         Player player = gs.getPlayer(0);
 
@@ -335,7 +335,7 @@ public class GameStateTest {
         VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
 
         GameState gs = Populate.createCardsMap();
-        gs.addPlayer(new Player("paolo", client));
+        gs.addPlayer("paolo", client);
         Controller c = new Controller(gs);
         Player player = gs.getPlayer(0);
 
@@ -387,28 +387,27 @@ public class GameStateTest {
         VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
 
         GameState gs = Populate.populate();
-        gs.addPlayer(new Player("paolo", client));
-        gs.addPlayer(new Player("piergiorgio", client));
-        gs.addPlayer(new Player("fungiforme", client));
-        gs.addPlayer(new Player("paola", client));
+        gs.addPlayer("paolo", client);
+        gs.addPlayer("piergiorgio", client);
+        gs.addPlayer("fungiforme", client);
+        gs.addPlayer("paola", client);
 
         assertFalse(gs.isGameEnded());
 
-        gs.getPlayer(0).setPoints(10);
+        gs.getPlayer(0).addPoints(10);
         assertFalse(gs.isGameEnded());
 
-        gs.getPlayer(0).setPoints(20);
-        assertTrue(gs.isGameEnded());
-
-        gs.getPlayer(0).setPoints(20);
         try {
             gs.getMainBoard().drawFromGoldDeck();
         } catch(EmptyDeckException e) {
             assertTrue(gs.isGameEnded());
 
-            gs.getPlayer(0).setPoints(10);
+            //points = 10
             assertTrue(gs.isGameEnded());
         }
+
+        gs.getPlayer(0).addPoints(10);
+        assertTrue(gs.isGameEnded());
     }
 
     @Test
@@ -421,7 +420,6 @@ public class GameStateTest {
             gs.getMainBoard().drawFromResourceDeck();
         }
         assertTrue(gs.isGameEnded());
-
     }
 
 
@@ -431,8 +429,8 @@ public class GameStateTest {
         GameState gs = Populate.createCardsMap();
         VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
 
-        gs.addPlayer(new Player("1", client));
-        gs.addPlayer(new Player("2", client));
+        gs.addPlayer("paolo", client);
+        gs.addPlayer("piergiorgio", client);
 
         ArrayList<Integer> first_wins = new ArrayList<>();
         ArrayList<Integer> second_wins = new ArrayList<>();
@@ -445,7 +443,7 @@ public class GameStateTest {
         assertThrows(GameIsNotEndedException.class, ()-> gs.getWinnerPlayerIndex());
 
 
-        gs.getPlayer(0).setPoints(24);
+        gs.getPlayer(0).addPoints(24);
         assertEquals(first_wins, gs.getWinnerPlayerIndex());
 
         gs.getPlayer(1).addToAllElements(Element.INSECT, 4);
@@ -454,25 +452,25 @@ public class GameStateTest {
         gs.getCard(98).calculatePoints(gs.getPlayer(1));
         assertEquals(first_wins, gs.getWinnerPlayerIndex());
 
-        gs.getPlayer(1).setPoints(24);
+        gs.getPlayer(1).addPoints(24);
         assertEquals(second_wins, gs.getWinnerPlayerIndex());
 
-        gs.getPlayer(1).setPoints(25);
+
         gs.getPlayer(0).addToAllElements(Element.INSECT, 6);
         gs.getCard(98).calculatePoints(gs.getPlayer(0));
-        assertEquals(second_wins, gs.getWinnerPlayerIndex());
-
-        gs.getPlayer(1).setPoints(24);
         assertEquals(first_second_win, gs.getWinnerPlayerIndex());
 
         gs.getPlayer(0).addToAllElements(Element.FUNGI, 6);
         gs.getCard(95).calculatePoints(gs.getPlayer(0));
         assertEquals(first_wins, gs.getWinnerPlayerIndex());
+
+        gs.getPlayer(1).addPoints(1);
+        assertEquals(second_wins, gs.getWinnerPlayerIndex());
     }
 
     @Test
     void setColorTest(){
-        Player player = new Player("pole", null);
+        //Player player = new Player("pole", null);
     }
 
 }

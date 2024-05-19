@@ -1,19 +1,20 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 import java.util.ArrayList;
 
-public class ConnectionInfoEvent extends Event{
+public class UpdateColorEvent extends Event{
     private final Player player;
-    private final boolean connected;
+    private final Color color;
 
-    public ConnectionInfoEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, boolean connected) {
+    public UpdateColorEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, Color color) {
         super(gameState, clients);
         this.player = player;
-        this.connected = connected;
+        this.color = color;
     }
 
     @Override

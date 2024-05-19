@@ -3,10 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.ConnectionInfoEvent;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateAddHandEvent;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateBoardEvent;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateSecretObjectiveEvent;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 import java.util.*;
@@ -228,6 +225,7 @@ public class Player {
         this.handCardsMap.replace(index, side);
         synchronized (gameState.getEventQueue()){
             gameState.addToEventQueue(new UpdateHandSide(gameState, gameState.singleClient(this.getClient()), index, side));
+            gameState.getEventQueue().notifyAll();
         }
     }
 

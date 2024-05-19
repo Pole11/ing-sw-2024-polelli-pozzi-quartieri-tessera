@@ -44,10 +44,10 @@ public class ControllerTest {
 
 
         GameState gs = Populate.populate();
-        gs.addPlayer(new Player("paolo", client));
-        gs.addPlayer(new Player("piergiorgio", client));
-        gs.addPlayer(new Player("fungiforme", client));
-        gs.addPlayer(new Player("paola",  client));
+        gs.addPlayer("paolo", client);
+        gs.addPlayer("piergiorgio", client);
+        gs.addPlayer("fungiforme", client);
+        gs.addPlayer("paola", client);
         Player player = gs.getPlayer(0);
         Controller c = new Controller(gs);
         gs.getMainBoard().shuffleCards();
@@ -272,10 +272,10 @@ public class ControllerTest {
 
         // create game state
         GameState gs = Populate.populate();
-        gs.addPlayer(new Player("paolo", client));
-        gs.addPlayer(new Player("piergiorgio", client));
-        gs.addPlayer(new Player("fungiforme", client));
-        gs.addPlayer(new Player("paola", client));
+        gs.addPlayer("paolo", client);
+        gs.addPlayer("piergiorgio", client);
+        gs.addPlayer("fungiforme", client);
+        gs.addPlayer("paola", client);
 
         gs.setPlayersConnected(0, true);
         gs.setPlayersConnected(1, true);
@@ -379,10 +379,10 @@ public class ControllerTest {
 
 
         GameState gs = Populate.populate();
-        gs.addPlayer(new Player("paolo", client));
-        gs.addPlayer(new Player("piergiorgio", client));
-        gs.addPlayer(new Player("fungiforme", client));
-        gs.addPlayer(new Player("paola", client));
+        gs.addPlayer("paolo", client);
+        gs.addPlayer("piergiorgio", client);
+        gs.addPlayer("fungiforme", client);
+        gs.addPlayer("paola", client);
         Controller c = new Controller(gs);
 
         gs.getPlayer(0).addToHandCardsMap(1, Side.FRONT);

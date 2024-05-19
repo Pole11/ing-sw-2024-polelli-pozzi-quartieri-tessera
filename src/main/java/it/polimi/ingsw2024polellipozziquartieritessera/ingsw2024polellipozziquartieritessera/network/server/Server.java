@@ -194,7 +194,7 @@ public class Server implements VirtualServer {
             (controller.getTurnPhase().equals(TurnPhase.PLACINGPHASE)) &&
             (isRightTurn(playerIndex))){
 
-
+            //CardIsNotInHand e CardAlreadyPlaced FORSE da rimuovere e gestire sulla view
             try {
                 this.controller.placeCard(playerIndex, placingCardId, tableCardId, tableCornerPos, placingCardSide);
             } catch (WrongInstanceTypeException | CardIsNotInHandException | CardAlreadPlacedException | CardAlreadyPresentOnTheCornerException | PlacingOnHiddenCornerException | GoldCardCannotBePlacedException e){
@@ -217,23 +217,7 @@ public class Server implements VirtualServer {
             (isRightTurn(playerIndex))){
 
             try {
-                int playing_client_index = controller.getCurrentPlayerIndex();
                 this.controller.drawCard(drawType);
-                for (VirtualView clientIterator : this.clients.values()) {
-                    if (clients.get(playing_client_index).equals(clientIterator)) {
-                        if (ping(clientIterator)){
-                            clientIterator.sendMessage("you drew your card, now is the turn of " + controller.getPlayerNickname(controller.getCurrentPlayerIndex()));
-                        }
-                    } else if (clients.get(controller.getCurrentPlayerIndex()).equals(clientIterator)) {
-                        if (ping(clientIterator)) {
-                            clientIterator.sendMessage(controller.getPlayerNickname(playing_client_index) + "drew his card, now it's your turn to place your card with PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)]");
-                        }
-                    } else {
-                        if (ping(clientIterator)){
-                            clientIterator.sendMessage(controller.getPlayerNickname(playing_client_index) + "drew his card, now it's the turn of " + controller.getPlayerNickname(controller.getCurrentPlayerIndex()) + " to place his card");
-                        }
-                    }
-                }
             } catch (InvalidHandException e) {
                 client.sendError("Too many cards in hand");
             } catch (EmptyDeckException e) {
@@ -241,11 +225,7 @@ public class Server implements VirtualServer {
             }
         }
         else{
-            try {
-                client.sendError("You cannot do this action now");
-            } catch (RemoteException e) {
-                throw new RuntimeException(e);
-            }
+            client.sendError("You cannot do this action now");
         }
     }
 
@@ -259,11 +239,7 @@ public class Server implements VirtualServer {
                 client.sendError("The selected card is not in hand");
             }
         } else {
-            try {
-                client.sendError("You cannot do this action now");
-            } catch (RemoteException e) {
-                throw new RuntimeException(e);
-            }
+            client.sendError("You cannot do this action now");
         }
     }
 

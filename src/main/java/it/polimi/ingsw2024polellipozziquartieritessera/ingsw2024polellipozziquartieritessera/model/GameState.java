@@ -222,6 +222,10 @@ public class GameState {
         } else if (numberConnected == 0){
             //chiedere specifica
         }
+        synchronized (eventQueue){
+            eventQueue.add(new UpdateCurrentPlayer(this, allClients(), currentPlayerIndex));
+            eventQueue.notifyAll();
+        }
     }
 
     //TODO: resilienza clients: bisogna mandare un ping a tutti i client e fare partire un timeout per ogni client, poi si aspetta una risposta da un client, che se non arriva si mette setta a disconesso, altrimenti si setta a connesso, questo ping va poi wrappato in un thread che esegue in modo periodico
@@ -275,7 +279,7 @@ public class GameState {
                         eventQueue.add(new ChangePhaseEvent(this, singleClient(player.getClient()), this.currentGamePhase));
                         eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "you re-connected to the game"));
                         //to all the other clients says that a client reconnected
-                        eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player.getNickname(), true));
+                        eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player, true));
                         eventQueue.notifyAll();
                     }
                 } else {

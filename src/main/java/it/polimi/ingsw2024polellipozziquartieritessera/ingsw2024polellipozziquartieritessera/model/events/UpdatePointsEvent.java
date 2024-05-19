@@ -6,14 +6,14 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.util.ArrayList;
 
-public class ConnectionInfoEvent extends Event{
+public class UpdatePointsEvent extends Event{
     private final Player player;
-    private final boolean connected;
+    private final int points;
 
-    public ConnectionInfoEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, boolean connected) {
+    public UpdatePointsEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, int points) {
         super(gameState, clients);
         this.player = player;
-        this.connected = connected;
+        this.points = points;
     }
 
     @Override
