@@ -24,7 +24,7 @@ public class GUITest extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource("/fxml/game.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource("/fxml/chooseStarter.fxml"));
 
         VirtualServer server = null;
         VirtualView client = null;
@@ -34,7 +34,7 @@ public class GUITest extends Application {
         mainStage = stage;
 
 
-        //guiController.setStarterCardImage(84);
+        guiController.setStarterCardImage(84);
         //guiController.setObjectiveCardImages(90, 91);
 
         Scene scene = new Scene(fxmlLoader.load(), 920, 920);
@@ -51,8 +51,8 @@ public class GUITest extends Application {
 
         stage.show();
 
-        guiController.initTable(4, 61, 11, 42, 27, 63, 3);
-        guiController.highlightCurrentPlayerTable();
+        //guiController.initTable(4, 61, 11, 42, 27, 63, 3);
+        //guiController.highlightCurrentPlayerTable();
     }
 
     public void runGui(GUIController guiController) {

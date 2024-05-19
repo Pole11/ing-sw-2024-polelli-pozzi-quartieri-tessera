@@ -40,9 +40,3 @@
 .verticalPlayerContainer {
     -fx-padding: 30px;
 }
-
-.imageWithBorder {
-    -fx-effect: dropshadow(gaussian, black, 5, 0.2, 0, 0);
-    -fx-padding: 10;
-    -fx-background-color: white;
-}
