@@ -52,57 +52,74 @@ public class ClientProxy implements VirtualView {
     }
 
     @Override
+    public void start() throws RemoteException {
+        output.println(Messages.START);
+        output.flush();
+    }
+
+    @Override
     public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
-
+        output.println(Messages.CONNECTIONINFO + "; " + playerIndex + "; " + connected);
+        output.flush();
     }
 
     @Override
-    public void updateAddEnd(int playerIndex, int cardIndex, Side side) throws RemoteException {
-
+    public void updateAddHand(int playerIndex, int cardIndex) throws RemoteException {
+        output.println(Messages.ADDHAND + "; " + playerIndex + "; " + cardIndex);
+        output.flush();
     }
 
     @Override
-    public void updateRemoveHand(int playerIndex, int cardIndex, Side side) throws RemoteException {
-
+    public void updateRemoveHand(int playerIndex, int cardIndex) throws RemoteException {
+        output.println(Messages.REMOVEHAND + "; " + playerIndex + "; " + cardIndex);
+        output.flush();
     }
 
     @Override
-    public void updateBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos) throws RemoteException {
-
+    public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
+        output.println(Messages.UPDATEPLAYERBOARD + "; " + playerIndex + "; " + placingCardId + "; " + tableCardId + "; " + existingCornerPos.toString() + "; " + side.toString());
+        output.flush();
     }
 
     @Override
     public void updateColor(int playerIndex, Color color) throws RemoteException {
-
+        output.println(Messages.UPDATECOLOR + "; " + playerIndex + "; " + color.toString());
+        output.flush();
     }
 
     @Override
     public void updateCurrentPlayer(int currentPlayerIndex) throws RemoteException {
-
+        output.println(Messages.UPDATECURRENTPLAYER + "; " + currentPlayerIndex);
+        output.flush();
     }
 
     @Override
-    public void updateHandSide(int playerIndex, Side side) throws RemoteException {
-
+    public void updateHandSide(int cardIndex, Side side) throws RemoteException {
+        output.println(Messages.UPDATEHANDSIDE + "; " + cardIndex + "; " + side.toString());
+        output.flush();
     }
 
     @Override
     public void updatePoints(int playerIndex, int points) throws RemoteException {
-
+        output.println(Messages.UPDATEPOINTS + "; " + playerIndex + "; " + points);
+        output.flush();
     }
 
     @Override
     public void updateSecretObjective(int objectiveCardId1, int objectiveCardId2) throws RemoteException {
-
+        output.println(Messages.UPDATESECRETOBJECTIVE + "; " + objectiveCardId1 + "; " + objectiveCardId2);
+        output.flush();
     }
 
     @Override
     public void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
-
+        output.println(Messages.UPDATESHAREDOBJECTIVE + "; " + sharedObjectiveCardId1 + "; " + sharedObjectiveCardId2);
+        output.flush();
     }
 
     @Override
-    public void updateStarteCard(int cardId1) throws RemoteException {
-
+    public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
+        output.println(Messages.UPDATESTARTER + "; " + playerIndex + "; " + cardId1 + "; " + side.toString());
+        output.flush();
     }
 }

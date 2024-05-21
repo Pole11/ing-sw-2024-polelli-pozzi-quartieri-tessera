@@ -175,9 +175,7 @@ public class Controller {
                 throw new RuntimeException(e);
             }
 
-            player.updateBoard(placingCardId, tableCardId, tableCornerPos);
             player.addPoints(placingCard.calculatePoints(player));
-
             gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE);
         }
     }

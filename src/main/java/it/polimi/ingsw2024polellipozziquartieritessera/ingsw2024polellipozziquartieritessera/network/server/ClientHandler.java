@@ -163,22 +163,27 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
+    public void start() throws RemoteException {
+
+    }
+
+    @Override
     public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
 
     }
 
     @Override
-    public void updateAddEnd(int playerIndex, int cardIndex, Side side) throws RemoteException {
+    public void updateAddHand(int playerIndex, int cardIndex) throws RemoteException {
 
     }
 
     @Override
-    public void updateRemoveHand(int playerIndex, int cardIndex, Side side) throws RemoteException {
+    public void updateRemoveHand(int playerIndex, int cardIndex) throws RemoteException {
 
     }
 
     @Override
-    public void updateBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos) throws RemoteException {
+    public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
 
     }
 
@@ -193,7 +198,7 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
-    public void updateHandSide(int playerIndex, Side side) throws RemoteException {
+    public void updateHandSide(int cardIndex, Side side) throws RemoteException {
 
     }
 
@@ -213,7 +218,7 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
-    public void updateStarteCard(int cardId1) throws RemoteException {
+    public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
 
     }
 }

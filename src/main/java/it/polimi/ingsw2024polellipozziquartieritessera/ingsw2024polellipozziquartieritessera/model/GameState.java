@@ -366,7 +366,12 @@ public class GameState {
             return;
         }
         StarterCard playerStarterCard = player.getStarterCard();
+        //doesn't call updateBoard because the boardMatrix already has the card (without the side)
         player.addToPlacedCardsMap(playerStarterCard.getId(), side);
+
+        synchronized (eventQueue){
+            eventQueue.add(new UpdateStarterCardEvent(this, allClients(), playerIndex,  playerStarterCard.getId(), side));
+        }
 
         // add the initial elements of the starter card
         for (Element ele : player.getStarterCard().getUncoveredElements(side)) {

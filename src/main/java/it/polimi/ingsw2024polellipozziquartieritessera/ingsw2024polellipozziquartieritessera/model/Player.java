@@ -146,7 +146,7 @@ public class Player {
         this.starterCard = starterCard;
         this.placedCardsMap.put(this.getStarterCard().getId(), Side.FRONT); // also set the default side to FRONT
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateStarterCardEvent(gameState, gameState.allClients(), starterCard.getId()));
+            gameState.addToEventQueue(new UpdateStarterCardEvent(gameState, gameState.singleClient(this.getClient()), gameState.getPlayerIndex(this), starterCard.getId(), null));
             gameState.getEventQueue().notifyAll();
         }
     }
@@ -189,7 +189,7 @@ public class Player {
     public void addToHandCardsMap(Integer index, Side side){
         this.handCardsMap.put(index, side);
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateAddHandEvent(gameState, gameState.allClients(), this, index, side));
+            gameState.addToEventQueue(new UpdateAddHandEvent(gameState, gameState.allClients(), this, index));
             gameState.getEventQueue().notifyAll();
         }
     }
@@ -241,8 +241,12 @@ public class Player {
     public void updatePlayerCardsMap(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException {
         addToPlacedCardsMap(placingCardId, placingCardSide);
         removeFromHandCardsMap(placingCardId);
-
+        updateBoard(placingCardId, tableCardId, tableCornerPos);
         this.centerResource.put(placingCardId, placingCard.getResourceType());
+        synchronized (gameState.getEventQueue()){
+            gameState.addToEventQueue(new UpdateBoardEvent(gameState, gameState.allClients(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     public static int getElementOccurencies(ArrayList<Element> elements, Element targetElement) {
@@ -325,11 +329,6 @@ public class Player {
         }
         // Place the new card at the specified position
         this.playerBoard.get(rowIndex).set(colIndex, placingCardId);
-
-        synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateBoardEvent(gameState, gameState.allClients(), this, placingCardId, tableCardId, tableCornerPos));
-            gameState.getEventQueue().notifyAll();
-        }
     }
 
     private void expandBoard(int rowIndex, int colIndex){

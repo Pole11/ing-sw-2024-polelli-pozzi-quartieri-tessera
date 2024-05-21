@@ -5,6 +5,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class UpdateColorEvent extends Event{
@@ -19,6 +20,12 @@ public class UpdateColorEvent extends Event{
 
     @Override
     public void execute() {
-
+        for (VirtualView client : clients) {
+            try {
+                client.updateColor(gameState.getPlayerIndex(player), color);
+            } catch (RemoteException e) {
+                playerDisconnected(client);
+            }
+        }
     }
 }

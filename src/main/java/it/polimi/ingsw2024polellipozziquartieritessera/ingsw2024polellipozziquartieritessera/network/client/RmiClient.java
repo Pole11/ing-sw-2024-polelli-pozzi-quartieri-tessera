@@ -1,6 +1,5 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
@@ -51,21 +50,17 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     @Override
     public void sendMessage(String msg) {
-        // check if there is gui and if so show the message on the gui
         Client.printMessage(msg);
-        //System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
-
     }
 
     @Override
     public void sendError(String msg) throws RemoteException {
         Client.printError(msg);
-        //System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
-
     }
 
     @Override
     public void ping(String ping) throws RemoteException {
+        Client.ping(ping);
     }
 
     @Override
@@ -75,67 +70,72 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     @Override
     public void sendIndex(int index) throws RemoteException {
-
+        Client.sendIndex(index);
     }
 
     @Override
-    public void changePhase(GamePhase nextGamePhase) {
-        Client.changePhase(nextGamePhase);
+    public void changePhase(GamePhase nextGamePhaseString) {
+        Client.changePhase(nextGamePhaseString);
+    }
+
+    @Override
+    public void start() throws RemoteException {
+        Client.start();
     }
 
     @Override
     public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
-
+        Client.connectionInfo(playerIndex, connected);
     }
 
     @Override
-    public void updateAddEnd(int playerIndex, int cardIndex, Side side) throws RemoteException {
-
+    public void updateAddHand(int playerIndex, int cardIndex) throws RemoteException {
+        Client.updateAddHand(playerIndex, cardIndex);
     }
 
     @Override
-    public void updateRemoveHand(int playerIndex, int cardIndex, Side side) throws RemoteException {
-
+    public void updateRemoveHand(int playerIndex, int cardIndex) throws RemoteException {
+        Client.updateRemoveHand(playerIndex, cardIndex);
     }
 
     @Override
-    public void updateBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos) throws RemoteException {
-
+    public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
+        Client.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
     }
 
     @Override
     public void updateColor(int playerIndex, Color color) throws RemoteException {
-
+        Client.updateColor(playerIndex, color);
     }
 
     @Override
     public void updateCurrentPlayer(int currentPlayerIndex) throws RemoteException {
-
+        Client.updateCurrentPlayer(currentPlayerIndex);
     }
 
     @Override
-    public void updateHandSide(int playerIndex, Side side) throws RemoteException {
-
+    public void updateHandSide(int cardIndex, Side side) throws RemoteException {
+        Client.updateHandSide(cardIndex, side);
     }
 
     @Override
     public void updatePoints(int playerIndex, int points) throws RemoteException {
-
+        Client.updatePoints(playerIndex, points);
     }
 
     @Override
     public void updateSecretObjective(int objectiveCardId1, int objectiveCardId2) throws RemoteException {
-
+        Client.updateSecretObjective(objectiveCardId1, objectiveCardId2);
     }
 
     @Override
     public void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
-
+        Client.updateSharedObjective(sharedObjectiveCardId1, sharedObjectiveCardId2);
     }
 
     @Override
-    public void updateStarteCard(int cardId1) throws RemoteException {
-
+    public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
+        Client.updateStarterCard(playerIndex, cardId1, side);
     }
 
 }

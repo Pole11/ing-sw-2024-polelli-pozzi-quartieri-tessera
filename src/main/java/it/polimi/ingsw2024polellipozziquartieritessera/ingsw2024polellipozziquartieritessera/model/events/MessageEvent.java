@@ -18,7 +18,7 @@ public class MessageEvent extends Event {
     public void execute() {
         for (VirtualView clientIterator : this.clients){
             try {
-                clientIterator.ping(message);
+                clientIterator.sendMessage(message);
             } catch (RemoteException e) {
                 this.playerDisconnected(clientIterator);
             }

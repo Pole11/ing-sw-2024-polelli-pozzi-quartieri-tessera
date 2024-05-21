@@ -3,6 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class UpdateCurrentPlayer extends Event {
@@ -15,6 +16,12 @@ public class UpdateCurrentPlayer extends Event {
 
     @Override
     public void execute() {
-
+        for (VirtualView client : clients) {
+            try {
+                client.updateCurrentPlayer(currentPlayerIndex);
+            } catch (RemoteException e) {
+                playerDisconnected(client);
+            }
+        }
     }
 }

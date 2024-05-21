@@ -4,6 +4,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ObjectiveCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class UpdateSharedObjectiveEvent extends Event{
@@ -16,6 +17,12 @@ public class UpdateSharedObjectiveEvent extends Event{
 
     @Override
     public void execute() {
-
+        for (VirtualView client:clients){
+            try {
+                client.updateSharedObjective(objectiveCards.get(0).getId(), objectiveCards.get(1).getId());
+            } catch (RemoteException e) {
+                playerDisconnected(client);
+            }
+        }
     }
 }

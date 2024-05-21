@@ -6,22 +6,27 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.CornerCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class UpdateAddHandEvent extends Event{
     private final Player player;
     private final int index;
-    private final Side side;
 
-    public UpdateAddHandEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, int index, Side side) {
+    public UpdateAddHandEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, int index) {
         super(gameState, clients);
         this.player = player;
         this.index = index;
-        this.side = side;
     }
 
     @Override
     public void execute() {
-
+        for (VirtualView client: clients) {
+            try {
+                client.updateAddHand(gameState.getPlayerIndex(player), index);
+            } catch (RemoteException e) {
+                playerDisconnected(client);
+            }
+        }
     }
 }
