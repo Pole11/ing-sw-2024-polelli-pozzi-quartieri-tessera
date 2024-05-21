@@ -298,7 +298,7 @@ public class GameState {
             //to all the other clients gives the nickname so that they can execute their model
             eventQueue.add(new NicknameEvent(this, otherClients(player.getClient()), getPlayerIndex(player), player.getNickname()));
             for (Player playerIterator : players){
-                eventQueue.add(new NicknameEvent(this, singleClient(playerIterator.getClient()), getPlayerIndex(playerIterator), playerIterator.getNickname()));
+                eventQueue.add(new NicknameEvent(this, singleClient(player.getClient()), getPlayerIndex(playerIterator), playerIterator.getNickname()));
             }
             eventQueue.notifyAll();
         }

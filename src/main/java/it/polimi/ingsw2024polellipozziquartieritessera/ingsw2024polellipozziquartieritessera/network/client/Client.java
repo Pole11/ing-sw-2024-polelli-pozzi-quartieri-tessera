@@ -87,36 +87,36 @@ public class Client {
 
     public static void changePhase(GamePhase nextGamePhase) {
         viewModel.setGamePhase(nextGamePhase);
-
         currentGamePhase = nextGamePhase;
 
+        if (meDoGui) {
+            switch (nextGamePhase) {
+                case GamePhase.NICKNAMEPHASE -> {
+                    guiApplication.getGUIController().goToScene("/fxml/start.fxml");
+                }
+                case GamePhase.CHOOSESTARTERSIDEPHASE -> {
+                    guiApplication.getGUIController().goToScene("/fxml/chooseStarter.fxml");
+                }
 
-        switch (nextGamePhase) {
-            case GamePhase.NICKNAMEPHASE -> {
-                guiApplication.getGUIController().goToScene("/fxml/start.fxml");
-            }
-            case GamePhase.CHOOSESTARTERSIDEPHASE -> {
-                guiApplication.getGUIController().goToScene("/fxml/chooseStarter.fxml");
-            }
+                case GamePhase.CHOOSECOLORPHASE -> {
+                    System.out.println("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]");
+                    guiApplication.getGUIController().goToScene("/fxml/chooseColor.fxml");
 
-            case GamePhase.CHOOSECOLORPHASE -> {
-                System.out.println("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]");
-                guiApplication.getGUIController().goToScene("/fxml/chooseColor.fxml");
+                }
+                case GamePhase.CHOOSEOBJECTIVEPHASE -> {
+                    guiApplication.getGUIController().goToScene("/fxml/chooseObjective.fxml");
+                }
 
-            }
-            case GamePhase.CHOOSEOBJECTIVEPHASE -> {
-                guiApplication.getGUIController().goToScene("/fxml/chooseObjective.fxml");
-            }
-
-            case GamePhase.MAINPHASE -> {
-                System.out.println("---Game started---");
-                guiApplication.getGUIController().goToScene("/fxml/game.fxml");
-            }
-            case GamePhase.ENDPHASE -> {
-                System.out.println("NON SO CHI reached 20 points o NON SO");
-            }
-            case GamePhase.FINALPHASE -> {
-                guiApplication.getGUIController().goToScene("/fxml/final.fxml");
+                case GamePhase.MAINPHASE -> {
+                    System.out.println("---Game started---");
+                    guiApplication.getGUIController().goToScene("/fxml/game.fxml");
+                }
+                case GamePhase.ENDPHASE -> {
+                    System.out.println("NON SO CHI reached 20 points o NON SO");
+                }
+                case GamePhase.FINALPHASE -> {
+                    guiApplication.getGUIController().goToScene("/fxml/final.fxml");
+                }
             }
         }
     }
@@ -138,9 +138,10 @@ public class Client {
             } else {
                 System.out.println("you successfully entered the game with the nickname " + nickname + ", there are " + viewModel.getPlayersSize() + " players connected, to start the game type START");
             }
+        } else {
+            System.out.println("a new player has connected with the name:" + nickname);
         }
 
-        System.out.println("a new player has connected with the name:" + nickname);
     }
 
 
@@ -164,7 +165,6 @@ public class Client {
                 guiApplication.getGUIController().goToScene("/fxml/final.fxml");
             }
         }
-
     }
 
     public static void updateAddHand(int playerIndex, int cardIndex) throws RemoteException {

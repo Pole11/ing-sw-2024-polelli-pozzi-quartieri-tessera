@@ -230,6 +230,7 @@ public class ViewModel {
         ArrayList<Integer> row = new ArrayList<>();
         row.add(placingCardId);
         this.boardsMap.get(playerIndex).add(row);
+
     }
 
     private void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos){
