@@ -264,6 +264,7 @@ public class Client {
     public static void printCard(int cardId, Side side) {
         String filePath = new File("").getAbsolutePath();
         String jsonString = null;
+        ArrayList<String> cardToPrint = null;
         try {
             jsonString = Populate.readJSON(filePath + Config.CARD_JSON_PATH);
         } catch (IOException e) {
@@ -280,57 +281,119 @@ public class Client {
             if (id == cardId){
                 switch (card.get("Type").toString()){
                     case "Objective":
-                        printObjectiveCard(card);
+                        cardToPrint = printObjectiveCard(card);
                         break;
                     case "Resource":
-                        printResourceCard(card, side);
+                        cardToPrint = printResourceCard(card, side);
                         break;
                     case "Gold":
-                        printGoldCard(card, side);
+                        cardToPrint = printGoldCard(card, side);
                         break;
                     case "Starter":
-                        printStarterCard(card, side);
+                        cardToPrint = printStarterCard(card, side);
                         break;
                 }
+            }
+            for(int i = 0; i < cardToPrint.size(); i++){
+                System.out.print(cardToPrint.get(i));
             }
         }
     }
 
-    private static void printObjectiveCard(Map card){
+    private static ArrayList<String> printObjectiveCard(Map card) {
         // attributes
         String points;
         ArrayList<Element> elementChallenge = null;
         Element[][] structureChallenge = null;
+        String elementString = "";
+        ArrayList<ArrayList<String>> challengeMatrix = null;
+        String structureString = null;
+        ArrayList<String> output = new ArrayList<>();
+
+        int irel = 0, jrel = 0;
 
         // set points
         points = card.get("Points").toString();
 
         // set challenge
-        if (card.get("ChallengeType").equals("StructureChallenge")){
+        if (card.get("ChallengeType").equals("StructureChallenge")) {
             Element[][] configuration = new Element[Config.N_STRUCTURE_CHALLENGE_CONFIGURATION][Config.N_STRUCTURE_CHALLENGE_CONFIGURATION];
-            for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
-                for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
-                    configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(3*i+j).toString().toUpperCase() );
+            for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++) {
+                for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++) {
+                    configuration[i][j] = Element.valueOf(((ArrayList) card.get("Structure")).get(3 * i + j).toString().toUpperCase());
                 }
             }
             structureChallenge = configuration;
-        } else if (card.get("ChallengeType").equals("ElementChallenge")){
+        } else if (card.get("ChallengeType").equals("ElementChallenge")) {
             ArrayList<Element> elements = new ArrayList<>();
             for (Object e : (ArrayList) card.get("ChallengeElements")) {
                 elements.add(Element.valueOf(e.toString().toUpperCase()));
             }
             elementChallenge = elements;
         }
+        //printing objects settings
 
-        // TODO: printing
+        if(card.get("ChallengeType").equals("ElementChallenge")) {
+            for (Element e : elementChallenge) {
+                elementString = " " + elementString + e.toString().substring(0, 3).toUpperCase();
+            }
+            if (elementString.startsWith(" ")) {
+                elementString = elementString.substring(1);
+            }
+        } else if (card.get("ChallengeType").equals("StructureChallenge")) {
+            challengeMatrix = new ArrayList<ArrayList<String>>();
+            for(int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION + 2; i++){
+                challengeMatrix.add(new ArrayList<String>());
+                for(int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION + 2; j++){
+                    challengeMatrix.get(i).add("");
+                }
+            }
+            //rotation of 45° of the structureChallenge
+            for(int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
+                for(int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
+                    int centeri = (int)Math.floor((double) Config.N_STRUCTURE_CHALLENGE_CONFIGURATION/2);
+                    int centerj = (int)Math.floor((double) Config.N_STRUCTURE_CHALLENGE_CONFIGURATION/2);
+                    challengeMatrix.get(centeri + i + jrel).set(centerj + j - irel, structureChallenge[i][j].toString().substring(0,3));
+                }
+            }
+            //remove empty rows and columns
+            resize(challengeMatrix);
+
+
+        }
+        if (card.get("ChallengeType").equals("ElementChallenge")) {
+            output.add("+-----------------+");
+            output.add("|" + getFormattedString(17, card.get("ChallengeType").toString().toUpperCase()) + "|");
+            output.add("|" + getFormattedString(17, "points: "+points.toString()) + "|");
+            output.add("|" + getFormattedString(17, "<"+ elementString +">") + "|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("+-----------------+");
+            //todo testing
+        } else if (card.get("ChallengeType").equals("StructureChallenge")) {
+            output.add("+-----------------+");
+            output.add("|" + getFormattedString(17, card.get("ChallengeType").toString().toUpperCase()) + "|");
+            output.add("|" + getFormattedString(17, "points: "+points.toString()) + "|");
+            for(int i = 0; i < challengeMatrix.size(); i++){
+                for(int j = 0; j < challengeMatrix.get(i).size(); j++){
+                    if(challengeMatrix.get(i).get(j).isEmpty())
+                        structureString = structureString + "   ";
+                    else
+                        structureString = structureString + challengeMatrix.get(i).get(j);
+                }
+                output.add("|" + getFormattedString(17, structureString) + "|");
+            }
+            output.add("+-----------------+");
+        }
+        return output;
     }
-
-    private static void printResourceCard(Map card, Side side){
+    private static ArrayList<String> printResourceCard(Map card, Side side){
         // attributes
         String points;
         Element resource;
         Element[] frontCorners = new Element[Config.N_CORNERS];
         Element[] backCorners = new Element[Config.N_CORNERS];
+        ArrayList<String> output = new ArrayList<>();
 
         // set points
         points = card.get("Points").toString();
@@ -349,25 +412,26 @@ public class Client {
         }
 
         if (side == Side.BACK){
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
-            System.out.println("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) +"|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
+            output.add("+-----------------+");
+            output.add("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
+            output.add("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) +"|");
+            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "id: "+card.get("id").toString()) +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("+-----------------+");
         } else{
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, points)+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
+            output.add("+-----------------+");
+            output.add("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, points)+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.get("id").toString())+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("+-----------------+");
         }
+        return output;
     }
 
-    private static void printGoldCard(Map card, Side side){
+    private static ArrayList<String> printGoldCard(Map card, Side side){
         // attributes
         String points;
         Element resource;
@@ -377,6 +441,7 @@ public class Client {
         boolean noChallenge = false;
         ArrayList<Element> elementChallenge = null;
         ArrayList<Element> resourceNeeded = null;
+        ArrayList<String> output = new ArrayList<>();
 
         // set points
         points = card.get("Points").toString();
@@ -434,30 +499,31 @@ public class Client {
         }
 
         if (side == Side.BACK){
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
-            System.out.println("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) +"|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
+            output.add("+-----------------+");
+            output.add("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
+            output.add("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) +"|");
+            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "id: "+card.get("id".toString())) +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("+-----------------+");
         } else{
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, points)+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|"+ getFormattedString(17, costString)+"|");
-            System.out.println("|"+ getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
-            System.out.println("|"+ getFormattedString(17, challengeString)+"|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
+            output.add("+-----------------+");
+            output.add("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, points)+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|"+ getFormattedString(17, costString)+"|");
+            output.add("|"+ getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
+            output.add("|"+ getFormattedString(17, challengeString)+"|");
+            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.get("id").toString())+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("+-----------------+");
         }
+        return output;
     }
 
-    private static void printStarterCard(Map card, Side side){
+    private static ArrayList<String> printStarterCard(Map card, Side side){
         // attributes
         Element[] frontCorners = new Element[Config.N_CORNERS];
         Element[] backCorners = new Element[Config.N_CORNERS];
         ArrayList<Element> centerResources = null;
-
+        ArrayList<String> output = new ArrayList<>();
         // set corners
         //for in frontCorners
         for (int i = 0; i < Config.N_CORNERS; i++){
@@ -483,22 +549,23 @@ public class Client {
         }
 
         if (side == Side.BACK){
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
+            output.add("+-----------------+");
+            output.add("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.get("id").toString())+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("+-----------------+");
         } else{
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|"+ getFormattedString(17, centerString) +"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
+            output.add("+-----------------+");
+            output.add("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("|"+ getFormattedString(17, centerString) +"|");
+            output.add("|" + getFormattedString(17, "") + "|");
+            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.get("id").toString())+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("+-----------------+");
         }
+        return output;
     }
 
     private static int getId(Object key) {
@@ -526,6 +593,8 @@ public class Client {
         }
         return content;
     }
+
+
 
     public static void printMessage(String msg) {
         if (meDoGui) {
@@ -592,14 +661,44 @@ public class Client {
             }
         }
     }*/
+
+    private static void resize(ArrayList<ArrayList<String>> matrix){
+        //remove empty rows
+        for(int j = 0; j < matrix.size(); j++){
+            Boolean isEmpty = true;
+            for(int i = 0; i < matrix.get(j).size() && isEmpty; i++){
+                if(!matrix.get(j).get(i).equals("")){
+                    isEmpty = false;
+                }
+            }
+            if(isEmpty){
+                matrix.remove(j);
+                j--;
+            }
+        }
+        //remove empty columns
+        ArrayList<Boolean> areEmpty = new ArrayList<>();
+        for(int i = 0; i < matrix.get(0).size(); i++){
+            areEmpty.add(true);
+        }
+
+        for(int i = 0; i < matrix.size(); i++){
+            for (int j = 0; j < matrix.get(i).size(); j++){
+                if(!matrix.get(i).get(j).equals("")){
+                    areEmpty.set(j, false);
+                }
+            }
+        }
+        for(int j = 0; j < areEmpty.size(); j++){
+            if(areEmpty.get(j).equals(true)){
+                areEmpty.remove(j);
+                for(int i = 0; i < matrix.size(); i++){
+                    matrix.get(i).remove(j);
+                }
+            }
+        }
+    }
 }
 
+
 // TODO: capire come fare a chiamare le print card... da dove, chi lo fa, etc.
-// TODO: la mappa possiamo farla in due modi
-// 1)      2)
-// 2 3     1>2
-// 4 1     ^
-//         3>4
-// TODO: scegliere come printare le objectives
-// 1) testuale (scrivere cosa fanno)
-// 2) visuale (disegnare la objective)

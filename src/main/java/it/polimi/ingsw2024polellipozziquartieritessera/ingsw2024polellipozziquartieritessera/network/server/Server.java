@@ -341,7 +341,7 @@ public class Server implements VirtualServer {
                 client.printMessage("Thank you!");
                 this.answered.put(playerIndex, true);
             } catch (InvalidObjectiveCardException e) {
-                client.printError("The objective card you selected was invalid, please try again");starte
+                client.printError("The objective card you selected was invalid, please try again");
                 return;
             }
 
