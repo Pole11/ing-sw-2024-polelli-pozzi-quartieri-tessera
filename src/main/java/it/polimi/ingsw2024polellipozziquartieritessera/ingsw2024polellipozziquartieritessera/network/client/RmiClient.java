@@ -49,13 +49,13 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     }
 
     @Override
-    public void sendMessage(String msg) {
-        Client.printMessage(msg);
+    public void sendMessage(String msg) throws RemoteException {
+        Client.sendMessage(msg);
     }
 
     @Override
     public void sendError(String msg) throws RemoteException {
-        Client.printError(msg);
+        Client.sendError(msg);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     @Override
     public void changePhase(GamePhase nextGamePhaseString) {
-        Client.changePhase(nextGamePhaseString);
+        //Client.changePhase(nextGamePhaseString);
     }
 
     @Override

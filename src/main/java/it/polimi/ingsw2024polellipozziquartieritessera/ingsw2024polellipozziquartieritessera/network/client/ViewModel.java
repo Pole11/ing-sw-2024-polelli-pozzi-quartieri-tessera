@@ -18,11 +18,11 @@ public class ViewModel {
     private final HashMap<Integer, Boolean> connessionMap;
     private final HashMap<Integer, Color> colorsMap;
     private final HashMap<Integer, Integer> pointsMap;
+    private int starterCardId;
     private final int[] objectives; // 0,1 are common - 2,3 are secret (2 is the chosen one) // if the card is not set it is -1
     private GamePhase gamePhase;
     // private TurnPhase turnPhase;
     private int currentPlayer;
-    private boolean gameStarted;
     private final HashMap<Integer,ArrayList<Integer>> handsMap; // mappa delle hands dei player
     private final HashMap<Integer,Side> placedSideMap; // side delle carte sulla board (unico per id)
     private final HashMap<Integer,Side> handsSideMap; // side delle carte in mano (unico per id)
@@ -39,7 +39,6 @@ public class ViewModel {
         Arrays.fill(objectives, -1);
         sharedCards = new int[4];
         Arrays.fill(sharedCards, -1);
-        gameStarted = false;
         handsMap = new HashMap<>();
         boardsMap = new HashMap<>();
         connessionMap = new HashMap<>();
@@ -50,6 +49,9 @@ public class ViewModel {
     // BASIC SETTER
     public void setPlayerIndex(int playerIndex) {
         this.playerIndex = playerIndex;
+    }
+    public void setStarterCard(int starterCardId){
+        this.starterCardId = starterCardId;
     }
 
     public void setNickname(int playerIndex, String nickname) {
@@ -113,7 +115,8 @@ public class ViewModel {
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side){
         // for starter cards (initialization)
         if (!boardsMap.containsKey(playerIndex)){
-            initializeBoard(playerIndex, placingCardId);
+            // TODO: DAFARE
+            System.out.println("Erroorrrrr!");
         }
 
         // for all the other placements
@@ -126,7 +129,10 @@ public class ViewModel {
     }
 
     public void setHandSide(int cardId, Side side){
-        handsSideMap.replace(cardId, side);
+        handsSideMap.put(cardId, side);
+    }
+    public void setPlacedSide(int cardId, Side side){
+        placedSideMap.put(cardId, side);
     }
 
     // GETTERS FOR CLI&GUI
@@ -166,8 +172,8 @@ public class ViewModel {
         return turnPhase;
     } */
 
-    public boolean isGameStarted() {
-        return gameStarted;
+    public int getStarterCard() {
+        return starterCardId;
     }
 
     public ArrayList<Integer> getHand(int playerIndex){
@@ -215,7 +221,7 @@ public class ViewModel {
     }
 
     // UTILS METHOD
-    private void initializeBoard(int playerIndex, int placingCardId){
+    public void initializeBoard(int playerIndex, int placingCardId){
         this.boardsMap.get(playerIndex).clear();
         ArrayList<Integer> row = new ArrayList<>();
         row.add(placingCardId);

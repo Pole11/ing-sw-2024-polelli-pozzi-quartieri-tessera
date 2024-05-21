@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 
 public class GUIController {
+    /*
     @FXML
     private Label serverMessageLabel;
     @FXML
@@ -158,4 +159,5 @@ public class GUIController {
             }
         });
     }
+     */
 }

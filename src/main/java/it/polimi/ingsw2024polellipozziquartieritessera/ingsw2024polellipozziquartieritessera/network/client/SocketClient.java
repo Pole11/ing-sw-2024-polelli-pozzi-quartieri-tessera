@@ -10,8 +10,8 @@ import java.util.*;
 
 
 public class SocketClient implements VirtualView {
-    final BufferedReader input;
-    final ServerProxy server;
+    private final  BufferedReader input;
+    private final ServerProxy server;
 
     public SocketClient(BufferedReader input, BufferedWriter output) {
         this.input = input;
@@ -59,19 +59,66 @@ public class SocketClient implements VirtualView {
             String[] messageString = line.split("; ");
             Messages message = Messages.valueOf(messageString[0]);
             switch (message) {
-                case Messages.MESSAGE:
-                    this.sendMessage(messageString[1]);
+                case Messages.CHANGEPHASE:
+                    this.changePhase(GamePhase.valueOf(messageString[1]));
+                    break;
+                case Messages.CONNECTIONINFO:
+                    this.connectionInfo(Integer.parseInt(messageString[1]), Boolean.parseBoolean(messageString[2]));
                     break;
                 case Messages.ERROR:
                     this.sendError(messageString[1]);
                     break;
+                case Messages.MESSAGE:
+                    this.sendMessage(messageString[1]);
+                    break;
+                case Messages.NICKNAME:
+                    this.nicknameUpdate(Integer.parseInt(messageString[1]),messageString[2]);
+                    break;
                 case Messages.PING:
                     this.ping(messageString[1]);
                     break;
-                case Messages.CHANGEPHASE:
-                    this.changePhase(GamePhase.valueOf(messageString[1]));
+                case Messages.SENDINDEX:
+                    this.sendIndex(Integer.parseInt(messageString[1]));
                     break;
-
+                case Messages.START:
+                    this.start();
+                    break;
+                case Messages.ADDHAND:
+                    this.updateAddHand(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
+                    break;
+                case Messages.REMOVEHAND:
+                    this.updateRemoveHand(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
+                    break;
+                case Messages.UPDATEPLAYERBOARD:
+                    this.updatePlayerBoard(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]), Integer.parseInt(messageString[3]), CornerPos.valueOf(messageString[4]), Side.valueOf(messageString[5]));
+                    break;
+                case Messages.UPDATECOLOR:
+                    this.updateColor(Integer.parseInt(messageString[1]), Color.valueOf(messageString[2]));
+                    break;
+                case Messages.UPDATECURRENTPLAYER:
+                    this.updateCurrentPlayer(Integer.parseInt(messageString[1]));
+                    break;
+                case Messages.UPDATEHANDSIDE:
+                    this.updateHandSide(Integer.parseInt(messageString[1]), Side.valueOf(messageString[2]));
+                    break;
+                case Messages.UPDATEPOINTS:
+                    this.updatePoints(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
+                    break;
+                case Messages.UPDATESECRETOBJECTIVE:
+                    this.updateSecretObjective(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
+                    break;
+                case Messages.UPDATESHAREDOBJECTIVE:
+                    this.updateSharedObjective(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
+                    break;
+                case Messages.UPDATESTARTER:
+                    Side side;
+                    if (messageString[3].equals("null")) { // if NULL is passed as Side parameter, t
+                        side = null;
+                    } else {
+                        side = Side.valueOf(messageString[3]);
+                    }
+                    this.updateStarterCard(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]), side);
+                    break;
                 default:
                     System.err.println("[5xx INVALID MESSAGE FROM SERVER]");
                     break;
@@ -80,13 +127,13 @@ public class SocketClient implements VirtualView {
     }
 
     @Override
-    public void sendMessage(String msg) {
-        Client.printMessage(msg);
+    public void sendMessage(String msg) throws RemoteException {
+        Client.sendMessage(msg);
     }
 
     @Override
     public void sendError(String msg) throws RemoteException {
-        Client.printError(msg);
+        Client.sendError(msg);
     }
 
     @Override
@@ -106,7 +153,7 @@ public class SocketClient implements VirtualView {
 
     @Override
     public void changePhase(GamePhase nextGamePhaseString) {
-        Client.changePhase(nextGamePhaseString);
+        //Client.changePhase(nextGamePhaseString);
     }
 
     @Override
