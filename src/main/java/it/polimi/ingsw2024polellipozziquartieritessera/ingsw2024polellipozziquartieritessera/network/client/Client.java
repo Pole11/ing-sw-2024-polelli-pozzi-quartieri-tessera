@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
@@ -20,7 +20,7 @@ import java.util.*;
 public class Client {
     private static boolean meDoGui;
     public static GUIApplication guiApplication; // TODO: public only for testing purpose, put private after finished testing
-    public static GUIController guiController; // TODO: public only for testing purpose, put private after finished testing
+    public static GUIControllerGame guiControllerOld; // TODO: public only for testing purpose, put private after finished testing
     private static GamePhase currentGamePhase;
 
     public static void main(String[] args) throws IOException {
@@ -72,9 +72,9 @@ public class Client {
         // il punto è che dovresti fare questo ma dopo il runGui
         //guiController = guiApplication.getGUIController();
         //System.out.println("CCC" + guiController);
-        guiController = new GUIController(client, server);
+        //guiApplication.getGUIController() = new GUIControllerOld(client, server);
 
-        guiApplication.runGui(guiController);
+        guiApplication.runGui(client, server);
     }
 
     // TODO: refactor with multiple methods
@@ -518,14 +518,18 @@ public class Client {
 
     public static void printMessage(String msg) {
         if (meDoGui) {
-            guiController.setServerMessage(msg);
+            synchronized (guiApplication) { // ??
+                guiApplication.getGUIController().setServerMessage(msg);
+            }
         }
         System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
 
     public static void printError(String msg) {
         if (meDoGui) {
-            guiController.setServerError(msg);
+            synchronized (guiApplication) { // ??
+                guiApplication.getGUIController().setServerError(msg);
+            }
         }
         System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
 
@@ -546,27 +550,24 @@ public class Client {
 
         switch (nextGamePhase) {
             case GamePhase.NICKNAMEPHASE -> {
-                guiController.goToScene("/fxml/startGame.fxml");
+                guiApplication.getGUIController().goToScene("/fxml/startGame.fxml");
             }
             case GamePhase.CHOOSESTARTERSIDEPHASE -> {
-                guiController.goToScene("/fxml/chooseStarter.fxml");
-                guiController.setStarterCardImage(84); // TODO: FORCED: change
+                guiApplication.getGUIController().goToScene("/fxml/chooseStarter.fxml");
             }
             case GamePhase.CHOOSECOLORPHASE -> {
-                guiController.goToScene("/fxml/chooseColor.fxml");
+                guiApplication.getGUIController().goToScene("/fxml/chooseColor.fxml");
             }
             case GamePhase.CHOOSEOBJECTIVEPHASE -> {
-                guiController.goToScene("/fxml/chooseObjective.fxml");
-                guiController.setObjectiveCardImages(90, 91); // TODO: FORCED: change
+                guiApplication.getGUIController().goToScene("/fxml/chooseObjective.fxml");
             }
             case GamePhase.MAINPHASE -> {
-                guiController.goToScene("/fxml/game.fxml");
-                guiController.initTable(4, 61, 11, 42, 27, 63, 3);
+                guiApplication.getGUIController().goToScene("/fxml/game.fxml");
             }
             case GamePhase.ENDPHASE -> {
             }
             case GamePhase.FINALPHASE -> {
-                guiController.goToScene("/fxml/final.fxml");
+                guiApplication.getGUIController().goToScene("/fxml/final.fxml");
             }
         }
 
