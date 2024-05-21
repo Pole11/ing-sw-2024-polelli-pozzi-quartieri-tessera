@@ -158,8 +158,13 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
-    public void changePhase(GamePhase nextGamePhase) throws RemoteException {
-        view.changePhase(nextGamePhase);
+    public void updateGamePhase(GamePhase nextGamePhase) throws RemoteException {
+        view.updateGamePhase(nextGamePhase);
+    }
+
+    @Override
+    public void updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException {
+        view.updateTurnPhase(nextTurnPhase);
     }
 
     @Override

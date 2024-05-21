@@ -1,9 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.CornerPos;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.GamePhase;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 
 import java.rmi.*;
 
@@ -14,7 +11,8 @@ public interface VirtualView extends Remote {
     void sendError(String error) throws RemoteException;
     void sendIndex(int index) throws RemoteException;
     void nicknameUpdate(int index, String nickname) throws RemoteException;
-    void changePhase(GamePhase nextGamePhase) throws RemoteException;
+    void updateGamePhase(GamePhase nextGamePhase) throws RemoteException;
+    void updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException;
     //FORSE da togliere
     void start() throws RemoteException;
     void connectionInfo(int playerIndex, boolean connected) throws RemoteException;
@@ -29,4 +27,5 @@ public interface VirtualView extends Remote {
     void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException;
     //side is null if is not decided
     void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException;
+
 }

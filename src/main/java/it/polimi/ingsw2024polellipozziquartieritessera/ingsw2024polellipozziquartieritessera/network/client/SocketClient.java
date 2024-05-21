@@ -59,8 +59,11 @@ public class SocketClient implements VirtualView {
             String[] messageString = line.split("; ");
             Messages message = Messages.valueOf(messageString[0]);
             switch (message) {
-                case Messages.CHANGEPHASE:
-                    this.changePhase(GamePhase.valueOf(messageString[1]));
+                case Messages.GAMEPHASE:
+                    this.updateGamePhase(GamePhase.valueOf(messageString[1]));
+                    break;
+                case Messages.TURNPHASE:
+                    this.updateTurnPhase(TurnPhase.valueOf(messageString[1]));
                     break;
                 case Messages.CONNECTIONINFO:
                     this.connectionInfo(Integer.parseInt(messageString[1]), Boolean.parseBoolean(messageString[2]));
@@ -152,8 +155,14 @@ public class SocketClient implements VirtualView {
     }
 
     @Override
-    public void changePhase(GamePhase nextGamePhaseString) {
-        //Client.changePhase(nextGamePhaseString);
+    public void updateGamePhase(GamePhase nextGamePhaseString) {
+        Client.changePhase(nextGamePhaseString);
+    }
+
+    @Override
+    public void
+    updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException {
+        Client.updateTurnPhase(nextTurnPhase);
     }
 
     @Override

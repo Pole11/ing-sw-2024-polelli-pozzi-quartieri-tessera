@@ -218,10 +218,15 @@ public class CLIController {
     public void printBoard(ArrayList<ArrayList<Integer>> board, ArrayList<Integer> cardsOrder){
         ArrayList<ArrayList<Integer>> rotatedBoard = new ArrayList<>();
         ArrayList<String> printedBoard = new ArrayList<>();
+        ArrayList<String> card = null;
+
         int irel = 0, jrel = 0;
 
         for(int i = 0; i < board.size() + 2; i++){
             rotatedBoard.add(new ArrayList<>());
+            for(int j  = 0; j < board.get(i).size() + 2; j++){
+                rotatedBoard.get(i).add(-1);
+            }
         }
         //rotate board of 45°
         int centeri = (int)Math.floor((double) board.size()/2);
@@ -236,8 +241,15 @@ public class CLIController {
         //for each id in the rotated board, create a Arraylist of strings that represent the card and place it in the right position in the printedBoard
         for(int i = 0; i < rotatedBoard.size(); i++){
             for(int j = 0; j < rotatedBoard.get(i).size(); j++){
+                card = new ArrayList<>();
+
+                int id = rotatedBoard.get(i).get(j);
+                if(id < 0){
+                    ;
+                }
 
             }
+
         }
 
     }

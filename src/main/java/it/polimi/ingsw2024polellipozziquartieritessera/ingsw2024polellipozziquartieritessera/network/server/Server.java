@@ -126,6 +126,7 @@ public class Server implements VirtualServer {
                 client.sendError("You already chose a nickname, you cannot change it");
                 return;
             }
+            // DA TOGLIERE va controllato tutto nel gamestate
             this.clients.put(this.clients.size(), client);
             this.controller.addPlayer(client, nickname);
             System.out.println("New player connected!");

@@ -9,37 +9,21 @@ import java.util.ArrayList;
 
 public class NicknameEvent extends Event{
     private final String nickname;
+    private final int playerIndex;
 
-    public NicknameEvent(GameState gameState, ArrayList<VirtualView> clients, String nickname) {
+    public NicknameEvent(GameState gameState, ArrayList<VirtualView> clients,int playerIndex, String nickname) {
         super(gameState, clients);
         this.nickname = nickname;
+        this.playerIndex = playerIndex;
     }
 
     @Override
     public void execute() {
-        VirtualView client = clients.getLast();
-
-        try {
-            if (clients.size() == 1) {
-                client.sendMessage("you successfully entered the game with the nickname " + nickname + ", wait for at least two players to start the game");
-            } else {
-                client.sendMessage("you successfully entered the game with the nickname " + nickname + ", there are " + clients.size() + " players connected, to start the game type START");
-                for (int i = 0; i < gameState.getPlayersSize() -1 ; i++){
-                    client.nicknameUpdate(gameState.getPlayerIndex(client), gameState.getPlayer(i).getNickname());
-                }
-            }
-        } catch (RemoteException e) {
-            System.out.println("client" + gameState.getPlayerIndex(client) + "is disconnected");
-            gameState.setPlayersConnected(gameState.getPlayerIndex(client), false);
-        }
-
         for (VirtualView clientIterator : this.clients) {
-            if (!clientIterator.equals(client)){
-                try {
-                    clientIterator.nicknameUpdate(gameState.getPlayerIndex(client), nickname);
-                } catch (RemoteException e){
-                    this.playerDisconnected(clientIterator);
-                }
+            try {
+                clientIterator.nicknameUpdate(playerIndex, nickname);
+            } catch (RemoteException e){
+                this.playerDisconnected(clientIterator);
             }
         }
 

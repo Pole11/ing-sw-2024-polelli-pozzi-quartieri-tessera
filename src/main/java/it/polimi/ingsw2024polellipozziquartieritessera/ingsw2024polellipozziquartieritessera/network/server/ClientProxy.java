@@ -34,7 +34,7 @@ public class ClientProxy implements VirtualView {
 
     @Override
     public void nicknameUpdate(int index, String nickname) throws RemoteException {
-        output.println(Messages.NICKNAME + "; " + nickname);
+        output.println(Messages.NICKNAME + "; " + index + "; "+ nickname);
         output.flush();
     }
 
@@ -46,8 +46,14 @@ public class ClientProxy implements VirtualView {
     }
 
     @Override
-    public void changePhase(GamePhase nextGamePhase) {
-        output.println(Messages.CHANGEPHASE + "; " + nextGamePhase.toString());
+    public void updateGamePhase(GamePhase nextGamePhase) {
+        output.println(Messages.GAMEPHASE + "; " + nextGamePhase.toString());
+        output.flush();
+    }
+
+    @Override
+    public void updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException {
+        output.println(Messages.TURNPHASE + "; " + nextTurnPhase.toString());
         output.flush();
     }
 

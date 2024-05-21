@@ -74,8 +74,13 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     }
 
     @Override
-    public void changePhase(GamePhase nextGamePhaseString) {
-        //Client.changePhase(nextGamePhaseString);
+    public void updateGamePhase(GamePhase nextGamePhaseString) {
+        Client.changePhase(nextGamePhaseString);
+    }
+
+    @Override
+    public void updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException {
+        Client.updateTurnPhase(nextTurnPhase);
     }
 
     @Override

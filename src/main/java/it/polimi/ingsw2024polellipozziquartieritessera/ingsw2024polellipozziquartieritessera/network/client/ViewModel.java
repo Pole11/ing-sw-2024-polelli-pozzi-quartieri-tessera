@@ -21,7 +21,7 @@ public class ViewModel {
     private int starterCardId;
     private final int[] objectives; // 0,1 are common - 2,3 are secret (2 is the chosen one) // if the card is not set it is -1
     private GamePhase gamePhase;
-    // private TurnPhase turnPhase;
+    private TurnPhase turnPhase;
     private int currentPlayer;
     private final HashMap<Integer,ArrayList<Integer>> handsMap; // mappa delle hands dei player
     private final HashMap<Integer,Side> placedSideMap; // side delle carte sulla board (unico per id)
@@ -76,10 +76,10 @@ public class ViewModel {
         objectives[3] = objectiveCardId2;
     }
 
-    /*
+
     public void setTurnPhase(TurnPhase turnPhase){
         this.turnPhase = turnPhase;
-    }*/
+    }
 
     public void setGamePhase(GamePhase gamePhase){
         this.gamePhase = gamePhase;
@@ -143,6 +143,10 @@ public class ViewModel {
 
     public String getNickname(int playerIndex) {
         return nicknamesMap.get(playerIndex);
+    }
+
+    public int getPlayersSize(){
+        return nicknamesMap.keySet().size();
     }
 
     public int[] getObjectives() {

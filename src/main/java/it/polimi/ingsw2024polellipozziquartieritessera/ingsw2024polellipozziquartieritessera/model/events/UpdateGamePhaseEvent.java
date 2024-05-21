@@ -7,10 +7,10 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class ChangePhaseEvent extends Event{
+public class UpdateGamePhaseEvent extends Event{
     private final GamePhase gamePhase;
 
-    public ChangePhaseEvent(GameState gameState, ArrayList<VirtualView> clients, GamePhase gamePhase) {
+    public UpdateGamePhaseEvent(GameState gameState, ArrayList<VirtualView> clients, GamePhase gamePhase) {
         super(gameState, clients);
         this.gamePhase = gamePhase;
     }
@@ -19,7 +19,7 @@ public class ChangePhaseEvent extends Event{
     public void execute() {
         for (VirtualView client: clients) {
             try {
-                client.changePhase(gamePhase);
+                client.updateGamePhase(gamePhase);
             } catch (RemoteException e) {
                 playerDisconnected(client);
             }

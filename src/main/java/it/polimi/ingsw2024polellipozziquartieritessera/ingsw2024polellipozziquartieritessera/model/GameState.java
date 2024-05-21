@@ -276,8 +276,7 @@ public class GameState {
                     synchronized (eventQueue){
                         //only to the client
                         this.restoreView();
-                        eventQueue.add(new ChangePhaseEvent(this, singleClient(player.getClient()), this.currentGamePhase));
-                        eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "you re-connected to the game"));
+                        eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), this.currentGamePhase));
                         //to all the other clients says that a client reconnected
                         eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player, true));
                         eventQueue.notifyAll();
@@ -295,9 +294,12 @@ public class GameState {
         players.add(player);
         synchronized (eventQueue){
             eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
-            eventQueue.add(new ChangePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
+            eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
             //to all the other clients gives the nickname so that they can execute their model
-            eventQueue.add(new NicknameEvent(this, allClients(), player.getNickname()));
+            eventQueue.add(new NicknameEvent(this, otherClients(player.getClient()), getPlayerIndex(player), player.getNickname()));
+            for (Player playerIterator : players){
+                eventQueue.add(new NicknameEvent(this, singleClient(playerIterator.getClient()), getPlayerIndex(playerIterator), playerIterator.getNickname()));
+            }
             eventQueue.notifyAll();
         }
     }
@@ -331,9 +333,8 @@ public class GameState {
         System.out.println("Starting game");
         this.currentGamePhase = GamePhase.CHOOSESTARTERSIDEPHASE;
         synchronized (eventQueue){
-            //remember to changePhase
-            eventQueue.add(new StartEvent(this, allClients()));
-            eventQueue.add(new ChangePhaseEvent(this, allClients(), GamePhase.CHOOSESTARTERSIDEPHASE));
+            //eventQueue.add(new StartEvent(this, allClients()));
+            eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSESTARTERSIDEPHASE));
             eventQueue.notifyAll();
         }
     }
@@ -379,18 +380,14 @@ public class GameState {
             player.addToAllElements(ele, currentOccurrences + 1);
         }
 
-        synchronized (eventQueue){
-            eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "Thank you for the side of your starter card"));
-            eventQueue.notifyAll();
-        }
+
         this.answered.put(playerIndex, true);
 
         //notify him and all the others about the change
         if (numberAnswered() == players.size()){
             this.currentGamePhase = GamePhase.CHOOSECOLORPHASE;
             synchronized (eventQueue){
-                eventQueue.add(new ChangePhaseEvent(this, allClients(), GamePhase.CHOOSECOLORPHASE));
-                eventQueue.add(new MessageEvent(this, allClients(), "Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]"));
+                eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSECOLORPHASE));
                 eventQueue.notifyAll();
             }
             resetAnswered();
@@ -416,10 +413,6 @@ public class GameState {
             }
         }
         player.setColor(color);
-        synchronized (eventQueue){
-            eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "Thank you for selecting the color"));
-            eventQueue.notifyAll();
-        }
         this.answered.put(playerIndex, true);
 
         if (numberAnswered() == players.size()) {
@@ -435,8 +428,7 @@ public class GameState {
             this.setObjectives();
             this.currentGamePhase = GamePhase.CHOOSEOBJECTIVEPHASE;
             synchronized (eventQueue){
-                eventQueue.add(new ChangePhaseEvent(this, allClients(), GamePhase.CHOOSEOBJECTIVEPHASE));
-                eventQueue.add(new MessageEvent(this, allClients(), "Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1], to see your card use the command SHOWOBJECTIVE" ));
+                eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSEOBJECTIVEPHASE));
                 eventQueue.notifyAll();
             }
         }
@@ -511,22 +503,14 @@ public class GameState {
         }
 
         player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
-
-        //considerare se spostare
-        synchronized (eventQueue){
-            eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "Thank you for selecting the objective card"));
-            eventQueue.notifyAll();
-        }
         this.answered.put(playerIndex, true);
-
 
         if (numberAnswered() == players.size()) {
             resetAnswered();
             currentGamePhase = GamePhase.MAINPHASE;
             synchronized (eventQueue){
-                eventQueue.add(new ChangePhaseEvent(this, allClients(), GamePhase.MAINPHASE));
-                eventQueue.add(new MessageEvent(this, singleClient(getCurrentPlayer().getClient()), "The preparation phase is over, it's your turn to play as first, use the command PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)] to place your card"));
-                eventQueue.add(new MessageEvent(this, otherClients(getCurrentPlayer().getClient()), "The preparation phase is over, it's now the turn of " + getCurrentPlayer().getNickname() + " to play as first"));
+                eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.MAINPHASE));
+                eventQueue.add(new UpdateCurrentPlayer(this, allClients(), currentPlayerIndex));
                 eventQueue.notifyAll();
             }
         }
@@ -586,8 +570,7 @@ public class GameState {
         updateElements(player, placingCard, placingCardSide);
         //NON MI PIACE MESSA QUI PERCHE NON E' L'ULTIMA AZIONE DEL CONTROLLER, CERCARE DI CAPIRE COME MODIFIFCARE
         synchronized (eventQueue){
-            eventQueue.add(new MessageEvent(this, singleClient(player.getClient()), "you placed your card, now you have to draw your card with DRAW [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]"));
-            eventQueue.add(new MessageEvent(this, otherClients(player.getClient()), getCurrentPlayer().getNickname() + "placed his card"));
+            eventQueue.add(new UpdateTurnPhaseEvent(this, allClients(), TurnPhase.DRAWPHASE));
             eventQueue.notifyAll();
         }
     }
