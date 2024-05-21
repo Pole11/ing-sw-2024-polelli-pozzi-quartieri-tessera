@@ -11,12 +11,8 @@ public class GUIControllerStart extends GUIController {
     @FXML
     public void handleStartGame(ActionEvent event) {
         String message = Command.START.toString();
-        try {
-            Client.manageInputCli(getServer(), message.split(" "), getClient());
-        } catch (RemoteException e) {
-            e.printStackTrace(); // TODO: remove on prod
-            getServerErrorLabel().setText("There was an error while adding a user");
-        }
+        //Client.manageInputCli(getServer(), message.split(" "), getClient());
+
         // check if the user has logged in
         // check if the game is startable
     }

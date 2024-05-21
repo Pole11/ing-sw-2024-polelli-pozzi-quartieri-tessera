@@ -39,12 +39,8 @@ public class GUIControllerColor extends GUIController {
         changeMainContainerBorder(color); // TODO: move from here, put it in the client so that the color is changed only one single time
 
         String message = Command.CHOOSECOLOR + " " + color;
-        try {
-            Client.manageInputCli(getServer(), message.split(" "), getClient());
-        } catch (RemoteException e) {
-            e.printStackTrace(); // TODO: remove on prod
-            Platform.runLater(() -> getServerErrorLabel().setText("There was an error while selecting a color"));
-        }
+        //Client.manageInputCli(getServer(), message.split(" "), getClient());
+
     }
 
     private void changeMainContainerBorder(Color color) {

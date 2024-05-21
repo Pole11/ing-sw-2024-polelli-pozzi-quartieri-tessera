@@ -14,11 +14,7 @@ public class GUIControllerLobby extends GUIController {
     @FXML
     public void handleAddUser(ActionEvent event) {
         String message = Command.ADDUSER + " " + nicknameTextField.getText();
-        try {
-            Client.manageInputCli(getServer(), message.split(" "), getClient());
-        } catch (RemoteException e) {
-            e.printStackTrace(); // TODO: remove on prod
-            getServerErrorLabel().setText("There was an error while adding a user");
-        }
+        //Client.manageInputCli(getServer(), message.split(" "), getClient());
+
     }
 }

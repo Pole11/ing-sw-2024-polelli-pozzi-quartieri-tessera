@@ -31,12 +31,8 @@ public class GUIControllerStarterCard extends GUIController {
 
     private void handleChooseSideStarter(Side side) {
         String message = Command.CHOOSESTARTER + " " + side;
-        try {
-            Client.manageInputCli(getServer(), message.split(" "), getClient());
-        } catch (RemoteException e) {
-            e.printStackTrace(); // TODO: remove on prod
-            getServerErrorLabel().setText("There was an error while choosing the starter side");
-        }
+        //Client.manageInputCli(getServer(), message.split(" "), getClient());
+
     }
 
     public void setStarterCardImage(int id) {

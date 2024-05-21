@@ -20,7 +20,6 @@ import java.util.*;
 
 public class Client {
     private static boolean meDoGui;
-    private static GUIApplication guiApplication;
     private static GUIController guiController;
     private static CLIController cliController = new CLIController();
     public static GUIApplication guiApplication; // TODO: public only for testing purpose, put private after finished testing
@@ -81,7 +80,7 @@ public class Client {
         //System.out.println("CCC" + guiController);
         //guiApplication.getGUIController() = new GUIControllerOld(client, server);
 
-        guiApplication.runGui(guiController);
+        guiApplication.runGui(client, server);
 
     }
 

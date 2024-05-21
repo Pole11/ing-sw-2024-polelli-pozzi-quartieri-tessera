@@ -31,12 +31,8 @@ public class GUIControllerObjective extends GUIController{
 
     public void handleChooseObjective(int index) {
         String message = Command.CHOOSEOBJECTIVE + " " + index;
-        try {
-            Client.manageInputCli(getServer(), message.split(" "), getClient());
-        } catch (RemoteException e) {
-            e.printStackTrace(); // TODO: remove on prod
-            Platform.runLater(() -> getServerErrorLabel().setText("There was an error selecting the secret objective card") );
-        }
+        //Client.manageInputCli(getServer(), message.split(" "), getClient());
+
     }
 
 
