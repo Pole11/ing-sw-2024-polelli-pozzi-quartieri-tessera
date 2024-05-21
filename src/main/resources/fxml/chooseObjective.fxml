@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Button?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
 <?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
 
-<!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
-<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" stylesheets="@../style/prepPhase.css">
+<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" stylesheets="@../style/prepPhase.css, @../style/main.css" styleClass="root" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerObjective">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
-    <VBox>
+    <VBox styleClass="mainContainer" fx:id="mainContainerPrep" alignment="CENTER">
         <Text styleClass="title">Choose the objective card</Text>
-
-        <Button text="1"
-                onAction="#chooseFirstObjective"/>
-
-        <Button text="2"
-                onAction="#chooseSecondObjective"/>
-
+        <Label>First option:</Label>
+        <StackPane styleClass="objectiveCardImageContainer" fx:id="firstObjectiveImageContainer" >
+        </StackPane>
+        <Label>Secondo opziono:</Label>
+        <StackPane styleClass="objectiveCardImageContainer" fx:id="secondObjectiveImageContainer">
+        </StackPane>
         <Label
                 fx:id="serverMessageLabel"
                 styleClass="serverMessage"/>

@@ -4,20 +4,22 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
+<!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerGame"> -->
 
 <?import javafx.scene.text.Text?>
-<GridPane alignment="CENTER" hgap="10" stylesheets="@../style/prepPhase.css" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea">
+<?import javafx.scene.shape.Line?>
+<GridPane alignment="CENTER" hgap="10" stylesheets="@../style/prepPhase.css, @../style/main.css" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea" styleClass="root" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerLobby">
     <padding>
         <Insets bottom="50" left="50" right="50" top="50" />
     </padding>
 
-    <VBox>
+    <VBox styleClass="mainContainer" fx:id="mainContainerPrep">
         <Text styleClass="title">Welcome to Codex Naturalis</Text>
-
-        <Label text="Nickname:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-        <TextField fx:id="nicknameTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <Button onAction="#handleAddUser" text="Register" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <Label text="Nickname:" />
+        <Separator/>
+        <TextField fx:id="nicknameTextField" />
+        <Separator/>
+        <Button onAction="#handleAddUser" text="Register" />
         <Label
                 fx:id="serverMessageLabel"
                 styleClass="serverMessage"/>

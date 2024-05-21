@@ -1,42 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
-
-<GridPane alignment="CENTER" hgap="10" stylesheets="@../style/prepPhase.css" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
-
-    <VBox>
-     <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
-        <tabs>
-            <Tab text="player 1">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                </content>
-            </Tab>
-            <Tab text="player2">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                </content>
-            </Tab>
-            <Tab text="player3">
-               <content>
-                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-               </content>
-            </Tab>
-            <Tab text="player4">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                </content>
-            </Tab>
-        </tabs>
-     </TabPane>
-    </VBox>
-
-
-</GridPane>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<BorderPane styleClass="root" fx:id="mainContainerGame" stylesheets="@../style/game.css, @../style/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerGame">
+    <top>
+        <HBox alignment="TOP_CENTER" id="player1ContainerGame" styleClass="horizontalPlayerContainer">
+            <HBox alignment="CENTER" id="player1HandContainerGame"></HBox>
+        </HBox>
+    </top>
+    <bottom>
+        <HBox alignment="TOP_CENTER" id="player2ContainerGame"  styleClass="horizontalPlayerContainer">
+            <HBox alignment="CENTER" id="player2HandContainerGame"></HBox>
+        </HBox>
+    </bottom>
+    <left>
+        <VBox alignment="CENTER_LEFT" id="player3ContainerGame"  styleClass="verticalPlayerContainer">
+            <VBox alignment="CENTER" id="player3HandContainerGame"></VBox>
+        </VBox>
+    </left>
+    <right>
+        <VBox alignment="CENTER_RIGHT" id="player4ContainerGame" styleClass="verticalPlayerContainer">
+            <VBox alignment="CENTER" id="player4HandContainerGame"></VBox>
+        </VBox>
+    </right>
+    <center>
+        <HBox alignment="CENTER">
+            <VBox alignment="CENTER" fx:id="sharedGoldContainerGame"></VBox>
+            <VBox alignment="CENTER" fx:id="plateauContainerGame" styleClass="plateauContainerGame">
+                <Label
+                        fx:id="serverMessageLabel"
+                        styleClass="serverMessage"/>
+                <Label
+                        fx:id="serverErrorLabel"
+                        styleClass="serverError"/>
+            </VBox>
+            <VBox alignment="CENTER" fx:id="sharedResourceContainerGame"></VBox>
+        </HBox>
+    </center>
+</BorderPane>

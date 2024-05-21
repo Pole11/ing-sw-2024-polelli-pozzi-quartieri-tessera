@@ -5,7 +5,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.MessageEvent;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
@@ -23,6 +23,8 @@ public class Client {
     private static GUIApplication guiApplication;
     private static GUIController guiController;
     private static CLIController cliController = new CLIController();
+    public static GUIApplication guiApplication; // TODO: public only for testing purpose, put private after finished testing
+    public static GUIControllerGame guiControllerOld; // TODO: public only for testing purpose, put private after finished testing
     private static GamePhase currentGamePhase;
     private static ViewModel viewModel = new ViewModel();
 
@@ -66,7 +68,7 @@ public class Client {
     }
 
     public static void runGui(VirtualServer server, VirtualView client){
-        /*
+        
         meDoGui = true;
 
         guiApplication = new GUIApplication();
@@ -77,11 +79,10 @@ public class Client {
         // il punto è che dovresti fare questo ma dopo il runGui
         //guiController = guiApplication.getGUIController();
         //System.out.println("CCC" + guiController);
-        guiController = new GUIController(client, server);
+        //guiApplication.getGUIController() = new GUIControllerOld(client, server);
 
         guiApplication.runGui(guiController);
 
-         */
     }
 
 
@@ -93,27 +94,30 @@ public class Client {
 
         switch (nextGamePhase) {
             case GamePhase.NICKNAMEPHASE -> {
-                //guiController.goToScene("/fxml/start.fxml");
+                guiApplication.getGUIController().goToScene("/fxml/start.fxml");
             }
             case GamePhase.CHOOSESTARTERSIDEPHASE -> {
-                //guiController.goToScene("/fxml/chooseStarter.fxml");
+                guiApplication.getGUIController().goToScene("/fxml/chooseStarter.fxml");
             }
+
             case GamePhase.CHOOSECOLORPHASE -> {
                 System.out.println("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]");
-                //guiController.goToScene("/fxml/chooseColor.fxml");
+                guiApplication.getGUIController().goToScene("/fxml/chooseColor.fxml");
+
             }
             case GamePhase.CHOOSEOBJECTIVEPHASE -> {
-                //guiController.goToScene("/fxml/chooseObjective.fxml");
+                guiApplication.getGUIController().goToScene("/fxml/chooseObjective.fxml");
             }
+
             case GamePhase.MAINPHASE -> {
                 System.out.println("---Game started---");
-                //guiController.goToScene("/fxml/game.fxml");
+                guiApplication.getGUIController().goToScene("/fxml/game.fxml");
             }
             case GamePhase.ENDPHASE -> {
                 System.out.println("NON SO CHI reached 20 points o NON SO");
             }
             case GamePhase.FINALPHASE -> {
-                //guiController.goToScene("/fxml/final.fxml");
+                guiApplication.getGUIController().goToScene("/fxml/final.fxml");
             }
         }
     }
@@ -158,6 +162,7 @@ public class Client {
                 System.out.println(viewModel.getNickname(playerIndex) + " connected");
             } else {
                 System.out.println(viewModel.getNickname(playerIndex) + " disconnected");
+                guiApplication.getGUIController().goToScene("/fxml/final.fxml");
             }
         }
 

@@ -1,0 +1,41 @@
+@font-face {
+    src: url("../fonts/Comic_Neue/ComicNeue-Regular.ttf");
+}
+
+@font-face {
+    src: url("../fonts/Comic_Neue/ComicNeue-Bold.ttf");
+}
+
+* {
+    -fx-wrap-text: true;
+}
+
+Separator {
+    -fx-padding: 10px;
+}
+
+Button {
+    -fx-background-color: rgb(200, 200, 220);
+}
+
+.rotateYes {
+    -fx-rotate: 3deg;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.rotateNo {
+    -fx-rotate: 0deg;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+}
+
+.clickable, Button {
+    -fx-cursor: hand;
+}
+
+.imageWithBorder {
+    -fx-effect: dropshadow(gaussian, black, 5, 0.2, 0, 0);
+    -fx-padding: 10;
+    -fx-background-color: white;
+}
