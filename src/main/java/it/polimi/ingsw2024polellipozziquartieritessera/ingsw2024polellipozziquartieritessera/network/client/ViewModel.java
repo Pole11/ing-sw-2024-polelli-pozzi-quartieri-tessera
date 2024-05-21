@@ -4,11 +4,9 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.GamePhase;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.TurnPhase;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Chat;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateBoardEvent;
 
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,9 +15,13 @@ import java.util.HashMap;
 public class ViewModel {
     private int playerIndex;
     private final HashMap<Integer,String> nicknamesMap;
-    private final int[] objectives; // 0,1 are common - 2 is secret // se la carta non c'è viene posta a -1
+    private final HashMap<Integer, Boolean> connessionMap;
+    private final HashMap<Integer, Color> colorsMap;
+    private final HashMap<Integer, Integer> pointsMap;
+    private final int[] objectives; // 0,1 are common - 2,3 are secret (2 is the chosen one) // if the card is not set it is -1
     private GamePhase gamePhase;
-    private TurnPhase turnPhase;
+    // private TurnPhase turnPhase;
+    private int currentPlayer;
     private boolean gameStarted;
     private final HashMap<Integer,ArrayList<Integer>> handsMap; // mappa delle hands dei player
     private final HashMap<Integer,Side> placedSideMap; // side delle carte sulla board (unico per id)
@@ -40,27 +42,52 @@ public class ViewModel {
         gameStarted = false;
         handsMap = new HashMap<>();
         boardsMap = new HashMap<>();
+        connessionMap = new HashMap<>();
+        colorsMap = new HashMap<>();
+        pointsMap = new HashMap<>();
     }
 
     // BASIC SETTER
-    public void setPlayerIndex(int index) {
-        this.playerIndex = index; }
-    public void addedNickname(String nickname, int index) {
-        this.nicknamesMap.put(index, nickname);
+    public void setPlayerIndex(int playerIndex) {
+        this.playerIndex = playerIndex;
+    }
+
+    public void setNickname(int playerIndex, String nickname) {
+        this.nicknamesMap.put(playerIndex, nickname);
+    }
+
+    public void setConnection(int playerIndex, boolean isConnected){
+        this.connessionMap.put(playerIndex, isConnected);
+    }
+
+    public void setColor(int playerIndex, Color color){
+        this.colorsMap.put(playerIndex, color);
     }
 
     // GAME UPDATES
-    public void setCommonObjectives(int objectiveCardId1, int objectiveCardId2) {
+    public void setSharedObjectives(int objectiveCardId1, int objectiveCardId2) {
         objectives[0] = objectiveCardId1;
         objectives[1] = objectiveCardId2;
     }
-    public void setSecretObjective(int objectiveCardId){
-        objectives[2] = objectiveCardId;
+    public void setSecretObjective(int objectiveCardId1, int objectiveCardId2){
+        objectives[2] = objectiveCardId1;
+        objectives[3] = objectiveCardId2;
     }
+
+    /*
     public void setTurnPhase(TurnPhase turnPhase){
-        this.turnPhase = turnPhase; }
+        this.turnPhase = turnPhase;
+    }*/
+
     public void setGamePhase(GamePhase gamePhase){
         this.gamePhase = gamePhase;
+    }
+    public void setCurrentPlayer(int playerIndex){
+        currentPlayer = playerIndex;
+    }
+
+    public void setPoints(int playerIndex, int points){
+        this.pointsMap.put(playerIndex, points);
     }
 
     // position are: resource [0,1], gold [2,3]
@@ -83,7 +110,7 @@ public class ViewModel {
         handsSideMap.remove(cardId);
     }
 
-    public void updateBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side){
+    public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side){
         // for starter cards (initialization)
         if (!boardsMap.containsKey(playerIndex)){
             initializeBoard(playerIndex, placingCardId);
@@ -98,24 +125,14 @@ public class ViewModel {
         placedSideMap.put(placingCardId, side);
     }
 
-    public void setCardSide(int cardId, Side side){
+    public void setHandSide(int cardId, Side side){
         handsSideMap.replace(cardId, side);
-    }
-
-    // TODO: Sarebbe bello trasformare i messaggi per salvarsi solo l'id del player e non il player stesso
-    // Da sistemare e rifare
-    public void addedMessage(int playerIndex, String messageContent, LocalDateTime time){
-        // String message = new Message(playerIndex, time, messageContent);
     }
 
     // GETTERS FOR CLI&GUI
 
     public int getPlayerIndex() {
         return playerIndex;
-    }
-
-    public HashMap<Integer, String> getNicknamesMap() {
-        return nicknamesMap;
     }
 
     public String getNickname(int playerIndex) {
@@ -133,52 +150,36 @@ public class ViewModel {
         return commonObjectives;
     }
 
-    public int getSecretObjectiveCard(){
-        return objectives[2];
+    public int[] getSecretObjectiveCards(){
+        int[] secretObjectives = new int[2];
+        secretObjectives[0] = objectives[2];
+        secretObjectives[1] = objectives[3];
+        return secretObjectives;
     }
 
     public GamePhase getGamePhase() {
         return gamePhase;
     }
 
+    /*
     public TurnPhase getTurnPhase() {
         return turnPhase;
-    }
+    } */
 
     public boolean isGameStarted() {
         return gameStarted;
-    }
-
-    public Chat getChat() {
-        return chat;
-    }
-
-    public HashMap<Integer, ArrayList<Integer>> getHandsMap() {
-        return handsMap;
     }
 
     public ArrayList<Integer> getHand(int playerIndex){
         return handsMap.get(playerIndex);
     }
 
-    public HashMap<Integer, Side> getHandsSideMap() {
-        return handsSideMap;
-    }
-
-    public Side getHandCardSide(int cardId){
+    public Side getHandCardsSide(int cardId){
         return handsSideMap.get(cardId);
-    }
-
-    public HashMap<Integer, Side> getplacedSideMap() {
-        return placedSideMap;
     }
 
     public Side getPlacedCardSide(int cardId){
         return placedSideMap.get(cardId);
-    }
-
-    public HashMap<Integer, ArrayList<ArrayList<Integer>>> getBoardsMap() {
-        return boardsMap;
     }
 
     public ArrayList<ArrayList<Integer>> getPlayerBoard(int playerIndex){
@@ -197,12 +198,23 @@ public class ViewModel {
         return new int[] { sharedCards[2], sharedCards[3] };
     }
 
+    public boolean getConnession(int playerIndex) {
+        return connessionMap.get(playerIndex);
+    }
 
+    public Color getColorsMap(int playerIndex) {
+        return colorsMap.get(playerIndex);
+    }
 
+    public int getPointsMap(int playerIndex) {
+        return pointsMap.get(playerIndex);
+    }
 
+    public int getCurrentPlayer() {
+        return currentPlayer;
+    }
 
-
-
+    // UTILS METHOD
     private void initializeBoard(int playerIndex, int placingCardId){
         this.boardsMap.get(playerIndex).clear();
         ArrayList<Integer> row = new ArrayList<>();
@@ -284,7 +296,7 @@ public class ViewModel {
         // Expand columns if needed
         for (ArrayList<Integer> row : playerBoard) {
             if (colIndex < 0) {
-                row.add(0, -1); // Adding -1 if there is no card
+                row.addFirst(-1); // Adding -1 if there is no card
             } else if (colIndex >= row.size()) {
                 row.add(-1); // Placeholder for empty cell
             }
