@@ -5,6 +5,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.*;
 import javafx.application.*;
+import javafx.collections.ObservableList;
 import javafx.fxml.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -30,6 +31,7 @@ public class GUIControllerGame extends GUIController {
     @FXML private VBox plateauContainerGame;
     @FXML private VBox sharedResourceContainerGame;
     @FXML private Stage dialog;
+    @FXML private Point2D targetPoint;
 
     private HashMap<Integer, Side> playerHandCards;
     int meId;
@@ -112,7 +114,6 @@ public class GUIControllerGame extends GUIController {
                 secondSharedResourceCardImageView.getStyleClass().add("clickable");
                 sharedResourceContainerGame.getChildren().add(secondSharedResourceCardImageView);
 
-
                 goldDeckPane.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.DECKGOLD); });
                 firstSharedGoldCardImageView.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.SHAREDGOLD1); });
                 secondSharedGoldCardImageView.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.SHAREDGOLD2); });
@@ -133,14 +134,14 @@ public class GUIControllerGame extends GUIController {
 
     public void highlightCurrentPlayerTable() {
         Platform.runLater(() -> {
-                    // TODO: get current player id
-                    int idCurrentPlayer = 3;
-                    Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame");
+                // TODO: get current player id
+                int idCurrentPlayer = 3;
+                Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame");
 
-                    // TODO: get current player color
-                    Color currentPlayerColor = Color.BLUE;
-                    currentPlayerHBox.getStyleClass().add(currentPlayerColor.toString().toLowerCase() + "Background");
-                }
+                // TODO: get current player color
+                Color currentPlayerColor = Color.BLUE;
+                currentPlayerHBox.getStyleClass().add(currentPlayerColor.toString().toLowerCase() + "Background");
+            }
         );
     }
 
@@ -174,64 +175,69 @@ public class GUIControllerGame extends GUIController {
     }
 
     public void updatePlayerHand(int playerId, HashMap<Integer, Side> playerHandCards) {
-        HBox handContainerHBox = null;
-        VBox handContainerVBox = null;
+        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+            @Override
+            public void run() {
+                HBox handContainerHBox = null;
+                VBox handContainerVBox = null;
 
-        if (playerId == 1 || playerId == 2) {
-            handContainerHBox = (HBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
-            if (handContainerHBox != null) { handContainerHBox.getChildren().clear(); }
-        } else {
-            handContainerVBox = (VBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
-            if (handContainerVBox != null) { handContainerVBox.getChildren().clear(); }
-        }
+                if (playerId == 1 || playerId == 2) {
+                    handContainerHBox = (HBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
+                    if (handContainerHBox != null) { handContainerHBox.getChildren().clear(); }
+                } else {
+                    handContainerVBox = (VBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
+                    if (handContainerVBox != null) { handContainerVBox.getChildren().clear(); }
+                }
 
-        // TODO: get my player id
-        for (Integer cardId : playerHandCards.keySet()) {
-            ImageView tempImageView;
-            if ((playerId == meId && playerHandCards.get(cardId) == Side.FRONT) || (playerId != meId && playerHandCards.get(cardId) == Side.BACK)) {
-                tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
-            } else {
-                tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
-            }
-            tempImageView.setId("player" + playerId + "card" + cardId);
-            //tempImageView.getStyleClass().add("imageWithBorder");
-            if (playerId == 1 || playerId == 2) {
-                handContainerHBox.getChildren().add(tempImageView);
-            } else {
-                handContainerVBox.getChildren().add(tempImageView);
-            }
-            if (playerId == meId) {
-                tempImageView.getStyleClass().add("clickable");
-                tempImageView.setOnMousePressed(mouseEvent -> {
-                    if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                        flipCard(playerId, cardId);
-                    } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                        // if phase is placing
-                        Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
-                        int cornerId;
-                        if (mouseEvent.getSceneX() < tempImageViewPosition.getX() + tempImageView.getBoundsInLocal().getWidth()/2) { // left
-                            if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top left
-                                cornerId = 0;
-                            } else { // down left
-                                cornerId = 3;
-                            }
-                        } else { // right
-                            if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top right
-                                cornerId = 1;
-                            } else { // down right
-                                cornerId = 2;
-                          placedSideMap.put(76, Side.BACK);  }
-                        }
-                        //Line dragLine = new Line(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 270, 40);
-                        //mainContainerGame.getChildren().add(dragLine);
-                        Circle clickedCircle = new Circle(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 10);
-                        mainContainerGame.getChildren().add(clickedCircle);
-                        printBoard(playerId);
-
+                // TODO: get my player id
+                for (Integer cardId : playerHandCards.keySet()) {
+                    ImageView tempImageView;
+                    if ((playerId == meId && playerHandCards.get(cardId) == Side.FRONT) || (playerId != meId && playerHandCards.get(cardId) == Side.BACK)) {
+                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+                    } else {
+                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
                     }
-                });
+                    tempImageView.setId("player" + playerId + "card" + cardId);
+                    //tempImageView.getStyleClass().add("imageWithBorder");
+                    if (playerId == 1 || playerId == 2) {
+                        handContainerHBox.getChildren().add(tempImageView);
+                    } else {
+                        handContainerVBox.getChildren().add(tempImageView);
+                    }
+                    if (playerId == meId) {
+                        tempImageView.getStyleClass().add("clickable");
+                        tempImageView.setOnMousePressed(mouseEvent -> {
+                            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                                flipCard(playerId, cardId);
+                            } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                                // if phase is placing
+                                Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
+                                int cornerId;
+                                if (mouseEvent.getSceneX() < tempImageViewPosition.getX() + tempImageView.getBoundsInLocal().getWidth()/2) { // left
+                                    if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top left
+                                        cornerId = 0;
+                                    } else { // down left
+                                        cornerId = 3;
+                                    }
+                                } else { // right
+                                    if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top right
+                                        cornerId = 1;
+                                    } else { // down right
+                                        cornerId = 2;
+                                    }
+                                }
+                                //Line dragLine = new Line(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 270, 40);
+                                //mainContainerGame.getChildren().add(dragLine);
+                                Circle clickedCircle = new Circle(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 10);
+                                mainContainerGame.getChildren().removeIf(n -> n instanceof Circle);
+                                mainContainerGame.getChildren().add(clickedCircle);
+                                printBoard(playerId);
+                            }
+                        });
+                    }
+                }
             }
-        }
+        });
     }
 
     public void flipCard(int playerId, int cardId) {
@@ -244,74 +250,95 @@ public class GUIControllerGame extends GUIController {
     }
 
     public void printPrivateObjective(int playerId, int cardId) {
-        ImageView tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
-        //tempImageView.getStyleClass().add("imageWithBorder");
-        if (playerId == 1 || playerId == 2) {
-            HBox playerContainer = (HBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
-            playerContainer.getChildren().add(tempImageView);
-        } else {
-            VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
-            playerContainer.getChildren().add(tempImageView);
-        }
+        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+            @Override
+            public void run() {
+                ImageView tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+                //tempImageView.getStyleClass().add("imageWithBorder");
+                if (playerId == 1 || playerId == 2) {
+                    HBox playerContainer = (HBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+                    playerContainer.getChildren().add(tempImageView);
+                } else {
+                    VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+                    playerContainer.getChildren().add(tempImageView);
+                }
+            }
+        });
     }
 
     public void printBoard(int playerId) {
-        int boardImageWidth = 100;
-        int gridPaneVPadding = 50;
-        int gridPaneHgap = -30;
-        int gridPaneVgap = -35;
+        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+            @Override
+            public void run() {
+                int boardImageWidth = 100;
+                int gridPaneVPadding = 50;
+                int gridPaneHgap = -30;
+                int gridPaneVgap = -35;
 
-        dialog = new Stage();
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.initOwner(GUIApplication.getMainStage());
-        VBox dialogVbox = new VBox(gridPaneVPadding);
+                dialog = new Stage();
+                dialog.initModality(Modality.APPLICATION_MODAL);
+                dialog.initOwner(GUIApplication.getMainStage());
 
-        playerBoard = new ArrayList<>();
-        playerBoard.add(new ArrayList<>(Arrays.asList(null, 2, 6, null)));
-        playerBoard.add(new ArrayList<>(Arrays.asList(3, 1, 4, 5)));
-        playerBoard.add(new ArrayList<>(Arrays.asList(null, 7, 76, null)));
-        playerBoard.add(new ArrayList<>(Arrays.asList(null, 71, 73, null)));
-        playerBoard.add(new ArrayList<>(Arrays.asList(null, 23, 56, null)));
+                Pane dialogPane = new Pane();
 
-        placedSideMap.put(2, Side.FRONT);
-        placedSideMap.put(6, Side.BACK);
-        placedSideMap.put(3, Side.FRONT);
-        placedSideMap.put(1, Side.FRONT);
-        placedSideMap.put(4, Side.BACK);
-        placedSideMap.put(5, Side.FRONT);
-        placedSideMap.put(7, Side.FRONT);
-        placedSideMap.put(76, Side.FRONT);
-        placedSideMap.put(71, Side.FRONT);
-        placedSideMap.put(73, Side.FRONT);
-        placedSideMap.put(23, Side.FRONT);
-        placedSideMap.put(56, Side.BACK);
+                playerBoard = new ArrayList<>();
+                playerBoard.add(new ArrayList<>(Arrays.asList(null, 2, 6, null)));
+                playerBoard.add(new ArrayList<>(Arrays.asList(3, 1, 4, 5)));
+                playerBoard.add(new ArrayList<>(Arrays.asList(null, 7, 76, null)));
+                playerBoard.add(new ArrayList<>(Arrays.asList(null, 71, 73, null)));
+                playerBoard.add(new ArrayList<>(Arrays.asList(null, 23, 56, null)));
 
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(gridPaneHgap); // Spacing orizzontale
-        gridPane.setVgap(gridPaneVgap); // Spacing verticale
-        gridPane.setPadding(new Insets(gridPaneVPadding)); // Margine di 20 pixel su tutti i lati
-        for(ArrayList<Integer> row : playerBoard) {
-            for (Integer ele : row) {
-                if (ele != null) {
-                    ImageView tempImageView;
-                    if (placedSideMap.get(ele) == Side.FRONT) {
-                        tempImageView = createCardImageView("/img/carte_fronte/" + ele + ".jpg", boardImageWidth);
-                    } else {
-                        tempImageView = createCardImageView("/img/carte_retro/" + ele + ".jpg", boardImageWidth);
+                placedSideMap.put(2, Side.FRONT);
+                placedSideMap.put(6, Side.BACK);
+                placedSideMap.put(3, Side.FRONT);
+                placedSideMap.put(1, Side.FRONT);
+                placedSideMap.put(4, Side.BACK);
+                placedSideMap.put(5, Side.FRONT);
+                placedSideMap.put(7, Side.FRONT);
+                placedSideMap.put(76, Side.FRONT);
+                placedSideMap.put(71, Side.FRONT);
+                placedSideMap.put(73, Side.FRONT);
+                placedSideMap.put(23, Side.FRONT);
+                placedSideMap.put(56, Side.BACK);
+
+                GridPane gridPane = new GridPane();
+                dialogPane.getChildren().add(gridPane);
+                gridPane.setHgap(gridPaneHgap); // Spacing orizzontale
+                gridPane.setVgap(gridPaneVgap); // Spacing verticale
+                gridPane.setPadding(new Insets(gridPaneVPadding)); // Margine di 20 pixel su tutti i lati
+                for(ArrayList<Integer> row : playerBoard) {
+                    for (Integer ele : row) {
+                        if (ele != null) {
+                            ImageView tempImageView;
+                            if (placedSideMap.get(ele) == Side.FRONT) {
+                                tempImageView = createCardImageView("/img/carte_fronte/" + ele + ".jpg", boardImageWidth);
+                            } else {
+                                tempImageView = createCardImageView("/img/carte_retro/" + ele + ".jpg", boardImageWidth);
+                            }
+                            tempImageView.getStyleClass().add("clickable");
+                            tempImageView.setOnMousePressed(mouseEvent -> {
+                                targetPoint = new Point2D(mouseEvent.getSceneX(), mouseEvent.getSceneY());
+                                dialogPane.getChildren().removeIf(n -> n instanceof Circle);
+                                Circle clickedCircle = new Circle(0, 0, 10);
+                                clickedCircle.setLayoutX(mouseEvent.getSceneX());
+                                clickedCircle.setLayoutY(mouseEvent.getSceneY());
+
+                                disappearAfter(1, clickedCircle, dialogPane);
+                                dialogPane.getChildren().add(clickedCircle);
+                            });
+                            gridPane.add(tempImageView, row.indexOf(ele), playerBoard.indexOf(row));
+                        }
                     }
-                    tempImageView.getStyleClass().add("clickable");
-                    gridPane.add(tempImageView, row.indexOf(ele), playerBoard.indexOf(row));
                 }
-            }
-        }
 
-        dialogVbox.getChildren().add(gridPane);
-        Scene dialogScene = new Scene(dialogVbox, (boardImageWidth - gridPaneHgap) * playerBoard.getFirst().size() + 2 * gridPaneVPadding, (boardImageWidth*(2/3) - 2 * gridPaneVgap) * playerBoard.size() + 3 * gridPaneVPadding);
-        dialogScene.getStylesheets().add(getClass().getResource("/style/game.css").toExternalForm());
-        dialogScene.getStylesheets().add(getClass().getResource("/style/main.css").toExternalForm());
-        dialog.setTitle("Board of " + playerId);
-        dialog.setScene(dialogScene);
-        dialog.show();
+                Scene dialogScene = new Scene(dialogPane, (boardImageWidth - gridPaneHgap) * playerBoard.getFirst().size() + 2 * gridPaneVPadding, (boardImageWidth*(2/3) - 2 * gridPaneVgap) * playerBoard.size() + 3 * gridPaneVPadding);
+                dialogScene.getStylesheets().add(getClass().getResource("/style/game.css").toExternalForm());
+                dialogScene.getStylesheets().add(getClass().getResource("/style/main.css").toExternalForm());
+                dialog.setTitle("Board of " + playerId);
+                dialog.setScene(dialogScene);
+                dialog.show();
+            }
+        });
     }
 
     @FXML

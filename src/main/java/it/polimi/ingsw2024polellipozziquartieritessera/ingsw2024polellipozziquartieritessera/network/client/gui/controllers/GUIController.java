@@ -3,6 +3,8 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -11,6 +13,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 
 import java.io.IOException;
 
@@ -118,6 +122,16 @@ abstract public class GUIController {
             node.setOnMouseEntered(mouseEvent -> { node.getStyleClass().add("rotateYes"); node.getStyleClass().remove("rotateNo"); });
             node.setOnMouseExited(mouseEvent -> { node.getStyleClass().add("rotateNo"); node.getStyleClass().remove("rotateYes"); });
         });
+    }
+
+    public void disappearAfter(int time, Node target, Pane father) {
+        // Set up a Timeline to remove the Label after 10 seconds
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(10),
+                event -> father.getChildren().remove(target)
+        ));
+        timeline.setCycleCount(1); // Run only once
+        timeline.play();
     }
 
 }
