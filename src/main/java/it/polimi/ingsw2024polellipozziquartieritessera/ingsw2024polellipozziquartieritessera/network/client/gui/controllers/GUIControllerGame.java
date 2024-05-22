@@ -30,8 +30,6 @@ public class GUIControllerGame extends GUIController {
     @FXML private VBox sharedGoldContainerGame;
     @FXML private VBox plateauContainerGame;
     @FXML private VBox sharedResourceContainerGame;
-    @FXML private Stage dialog;
-    @FXML private Point2D targetPoint;
 
     private HashMap<Integer, Side> playerHandCards;
     int meId;
@@ -155,7 +153,7 @@ public class GUIControllerGame extends GUIController {
                 Text nicknameText = new Text(currentPlayerNickname);
                 Button expandButton = new Button("Expand Board");
                 expandButton.setOnMousePressed(mouseEvent -> {
-                    printBoard(playerId);
+                    goToScene("/fxml/board.fxml", new String[]{playerId + ""});
                 });
                 infoContainerVBox.getChildren().addAll(nicknameText, expandButton);
                 infoContainerVBox.setAlignment(Pos.CENTER);
@@ -228,10 +226,10 @@ public class GUIControllerGame extends GUIController {
                                 }
                                 //Line dragLine = new Line(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 270, 40);
                                 //mainContainerGame.getChildren().add(dragLine);
-                                Circle clickedCircle = new Circle(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 10);
-                                mainContainerGame.getChildren().removeIf(n -> n instanceof Circle);
-                                mainContainerGame.getChildren().add(clickedCircle);
-                                printBoard(playerId);
+                                //Circle clickedCircle = new Circle(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 10);
+                                //mainContainerGame.getChildren().removeIf(n -> n instanceof Circle);
+                                //mainContainerGame.getChildren().add(clickedCircle);
+                                goToScene("/fxml/board.fxml", new String[]{playerId + ""});
                             }
                         });
                     }
@@ -262,81 +260,6 @@ public class GUIControllerGame extends GUIController {
                     VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
                     playerContainer.getChildren().add(tempImageView);
                 }
-            }
-        });
-    }
-
-    public void printBoard(int playerId) {
-        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
-            @Override
-            public void run() {
-                int boardImageWidth = 100;
-                int gridPaneVPadding = 50;
-                int gridPaneHgap = -30;
-                int gridPaneVgap = -35;
-
-                dialog = new Stage();
-                dialog.initModality(Modality.APPLICATION_MODAL);
-                dialog.initOwner(GUIApplication.getMainStage());
-
-                Pane dialogPane = new Pane();
-
-                playerBoard = new ArrayList<>();
-                playerBoard.add(new ArrayList<>(Arrays.asList(null, 2, 6, null)));
-                playerBoard.add(new ArrayList<>(Arrays.asList(3, 1, 4, 5)));
-                playerBoard.add(new ArrayList<>(Arrays.asList(null, 7, 76, null)));
-                playerBoard.add(new ArrayList<>(Arrays.asList(null, 71, 73, null)));
-                playerBoard.add(new ArrayList<>(Arrays.asList(null, 23, 56, null)));
-
-                placedSideMap.put(2, Side.FRONT);
-                placedSideMap.put(6, Side.BACK);
-                placedSideMap.put(3, Side.FRONT);
-                placedSideMap.put(1, Side.FRONT);
-                placedSideMap.put(4, Side.BACK);
-                placedSideMap.put(5, Side.FRONT);
-                placedSideMap.put(7, Side.FRONT);
-                placedSideMap.put(76, Side.FRONT);
-                placedSideMap.put(71, Side.FRONT);
-                placedSideMap.put(73, Side.FRONT);
-                placedSideMap.put(23, Side.FRONT);
-                placedSideMap.put(56, Side.BACK);
-
-                GridPane gridPane = new GridPane();
-                dialogPane.getChildren().add(gridPane);
-                gridPane.setHgap(gridPaneHgap); // Spacing orizzontale
-                gridPane.setVgap(gridPaneVgap); // Spacing verticale
-                gridPane.setPadding(new Insets(gridPaneVPadding)); // Margine di 20 pixel su tutti i lati
-                for(ArrayList<Integer> row : playerBoard) {
-                    for (Integer ele : row) {
-                        if (ele != null) {
-                            ImageView tempImageView;
-                            if (placedSideMap.get(ele) == Side.FRONT) {
-                                tempImageView = createCardImageView("/img/carte_fronte/" + ele + ".jpg", boardImageWidth);
-                            } else {
-                                tempImageView = createCardImageView("/img/carte_retro/" + ele + ".jpg", boardImageWidth);
-                            }
-                            tempImageView.getStyleClass().add("clickable");
-                            tempImageView.setOnMousePressed(mouseEvent -> {
-                                targetPoint = new Point2D(mouseEvent.getSceneX(), mouseEvent.getSceneY());
-                                dialogPane.getChildren().removeIf(n -> n instanceof Circle);
-                                Circle clickedCircle = new Circle(0, 0, 10);
-                                clickedCircle.setLayoutX(mouseEvent.getSceneX());
-                                clickedCircle.setLayoutY(mouseEvent.getSceneY());
-
-                                disappearAfter(1, clickedCircle, dialogPane);
-                                dialogPane.getChildren().add(clickedCircle);
-                            });
-                            gridPane.add(tempImageView, row.indexOf(ele), playerBoard.indexOf(row));
-                        }
-                    }
-                }
-
-                Scene dialogScene = new Scene(dialogPane, (boardImageWidth - gridPaneHgap) * playerBoard.getFirst().size() + 2 * gridPaneVPadding, (boardImageWidth*(2/3) - 2 * gridPaneVgap) * playerBoard.size() + 3 * gridPaneVPadding);
-                dialogScene.getStylesheets().add(getClass().getResource("/style/game.css").toExternalForm());
-                dialogScene.getStylesheets().add(getClass().getResource("/style/main.css").toExternalForm());
-                dialog.setTitle("Board of " + playerId);
-                dialog.setScene(dialogScene);
-                dialog.show();
             }
         });
     }

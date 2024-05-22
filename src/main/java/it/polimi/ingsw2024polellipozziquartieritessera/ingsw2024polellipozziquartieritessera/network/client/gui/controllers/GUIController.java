@@ -24,6 +24,15 @@ abstract public class GUIController {
     // add virtual model
     private VirtualView client; // temp
     private VirtualServer server; // temp
+    private String[] args;
+
+    public String[] getArgs() {
+        return args;
+    }
+
+    public void setArgs(String[] args) {
+        this.args = args;
+    }
 
     public VirtualView getClient() {
         return client;
@@ -94,6 +103,19 @@ abstract public class GUIController {
             public void run() {
                 try {
                     GUIApplication.changeScene(fxml);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+    public void goToScene(String fxml, String[] args) {
+        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+            @Override
+            public void run() {
+                try {
+                    GUIApplication.changeScene(fxml, args);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

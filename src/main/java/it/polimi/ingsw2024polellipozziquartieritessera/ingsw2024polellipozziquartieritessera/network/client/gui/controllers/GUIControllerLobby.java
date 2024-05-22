@@ -15,6 +15,5 @@ public class GUIControllerLobby extends GUIController {
     public void handleAddUser(ActionEvent event) {
         String message = Command.ADDUSER + " " + nicknameTextField.getText();
         //Client.manageInputCli(getServer(), message.split(" "), getClient());
-
     }
 }

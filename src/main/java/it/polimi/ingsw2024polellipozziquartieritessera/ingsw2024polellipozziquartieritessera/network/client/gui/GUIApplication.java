@@ -34,6 +34,15 @@ public class GUIApplication extends Application {
         guiController.setServer(server);
     }
 
+    public static void changeScene(String fxml, String[] args) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
+        mainStage.getScene().setRoot(fxmlLoader.load());
+        guiController = fxmlLoader.getController();
+        guiController.setArgs(args);
+        guiController.setClient(client);
+        guiController.setServer(server);
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/game.fxml"));
