@@ -176,6 +176,7 @@ public class GameState {
 
     public void setPlayersConnected(int index, boolean connected){
         players.get(index).setConnected(connected);
+        players.get(index).setClient(null);
     }
 
 
@@ -267,6 +268,24 @@ public class GameState {
 
     public void addPlayer(String nickname, VirtualView client) {
         Player player = new Player(nickname, client, this);
+        //TODO: CONTROLLA se salta i null
+        List<VirtualView> clients = allClients();
+        System.out.println("CLIENTS:" + clients.size());
+        if (clients.size() >= Config.MAX_PLAYERS) {
+            synchronized (eventQueue){
+                eventQueue.add(new ErrorEvent(this, singleClient(client), "The game is full"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+        if (clients.contains(client)) {
+            synchronized (eventQueue){
+                eventQueue.add(new ErrorEvent(this, singleClient(client), "You already chose a nickname, you cannot change it"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+
         for (int j = 0; j < players.size(); j++) {
             if (player.getNickname().equals(players.get(j).getNickname())) {
                 //takes for granted that player connection is updated
@@ -325,7 +344,27 @@ public class GameState {
 
 
 
-    public void startGame() throws EmptyDeckException {
+    public void startGame(VirtualView client) throws EmptyDeckException {
+        ArrayList<VirtualView> clients = allClients();
+        if (!clients.contains(client)) {
+            synchronized (eventQueue){
+                eventQueue.add(new ErrorEvent(this, singleClient(client), "Please register before starting the game"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+        if (clients.size() < 2){
+            if (clients.contains(client)){
+                synchronized (eventQueue){
+                    eventQueue.add(new ErrorEvent(this, singleClient(client), "Number of player insufficient"));
+                    eventQueue.notifyAll();
+                }
+            } /*else { //NON CAPISCO A COSA SERVA QUESTO CODICE
+                client.sendError("You must choose your nickname with adduser first");
+            }*/
+            return;
+        }
+
         this.mainBoard.shuffleCards();
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
@@ -372,6 +411,7 @@ public class GameState {
 
         synchronized (eventQueue){
             eventQueue.add(new UpdateStarterCardEvent(this, allClients(), playerIndex,  playerStarterCard.getId(), side));
+            eventQueue.notifyAll();
         }
 
         // add the initial elements of the starter card
@@ -382,9 +422,10 @@ public class GameState {
 
 
         this.answered.put(playerIndex, true);
-
+        System.out.println("someone chose his startercard, the number of ansewred is: " + numberAnswered());
         //notify him and all the others about the change
         if (numberAnswered() == players.size()){
+            System.out.println("everyone answred");
             this.currentGamePhase = GamePhase.CHOOSECOLORPHASE;
             synchronized (eventQueue){
                 eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSECOLORPHASE));
@@ -410,6 +451,8 @@ public class GameState {
                     eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The color was already selected by another user, please select a new one"));
                     eventQueue.notifyAll();
                 }
+                return;
+
             }
         }
         player.setColor(color);

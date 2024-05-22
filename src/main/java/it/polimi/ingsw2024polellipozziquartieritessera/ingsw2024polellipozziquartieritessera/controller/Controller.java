@@ -41,6 +41,10 @@ public class Controller {
     // drawCard() *avverte il model del pescaggio di una carta
     // flipCard() *avverte il model del flipping della carta
     // ? sendMessage() *permette al model di salvare le informazioni del messaggio
+    public int getPlayerIndex(VirtualView client){
+        return gameState.getPlayerIndex(client);
+    }
+
 
     public GamePhase getGamePhase() {
         return this.gameState.getCurrentGamePhase();
@@ -79,10 +83,10 @@ public class Controller {
     }
 
     //this is runned after gameState is populated with cards and players
-    public void startGame() {
+    public void startGame(VirtualView client) {
         synchronized (this.gameState) {
             try {
-                this.gameState.startGame();
+                this.gameState.startGame(client);
             } catch (EmptyDeckException e) {
                 //if in this moment of the game the deck is empty, it's a programming error
                 throw new RuntimeException(e);

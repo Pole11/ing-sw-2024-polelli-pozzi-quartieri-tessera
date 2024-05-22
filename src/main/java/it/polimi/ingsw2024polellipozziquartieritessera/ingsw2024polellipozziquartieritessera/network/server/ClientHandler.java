@@ -45,7 +45,7 @@ public class ClientHandler implements VirtualView {
                         side = Side.valueOf(message[1].toUpperCase());
                     } catch (IllegalArgumentException e) {
                         System.err.println("Invalid side, please enter a valid side (Front / Back)");
-                        return;
+                        break;
                     }
                     server.chooseInitialStarterSide(this, side);
                     break;
@@ -55,7 +55,7 @@ public class ClientHandler implements VirtualView {
                         color = Color.valueOf(message[1].toUpperCase());
                     } catch (IllegalArgumentException e) {
                         System.err.println("Invalid color, please enter a valid color (Blue / Green / Yellow / Red)");
-                        return;
+                        break;
                     }
                     server.chooseInitialColor(this, color);
                     break;
@@ -65,7 +65,7 @@ public class ClientHandler implements VirtualView {
                         cardId = Integer.parseInt(message[1]);
                     } catch (IllegalArgumentException e) {
                         System.err.println("Invalid card id, please enter a valid one");
-                        return;
+                        break;
                     }
                     server.chooseInitialObjective(this, cardId);
                     break;
@@ -79,25 +79,25 @@ public class ClientHandler implements VirtualView {
                         placingCardId = Integer.parseInt(message[1]);
                     } catch (IllegalArgumentException e) {
                         System.err.println(("Invalid id of the placing card, please insert a valid id"));
-                        return;
+                        break;
                     }
                     try {
                         tableCardId = Integer.parseInt(message[2]);
                     } catch (IllegalArgumentException e) {
                         System.err.println(("Invalid id of the table card, please insert a valid id"));
-                        return;
+                        break;
                     }
                     try {
                         tableCornerPos = CornerPos.valueOf(message[3].toUpperCase());
                     } catch (IllegalArgumentException e) {
                         System.err.println(("Invalid corner, please insert a valid corner position (Upleft / Upright / Downleft / Downright)"));
-                        return;
+                        break;
                     }
                     try {
                         placingCardSide = Side.valueOf(message[4].toUpperCase());
                     } catch (IllegalArgumentException e) {
                         System.err.println(("Invalid side, please insert a valid side (Front / Back)"));
-                        return;
+                        break;
                     }
                     server.placeCard(this, placingCardId, tableCardId, tableCornerPos, placingCardSide);
                     break;
@@ -107,7 +107,7 @@ public class ClientHandler implements VirtualView {
                         drawType = DrawType.valueOf(message[1]);
                     } catch (IllegalArgumentException e) {
                         System.err.println("Invalid draw option, please choose a valid option (SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource)");
-                        return;
+                        break;
                     }
                     server.drawCard(this, drawType);
                     break;
@@ -117,7 +117,7 @@ public class ClientHandler implements VirtualView {
                         cardId = Integer.parseInt(message[1]);
                     } catch (NumberFormatException e) {
                         System.err.println("Please enter a valid card id");
-                        return;
+                        break;
                     }
                     server.flipCard(this, cardId);
                     break;

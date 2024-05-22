@@ -126,7 +126,7 @@ public class CLIController {
                 try {
                     DrawType drawType;
                     try {
-                        drawType = DrawType.valueOf(message[1]);
+                        drawType = DrawType.valueOf(message[1].toUpperCase());
                     } catch (IllegalArgumentException e) {
                         System.err.println(("Invalid draw option, please choose a valid option (SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource)"));
                         return;

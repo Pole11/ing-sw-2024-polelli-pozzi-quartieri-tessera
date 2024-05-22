@@ -25,7 +25,7 @@ public class Player {
     private final HashMap<Element, Integer> allElements;
 
     private boolean connected;
-    private final VirtualView client;
+    private VirtualView client;
     private final GameState gameState;
 
     public Player(String nickname, VirtualView client, GameState gameState){
@@ -132,6 +132,10 @@ public class Player {
 
 
     //SETTER
+
+    public void setClient(VirtualView client){
+        this.client = client;
+    }
 
     public void setObjectiveCard(ObjectiveCard objectiveCard) {
         this.objectiveCard = objectiveCard;

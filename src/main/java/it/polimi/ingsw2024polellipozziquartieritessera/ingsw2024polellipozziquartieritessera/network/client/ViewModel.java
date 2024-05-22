@@ -226,11 +226,11 @@ public class ViewModel {
 
     // UTILS METHOD
     public void initializeBoard(int playerIndex, int placingCardId){
+        this.boardsMap.put(playerIndex, new ArrayList<>());
         this.boardsMap.get(playerIndex).clear();
         ArrayList<Integer> row = new ArrayList<>();
         row.add(placingCardId);
         this.boardsMap.get(playerIndex).add(row);
-
     }
 
     private void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos){

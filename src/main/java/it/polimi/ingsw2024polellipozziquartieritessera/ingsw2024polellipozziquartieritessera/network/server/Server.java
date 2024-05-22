@@ -22,7 +22,6 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 public class Server implements VirtualServer {
     final Controller controller;
-    final HashMap<Integer, VirtualView> clients = new HashMap<>();
     final ServerSocket listenSocket;
     final HashMap<Integer, Boolean> answered;
 
@@ -46,14 +45,6 @@ public class Server implements VirtualServer {
         this.answered.put(1, false);
         this.answered.put(2, false);
         this.answered.put(3, false);
-    }
-
-    private int numberAnswered() {
-        int res = 0;
-        for (boolean v : this.answered.values()) {
-            if (v) { res++; }
-        }
-        return res;
     }
 
     public static void startServer(String host, int socketport, int rmiport) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException{
@@ -118,16 +109,8 @@ public class Server implements VirtualServer {
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) || controller.getGamePhase().equals(GamePhase.TIMEOUT)){
-            if (this.clients.size() >= Config.MAX_PLAYERS) {
-                client.sendError("The game is full");
-                return;
-            }
-            if (clients.containsValue(client)) {
-                client.sendError("You already chose a nickname, you cannot change it");
-                return;
-            }
-            // DA TOGLIERE va controllato tutto nel gamestate
-            this.clients.put(this.clients.size(), client);
+
+            //this.clients.put(this.clients.size(), client);
             this.controller.addPlayer(client, nickname);
             System.out.println("New player connected!");
         } else {
@@ -138,19 +121,10 @@ public class Server implements VirtualServer {
 
     @Override
     public void startGame(VirtualView client) throws RemoteException{
-        if (!clients.containsValue(client)) {
-            client.sendError("Please register before starting the game");
-            return;
-        }
-        if (clients.size() >= 2) {
-            this.controller.startGame();
-        }
-        else{
-            if (clients.containsValue(client)){
-                client.sendError("Number of player insufficient");
-            } else {
-                client.sendError("You must choose your nickname with adduser first");
-            }
+        if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
+            this.controller.startGame(client);
+        } else {
+            client.sendError("You cannot do this action now");
         }
     }
 
@@ -191,9 +165,13 @@ public class Server implements VirtualServer {
     public void placeCard(VirtualView client, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws RemoteException {
         int playerIndex = getPlayerIndex(client);
 
-        if (controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
+        //NON FUNZIONA IL CONTROLLO SUL PLAYER
+        //NON FUNZIONA IL PARSING A INT SU SOCKEit
+        if (
+            controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
             (controller.getTurnPhase().equals(TurnPhase.PLACINGPHASE)) &&
-            (isRightTurn(playerIndex))){
+            (isRightTurn(playerIndex))
+        ){
 
             //CardIsNotInHand e CardAlreadyPlaced FORSE da rimuovere e gestire sulla view
             try {
@@ -203,7 +181,6 @@ public class Server implements VirtualServer {
             } catch (WrongPlacingPositionException | CardNotPlacedException e) {
                 throw new RuntimeException();
             }
-
         } else{
             client.sendError("You cannot do this action now");
         }
@@ -213,10 +190,11 @@ public class Server implements VirtualServer {
     public void drawCard(VirtualView client, DrawType drawType) throws RemoteException {
         int playerIndex = getPlayerIndex(client);
 
-        if (controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
+        if (
+            controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
             (controller.getTurnPhase().equals(TurnPhase.DRAWPHASE)) &&
-            (isRightTurn(playerIndex))){
-
+            (isRightTurn(playerIndex))
+        ){
             try {
                 this.controller.drawCard(drawType);
             } catch (InvalidHandException e) {
@@ -257,12 +235,7 @@ public class Server implements VirtualServer {
 
 
     private int getPlayerIndex(VirtualView client) {
-        for (int i : this.clients.keySet()) {
-            if (this.clients.get(i).equals(client)) {
-                return i;
-            }
-        }
-        return -1;
+        return controller.getPlayerIndex(client);
     }
 
     private boolean isRightTurn(int playerIndex){

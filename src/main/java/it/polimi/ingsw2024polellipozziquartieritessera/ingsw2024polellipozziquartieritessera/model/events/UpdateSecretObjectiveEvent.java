@@ -19,18 +19,17 @@ public class UpdateSecretObjectiveEvent extends Event{
     @Override
     public void execute() {
         for (VirtualView client: clients) {
-            try {
-                int id1, id2;
-                if (objectiveCards.get(0) != null) {
+            int id1=-1, id2=-1;
+            switch (objectiveCards.size()){
+                case 1:
                     id1 = objectiveCards.get(0).getId();
-                } else {
-                    id1 = -1;
-                }
-                if (objectiveCards.get(1) != null) {
+                    break;
+                case 2:
+                    id1 = objectiveCards.get(0).getId();
                     id2 = objectiveCards.get(1).getId();
-                } else{
-                    id2 = -1;
-                }
+                    break;
+            }
+            try {
                 client.updateSecretObjective(id1, id2);
             } catch (RemoteException e) {
                 playerDisconnected(client);
