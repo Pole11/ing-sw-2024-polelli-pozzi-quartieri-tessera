@@ -38,6 +38,14 @@ public class Board {
         return sharedObjectiveCards[index];
     }
 
+    public GoldCard getFirstGoldDeckCard(){
+        return goldDeck.getFirst();
+    }
+
+    public ResourceCard getFirstResourceDeckCard(){
+        return resourceDeck.getFirst();
+    }
+
     //----size-----
 
     public int getGoldDeckSize(){

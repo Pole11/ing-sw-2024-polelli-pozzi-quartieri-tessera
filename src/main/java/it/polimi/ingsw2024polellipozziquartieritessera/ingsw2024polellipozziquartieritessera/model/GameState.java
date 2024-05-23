@@ -27,6 +27,8 @@ public class GameState {
     private final ArrayDeque<Event> eventQueue;
     private Thread executeEvents;
     private final HashMap<Integer, Boolean> answered;
+    private Thread pingThread;
+    ArrayList<Thread> playerThreads = new ArrayList<>();
 
     private Thread timeoutThread;
     private GamePhase prevGamePhase;
@@ -54,6 +56,10 @@ public class GameState {
 
         this.executeEvents = new Thread(this::executeEventsRunnable);
         this.executeEvents.start();
+
+        this.pingThread = new Thread(this::pingThreadRunnable);
+        pingThread.start();
+
         this.answered = new HashMap<>();
         resetAnswered();
 
@@ -136,14 +142,12 @@ public class GameState {
     }
 
     private void executeEventsRunnable() {
-        //non so se sia bello
         while (true){
             synchronized (eventQueue) {
                 while (eventQueue.isEmpty()) {
                     try {
                         eventQueue.wait();
-                    } catch (InterruptedException e) {
-                    }
+                    } catch (InterruptedException e) {}
                 }
                 eventQueue.remove().execute();
             }
@@ -160,7 +164,7 @@ public class GameState {
     public ArrayList<VirtualView> otherClients(VirtualView client){
         ArrayList<VirtualView> clients = new ArrayList<>();
         for (Player playerIterator : players) {
-            if (!client.equals(playerIterator.getClient())) {
+            if (playerIterator.isConnected() && !client.equals(playerIterator.getClient()) ) {
                 clients.add(playerIterator.getClient());
             }
         }
@@ -168,69 +172,120 @@ public class GameState {
     }
 
     public ArrayList<VirtualView> allClients(){
-        return (ArrayList<VirtualView>) players.stream().map(Player::getClient).collect(Collectors.toList());
+        return (ArrayList<VirtualView>) players.stream().filter(Player::isConnected).map(Player::getClient).collect(Collectors.toList());
     }
 
 
     //DISCONNECTIONS
+
+    public void pingThreadRunnable(){
+        while (true){
+            updatePlayersConnected();
+            int i = 0;
+            for (Thread playerThread : playerThreads){
+                int finalI = i;
+                playerThread = new Thread(()->{
+                    int j = finalI;
+                    try {
+                        //wait for the answare of players
+                        Thread.sleep(1000*3);
+                    } catch (InterruptedException e) {}
+                    synchronized (players){
+                        players.get(j).setConnected(false);
+                        players.notifyAll();
+                    }
+                });
+                playerThread.start();
+                i ++;
+            }
+
+            try {
+                //wait to ping another time
+                Thread.sleep(1000*5);
+            } catch (InterruptedException e) {}
+        }
+    }
+
+    public void pingAnswere(VirtualView client){
+        synchronized (players){
+            playerThreads.get(getPlayerIndex(client)).interrupt();
+            players.get(getPlayerIndex(client)).setConnected(true);
+            players.notifyAll();
+        }
+    }
 
     public void setPlayersConnected(int index, boolean connected){
         players.get(index).setConnected(connected);
         players.get(index).setClient(null);
     }
 
-
-    private void manageReconnection(){
+    private void manageReconnection(Player player){
+        synchronized (players){
+            player.setConnected(true);
+            players.notifyAll();
+        }
+        restoreView(player.getClient());
         if (this.currentGamePhase.equals(GamePhase.TIMEOUT)){
             this.timeoutThread.interrupt();
             currentGamePhase = prevGamePhase;
             prevGamePhase = null;
         }
-        //updatePlayersConnected();
-    }
-
-    public void restoreView(){
-
     }
 
 
-    public void startTimeout() throws InterruptedException {
-        Thread.sleep(60*1000);
+    public void restoreView(VirtualView client){
+        //send everything to client
     }
 
-    public void changeCurrentPlayer(){
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-        //check for disconnetions
-        int numberConnected = 0;
-        for (int i = 0; i< players.size() && numberConnected <= 1; i++){
-            if (!getPlayer(getCurrentPlayerIndex()).isConnected()){
-                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-            } else {
-                numberConnected ++;
-            }
+
+    public void playerDisconnected(){
+        long numberConnected;
+        synchronized (players){
+            numberConnected = players.stream().filter(Player::isConnected).count();
+            players.notifyAll();
         }
         if (numberConnected == 1){
             this.prevGamePhase = currentGamePhase;
             this.currentGamePhase = GamePhase.TIMEOUT;
             timeoutThread = new Thread(() -> {
                 try {
-                    startTimeout();
+                    Thread.sleep(60*1000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             });
             timeoutThread.start();
-        } else if (numberConnected == 0){
+        } else if(numberConnected == 0){
             //chiedere specifica
+        }
+    }
+
+    public void changeCurrentPlayer(){
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        //check for disconnetions
+        for (int i = 0; i< players.size(); i++){
+            if (!getPlayer(getCurrentPlayerIndex()).isConnected()) {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+            } else {
+                break;
+            }
         }
         synchronized (eventQueue){
             eventQueue.add(new UpdateCurrentPlayer(this, allClients(), currentPlayerIndex));
             eventQueue.notifyAll();
         }
+        playerDisconnected();
     }
 
-    //TODO: resilienza clients: bisogna mandare un ping a tutti i client e fare partire un timeout per ogni client, poi si aspetta una risposta da un client, che se non arriva si mette setta a disconesso, altrimenti si setta a connesso, questo ping va poi wrappato in un thread che esegue in modo periodico
+    private void updatePlayersConnected(){
+        players.stream().map(Player::getClient).forEach(e->{
+            eventQueue.add(new PingEvent(this, allClients()));
+            eventQueue.notifyAll();
+        });
+    }
 
+
+    //TODO: resilienza clients: bisogna mandare un ping a tutti i client e fare partire un timeout per ogni client, poi si aspetta una risposta da un client, che se non arriva si mette setta a disconesso, altrimenti si setta a connesso, questo ping va poi wrappato in un thread che esegue in modo periodico
 
 
     //PLAYERS MANAGING
@@ -291,10 +346,10 @@ public class GameState {
                 //takes for granted that player connection is updated
                 //if the player is not connected but the gameState doesn't know, the following code fails
                 if (!players.get(j).isConnected()){
-                    this.manageReconnection();
+                    player.setClient(client);
+                    this.manageReconnection(player);
                     synchronized (eventQueue){
                         //only to the client
-                        this.restoreView();
                         eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), this.currentGamePhase));
                         //to all the other clients says that a client reconnected
                         eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player, true));
@@ -368,6 +423,10 @@ public class GameState {
         this.mainBoard.shuffleCards();
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
+        synchronized (eventQueue){
+            eventQueue.add(new updateMainBoardEvent(this, allClients(), mainBoard));
+            eventQueue.notifyAll();
+        }
         this.initStarters(); // set the starters cards for every player
         System.out.println("Starting game");
         this.currentGamePhase = GamePhase.CHOOSESTARTERSIDEPHASE;

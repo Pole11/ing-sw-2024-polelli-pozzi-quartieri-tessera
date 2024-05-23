@@ -260,6 +260,12 @@ public class Controller {
 
     public void addMessage(int playerIndex, String content){}
 
+    public void ping(VirtualView client){
+        synchronized (this.gameState){
+            gameState.pingAnswere(client);
+        }
+    }
+
 /*
     public void setConnected(int index, boolean connected){
         synchronized (this.gameState) {

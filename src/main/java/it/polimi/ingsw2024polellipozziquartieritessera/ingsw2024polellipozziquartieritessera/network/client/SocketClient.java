@@ -95,6 +95,9 @@ public class SocketClient implements VirtualView {
                 case Messages.UPDATEPLAYERBOARD:
                     this.updatePlayerBoard(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]), Integer.parseInt(messageString[3]), CornerPos.valueOf(messageString[4]), Side.valueOf(messageString[5]));
                     break;
+                case Messages.UPDATEMAINBOARD:
+                    this.updateMainBoard(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]), Integer.parseInt(messageString[3]), Integer.parseInt(messageString[4]), Integer.parseInt(messageString[5]), Integer.parseInt(messageString[6]));
+                    break;
                 case Messages.UPDATECOLOR:
                     this.updateColor(Integer.parseInt(messageString[1]), Color.valueOf(messageString[2]));
                     break;
@@ -218,6 +221,11 @@ public class SocketClient implements VirtualView {
     @Override
     public void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
         Client.updateSharedObjective(sharedObjectiveCardId1, sharedObjectiveCardId2);
+    }
+
+    @Override
+    public void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
+        Client.updateMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
     }
 
     @Override

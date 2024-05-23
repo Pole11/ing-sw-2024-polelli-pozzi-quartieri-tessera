@@ -139,6 +139,11 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     }
 
     @Override
+    public void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
+        Client.updateMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
+    }
+
+    @Override
     public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
         Client.updateStarterCard(playerIndex, cardId1, side);
     }

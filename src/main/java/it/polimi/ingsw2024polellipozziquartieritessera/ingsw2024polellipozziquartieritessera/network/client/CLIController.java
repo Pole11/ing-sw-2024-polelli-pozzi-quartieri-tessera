@@ -47,7 +47,7 @@ public class CLIController {
                     try {
                         side = Side.valueOf(message[1].toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid side, please enter a valid side (Front / Back)"));
+                        System.err.print(("Invalid side, please enter a valid side (Front / Back)\n> "));
                         return;
                     }
                     server.chooseInitialStarterSide(client, side);
@@ -62,7 +62,7 @@ public class CLIController {
                     try {
                         color = Color.valueOf(message[1].toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid color, please enter a valid color (Blue / Green / Yellow / Red)"));
+                        System.err.print(("Invalid color, please enter a valid color (Blue / Green / Yellow / Red)\n> "));
                         return;
                     }
                     server.chooseInitialColor(client, color);
@@ -77,7 +77,7 @@ public class CLIController {
                     try {
                         cardId = Integer.parseInt(message[1]);
                     } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid card id, please insert a valid card id"));
+                        System.err.print(("Invalid card id, please insert a valid card id\n> "));
                         return;
                     }
                     server.chooseInitialObjective(client, cardId);
@@ -95,25 +95,25 @@ public class CLIController {
                     try {
                         placingCardId = Integer.parseInt(message[1]);
                     } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid id of the placing card, please insert a valid id"));
+                        System.err.print(("Invalid id of the placing card, please insert a valid id\n> "));
                         return;
                     }
                     try {
                         tableCardId = Integer.parseInt(message[2]);
                     } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid id of the table card, please insert a valid id"));
+                        System.err.print(("Invalid id of the table card, please insert a valid id\n> "));
                         return;
                     }
                     try {
                         tableCornerPos = CornerPos.valueOf(message[3].toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid corner, please insert a valid corner position (Upleft / Upright / Downleft / Downright)"));
+                        System.err.print(("Invalid corner, please insert a valid corner position (Upleft / Upright / Downleft / Downright)\n> "));
                         return;
                     }
                     try {
                         placingCardSide = Side.valueOf(message[4].toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid side, please insert a valid side (Front / Back)"));
+                        System.err.print(("Invalid side, please insert a valid side (Front / Back)\n> "));
                         return;
                     }
                     server.placeCard(client, placingCardId, tableCardId, tableCornerPos, placingCardSide);
@@ -128,7 +128,7 @@ public class CLIController {
                     try {
                         drawType = DrawType.valueOf(message[1].toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid draw option, please choose a valid option (SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource)"));
+                        System.err.print(("Invalid draw option, please choose a valid option (SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource)"));
                         return;
                     }
                     server.drawCard(client, drawType);
@@ -154,6 +154,9 @@ public class CLIController {
                 break;
             case Command.OPENCHAT:
                 server.openChat();
+                break;
+            case Command.PING:
+                server.ping(client);
                 break;
             default:
                 System.err.print("INVALID COMMAND\n> ");
@@ -185,7 +188,7 @@ public class CLIController {
         try {
             jsonString = Populate.readJSON(filePath + Config.CARD_JSON_PATH);
         } catch (IOException e) {
-            System.out.println("Error while loading image, pls try again");
+            System.out.print("Error while loading image, pls try again");
         }
         Gson gson = new Gson();
         Map cards = gson.fromJson(jsonString, Map.class);

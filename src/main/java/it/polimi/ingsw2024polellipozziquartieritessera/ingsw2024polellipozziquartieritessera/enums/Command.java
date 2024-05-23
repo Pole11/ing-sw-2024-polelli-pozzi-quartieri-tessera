@@ -12,5 +12,6 @@ public enum Command {
      DRAWCARD,
      FLIPCARD,
      OPENCHAT,
-     ADDMESSAGE;
+     ADDMESSAGE,
+     PING;
 }

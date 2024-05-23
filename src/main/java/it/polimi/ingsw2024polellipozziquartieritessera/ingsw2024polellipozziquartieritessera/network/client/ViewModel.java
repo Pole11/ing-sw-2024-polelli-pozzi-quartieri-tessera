@@ -7,7 +7,6 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Chat;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,7 +26,7 @@ public class ViewModel {
     private final HashMap<Integer,Side> placedSideMap; // side delle carte sulla board (unico per id)
     private final HashMap<Integer,Side> handsSideMap; // side delle carte in mano (unico per id)
     private final HashMap<Integer,ArrayList<ArrayList<Integer>>> boardsMap; // mappa delle board dei players
-    private final int[] sharedCards; // se la carta non c'è viene inizializzata a -1
+    private int[] mainBoard; // se la carta non c'è viene inizializzata a -1
     private Chat chat;
 
     public ViewModel() {
@@ -37,8 +36,8 @@ public class ViewModel {
         //contains also the secretOptions, when the objective is decided the [3] is -1
         objectives = new int[4];
         Arrays.fill(objectives, -1);
-        sharedCards = new int[4];
-        Arrays.fill(sharedCards, -1);
+        mainBoard = new int[6];
+        Arrays.fill(mainBoard, -1);
         handsMap = new HashMap<>();
         boardsMap = new HashMap<>();
         connessionMap = new HashMap<>();
@@ -92,14 +91,16 @@ public class ViewModel {
         this.pointsMap.put(playerIndex, points);
     }
 
-    // position are: resource [0,1], gold [2,3]
-    public void addedSharedCard(int cardId, int position){
-        sharedCards[position] = cardId;
+    // position are: resource [0,1], gold [2,3], firstResource[4] firstGold[5]
+    public void setMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
+        mainBoard[0] = sharedResourceCard1;
+        mainBoard[1] = sharedResourceCard2;
+        mainBoard[2] = sharedGoldCard1;
+        mainBoard[3] = sharedGoldCard2;
+        mainBoard[4] = firstResourceDeckCard;
+        mainBoard[5] = firtGoldDeckCard;
     }
 
-    public void removedSharedCard(int cardId, int position){
-        sharedCards[position] = -1;
-    }
 
     public void addedCardToHand(int playerIndex, int cardId) {
         if (!handsMap.containsKey(playerIndex)){
@@ -107,6 +108,7 @@ public class ViewModel {
         }
         handsMap.get(playerIndex).add(cardId);
     }
+
     public void removedCardFromHand(int playerIndex, int cardId){
         handsMap.get(playerIndex).remove(cardId);
         handsSideMap.remove(cardId);
@@ -171,10 +173,10 @@ public class ViewModel {
         return gamePhase;
     }
 
-    /*
+
     public TurnPhase getTurnPhase() {
         return turnPhase;
-    } */
+    }
 
     public int getStarterCard() {
         return starterCardId;
@@ -197,15 +199,15 @@ public class ViewModel {
     }
 
     public int[] getSharedCards() {
-        return sharedCards;
+        return mainBoard;
     }
 
     public int[] getSharedResourceCards() {
-        return new int[] { sharedCards[0], sharedCards[1] };
+        return new int[] { mainBoard[0], mainBoard[1] };
     }
 
     public int[] getSharedGoldCards() {
-        return new int[] { sharedCards[2], sharedCards[3] };
+        return new int[] { mainBoard[2], mainBoard[3] };
     }
 
     public boolean getConnession(int playerIndex) {

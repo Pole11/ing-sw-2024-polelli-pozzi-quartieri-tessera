@@ -223,6 +223,11 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
+    public void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) throws RemoteException {
+        view.updateMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
+    }
+
+    @Override
     public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
         view.updateStarterCard(playerIndex, cardId1, side);
     }

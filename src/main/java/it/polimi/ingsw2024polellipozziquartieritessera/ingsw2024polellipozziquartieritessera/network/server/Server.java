@@ -232,6 +232,10 @@ public class Server implements VirtualServer {
         this.controller.addMessage(getPlayerIndex(client), content);
     }
 
+    @Override
+    public void ping(VirtualView client) throws RemoteException {
+        this.controller.ping(client);
+    }
 
 
     private int getPlayerIndex(VirtualView client) {

@@ -48,9 +48,7 @@ public class Client {
         meDoGui = false;
         boolean running = true;
         Scanner scan = new Scanner(System.in);
-        System.out.println("Please enter a nickname to start, with the command ADDUSER <nickname>");
-
-        System.out.print("> "); // print phase
+        System.out.print("Please enter a nickname to start, with the command ADDUSER <nickname>\n> ");
         while (running) {
             String line = scan.nextLine();
             String[] message = line.split(" ");
@@ -77,7 +75,7 @@ public class Client {
 
         // il punto è che dovresti fare questo ma dopo il runGui
         //guiController = guiApplication.getGUIController();
-        //System.out.println("CCC" + guiController);
+        //System.out.print("CCC" + guiController);
         //guiApplication.getGUIController() = new GUIControllerOld(client, server);
 
         guiApplication.runGui(client, server);
@@ -98,7 +96,7 @@ public class Client {
             }
 
             case GamePhase.CHOOSECOLORPHASE -> {
-                System.out.println("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]");
+                System.out.print("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]\n> ");
                 if (meDoGui) guiApplication.getGUIController().goToScene("/fxml/chooseColor.fxml");
 
             }
@@ -107,11 +105,11 @@ public class Client {
             }
 
             case GamePhase.MAINPHASE -> {
-                System.out.println("---Game started---");
+                System.out.print("---Game started---\n> ");
                 if (meDoGui) guiApplication.getGUIController().goToScene("/fxml/game.fxml");
             }
             case GamePhase.ENDPHASE -> {
-                System.out.println("NON SO CHI reached 20 points o NON SO");
+                System.out.print("NON SO CHI reached 20 points o NON SO\n> ");
             }
             case GamePhase.FINALPHASE -> {
                 if (meDoGui) guiApplication.getGUIController().goToScene("/fxml/final.fxml");
@@ -152,16 +150,16 @@ public class Client {
         viewModel.setConnection(playerIndex, connected);
         if (playerIndex == viewModel.getPlayerIndex()){
             if (connected){
-                System.out.println("you re-connected to the game");
+                System.out.print("you re-connected to the game\n> ");
             } else {
                 //SISTEMA
                 throw new RuntimeException();
             }
         } else {
             if (connected) {
-                System.out.println(viewModel.getNickname(playerIndex) + " connected");
+                System.out.print(viewModel.getNickname(playerIndex) + " connected\n> ");
             } else {
-                System.out.println(viewModel.getNickname(playerIndex) + " disconnected");
+                System.out.print(viewModel.getNickname(playerIndex) + " disconnected\n> ");
                 guiApplication.getGUIController().goToScene("/fxml/final.fxml");
             }
         }
@@ -171,9 +169,9 @@ public class Client {
         viewModel.addedCardToHand(playerIndex, cardIndex);
         viewModel.setHandSide(cardIndex, Side.FRONT);
         if (viewModel.getPlayerIndex() == playerIndex) {
-            System.out.println("you have drawn a card");
+            System.out.print("you have drawn a card\n> ");
         } else {
-            System.out.println(viewModel.getNickname(playerIndex) + "drew a card");
+            System.out.print(viewModel.getNickname(playerIndex) + "drew a card\n> ");
         }
     }
 
@@ -184,51 +182,51 @@ public class Client {
     public static void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
         viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
         if (viewModel.getPlayerIndex() == playerIndex) {
-            System.out.println("you placed a card, now you have to draw your card with DRAW [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]");
+            System.out.print("you placed a card, now you have to draw your card with DRAW [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");
         } else {
-            System.out.println(viewModel.getNickname(playerIndex) + "placed a card");
+            System.out.print(viewModel.getNickname(playerIndex) + "placed a card\n> ");
         }
     }
 
     public static void updateColor(int playerIndex, Color color) throws RemoteException {
         viewModel.setColor(playerIndex, color);
         if (viewModel.getPlayerIndex() == playerIndex) {
-            System.out.println("you chose the color:" + color);
+            System.out.print("you chose the color " + color+"\n> ");
         } else {
-            System.out.println(viewModel.getNickname(playerIndex) + "chose the color" + color);
+            System.out.print(viewModel.getNickname(playerIndex) + "chose the color " + color+"\n> ");
         }
     }
 
     public static void updateCurrentPlayer(int currentPlayerIndex) throws RemoteException {
         viewModel.setCurrentPlayer(currentPlayerIndex);
         if (viewModel.getPlayerIndex() == currentPlayerIndex) {
-            System.out.println("it's your turn");
-            System.out.println("to place your card use the command PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)] to place your card");
+            System.out.print("it's your turn\n> ");
+            System.out.print("to place your card use the command PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)] to place your card\n> ");
         } else {
-            System.out.println("it's the turn of" + viewModel.getNickname(currentPlayerIndex));
+            System.out.print("it's the turn of " + viewModel.getNickname(currentPlayerIndex)+"\n> ");
         }
     }
 
     public static void updateHandSide(int cardIndex, Side side) throws RemoteException {
         viewModel.setHandSide(cardIndex, side);
-        System.out.println("you flipped your card");
+        System.out.print("you flipped your card\n> ");
     }
 
     public static void updatePoints(int playerIndex, int points) throws RemoteException {
         viewModel.setPoints(playerIndex, points);
         if (viewModel.getPlayerIndex() == playerIndex) {
-            System.out.println("you now have " + points + "points");
+            System.out.print("you now have " + points + "points\n> ");
         } else {
-            System.out.println(viewModel.getNickname(playerIndex) + "has" + points + "points");
+            System.out.print(viewModel.getNickname(playerIndex) + "has" + points + "points\n> ");
         }
     }
 
     public static void updateSecretObjective(int objectiveCardId1, int objectiveCardId2) throws RemoteException {
         viewModel.setSecretObjective(objectiveCardId1, objectiveCardId2);
         if (objectiveCardId2 == -1){
-            System.out.println("you have chosen the objective card: " + objectiveCardId1);
+            System.out.print("you have chosen the objective card: " + objectiveCardId1+"\n> ");
         } else{
-            System.out.println("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1], to see your card use the command SHOWOBJECTIVE");
+            System.out.print("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1], to see your card use the command SHOWOBJECTIVE\n> ");
             // TODO: cliController.showSecretObjectives();
 
         }
@@ -236,25 +234,31 @@ public class Client {
 
     public static void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
         viewModel.setSharedObjectives(sharedObjectiveCardId1, sharedObjectiveCardId2);
-        System.out.println("the shared objectives are: " + sharedObjectiveCardId1 + "," + sharedObjectiveCardId2);
+        System.out.print("the shared objectives are: " + sharedObjectiveCardId1 + "," + sharedObjectiveCardId2 + "\n> ");
         //TODO: cliController.showSharedObjectvives();
     }
 
     public static void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
         if (side == null){
             viewModel.setStarterCard(cardId1);
-            System.out.println("Chose your preferred side for the starter card with the command CHOOSESTARTER[Front/Back]:");
+            System.out.print("Chose your preferred side for the starter card with the command CHOOSESTARTER[Front/Back]\n> ");
             // TODO : cliController.showStarterSides();
         } else {
             viewModel.initializeBoard(playerIndex, cardId1);
             viewModel.setPlacedSide(cardId1, side);
             if (viewModel.getPlayerIndex() == playerIndex) {
-                System.out.println("you now have chosen the starter side");
+                System.out.print("you now have chosen the starter side\n> ");
             } else {
-                System.out.println(viewModel.getNickname(playerIndex) + "has chosen the starter side");
+                System.out.print(viewModel.getNickname(playerIndex) + " has chosen the starter side\n> ");
             }
         }
     }
+
+
+    public static void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
+        viewModel.setMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
+    }
+
 
     public static void ping(String ping) throws RemoteException {
         //TODO : respond to ping to manage disconections
@@ -272,9 +276,7 @@ public class Client {
             guiController.setServerError(error);
         }
         System.err.print("\nERROR FROM SERVER: " + error + "\n> ");
-
     }
-
 }
 
 // TODO: capire come fare a chiamare le print card... da dove, chi lo fa, etc.

@@ -124,6 +124,12 @@ public class ClientProxy implements VirtualView {
     }
 
     @Override
+    public void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) throws RemoteException {
+        output.println(Messages.UPDATEMAINBOARD + "; " + sharedGoldCard1 + ", " + sharedGoldCard2 + "; " + sharedResourceCard1 + "; " + sharedResourceCard2 + "; " + firtGoldDeckCard + "; " + firstResourceDeckCard);
+        output.flush();
+    }
+
+    @Override
     public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
         String sideString;
         if (side == null){

@@ -30,4 +30,5 @@ public interface VirtualServer extends Remote {
 
     public void addMessage(VirtualView client, String content) throws RemoteException;
 
+    public void ping(VirtualView client) throws RemoteException;
 }
