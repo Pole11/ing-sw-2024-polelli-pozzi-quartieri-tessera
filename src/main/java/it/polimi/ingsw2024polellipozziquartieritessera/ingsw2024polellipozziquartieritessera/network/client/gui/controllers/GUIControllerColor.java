@@ -41,7 +41,11 @@ public class GUIControllerColor extends GUIController {
 
         String message = Command.CHOOSECOLOR + " " + color;
         //Client.manageInputCli(getServer(), message.split(" "), getClient());
-
+        try {
+            getServer().chooseInitialColor(getClient(), color);
+        } catch (RemoteException e) {
+            setServerError("There was an error while choosing the color, please try again");
+        }
     }
 
     private void changeMainContainerBorder(Color color) {

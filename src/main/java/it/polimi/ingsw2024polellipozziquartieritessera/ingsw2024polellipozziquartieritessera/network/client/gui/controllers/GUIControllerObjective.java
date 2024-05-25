@@ -31,9 +31,11 @@ public class GUIControllerObjective extends GUIController{
     }
 
     public void handleChooseObjective(int index) {
-        String message = Command.CHOOSEOBJECTIVE + " " + index;
-        //Client.manageInputCli(getServer(), message.split(" "), getClient());
-
+        try {
+            getServer().chooseInitialObjective(getClient(), index);
+        } catch (RemoteException e) {
+            setServerError("There was an error while choosing the initial objective card, please try again");
+        }
     }
 
 
@@ -76,6 +78,8 @@ public class GUIControllerObjective extends GUIController{
 
     @Override
     public void update(ViewModel viewModel) {
-
+        Platform.runLater(() -> {
+            setObjectiveCardImages(viewModel.getSecretObjectiveCards()[0], viewModel.getSecretObjectiveCards()[1]);
+        });
     }
 }

@@ -16,9 +16,7 @@ public class GUIControllerStarterCard extends GUIController {
     @FXML private StackPane starterCardImageContainerFront;
     @FXML private StackPane starterCardImageContainerBack;
 
-    public GUIControllerStarterCard() {
-        setStarterCardImage(84);
-    }
+    public GUIControllerStarterCard() {}
 
     @FXML
     public void handleChooseFrontStarter(ActionEvent event) {
@@ -31,9 +29,11 @@ public class GUIControllerStarterCard extends GUIController {
     }
 
     private void handleChooseSideStarter(Side side) {
-        String message = Command.CHOOSESTARTER + " " + side;
-        //Client.manageInputCli(getServer(), message.split(" "), getClient());
-
+        try {
+            getServer().chooseInitialStarterSide(getClient(), side);
+        } catch (RemoteException e) {
+            setServerError("There was an error while choosing the side of the starter card, please try again");
+        }
     }
 
     public void setStarterCardImage(int id) {
@@ -46,21 +46,13 @@ public class GUIControllerStarterCard extends GUIController {
             @Override
             public void run() {
                 starterCardImageViewFront.setOnMouseClicked(mouseEvent -> {
-                    // OPZIONE 1
                     if (!starterCardImageViewBack.getParent().getStyleClass().contains("greenBackground"))
                         starterCardImageViewFront.getParent().getStyleClass().add("greenBackground");
-                    // OPZIONE 2
-                    //starterCardImageViewFront.setOnMouseClicked(null);
-                    //starterCardImageViewBack.setOnMouseClicked(null);
                     handleChooseSideStarter(Side.FRONT);
                 });
                 starterCardImageViewBack.setOnMouseClicked(mouseEvent -> {
-                    // OPZIONE 1
                     if (!starterCardImageViewFront.getParent().getStyleClass().contains("greenBackground"))
                         starterCardImageViewBack.getParent().getStyleClass().add("greenBackground");
-                    // OPZIONE 2
-                    //starterCardImageViewFront.setOnMouseClicked(null);
-                    //starterCardImageViewBack.setOnMouseClicked(null);
                     handleChooseSideStarter(Side.BACK);
 
                 });
@@ -74,6 +66,8 @@ public class GUIControllerStarterCard extends GUIController {
 
     @Override
     public void update(ViewModel viewModel) {
-
+        Platform.runLater(() -> {
+            setStarterCardImage(viewModel.getStarterCard());
+        });
     }
 }

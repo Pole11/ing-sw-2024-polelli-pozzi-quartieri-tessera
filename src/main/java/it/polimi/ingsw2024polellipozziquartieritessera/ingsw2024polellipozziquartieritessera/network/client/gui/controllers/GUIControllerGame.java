@@ -21,7 +21,7 @@ import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.stage.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -30,20 +30,30 @@ public class GUIControllerGame extends GUIController {
     @FXML private VBox sharedGoldContainerGame;
     @FXML private VBox plateauContainerGame;
     @FXML private VBox sharedResourceContainerGame;
-
-    private HashMap<Integer, Side> playerHandCards;
-    int meId;
-    private ArrayList<ArrayList<Integer>> playerBoard;
-    private HashMap<Integer, Side> placedSideMap;
+    private ViewModel tempViewModel;
 
     public GUIControllerGame() {
-        playerHandCards = new HashMap<>();
-        playerBoard = new ArrayList<>();
-        placedSideMap = new HashMap<>();
-        meId = 1;
+        clearAllchilds();
+    }
 
-        initTable(4, 61, 11, 42, 27, 63, 3);
-        highlightCurrentPlayerTable();
+    private void clearAllchilds() {
+        Platform.runLater(() -> {
+            if (sharedResourceContainerGame != null) sharedResourceContainerGame.getChildren().clear();
+            if (sharedGoldContainerGame != null) sharedGoldContainerGame.getChildren().clear();
+            if (plateauContainerGame != null) {
+                while (plateauContainerGame.getChildren().size() > 2) {
+                    plateauContainerGame.getChildren().removeLast(); // the first two are the messages from server
+                }
+            }
+            for (int i = 1; i <= 4; i++) {
+                if (mainContainerGame.lookup("#player" + i + "ContainerGame") != null) {
+                    while (((Pane) mainContainerGame.lookup("#player" + i + "ContainerGame")).getChildren().size() > 1) {
+                        ((Pane) mainContainerGame.lookup("#player" + i + "ContainerGame")).getChildren().removeLast();
+                    }
+                }
+                if (mainContainerGame.lookup("#infoContainerPlayer" + i) != null) ((Pane) mainContainerGame.lookup("#infoContainerPlayer" + i)).getChildren().clear();
+            }
+        });
     }
 
     private ImageView createPlateauImageView() {
@@ -61,14 +71,25 @@ public class GUIControllerGame extends GUIController {
         return imageView;
     }
 
-    public void initTable(int numPlayers, int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId) {
+    public void initTable(ArrayList<HashMap<Integer, Side>> playerHandCards, int meId, int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId, int firstCommonObjective, int secondCommonObjective, int secretObjectiveCardId) {
+        printCommonObjective(firstCommonObjective, secondCommonObjective);
         printDecks(firstGoldDeckCardId, firstResourceDeckCardId, firstSharedGoldCardId, firstSharedResourceCardId, secondSharedGoldCardId, secondSharedResourceCardId);
+        for (int i = 0; i < playerHandCards.size(); i++) initPlayerHand(i + 1, meId + 1, playerHandCards.get(i), secretObjectiveCardId);
+    }
 
-        // TODO: get the player hand
-        playerHandCards.put(30, Side.FRONT);
-        playerHandCards.put(3, Side.BACK);
-        playerHandCards.put(45, Side.FRONT);
-        for (int i = 1; i <= numPlayers; i++) initPlayerHand(i, playerHandCards, 90);
+    public void printCommonObjective(int firstCommonObjective, int secondCommonObjective) {
+        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+            @Override
+            public void run() {
+                ImageView firstCommonObjectiveImageView = createCardImageView("/img/carte_fronte/" + firstCommonObjective + ".jpg", 75);
+                BorderPane firstCommonObjectivePane = new BorderPane(firstCommonObjectiveImageView);
+                sharedGoldContainerGame.getChildren().add(firstCommonObjectivePane);
+
+                ImageView secondCommonObjectiveImageView = createCardImageView("/img/carte_fronte/" + secondCommonObjective + ".jpg", 75);
+                BorderPane secondCommonObjectivePane = new BorderPane(secondCommonObjectiveImageView);
+                sharedResourceContainerGame.getChildren().add(secondCommonObjectivePane);
+            }
+        });
     }
 
     public void printDecks(int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId) {
@@ -125,15 +146,13 @@ public class GUIControllerGame extends GUIController {
                 addHover(resourceDeckPane);
                 addHover(firstSharedResourceCardImageView);
                 addHover(secondSharedResourceCardImageView);
-
             }
         });
     }
 
-    public void highlightCurrentPlayerTable() {
+    public void highlightCurrentPlayerTable(int idCurrentPlayer) {
         Platform.runLater(() -> {
                 // TODO: get current player id
-                int idCurrentPlayer = 3;
                 Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame");
 
                 // TODO: get current player color
@@ -143,12 +162,13 @@ public class GUIControllerGame extends GUIController {
         );
     }
 
-    public void initPlayerHand(int playerId, HashMap<Integer, Side> playerHandCards, int secreteObjCardId) {
+    public void initPlayerHand(int playerId, int meId, HashMap<Integer, Side> playerHandCards, int secreteObjCardId) {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
                 // TODO: get player nickname
                 VBox infoContainerVBox = new VBox();
+                infoContainerVBox.setId("infoContainerPlayer" + playerId);
                 String currentPlayerNickname = "Player nickname " + playerId;
                 Text nicknameText = new Text(currentPlayerNickname);
                 Button expandButton = new Button("Expand Board");
@@ -166,13 +186,13 @@ public class GUIControllerGame extends GUIController {
                     playerContainer.getChildren().add(infoContainerVBox);
                 }
 
-                updatePlayerHand(playerId, playerHandCards);
-                if (meId == playerId) printPrivateObjective(playerId, secreteObjCardId);
+                updatePlayerHand(playerId, meId, playerHandCards);
+                if (meId == playerId) printPrivateObjective(meId, secreteObjCardId);
             }
         });
     }
 
-    public void updatePlayerHand(int playerId, HashMap<Integer, Side> playerHandCards) {
+    public void updatePlayerHand(int playerId, int meId, HashMap<Integer, Side> playerHandCards) {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
@@ -206,7 +226,7 @@ public class GUIControllerGame extends GUIController {
                         tempImageView.getStyleClass().add("clickable");
                         tempImageView.setOnMousePressed(mouseEvent -> {
                             if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                                flipCard(playerId, cardId);
+                                flipCard(cardId);
                             } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                                 // if phase is placing
                                 Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
@@ -238,13 +258,14 @@ public class GUIControllerGame extends GUIController {
         });
     }
 
-    public void flipCard(int playerId, int cardId) {
-        if (playerHandCards.get(cardId) == Side.FRONT) {
-            playerHandCards.put(cardId, Side.BACK);
-        } else {
-            playerHandCards.put(cardId, Side.FRONT);
+    public void flipCard(int cardId) {
+        try {
+            getServer().flipCard(getClient(), cardId);
+        } catch (RemoteException e) {
+            Platform.runLater(() -> {
+                setServerError("There was an error while flipping the card, please try again");
+            });
         }
-        updatePlayerHand(playerId, playerHandCards);
     }
 
     public void printPrivateObjective(int playerId, int cardId) {
@@ -272,12 +293,41 @@ public class GUIControllerGame extends GUIController {
         try {
             getServer().drawCard(getClient(), drawType);
         } catch (RemoteException e) {
-            setServerError("There was an error while drawing the card, please try again");
+            Platform.runLater(() -> {
+                setServerError("There was an error while drawing the card, please try again");
+            });
         }
     }
 
     @Override
     public void update(ViewModel viewModel) {
+        Platform.runLater(() -> {
+            clearAllchilds();
 
+            // delete everything  or find a way to differentially change the content of the view
+            ArrayList<HashMap<Integer, Side>> playerHandCards = new ArrayList<>();
+            for (Integer playerId = 0; playerId < viewModel.getPlayersSize(); playerId++) {
+                HashMap<Integer, Side> playerHandCardsMap = new HashMap<>();
+                for (Integer cardId : viewModel.getHand(playerId)) {
+                    playerHandCardsMap.put(cardId, viewModel.getHandCardsSide(cardId));
+                }
+                playerHandCards.add(playerHandCardsMap);
+            }
+
+            initTable(playerHandCards,
+                    viewModel.getPlayerIndex(),
+                    viewModel.getSharedCards()[0],
+                    viewModel.getSharedCards()[1],
+                    viewModel.getSharedGoldCards()[0],
+                    viewModel.getSharedResourceCards()[0],
+                    viewModel.getSharedGoldCards()[1],
+                    viewModel.getSharedResourceCards()[1],
+                    viewModel.getObjectives()[0],
+                    viewModel.getObjectives()[1],
+                    viewModel.getObjectives()[2]); // !!! get the right secret objective
+            highlightCurrentPlayerTable(viewModel.getCurrentPlayer() + 1); // !!! make it work
+
+            this.tempViewModel = viewModel;
+        });
     }
 }

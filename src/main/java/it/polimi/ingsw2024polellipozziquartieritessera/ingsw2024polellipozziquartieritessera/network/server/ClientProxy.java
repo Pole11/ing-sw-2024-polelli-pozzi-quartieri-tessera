@@ -125,7 +125,7 @@ public class ClientProxy implements VirtualView {
 
     @Override
     public void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) throws RemoteException {
-        output.println(Messages.UPDATEMAINBOARD + "; " + sharedGoldCard1 + ", " + sharedGoldCard2 + "; " + sharedResourceCard1 + "; " + sharedResourceCard2 + "; " + firtGoldDeckCard + "; " + firstResourceDeckCard);
+        output.println(Messages.UPDATEMAINBOARD + "; " + sharedGoldCard1 + "; " + sharedGoldCard2 + "; " + sharedResourceCard1 + "; " + sharedResourceCard2 + "; " + firtGoldDeckCard + "; " + firstResourceDeckCard);
         output.flush();
     }
 

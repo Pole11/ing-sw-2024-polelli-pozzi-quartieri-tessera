@@ -18,6 +18,9 @@ import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 abstract public class GUIController {
     @FXML private Label serverMessageLabel;
@@ -138,7 +141,9 @@ abstract public class GUIController {
     }
 
     public ImageView createCardImageView(String url, int width) {
-        String imageUrl = getClass().getResource(url).toExternalForm();
+        URL resource = GUIController.class.getResource(url);
+        if (resource == null) return null;
+        String imageUrl = resource.toExternalForm();
         Image image = new Image(imageUrl);
 
         PixelReader reader = image.getPixelReader();
@@ -162,12 +167,28 @@ abstract public class GUIController {
 
     public void disappearAfter(int time, Node target, Pane father) {
         // Set up a Timeline to remove the Label after 10 seconds
-        Timeline timeline = new Timeline(new KeyFrame(
-                Duration.seconds(10),
-                event -> father.getChildren().remove(target)
-        ));
-        timeline.setCycleCount(1); // Run only once
-        timeline.play();
+        Platform.runLater(() -> {
+            Timeline timeline = new Timeline(new KeyFrame(
+                    Duration.seconds(10),
+                    event -> father.getChildren().remove(target)
+            ));
+            timeline.setCycleCount(1); // Run only once
+            timeline.play();
+        });
+    }
+
+    public void deleteContainingNodes(Pane root) {
+        Platform.runLater(() -> {
+            List<Node> nodesToRemove = new ArrayList<>();
+
+            // Iterate through children of the root pane
+            for (javafx.scene.Node node : root.getChildren()) {
+                nodesToRemove.add(node);
+            }
+
+            // Remove the collected nodes from the root pane
+            root.getChildren().removeAll(nodesToRemove);
+        });
     }
 
 }
