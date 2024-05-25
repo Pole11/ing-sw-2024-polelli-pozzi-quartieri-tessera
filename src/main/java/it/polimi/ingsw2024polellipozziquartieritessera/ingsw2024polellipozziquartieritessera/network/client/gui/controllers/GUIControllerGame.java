@@ -273,12 +273,13 @@ public class GUIControllerGame extends GUIController {
             @Override
             public void run() {
                 ImageView tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+                if (tempImageView == null) return;
                 //tempImageView.getStyleClass().add("imageWithBorder");
                 if (playerId == 1 || playerId == 2) {
-                    HBox playerContainer = (HBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+                    HBox playerContainer = (HBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
                     playerContainer.getChildren().add(tempImageView);
                 } else {
-                    VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+                    VBox playerContainer = (VBox) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
                     playerContainer.getChildren().add(tempImageView);
                 }
             }

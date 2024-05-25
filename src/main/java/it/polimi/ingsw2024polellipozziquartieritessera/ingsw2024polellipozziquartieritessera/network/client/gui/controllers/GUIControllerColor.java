@@ -37,14 +37,15 @@ public class GUIControllerColor extends GUIController {
     }
 
     private void handleChooseColor(Color color) {
-        changeMainContainerBorder(color); // TODO: move from here, put it in the client so that the color is changed only one single time
-
-        String message = Command.CHOOSECOLOR + " " + color;
-        //Client.manageInputCli(getServer(), message.split(" "), getClient());
+        Platform.runLater(() -> {
+            changeMainContainerBorder(color); // TODO: move from here, put it in the client so that the color is changed only one single time
+        });
         try {
             getServer().chooseInitialColor(getClient(), color);
         } catch (RemoteException e) {
-            setServerError("There was an error while choosing the color, please try again");
+            Platform.runLater(() -> {
+                setServerError("There was an error while choosing the color, please try again");
+            });
         }
     }
 

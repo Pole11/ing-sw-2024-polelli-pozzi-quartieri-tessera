@@ -17,7 +17,6 @@ public class GUIControllerObjective extends GUIController{
     @FXML private StackPane secondObjectiveImageContainer;
 
     public GUIControllerObjective() {
-        setObjectiveCardImages(91, 94);
     }
 
     @FXML
@@ -34,23 +33,27 @@ public class GUIControllerObjective extends GUIController{
         try {
             getServer().chooseInitialObjective(getClient(), index);
         } catch (RemoteException e) {
-            setServerError("There was an error while choosing the initial objective card, please try again");
+            Platform.runLater(() -> {
+                setServerError("There was an error while choosing the initial objective card, please try again");
+            });
         }
     }
 
 
     public void setObjectiveCardImages(int id1, int id2) {
-        ImageView firstObjectiveImageView = createCardImageView("/img/carte_fronte/" + id1 + ".jpg", 180);
-        firstObjectiveImageView.getStyleClass().add("clickable");
-        ImageView secondObjectiveImageView = createCardImageView("/img/carte_fronte/" + id2 + ".jpg", 180);
-        secondObjectiveImageView.getStyleClass().add("clickable");
-
-        addHover(firstObjectiveImageView);
-        addHover(secondObjectiveImageView);
-
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
+                ImageView firstObjectiveImageView = createCardImageView("/img/carte_fronte/" + id1 + ".jpg", 180);
+                if (firstObjectiveImageView == null) return;
+                firstObjectiveImageView.getStyleClass().add("clickable");
+                ImageView secondObjectiveImageView = createCardImageView("/img/carte_fronte/" + id2 + ".jpg", 180);
+                if (secondObjectiveImageView == null) return;
+                secondObjectiveImageView.getStyleClass().add("clickable");
+
+                addHover(firstObjectiveImageView);
+                addHover(secondObjectiveImageView);
+
                 firstObjectiveImageView.setOnMouseClicked(mouseEvent -> {
                     // OPZIONE 1
                     if (!secondObjectiveImageView.getParent().getStyleClass().contains("greenBackground"))

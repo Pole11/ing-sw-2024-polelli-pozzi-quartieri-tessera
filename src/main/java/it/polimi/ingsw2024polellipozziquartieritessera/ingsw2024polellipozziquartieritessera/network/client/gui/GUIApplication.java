@@ -36,20 +36,32 @@ public class GUIApplication extends Application {
     }
 
      public static void changeScene(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
-        mainStage.getScene().setRoot(fxmlLoader.load());
-        guiController = fxmlLoader.getController();
-        guiController.setClient(client);
-        guiController.setServer(server);
+         Platform.runLater(() -> {
+            FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
+             try {
+                 mainStage.getScene().setRoot(fxmlLoader.load());
+             } catch (IOException e) {
+                 throw new RuntimeException(e);
+             }
+             guiController = fxmlLoader.getController();
+            guiController.setClient(client);
+            guiController.setServer(server);
+         });
     }
 
     public static void changeScene(String fxml, String[] args) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
-        mainStage.getScene().setRoot(fxmlLoader.load());
-        guiController = fxmlLoader.getController();
-        guiController.setArgs(args);
-        guiController.setClient(client);
-        guiController.setServer(server);
+        Platform.runLater(() -> {
+            FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
+            try {
+                mainStage.getScene().setRoot(fxmlLoader.load());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            guiController = fxmlLoader.getController();
+            guiController.setArgs(args);
+            guiController.setClient(client);
+            guiController.setServer(server);
+        });
     }
 
     @Override

@@ -115,7 +115,7 @@ abstract public class GUIController {
     }
 
     public void goToScene(String fxml) {
-        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+        /*Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
                 try {
@@ -124,11 +124,16 @@ abstract public class GUIController {
                     throw new RuntimeException(e);
                 }
             }
-        });
+        });*/
+        try {
+            GUIApplication.changeScene(fxml);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void goToScene(String fxml, String[] args) {
-        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+        /*Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
                 try {
@@ -137,7 +142,12 @@ abstract public class GUIController {
                     throw new RuntimeException(e);
                 }
             }
-        });
+        });*/
+        try {
+            GUIApplication.changeScene(fxml, args);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public ImageView createCardImageView(String url, int width) {

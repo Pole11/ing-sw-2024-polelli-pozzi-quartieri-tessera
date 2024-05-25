@@ -15,8 +15,6 @@ public class GUIControllerLobby extends GUIController {
 
     @FXML
     public void handleAddUser(ActionEvent event) {
-        String message = Command.ADDUSER + " " + nicknameTextField.getText();
-        //Client.manageInputCli(getServer(), message.split(" "), getClient());
         try {
             getServer().addConnectedPlayer(getClient(), nicknameTextField.getText());
         } catch (RemoteException e) {

@@ -12,12 +12,12 @@ public class GUIControllerStartGame extends GUIController {
 
     @FXML
     public void handleStartGame(ActionEvent event) {
-        String message = Command.START.toString();
-        //Client.manageInputCli(getServer(), message.split(" "), getClient());
         try {
             getServer().startGame(getClient());
         } catch (RemoteException e) {
-            setServerError("Unfortunatly we could not start the game, please try again :/");
+            Platform.runLater(() -> {
+                setServerError("Unfortunatly we could not start the game, please try again :/");
+            });
         }
     }
 

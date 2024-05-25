@@ -32,19 +32,22 @@ public class GUIControllerStarterCard extends GUIController {
         try {
             getServer().chooseInitialStarterSide(getClient(), side);
         } catch (RemoteException e) {
-            setServerError("There was an error while choosing the side of the starter card, please try again");
+            Platform.runLater(() -> {
+                setServerError("There was an error while choosing the side of the starter card, please try again");
+            });
         }
     }
 
     public void setStarterCardImage(int id) {
-        ImageView starterCardImageViewFront = createCardImageView("/img/carte_fronte/" + id + ".jpg", 180);
-        starterCardImageViewFront.getStyleClass().add("clickable");
-        ImageView starterCardImageViewBack = createCardImageView("/img/carte_retro/" + id + ".jpg", 180);
-        starterCardImageViewBack.getStyleClass().add("clickable");
 
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
+                ImageView starterCardImageViewFront = createCardImageView("/img/carte_fronte/" + id + ".jpg", 180);
+                starterCardImageViewFront.getStyleClass().add("clickable");
+                ImageView starterCardImageViewBack = createCardImageView("/img/carte_retro/" + id + ".jpg", 180);
+                starterCardImageViewBack.getStyleClass().add("clickable");
+
                 starterCardImageViewFront.setOnMouseClicked(mouseEvent -> {
                     if (!starterCardImageViewBack.getParent().getStyleClass().contains("greenBackground"))
                         starterCardImageViewFront.getParent().getStyleClass().add("greenBackground");
