@@ -118,7 +118,7 @@ public class ViewModel {
         // for starter cards (initialization)
         if (!boardsMap.containsKey(playerIndex)){
             // TODO: DAFARE
-            System.out.println("Erroorrrrr!");
+            System.out.println("Errooooooooooooor!");
         }
 
         // for all the other placements

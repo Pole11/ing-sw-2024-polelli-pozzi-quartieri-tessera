@@ -1,5 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
@@ -25,6 +26,19 @@ abstract public class GUIController {
     private VirtualView client; // temp
     private VirtualServer server; // temp
     private String[] args;
+    private boolean isSceneLoaded = false;
+
+    @FXML
+    private void initialize() {
+        isSceneLoaded = true;
+        System.out.println("[DEBUG] Scene is loaded with " + this.getClass());
+    }
+
+    public boolean isSceneLoaded() {
+        return isSceneLoaded;
+    }
+
+    abstract public void update(ViewModel viewModel); // non mi piacerebbe avere un attributo di viewModel qui dentro il controller perchè a quel punto sarebbe una copia di quello client, quindi glielo chiedo come parametro e via
 
     public String[] getArgs() {
         return args;

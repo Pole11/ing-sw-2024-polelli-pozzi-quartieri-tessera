@@ -275,4 +275,9 @@ public class GUIControllerGame extends GUIController {
             setServerError("There was an error while drawing the card, please try again");
         }
     }
+
+    @Override
+    public void update(ViewModel viewModel) {
+
+    }
 }

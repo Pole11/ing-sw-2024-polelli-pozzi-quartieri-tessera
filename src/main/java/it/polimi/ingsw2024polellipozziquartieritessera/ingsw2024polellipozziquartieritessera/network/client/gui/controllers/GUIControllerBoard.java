@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -96,7 +97,10 @@ public class GUIControllerBoard extends GUIController {
     @FXML
     public void handleBackToGame(ActionEvent event) {
         goToScene("/fxml/game.fxml");
-        System.out.println("ciao");
     }
 
+    @Override
+    public void update(ViewModel viewModel) {
+
+    }
 }

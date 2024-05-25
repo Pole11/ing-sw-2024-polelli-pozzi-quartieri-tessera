@@ -1,5 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIController;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerGame;
@@ -26,7 +27,15 @@ public class GUIApplication extends Application {
         return mainStage;
     }
 
-    public static void changeScene(String fxml) throws IOException {
+    /*public boolean sceneLoaded() {
+        return mainStage.getScene() != null;
+    }*/
+
+    public static void updateController(ViewModel viewModel) {
+        Platform.runLater(() -> { getGUIController().update(viewModel); });
+    }
+
+     public static void changeScene(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
         mainStage.getScene().setRoot(fxmlLoader.load());
         guiController = fxmlLoader.getController();
@@ -45,7 +54,7 @@ public class GUIApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/game.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml"));
         Parent root = fxmlLoader.load();
 
         guiController = fxmlLoader.getController();
