@@ -125,6 +125,9 @@ public class SocketClient implements VirtualView {
                     }
                     this.updateStarterCard(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]), side);
                     break;
+                case Messages.UPDATEWINNER:
+                    this.updateWinner(Integer.parseInt(messageString[1]));
+                    break;
                 default:
                     System.err.println("[5xx INVALID MESSAGE FROM SERVER]");
                     break;
@@ -233,4 +236,8 @@ public class SocketClient implements VirtualView {
         Client.updateStarterCard(playerIndex, cardId1, side);
     }
 
+    @Override
+    public void updateWinner(int playerIndex) throws RemoteException {
+        Client.updateWinner(playerIndex);
+    }
 }

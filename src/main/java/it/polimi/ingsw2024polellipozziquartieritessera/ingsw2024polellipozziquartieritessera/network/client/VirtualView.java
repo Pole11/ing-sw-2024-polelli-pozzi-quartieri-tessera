@@ -28,5 +28,5 @@ public interface VirtualView extends Remote {
     void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) throws RemoteException;
     //side is null if is not decided
     void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException;
-
+    void updateWinner(int playerIndex) throws RemoteException;
 }

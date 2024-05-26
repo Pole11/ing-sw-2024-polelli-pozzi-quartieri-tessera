@@ -255,6 +255,10 @@ public class Client {
     }
 
 
+    public static void updateWinner(int playerIndex){
+        viewModel.addWinner(playerIndex);
+    }
+
     public static void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
         viewModel.setMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
     }

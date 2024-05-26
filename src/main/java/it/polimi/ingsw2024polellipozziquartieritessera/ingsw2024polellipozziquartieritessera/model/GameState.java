@@ -33,7 +33,7 @@ public class GameState {
     private Thread timeoutThread;
     private GamePhase prevGamePhase;
 
-
+    private int turnToPlay;
 
 
     // CONSTRUCTOR
@@ -62,6 +62,9 @@ public class GameState {
 
         this.answered = new HashMap<>();
         resetAnswered();
+
+        //cambia in intMax
+        this.turnToPlay = 1;
 
     }
 
@@ -94,7 +97,7 @@ public class GameState {
         return cardsMap.get(cardId);
     }
 
-    public int getPlayersSize(){
+    public int getPlayersSize() {
         return this.players.size();
     }
 
@@ -115,7 +118,7 @@ public class GameState {
         this.currentGameTurn = currentGameTurn;
     }
 
-    //ADDER
+    //ADDER/REMOVER
 
     public void addCardToCardsMap(int cardId, Card card) {
         this.cardsMap.put(cardId, card);
@@ -125,6 +128,9 @@ public class GameState {
         this.eventQueue.add(event);
     }
 
+    public void decrementTurn() {
+        this.turnToPlay--;
+    }
 
     //EVENTQUEUE
 
@@ -138,16 +144,17 @@ public class GameState {
 
     private int numberAnswered() {
         //controllare se funziona
-        return this.answered.values().stream().mapToInt(e-> e ? 1 : 0).sum();
+        return this.answered.values().stream().mapToInt(e -> e ? 1 : 0).sum();
     }
 
     private void executeEventsRunnable() {
-        while (true){
+        while (true) {
             synchronized (eventQueue) {
                 while (eventQueue.isEmpty()) {
                     try {
                         eventQueue.wait();
-                    } catch (InterruptedException e) {}
+                    } catch (InterruptedException e) {
+                    }
                 }
                 eventQueue.remove().execute();
             }
@@ -155,77 +162,79 @@ public class GameState {
     }
 
 
-    public ArrayList<VirtualView> singleClient(VirtualView client){
+    public ArrayList<VirtualView> singleClient(VirtualView client) {
         ArrayList<VirtualView> clients = new ArrayList<>();
         clients.add(client);
         return clients;
     }
 
-    public ArrayList<VirtualView> otherClients(VirtualView client){
+    public ArrayList<VirtualView> otherClients(VirtualView client) {
         ArrayList<VirtualView> clients = new ArrayList<>();
         for (Player playerIterator : players) {
-            if (playerIterator.isConnected() && !client.equals(playerIterator.getClient()) ) {
+            if (playerIterator.isConnected() && !client.equals(playerIterator.getClient())) {
                 clients.add(playerIterator.getClient());
             }
         }
         return clients;
     }
 
-    public ArrayList<VirtualView> allClients(){
+    public ArrayList<VirtualView> allClients() {
         return (ArrayList<VirtualView>) players.stream().filter(Player::isConnected).map(Player::getClient).collect(Collectors.toList());
     }
 
 
     //DISCONNECTIONS
 
-    public void pingThreadRunnable(){
-        while (true){
+    public void pingThreadRunnable() {
+        while (true) {
             updatePlayersConnected();
             int i = 0;
-            for (Thread playerThread : playerThreads){
+            for (Thread playerThread : playerThreads) {
                 int finalI = i;
-                playerThread = new Thread(()->{
+                playerThread = new Thread(() -> {
                     int j = finalI;
                     try {
                         //wait for the answare of players
-                        Thread.sleep(1000*3);
-                    } catch (InterruptedException e) {}
-                    synchronized (players){
+                        Thread.sleep(1000 * 3);
+                    } catch (InterruptedException e) {
+                    }
+                    synchronized (players) {
                         players.get(j).setConnected(false);
                         players.notifyAll();
                     }
                 });
                 playerThread.start();
-                i ++;
+                i++;
             }
 
             try {
                 //wait to ping another time
-                Thread.sleep(1000*5);
-            } catch (InterruptedException e) {}
+                Thread.sleep(1000 * 5);
+            } catch (InterruptedException e) {
+            }
         }
     }
 
-    public void pingAnswere(VirtualView client){
-        synchronized (players){
+    public void pingAnswere(VirtualView client) {
+        synchronized (players) {
             playerThreads.get(getPlayerIndex(client)).interrupt();
             players.get(getPlayerIndex(client)).setConnected(true);
             players.notifyAll();
         }
     }
 
-    public void setPlayersConnected(int index, boolean connected){
+    public void setPlayersConnected(int index, boolean connected) {
         players.get(index).setConnected(connected);
         players.get(index).setClient(null);
     }
 
-    private void manageReconnection(Player player){
-        synchronized (players){
+    private void manageReconnection(Player player) {
+        synchronized (players) {
             player.setConnected(true);
             players.notifyAll();
         }
         restoreView(player.getClient());
-        if (this.currentGamePhase.equals(GamePhase.TIMEOUT)){
+        if (this.currentGamePhase.equals(GamePhase.TIMEOUT)) {
             this.timeoutThread.interrupt();
             currentGamePhase = prevGamePhase;
             prevGamePhase = null;
@@ -233,59 +242,61 @@ public class GameState {
     }
 
 
-    public void restoreView(VirtualView client){
+    public void restoreView(VirtualView client) {
         //send everything to client
     }
 
 
-    public void playerDisconnected(){
+    public void playerDisconnected() {
         long numberConnected;
-        synchronized (players){
+        synchronized (players) {
             numberConnected = players.stream().filter(Player::isConnected).count();
             players.notifyAll();
         }
-        if (numberConnected == 1){
+        if (numberConnected == 1) {
             this.prevGamePhase = currentGamePhase;
             this.currentGamePhase = GamePhase.TIMEOUT;
             timeoutThread = new Thread(() -> {
                 try {
-                    Thread.sleep(60*1000);
+                    Thread.sleep(60 * 1000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             });
             timeoutThread.start();
-        } else if(numberConnected == 0){
+        } else if (numberConnected == 0) {
             //chiedere specifica
         }
     }
 
-    public void changeCurrentPlayer(){
+    public void changeCurrentPlayer() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         //check for disconnetions
-        for (int i = 0; i< players.size(); i++){
+        for (int i = 0; i < players.size(); i++) {
             if (!getPlayer(getCurrentPlayerIndex()).isConnected()) {
                 currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
             } else {
                 break;
             }
         }
-        synchronized (eventQueue){
+        synchronized (eventQueue) {
             eventQueue.add(new UpdateCurrentPlayer(this, allClients(), currentPlayerIndex));
             eventQueue.notifyAll();
         }
+        //TODO: capire se va bene decrementare di 1 in ogni caso
+        if (currentGamePhase.equals(GamePhase.ENDPHASE)) {
+            turnToPlay--;
+        }
         playerDisconnected();
+
     }
 
-    private void updatePlayersConnected(){
-        players.stream().map(Player::getClient).forEach(e->{
+    private void updatePlayersConnected() {
+        players.stream().map(Player::getClient).forEach(e -> {
             eventQueue.add(new PingEvent(this, allClients()));
             eventQueue.notifyAll();
         });
     }
-
-
-    //TODO: resilienza clients: bisogna mandare un ping a tutti i client e fare partire un timeout per ogni client, poi si aspetta una risposta da un client, che se non arriva si mette setta a disconesso, altrimenti si setta a connesso, questo ping va poi wrappato in un thread che esegue in modo periodico
 
 
     //PLAYERS MANAGING
@@ -294,7 +305,7 @@ public class GameState {
         return players.get(this.currentPlayerIndex);
     }
 
-    public Player getBlackPlayer(){
+    public Player getBlackPlayer() {
         return this.players.getFirst();
     }
 
@@ -304,7 +315,7 @@ public class GameState {
             if (playerIterator.getClient().equals(client)) {
                 return i;
             }
-            i ++;
+            i++;
         }
         return -1;
     }
@@ -315,7 +326,7 @@ public class GameState {
             if (playerIterator.equals(player)) {
                 return i;
             }
-            i ++;
+            i++;
         }
         return -1;
     }
@@ -327,14 +338,14 @@ public class GameState {
         List<VirtualView> clients = allClients();
         System.out.println("CLIENTS:" + clients.size());
         if (clients.size() >= Config.MAX_PLAYERS) {
-            synchronized (eventQueue){
+            synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "The game is full"));
                 eventQueue.notifyAll();
             }
             return;
         }
         if (clients.contains(client)) {
-            synchronized (eventQueue){
+            synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "You already chose a nickname, you cannot change it"));
                 eventQueue.notifyAll();
             }
@@ -345,10 +356,10 @@ public class GameState {
             if (player.getNickname().equals(players.get(j).getNickname())) {
                 //takes for granted that player connection is updated
                 //if the player is not connected but the gameState doesn't know, the following code fails
-                if (!players.get(j).isConnected()){
+                if (!players.get(j).isConnected()) {
                     player.setClient(client);
                     this.manageReconnection(player);
-                    synchronized (eventQueue){
+                    synchronized (eventQueue) {
                         //only to the client
                         eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), this.currentGamePhase));
                         //to all the other clients says that a client reconnected
@@ -357,7 +368,7 @@ public class GameState {
                     }
                 } else {
                     //only to the client
-                    synchronized (eventQueue){
+                    synchronized (eventQueue) {
                         eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The nickname is already used, please choose another one"));
                         eventQueue.notifyAll();
                     }
@@ -366,12 +377,12 @@ public class GameState {
             }
         }
         players.add(player);
-        synchronized (eventQueue){
+        synchronized (eventQueue) {
             eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
             eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
             //to all the other clients gives the nickname so that they can execute their model
             eventQueue.add(new NicknameEvent(this, otherClients(player.getClient()), getPlayerIndex(player), player.getNickname()));
-            for (Player playerIterator : players){
+            for (Player playerIterator : players) {
                 eventQueue.add(new NicknameEvent(this, singleClient(player.getClient()), getPlayerIndex(playerIterator), playerIterator.getNickname()));
             }
             eventQueue.notifyAll();
@@ -397,20 +408,18 @@ public class GameState {
     // un giocatore randomico per essere il blackPlayer (al momento sembra superflua)
 
 
-
-
     public void startGame(VirtualView client) throws EmptyDeckException {
         ArrayList<VirtualView> clients = allClients();
         if (!clients.contains(client)) {
-            synchronized (eventQueue){
+            synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "Please register before starting the game"));
                 eventQueue.notifyAll();
             }
             return;
         }
-        if (clients.size() < 2){
-            if (clients.contains(client)){
-                synchronized (eventQueue){
+        if (clients.size() < 2) {
+            if (clients.contains(client)) {
+                synchronized (eventQueue) {
                     eventQueue.add(new ErrorEvent(this, singleClient(client), "Number of player insufficient"));
                     eventQueue.notifyAll();
                 }
@@ -423,14 +432,14 @@ public class GameState {
         this.mainBoard.shuffleCards();
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
-        synchronized (eventQueue){
+        synchronized (eventQueue) {
             eventQueue.add(new updateMainBoardEvent(this, allClients(), mainBoard));
             eventQueue.notifyAll();
         }
         this.initStarters(); // set the starters cards for every player
         System.out.println("Starting game");
         this.currentGamePhase = GamePhase.CHOOSESTARTERSIDEPHASE;
-        synchronized (eventQueue){
+        synchronized (eventQueue) {
             //eventQueue.add(new StartEvent(this, allClients()));
             eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSESTARTERSIDEPHASE));
             eventQueue.notifyAll();
@@ -455,10 +464,10 @@ public class GameState {
         }
     }
 
-    public void setStarterSide(int playerIndex, Side side){
+    public void setStarterSide(int playerIndex, Side side) {
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
-            synchronized (eventQueue){
+            synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "You already selected the starter card"));
                 eventQueue.notifyAll();
             }
@@ -468,8 +477,8 @@ public class GameState {
         //doesn't call updateBoard because the boardMatrix already has the card (without the side)
         player.addToPlacedCardsMap(playerStarterCard.getId(), side);
 
-        synchronized (eventQueue){
-            eventQueue.add(new UpdateStarterCardEvent(this, allClients(), playerIndex,  playerStarterCard.getId(), side));
+        synchronized (eventQueue) {
+            eventQueue.add(new UpdateStarterCardEvent(this, allClients(), playerIndex, playerStarterCard.getId(), side));
             eventQueue.notifyAll();
         }
 
@@ -483,10 +492,10 @@ public class GameState {
         this.answered.put(playerIndex, true);
         System.out.println("someone chose his startercard, the number of ansewred is: " + numberAnswered());
         //notify him and all the others about the change
-        if (numberAnswered() == players.size()){
+        if (numberAnswered() == players.size()) {
             System.out.println("everyone answred");
             this.currentGamePhase = GamePhase.CHOOSECOLORPHASE;
-            synchronized (eventQueue){
+            synchronized (eventQueue) {
                 eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSECOLORPHASE));
                 eventQueue.notifyAll();
             }
@@ -497,7 +506,7 @@ public class GameState {
     public void setColor(int playerIndex, Color color) {//method called by view when the player chooses the side
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
-            synchronized (eventQueue){
+            synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "You already selected the color"));
                 eventQueue.notifyAll();
             }
@@ -506,7 +515,7 @@ public class GameState {
 
         for (int j = 0; j < players.size(); j++) {
             if (color.equals(players.get(j).getColor())) {
-                synchronized (eventQueue){
+                synchronized (eventQueue) {
                     eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The color was already selected by another user, please select a new one"));
                     eventQueue.notifyAll();
                 }
@@ -529,7 +538,7 @@ public class GameState {
             //send also the cards to the view
             this.setObjectives();
             this.currentGamePhase = GamePhase.CHOOSEOBJECTIVEPHASE;
-            synchronized (eventQueue){
+            synchronized (eventQueue) {
                 eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSEOBJECTIVEPHASE));
                 eventQueue.notifyAll();
             }
@@ -550,7 +559,7 @@ public class GameState {
     }
 
     //set SecretObjectiveOptions and SharedObjectiveCards
-    public void setObjectives(){
+    public void setObjectives() {
         Set<Integer> randomKeysSet = new HashSet<>(); // a set has no duplicates
         // Generate four different random numbers
         while (randomKeysSet.size() < 2 * players.size() + 2) { // 2 for each player and 2 shared
@@ -572,13 +581,13 @@ public class GameState {
         ObjectiveCard objectiveCard0 = (ObjectiveCard) cardsMap.get(randomKeysList.get(randomKeysList.size() - 2));
         ObjectiveCard objectiveCard1 = (ObjectiveCard) cardsMap.get(randomKeysList.getLast());
 
-        mainBoard.setSharedObjectiveCard(0,  objectiveCard0);
+        mainBoard.setSharedObjectiveCard(0, objectiveCard0);
         mainBoard.setSharedObjectiveCard(1, objectiveCard1);
         ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();
         sharedObjectives.add(objectiveCard0);
         sharedObjectives.add(objectiveCard1);
 
-        synchronized (eventQueue){
+        synchronized (eventQueue) {
             eventQueue.add(new UpdateSharedObjectiveEvent(this, allClients(), sharedObjectives));
             eventQueue.notifyAll();
         }
@@ -586,10 +595,10 @@ public class GameState {
 
 
     //called from controller
-    public void setSecretObjective (int playerIndex, int cardIndex) {
+    public void setSecretObjective(int playerIndex, int cardIndex) {
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
-            synchronized (eventQueue){
+            synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "You already selected the objective card"));
                 eventQueue.notifyAll();
             }
@@ -597,7 +606,7 @@ public class GameState {
         }
 
         if (cardIndex != 0 && cardIndex != 1) {
-            synchronized (eventQueue){
+            synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The card chosen was not in the options list"));
                 eventQueue.notifyAll();
             }
@@ -610,7 +619,7 @@ public class GameState {
         if (numberAnswered() == players.size()) {
             resetAnswered();
             currentGamePhase = GamePhase.MAINPHASE;
-            synchronized (eventQueue){
+            synchronized (eventQueue) {
                 eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.MAINPHASE));
                 eventQueue.add(new UpdateCurrentPlayer(this, allClients(), currentPlayerIndex));
                 eventQueue.notifyAll();
@@ -620,7 +629,6 @@ public class GameState {
 
 
     //GAMEPHASE
-
 
 
 //----------------------------place Card--------------------------------
@@ -671,7 +679,8 @@ public class GameState {
         }
         updateElements(player, placingCard, placingCardSide);
         //NON MI PIACE MESSA QUI PERCHE NON E' L'ULTIMA AZIONE DEL CONTROLLER, CERCARE DI CAPIRE COME MODIFIFCARE
-        synchronized (eventQueue){
+        //ANDRA MESSO NELLO STATE PATTERN
+        synchronized (eventQueue) {
             eventQueue.add(new UpdateTurnPhaseEvent(this, allClients(), TurnPhase.DRAWPHASE));
             eventQueue.notifyAll();
         }
@@ -703,7 +712,7 @@ public class GameState {
     }
 
 
-    public void updateElements(Player player, CornerCard placingCard, Side placingCardSide){
+    public void updateElements(Player player, CornerCard placingCard, Side placingCardSide) {
         for (Element ele : Element.values()) {
             if (player.getAllElements().get(ele) != null) {
                 int currentOccurencies = player.getAllElements().get(ele);
@@ -715,21 +724,47 @@ public class GameState {
 
     //ENDGAME
 
-    public boolean isGameEnded() {
+    public void checkGameEnded() {
         // 20 points?
-        for (int i = 0; i < this.players.size(); i++) {
-            if (this.players.get(i).getPoints() >= Config.POINTSTOENDPHASE) {
-                return true;
+        if (!currentGamePhase.equals(GamePhase.ENDPHASE)) {
+            for (int i = 0; i < this.players.size(); i++) {
+                if (this.players.get(i).getPoints() >= Config.POINTSTOENDPHASE) {
+                    currentGamePhase = GamePhase.ENDPHASE;
+                }
+            }
+            if (currentGamePhase.equals(GamePhase.ENDPHASE)) {
+                //currentPlayer is already updated here, it's the one that plays next, right after the previous drew
+                //currentPlayer = 0 => playerSize
+                //currentPlayer = 1 => playerSize + playerSize - 1
+                //currentPlayer = 2 => playerSize + playerSize - 2
+                //currentPlayer = 3 => playerSize + playerSize - 3
+                if (currentPlayerIndex == 0) {
+                    this.turnToPlay = players.size();
+                } else {
+                    this.turnToPlay = 2 * players.size() - currentPlayerIndex;
+                }
             }
         }
+
         // cards ended?
-        if (this.getMainBoard().isResourceDeckEmpty()) {
-            return true;
+        if ((this.getMainBoard().isResourceDeckEmpty() && this.getMainBoard().isGoldDeckEmpty()) || turnToPlay == 0) {
+            currentGamePhase = GamePhase.FINALPHASE;
+            calculateFinalPoints();
+            ArrayList<Integer> winners;
+            try {
+                winners = getWinnerPlayerIndex();
+            } catch (GameIsNotEndedException e) {
+                throw new RuntimeException(e);
+            }
+            synchronized (eventQueue) {
+                eventQueue.add(new GameEndedEvent(this, allClients(), winners));
+                eventQueue.notifyAll();
+            }
         }
-        return this.getMainBoard().isGoldDeckEmpty();
     }
 
-    void calculateFinalPoints() throws CardNotPlacedException, WrongInstanceTypeException {
+
+    void calculateFinalPoints() {
         ObjectiveCard sharedCard1 = this.mainBoard.getSharedObjectiveCard(0);
         ObjectiveCard sharedCard2 = this.mainBoard.getSharedObjectiveCard(1);
 
@@ -752,7 +787,7 @@ public class GameState {
         ArrayList<Integer> winnerPlayerIndeces = new ArrayList<>();
         boolean playerReachedPoints = false;
         for (int i = 0; i < this.players.size(); i++) {
-            if (this.players.get(i).getPoints() >= Config.POINTSTOENDPHASE){
+            if (this.players.get(i).getPoints() >= Config.POINTSTOENDPHASE) {
                 playerReachedPoints = true;
             }
             if (this.players.get(i).getPoints() > maxPoints) {
@@ -763,7 +798,7 @@ public class GameState {
                 winnerPlayerIndeces.add(i);
             }
         }
-        if (!playerReachedPoints){
+        if (!playerReachedPoints) {
             throw new GameIsNotEndedException("You called getWinnerPlayerIndex even if the game is not ended, no one is at 20 points");
         }
 
@@ -772,94 +807,29 @@ public class GameState {
         ArrayList<Integer> winnerObjectives = new ArrayList<>();
         if (winnerPlayerIndeces.size() > 1) {
             int mostObjectivesWins = -1;
-            for (int i=0; i<winnerPlayerIndeces.size(); i++) {
-                if (this.players.get(i).getObjectivesWon() > mostObjectivesWins){
+            for (int i = 0; i < winnerPlayerIndeces.size(); i++) {
+                if (this.players.get(i).getObjectivesWon() > mostObjectivesWins) {
                     winnerObjectives.clear();
                     winnerObjectives.add(i);
                     mostObjectivesWins = this.players.get(i).getObjectivesWon();
-                }
-                else if (this.players.get(i).getObjectivesWon() == mostObjectivesWins){
+                } else if (this.players.get(i).getObjectivesWon() == mostObjectivesWins) {
                     winnerObjectives.add(i);
                 }
             }
             winnerPlayerIndeces = winnerObjectives;
         }
-        return(winnerPlayerIndeces);
+        return (winnerPlayerIndeces);
     }
 
 
 //------------ others --------------------
 
     // !!! to implement !!!
-    public void saveGameState(){
+    public void saveGameState() {
     }
 
     // !!! optional !!!
-    public int getTurnTime(){
+    public int getTurnTime() {
         return 0;
     }
 }
-
-
-/*
-
-    private void playTurn() throws CardNotPlacedException, WrongInstanceTypeException {
-        // notify current player to place card (notify all changes)
-        // wait
-        this.setCurrentGameTurn(TurnPhase.DRAWPHASE);
-        // notify current player to draw a card (notify all changes)
-        //wait
-
-        // Base Case: game ended
-        if (isGameEnded()){
-            this.setCurrentGamePhase(GamePhase.ENDPHASE);
-            this.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
-            playEndTurn();
-        }
-
-        // play next turn
-        else{
-            // execute current player
-            this.setCurrentPlayerIndex((this.getCurrentPlayerIndex()+1) % this.players.size());
-            this.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
-
-            playTurn();
-        }
-    }
-
-    private void playEndTurn() throws CardNotPlacedException, WrongInstanceTypeException {
-        // BASE CASE:
-        if (this.players.get(getCurrentPlayerIndex()) == this.getBlackPlayer()){
-            if (isLastTurn) {
-                this.setCurrentGamePhase(GamePhase.FINALPHASE);
-                calculateFinalPoints();
-            }
-            else {
-                isLastTurn = true;
-            }
-        }
-
-        // Recursive call of the EndPhaseTurn
-        else{
-            // TODO: 17/04/2024 network place methods
-            // notify current player to place card (notify all changes)
-            // wait
-            this.setCurrentGameTurn(TurnPhase.DRAWPHASE);
-
-            if(this.getMainBoard().getGoldDeck().isEmpty() && this.getMainBoard().getResourceDeck().isEmpty() && this.getMainBoard().getSharedGoldCards().length == 0 && this.getMainBoard().getSharedResourceCards().length == 0){
-                ; //there are no card to be drawn, the game continues without drawing
-            }
-            else{
-                // TODO: 17/04/2024 network draw methods
-                // notify current player to draw a card (notify all changes)
-                //wait
-            }
-            // play next turn
-            // execute current player
-            this.setCurrentPlayerIndex((this.getCurrentPlayerIndex()+1) % this.players.size());
-            this.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
-
-            playEndTurn();
-        }
-    }
- */

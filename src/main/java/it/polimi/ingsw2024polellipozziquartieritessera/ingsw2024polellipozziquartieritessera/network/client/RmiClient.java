@@ -148,4 +148,9 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
         Client.updateStarterCard(playerIndex, cardId1, side);
     }
 
+    @Override
+    public void updateWinner(int playerIndex) throws RemoteException {
+        Client.updateWinner(playerIndex);
+    }
+
 }

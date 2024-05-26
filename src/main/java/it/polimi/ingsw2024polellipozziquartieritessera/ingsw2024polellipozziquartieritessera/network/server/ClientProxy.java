@@ -140,4 +140,10 @@ public class ClientProxy implements VirtualView {
         output.println(Messages.UPDATESTARTER + "; " + playerIndex + "; " + cardId1 + "; " + sideString);
         output.flush();
     }
+
+    @Override
+    public void updateWinner(int playerIndex) throws RemoteException {
+        output.println(Messages.UPDATEWINNER+ "; " + playerIndex);
+        output.flush();
+    }
 }
