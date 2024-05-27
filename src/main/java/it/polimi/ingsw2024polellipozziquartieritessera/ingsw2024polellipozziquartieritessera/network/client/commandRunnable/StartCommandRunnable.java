@@ -6,7 +6,7 @@ public class StartCommandRunnable extends CommandRunnable{
     @Override
     public void executeCLI() {
         try {
-            server.startGame(clientContainer.getClient());
+            server.startGame(client);
         } catch (RemoteException e) {
             this.serverDisconnected();
         }

@@ -6,7 +6,7 @@ public class PingCommandRunnable extends CommandRunnable{
     @Override
     public void executeCLI() {
         try {
-            server.ping(clientContainer.getClient());
+            server.ping(client);
         } catch (RemoteException e) {
             serverDisconnected();
         }

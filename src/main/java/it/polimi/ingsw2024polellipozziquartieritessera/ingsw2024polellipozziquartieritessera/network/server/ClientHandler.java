@@ -32,6 +32,13 @@ public class ClientHandler implements VirtualView {
             } catch(IllegalArgumentException e) {
                 System.out.println("Invalid command: " + message[0]);
             }
+
+            if (Command.valueOf(message[0]).getType().equals("Local")){
+                System.err.println("message arrived to server that should have been managed in client");
+            } else {
+                Command.valueOf(message[0]).getCommandRunnable(message, server, null, this).executeCLI();
+            }
+            /*
             switch (command) {
                 case Command.ADDUSER:
                     server.addConnectedPlayer(this, message[1]);
@@ -129,6 +136,8 @@ public class ClientHandler implements VirtualView {
                     System.err.println("[INVALID MESSAGE FROM CLIENT]");
                     break;
             }
+
+             */
         }
     }
 

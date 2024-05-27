@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
@@ -18,7 +19,6 @@ public enum Command {
      ADDMESSAGE(new AddMessageCommandRunnable(), "Network"),
      PING(new PingCommandRunnable(), "Network");
 
-
      private final CommandRunnable commandRunnable;
      private final String type;
 
@@ -31,12 +31,11 @@ public enum Command {
           return type;
      }
 
-     public CommandRunnable getCommandRunnable(String[] message, VirtualServer server, Client clientContainer) {
+     public CommandRunnable getCommandRunnable(String[] message, VirtualServer server, Client clientContainer, VirtualView client) {
           commandRunnable.setServer(server);
           commandRunnable.setMessageFromCli(message);
           commandRunnable.setClientContainer(clientContainer);
+          commandRunnable.setClient(client);
           return commandRunnable;
      }
-
-
 }

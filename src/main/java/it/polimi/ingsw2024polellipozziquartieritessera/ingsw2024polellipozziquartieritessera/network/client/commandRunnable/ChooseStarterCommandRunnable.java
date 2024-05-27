@@ -16,7 +16,7 @@ public class ChooseStarterCommandRunnable extends CommandRunnable {
                 return;
             }
             try {
-                server.chooseInitialStarterSide(clientContainer.getClient(), side);
+                server.chooseInitialStarterSide(client, side);
             } catch (RemoteException e) {
                 serverDisconnected();
             }

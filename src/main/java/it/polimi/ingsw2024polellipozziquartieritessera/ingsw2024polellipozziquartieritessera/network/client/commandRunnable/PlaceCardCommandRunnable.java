@@ -43,7 +43,7 @@ public class PlaceCardCommandRunnable extends CommandRunnable{
                 return;
             }
             try {
-                server.placeCard(clientContainer.getClient(), placingCardId, tableCardId, tableCornerPos, placingCardSide);
+                server.placeCard(client, placingCardId, tableCardId, tableCornerPos, placingCardSide);
             } catch (RemoteException e) {
                 serverDisconnected();
             }

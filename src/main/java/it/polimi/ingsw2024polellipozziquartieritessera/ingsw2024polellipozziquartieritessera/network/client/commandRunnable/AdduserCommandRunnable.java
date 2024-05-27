@@ -7,7 +7,7 @@ public class AdduserCommandRunnable extends CommandRunnable{
     public void executeCLI() {
         try {
             try {
-                server.addConnectedPlayer(clientContainer.getClient(), messageFromCli[1]);
+                server.addConnectedPlayer(client, messageFromCli[1]);
             } catch (RemoteException e) {
                 serverDisconnected();
             }

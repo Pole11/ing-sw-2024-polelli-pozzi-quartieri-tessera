@@ -39,6 +39,10 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
         }
     }
 
+    public Client getClientContainer(){
+        return clientContainer;
+    }
+
     @Override
     public void sendError(String msg) throws RemoteException {
         clientContainer.sendError(msg);

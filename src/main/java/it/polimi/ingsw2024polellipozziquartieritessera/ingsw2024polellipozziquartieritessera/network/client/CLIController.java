@@ -42,14 +42,12 @@ public class CLIController {
     }
 
 
-
-
-    public void manageInput(VirtualServer server, String[] message, Client clientContainer) throws RemoteException {
+    public void manageInput(VirtualServer server, VirtualView client, Client clientContainer, String[] message) throws RemoteException {
         if (Command.valueOf(message[0]).getType().equals("Local")){
-            Command.valueOf(message[0]).getCommandRunnable(message, server, clientContainer).executeCLI();
+            Command.valueOf(message[0]).getCommandRunnable(message, server, clientContainer, client).executeCLI();
         } else {
             synchronized (commandQueue){
-                commandQueue.add(Command.valueOf(message[0]).getCommandRunnable(message, server, clientContainer));
+                commandQueue.add(Command.valueOf(message[0]).getCommandRunnable(message, server, clientContainer, client));
                 commandQueue.notifyAll();
             }
         }

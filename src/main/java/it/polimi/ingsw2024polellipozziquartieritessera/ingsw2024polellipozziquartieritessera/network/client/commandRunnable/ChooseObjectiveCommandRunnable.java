@@ -14,7 +14,7 @@ public class ChooseObjectiveCommandRunnable extends CommandRunnable{
                 return;
             }
             try {
-                server.chooseInitialObjective(clientContainer.getClient(), cardId);
+                server.chooseInitialObjective(client, cardId);
             } catch (RemoteException e) {
                 serverDisconnected();
             }

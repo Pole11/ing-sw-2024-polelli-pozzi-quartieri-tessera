@@ -14,7 +14,7 @@ public class FlipCardCommandRunnable extends CommandRunnable{
                 return;
             }
             try {
-                server.flipCard(clientContainer.getClient(), cardId);
+                server.flipCard(client, cardId);
             } catch (RemoteException e) {
                 serverDisconnected();
             }

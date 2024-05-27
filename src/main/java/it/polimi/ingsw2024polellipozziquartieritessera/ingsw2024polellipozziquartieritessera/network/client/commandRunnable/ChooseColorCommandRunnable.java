@@ -16,7 +16,7 @@ public class ChooseColorCommandRunnable extends CommandRunnable{
                 return;
             }
             try {
-                server.chooseInitialColor(clientContainer.getClient(), color);
+                server.chooseInitialColor(client, color);
             } catch (RemoteException e) {
                 serverDisconnected();
             }

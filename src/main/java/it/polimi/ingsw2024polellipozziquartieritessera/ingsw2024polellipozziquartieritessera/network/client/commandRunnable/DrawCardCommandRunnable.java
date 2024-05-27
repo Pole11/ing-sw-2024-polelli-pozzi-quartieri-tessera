@@ -16,7 +16,7 @@ public class DrawCardCommandRunnable extends CommandRunnable{
                 return;
             }
             try {
-                server.drawCard(clientContainer.getClient(), drawType);
+                server.drawCard(client, drawType);
             } catch (RemoteException e) {
                 serverDisconnected();
             }

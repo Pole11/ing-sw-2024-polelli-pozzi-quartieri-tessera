@@ -82,7 +82,7 @@ public class Client implements VirtualView {
             String[] message = line.split(" ");
             if (line != null && !line.isEmpty() && !line.isBlank() && !line.equals("")) {
                 try {
-                    cliController.manageInput(server, message, this);
+                    cliController.manageInput(server, client, this, message);
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
