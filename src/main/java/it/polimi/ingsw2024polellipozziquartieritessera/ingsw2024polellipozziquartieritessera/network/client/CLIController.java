@@ -219,42 +219,70 @@ public class CLIController {
     }
 
     public void printBoard(ArrayList<ArrayList<Integer>> board, ArrayList<Integer> cardsOrder){
-        ArrayList<ArrayList<Integer>> rotatedBoard = new ArrayList<>();
-        ArrayList<String> printedBoard = new ArrayList<>();
-        ArrayList<String> card = null;
-
+        int i = 0, j = 0, u = 0 ,v = 0;
         int irel = 0, jrel = 0;
+        boolean found = false;
+        String openString = "", closeString = "";
+        ArrayList<ArrayList<Integer>> rotatedBoard = new ArrayList<>();
+        ArrayList<ArrayList<String>> printedBoard = new ArrayList<>();
 
-        for(int i = 0; i < board.size() + 2; i++){
+        //initialize rotatedBoard
+        //todo: ensures that the board is complete (rows of the same lenght) ora change initialization
+        for(i = 0; i < board.size() + 2; i++){
             rotatedBoard.add(new ArrayList<>());
-            for(int j  = 0; j < board.get(i).size() + 2; j++){
+            for(j  = 0; j < board.get(0).size() + 2; j++){
                 rotatedBoard.get(i).add(-1);
+            }
+        }
+        //initialize printedBoard
+        for(i = 0; i < rotatedBoard.size()*2 +1; i++){
+            printedBoard.add(new ArrayList<>());
+            printedBoard.add(new ArrayList<>());
+            for(j = 0; j < rotatedBoard.get(0).size() * 2 + 1; j++){
+                printedBoard.get(i*2).add(PrintableCardParts.EMPTY.firstRow());
+                printedBoard.get(i*2 + 1).add(PrintableCardParts.EMPTY.secondRow());
             }
         }
         //rotate board of 45°
         int centeri = (int)Math.floor((double) board.size()/2);
         int centerj = (int)Math.floor((double) board.get(0).size()/2);
-        for(int i = 0; i < board.size(); i++){
-            for(int j = 0; j < board.get(i).size(); j++){
-                irel = i - 1;
-                jrel = j - 1;
-                rotatedBoard.get(centeri + i + jrel).set(centerj + j - irel, board.get(i).get(j));
+        for(i = 0; i < board.size(); i++){
+            for(j = 0; j < board.get(i).size(); j++){
+                irel = i - centeri;
+                jrel = j - centerj;
+                rotatedBoard.get(centeri + i - jrel).set(centerj + j + irel, board.get(i).get(j));
             }
         }
-        //for each id in the rotated board, create a Arraylist of strings that represent the card and place it in the right position in the printedBoard
-        for(int i = 0; i < rotatedBoard.size(); i++){
-            for(int j = 0; j < rotatedBoard.get(i).size(); j++){
-                card = new ArrayList<>();
-
-                int id = rotatedBoard.get(i).get(j);
-                if(id < 0){
-                    ;
+        for(int k = 0; k < cardsOrder.size(); k++){
+            found = false;
+            //search the id idexes in the rotatedBoard
+            for(i = 0; !found && i < rotatedBoard.size(); i++){
+                for(j = 0; !found && j < rotatedBoard.get(i).size(); j++){
+                    if(rotatedBoard.get(i).get(j) == cardsOrder.get(k)){
+                        found = true;
+                        i--;
+                        j--;
+                    }
                 }
-
             }
+            u = 2*i;
+            v = 2*j;
 
+            openString =ColorPrint.BLACK.toString() + ColorPrint.byIndex(i+10).toString();
+            closeString = ColorPrint.RESET.toString();
+            for(int n = 0; n < 3; n++){
+                for(int m = 0; m < 3; m++){
+                    if(n == 1 && m == 1){
+                        printedBoard.get(u*2+n*2).set(v+m,openString + PrintableCardParts.byIndex(n*3+m).firstRow() + closeString);
+                        printedBoard.get(u*2+n*2+1).set(v+m,openString + String.format(PrintableCardParts.byIndex(n*3+m).secondRow(), cardsOrder.get(k)) + closeString);
+
+                    } else {
+                        printedBoard.get(u*2 + n*2).set(v + m, openString + PrintableCardParts.byIndex(n * 3 + m).firstRow() + closeString);
+                        printedBoard.get(u*2 + n*2 + 1).set(v + m, openString + PrintableCardParts.byIndex(n * 3 + m).secondRow() + closeString);
+                    }
+                }
+            }
         }
-
     }
 
     private static ArrayList<String> printObjectiveCard(Map card) {
@@ -312,14 +340,13 @@ public class CLIController {
             //todo testing
             for(int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
                 for(int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
-                    irel = i - 1;
-                    jrel = j - 1;
-                    challengeMatrix.get(centeri + i + jrel).set(centerj + j - irel, structureChallenge[i][j].toString().substring(0,3));
+                    irel = i - centeri;
+                    jrel = j - centerj;
+                    challengeMatrix.get(centeri + i - jrel).set(centerj + j + irel, structureChallenge[i][j].toString().substring(0,3));
                 }
             }
             //remove empty rows and columns
             resize(challengeMatrix);
-
 
         }
         if (card.get("ChallengeType").equals("ElementChallenge")) {

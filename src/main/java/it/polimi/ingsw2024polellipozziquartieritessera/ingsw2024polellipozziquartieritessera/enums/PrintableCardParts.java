@@ -4,27 +4,34 @@ import java.util.ArrayList;
 
 public enum PrintableCardParts {
 
-    UPLEFTCOVERED ("  |--+"),
-    UPLEFTCOVER ("+--|  "),
-    UP("---   "),
-    UPRIGHTCOVERED("|  +--"),
-    UPRIGHTCOVER("--+  |"),
-    RIGHT("  |  |"),
-    DOWNRIGHTCOVERED("+--|  "),
-    DOWNRIGHTCOVER("+--|  "),
-    DOWN("   ---"),
-    DOWNLEFTCOVERED("--+  |"),
-    DOWNLEFTCOVER("|  +--"),
-    LEFT("|  |  ");
+
+    UPLEFT ("+--|  ", 0),
+    UP("---   ", 1),
+    UPRIGHT("--+  |",2),
+    LEFT("|  |  ", 3),
+    CENTER("ID:%3d",4),
+    RIGHT("  |  |",5),
+    DOWNLEFT("|  +--", 6),
+    DOWN("   ---",7),
+    DOWNRIGHT("+--|  ",8),
+    EMPTY("      ",9);
+
 
     private final String disposition;
+    private static final int index = 0;
 
-    private PrintableCardParts(final String disposition) {
+    private PrintableCardParts(final String disposition, final int index) {
         this.disposition = disposition;
     }
 
     public String getDisposition(){return this.disposition;}
-
+    public static PrintableCardParts byIndex(int i){
+        for(PrintableCardParts p : PrintableCardParts.values()){
+            if (PrintableCardParts.index == i)
+                return  p;
+        }
+        return PrintableCardParts.EMPTY;
+    }
     public String firstRow(){return this.getDisposition().substring(0,3);}
 
     public String secondRow(){return this.getDisposition().substring(4,6);}
