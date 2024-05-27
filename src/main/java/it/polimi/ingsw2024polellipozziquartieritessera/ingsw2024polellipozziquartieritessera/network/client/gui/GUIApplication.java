@@ -3,7 +3,6 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIController;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerGame;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.application.*;
 import javafx.event.EventHandler;
@@ -47,7 +46,7 @@ public class GUIApplication extends Application {
              guiController = fxmlLoader.getController();
              guiController.setClient(client);
              guiController.setServer(server);
-             guiController.setTempViewModel(viewModel);
+             guiController.setViewModel(viewModel);
          });
     }
 
@@ -63,7 +62,7 @@ public class GUIApplication extends Application {
             guiController.setArgs(args);
             guiController.setClient(client);
             guiController.setServer(server);
-            guiController.setTempViewModel(viewModel);
+            guiController.setViewModel(viewModel);
         });
     }
 
@@ -75,7 +74,7 @@ public class GUIApplication extends Application {
         guiController = fxmlLoader.getController();
         guiController.setClient(client);
         guiController.setServer(server);
-        guiController.setTempViewModel(viewModel);
+        guiController.setViewModel(viewModel);
         mainStage = stage;
 
         Scene scene = new Scene(root, 920, 920);

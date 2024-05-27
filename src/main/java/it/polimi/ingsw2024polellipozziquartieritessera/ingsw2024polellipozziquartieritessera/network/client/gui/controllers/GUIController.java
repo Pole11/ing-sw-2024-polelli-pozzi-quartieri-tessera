@@ -18,7 +18,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ abstract public class GUIController {
     // add virtual model
     private VirtualView client; // temp
     private VirtualServer server; // temp
-    private ViewModel tempViewModel;
+    private ViewModel viewModel;
     private boolean isSceneLoaded = false;
     private String[] args;
 
@@ -45,12 +44,12 @@ abstract public class GUIController {
 
     abstract public void update();
 
-    public ViewModel getTempViewModel() {
-        return tempViewModel;
+    public ViewModel getViewModel() {
+        return viewModel;
     }
 
-    public void setTempViewModel(ViewModel newViewModel) {
-        tempViewModel = newViewModel;
+    public void setViewModel(ViewModel newViewModel) {
+        viewModel = newViewModel;
     }
 
     public VirtualView getClient() {
@@ -124,12 +123,12 @@ abstract public class GUIController {
 
     public void goToScene(String fxml, ViewModel tempViewModel) {
         GUIApplication.changeScene(fxml);
-        setTempViewModel(tempViewModel);
+        setViewModel(tempViewModel);
     }
 
     public void goToScene(String fxml, ViewModel tempViewModel, String[] args) {
         GUIApplication.changeScene(fxml, args);
-        setTempViewModel(tempViewModel);
+        setViewModel(tempViewModel);
     }
 
     public void setArgs(String[] args) {

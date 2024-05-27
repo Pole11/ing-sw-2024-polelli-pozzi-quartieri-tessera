@@ -1,8 +1,5 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -82,7 +79,7 @@ public class GUIControllerObjective extends GUIController{
     @Override
     public void update() {
         Platform.runLater(() -> {
-            setObjectiveCardImages(getTempViewModel().getSecretObjectiveCards()[0], getTempViewModel().getSecretObjectiveCards()[1]);
+            setObjectiveCardImages(getViewModel().getSecretObjectiveCards()[0], getViewModel().getSecretObjectiveCards()[1]);
         });
     }
 }

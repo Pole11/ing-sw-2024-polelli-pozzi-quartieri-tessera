@@ -1,28 +1,19 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.*;
 import javafx.application.*;
-import javafx.collections.ObservableList;
 import javafx.fxml.*;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.*;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.event.*;
 import javafx.scene.image.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.scene.shape.*;
 import javafx.scene.text.*;
-import javafx.stage.*;
 
-import java.io.*;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -176,7 +167,7 @@ public class GUIControllerGame extends GUIController {
                 Text nicknameText = new Text(currentPlayerNickname);
                 Button expandButton = new Button("Expand Board");
                 expandButton.setOnMousePressed(mouseEvent -> {
-                    goToScene("/fxml/board.fxml", getTempViewModel(), new String[]{"" + playerId});
+                    goToScene("/fxml/board.fxml", getViewModel(), new String[]{"" + playerId});
                 });
                 infoContainerVBox.getChildren().addAll(nicknameText, expandButton);
                 infoContainerVBox.setAlignment(Pos.CENTER);
@@ -238,7 +229,7 @@ public class GUIControllerGame extends GUIController {
                                 //Circle clickedCircle = new Circle(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 10);
                                 //mainContainerGame.getChildren().removeIf(n -> n instanceof Circle);
                                 //mainContainerGame.getChildren().add(clickedCircle);
-                                goToScene("/fxml/board.fxml", getTempViewModel(), new String[]{"" + meId});
+                                goToScene("/fxml/board.fxml", getViewModel(), new String[]{"" + meId});
                             }
                         });
                     }
@@ -300,31 +291,31 @@ public class GUIControllerGame extends GUIController {
             // delete everything  or find a way to differentially change the content of the view
             ArrayList<HashMap<Integer, Side>> playerHandCards = new ArrayList<>();
             HashMap<Integer, String> nicknames = new HashMap<>();
-            for (Integer playerId = 0; playerId < getTempViewModel().getPlayersSize(); playerId++) {
+            for (Integer playerId = 0; playerId < getViewModel().getPlayersSize(); playerId++) {
                 HashMap<Integer, Side> playerHandCardsMap = new HashMap<>();
-                for (Integer cardId : getTempViewModel().getHand(playerId)) {
-                    playerHandCardsMap.put(cardId, getTempViewModel().getHandCardsSide(cardId));
+                for (Integer cardId : getViewModel().getHand(playerId)) {
+                    playerHandCardsMap.put(cardId, getViewModel().getHandCardsSide(cardId));
                 }
                 playerHandCards.add(playerHandCardsMap);
-                nicknames.put(playerId, getTempViewModel().getNickname(playerId));
+                nicknames.put(playerId, getViewModel().getNickname(playerId));
             }
 
             initTable(playerHandCards,
                     nicknames,
-                    getTempViewModel().getPlayerIndex(),
-                    getTempViewModel().getSharedCards()[0],
-                    getTempViewModel().getSharedCards()[1],
-                    getTempViewModel().getSharedGoldCards()[0],
-                    getTempViewModel().getSharedResourceCards()[0],
-                    getTempViewModel().getSharedGoldCards()[1],
-                    getTempViewModel().getSharedResourceCards()[1],
-                    getTempViewModel().getObjectives()[0],
-                    getTempViewModel().getObjectives()[1],
-                    getTempViewModel().getObjectives()[2]); // !!! get the right secret objective
+                    getViewModel().getPlayerIndex(),
+                    getViewModel().getSharedCards()[0],
+                    getViewModel().getSharedCards()[1],
+                    getViewModel().getSharedGoldCards()[0],
+                    getViewModel().getSharedResourceCards()[0],
+                    getViewModel().getSharedGoldCards()[1],
+                    getViewModel().getSharedResourceCards()[1],
+                    getViewModel().getObjectives()[0],
+                    getViewModel().getObjectives()[1],
+                    getViewModel().getObjectives()[2]); // !!! get the right secret objective
 
-            highlightCurrentPlayerTable(getTempViewModel().getCurrentPlayer(), getTempViewModel().getColorsMap(getTempViewModel().getCurrentPlayer())); // !!! make it work
+            highlightCurrentPlayerTable(getViewModel().getCurrentPlayer(), getViewModel().getColorsMap(getViewModel().getCurrentPlayer())); // !!! make it work
 
-            this.setTempViewModel(getTempViewModel());
+            this.setViewModel(getViewModel());
         });
     }
 
