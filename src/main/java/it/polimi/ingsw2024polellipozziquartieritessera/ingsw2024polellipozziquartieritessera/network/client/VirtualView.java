@@ -7,7 +7,6 @@ import java.rmi.*;
 //clint che vede il server
 public interface VirtualView extends Remote {
     void ping(String ping) throws RemoteException;
-    void sendMessage(String message) throws RemoteException;
     void sendError(String error) throws RemoteException;
     void sendIndex(int index) throws RemoteException;
     void nicknameUpdate(int index, String nickname) throws RemoteException;
@@ -29,4 +28,5 @@ public interface VirtualView extends Remote {
     //side is null if is not decided
     void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException;
     void updateWinner(int playerIndex) throws RemoteException;
+
 }

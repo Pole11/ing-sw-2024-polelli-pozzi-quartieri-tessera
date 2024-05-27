@@ -138,11 +138,6 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
-    public void sendMessage(String message) throws RemoteException {
-        view.sendMessage(message);
-    }
-
-    @Override
     public void sendError(String error) throws RemoteException {
         view.sendError(error);
     }

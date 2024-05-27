@@ -20,12 +20,6 @@ public class ClientProxy implements VirtualView {
         output.flush();
     }
 
-    @Override
-    public void sendMessage(String message) throws RemoteException {
-        output.println(Messages.MESSAGE + "; " + message);
-        output.flush();
-    }
-
     public void sendError(String error) throws RemoteException {
         output.println(Messages.ERROR + "; " + error);
         output.flush();

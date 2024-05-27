@@ -3,22 +3,58 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import com.google.gson.Gson;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.Event;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CLIController {
-    private ViewModel viewModel;
+    private final ViewModel viewModel;
+    private final ArrayDeque<CommandRunnable> commandQueue;
+    private Thread executeCommands;
+
+    CLIController(ViewModel viewModel){
+        this.commandQueue = new ArrayDeque();
+        this.viewModel = viewModel;
+
+        this.executeCommands = new Thread(this::executeCommandsRunnable);
+        this.executeCommands.start();
+
+    }
+
+    private void executeCommandsRunnable() {
+        while (true) {
+            synchronized (commandQueue) {
+                while (commandQueue.isEmpty()) {
+                    try {
+                        commandQueue.wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+                commandQueue.remove().executeCLI();
+            }
+        }
+    }
 
 
-    public void manageInput(VirtualServer server, String[] message, VirtualView client) throws RemoteException {
+
+
+    public void manageInput(VirtualServer server, String[] message, Client clientContainer) throws RemoteException {
+        if (Command.valueOf(message[0]).getType().equals("Local")){
+            Command.valueOf(message[0]).getCommandRunnable(message, server, clientContainer).executeCLI();
+        } else {
+            synchronized (commandQueue){
+                commandQueue.add(Command.valueOf(message[0]).getCommandRunnable(message, server, clientContainer));
+                commandQueue.notifyAll();
+            }
+        }
+
+/*
         try {
             Command.valueOf(message[0].toUpperCase());
         } catch(IllegalArgumentException e) {
@@ -45,6 +81,7 @@ public class CLIController {
                 try {
                     Side side;
                     try {
+
                         side = Side.valueOf(message[1].toUpperCase());
                     } catch (IllegalArgumentException e) {
                         System.err.print(("Invalid side, please enter a valid side (Front / Back)\n> "));
@@ -162,6 +199,8 @@ public class CLIController {
                 System.err.print("INVALID COMMAND\n> ");
                 break;
         }
+
+ */
     }
 
     public void printAllCommands() {
