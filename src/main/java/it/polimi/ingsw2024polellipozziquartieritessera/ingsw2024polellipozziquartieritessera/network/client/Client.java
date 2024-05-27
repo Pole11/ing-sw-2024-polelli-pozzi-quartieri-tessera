@@ -68,8 +68,7 @@ public class Client {
     public static void runGui(VirtualServer server, VirtualView client) {
         meDoGui = true;
         guiApplication = new GUIApplication();
-        guiApplication.runGui(client, server);
-        guiApplication.getGUIController().setTempViewModel(viewModel);
+        guiApplication.runGui(client, server, viewModel);
     }
 
 
@@ -79,27 +78,27 @@ public class Client {
         if (meDoGui) {
             switch (nextGamePhase) {
                 case GamePhase.NICKNAMEPHASE -> {
-                    guiApplication.getGUIController().goToScene("/fxml/startGame.fxml", viewModel);
+                    guiApplication.changeScene("/fxml/startGame.fxml");
                 }
                 case GamePhase.CHOOSESTARTERSIDEPHASE -> {
-                    guiApplication.getGUIController().goToScene("/fxml/chooseStarter.fxml", viewModel);
+                    guiApplication.changeScene("/fxml/chooseStarter.fxml");
                 }
                 case GamePhase.CHOOSECOLORPHASE -> {
                     System.out.println("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]");
-                    guiApplication.getGUIController().goToScene("/fxml/chooseColor.fxml", viewModel);
+                    guiApplication.changeScene("/fxml/chooseColor.fxml");
                 }
                 case GamePhase.CHOOSEOBJECTIVEPHASE -> {
-                    guiApplication.getGUIController().goToScene("/fxml/chooseObjective.fxml", viewModel);
+                    guiApplication.changeScene("/fxml/chooseObjective.fxml");
                 }
                 case GamePhase.MAINPHASE -> {
                     System.out.println("---Game started---");
-                    guiApplication.getGUIController().goToScene("/fxml/game.fxml", viewModel);
+                    guiApplication.changeScene("/fxml/game.fxml");
                 }
                 case GamePhase.ENDPHASE -> {
                     System.out.println("NON SO CHI reached 20 points o NON SO");
                 }
                 case GamePhase.FINALPHASE -> {
-                    guiApplication.getGUIController().goToScene("/fxml/final.fxml", viewModel);
+                    guiApplication.changeScene("/fxml/final.fxml");
                 }
             }
             guiApplication.updateController();
@@ -149,7 +148,7 @@ public class Client {
                 System.out.println(viewModel.getNickname(playerIndex) + " connected");
             } else {
                 System.out.println(viewModel.getNickname(playerIndex) + " disconnected");
-                if (meDoGui) guiApplication.getGUIController().goToScene("/fxml/final.fxml", viewModel);
+                if (meDoGui) guiApplication.changeScene("/fxml/final.fxml");
             }
         }
         if (meDoGui) guiApplication.updateController();

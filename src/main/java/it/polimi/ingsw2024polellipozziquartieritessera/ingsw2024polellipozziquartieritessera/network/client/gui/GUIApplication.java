@@ -15,6 +15,7 @@ import java.io.*;
 
 public class GUIApplication extends Application {
     private static GUIController guiController;
+    private static ViewModel viewModel;
     private static Stage mainStage;
     private static VirtualView client;
     private static VirtualServer server;
@@ -35,7 +36,7 @@ public class GUIApplication extends Application {
         Platform.runLater(() -> { getGUIController().update(); });
     }
 
-     public static void changeScene(String fxml) throws IOException {
+     public static void changeScene(String fxml) {
          Platform.runLater(() -> {
             FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
              try {
@@ -46,10 +47,11 @@ public class GUIApplication extends Application {
              guiController = fxmlLoader.getController();
              guiController.setClient(client);
              guiController.setServer(server);
+             guiController.setTempViewModel(viewModel);
          });
     }
 
-    public static void changeScene(String fxml, String[] args) throws IOException { // this was used when viewModel was not static
+    public static void changeScene(String fxml, String[] args) { // this was used when viewModel was not static
         Platform.runLater(() -> {
             FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
             try {
@@ -61,6 +63,7 @@ public class GUIApplication extends Application {
             guiController.setArgs(args);
             guiController.setClient(client);
             guiController.setServer(server);
+            guiController.setTempViewModel(viewModel);
         });
     }
 
@@ -72,6 +75,7 @@ public class GUIApplication extends Application {
         guiController = fxmlLoader.getController();
         guiController.setClient(client);
         guiController.setServer(server);
+        guiController.setTempViewModel(viewModel);
         mainStage = stage;
 
         Scene scene = new Scene(root, 920, 920);
@@ -90,9 +94,10 @@ public class GUIApplication extends Application {
     }
 
     //public void runGui(GUIControllerOld guiControllerOld) {
-    public void runGui(VirtualView client, VirtualServer server) {
-        this.client = client;
-        this.server = server;
+    public void runGui(VirtualView client, VirtualServer server, ViewModel viewModel) {
+        GUIApplication.client = client;
+        GUIApplication.server = server;
+        GUIApplication.viewModel = viewModel;
         launch(); // create the UI thread
     }
 }

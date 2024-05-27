@@ -172,7 +172,7 @@ public class GUIControllerGame extends GUIController {
                 // TODO: get player nickname
                 VBox infoContainerVBox = new VBox();
                 infoContainerVBox.setId("infoContainerPlayer" + playerId);
-                String currentPlayerNickname = nicknames.get(playerId - 1);
+                String currentPlayerNickname = nicknames.get(playerId);
                 Text nicknameText = new Text(currentPlayerNickname);
                 Button expandButton = new Button("Expand Board");
                 expandButton.setOnMousePressed(mouseEvent -> {

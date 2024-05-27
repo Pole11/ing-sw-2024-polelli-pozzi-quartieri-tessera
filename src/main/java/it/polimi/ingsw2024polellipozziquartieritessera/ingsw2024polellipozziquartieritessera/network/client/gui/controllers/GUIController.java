@@ -29,7 +29,7 @@ abstract public class GUIController {
     // add virtual model
     private VirtualView client; // temp
     private VirtualServer server; // temp
-    private static ViewModel tempViewModel;
+    private ViewModel tempViewModel;
     private boolean isSceneLoaded = false;
     private String[] args;
 
@@ -49,8 +49,8 @@ abstract public class GUIController {
         return tempViewModel;
     }
 
-    public void setTempViewModel(ViewModel tempViewModel) {
-        this.tempViewModel = tempViewModel;
+    public void setTempViewModel(ViewModel newViewModel) {
+        tempViewModel = newViewModel;
     }
 
     public VirtualView getClient() {
@@ -119,29 +119,17 @@ abstract public class GUIController {
     }
 
     public void goToScene(String fxml) {
-        try {
-            GUIApplication.changeScene(fxml);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        GUIApplication.changeScene(fxml);
     }
 
     public void goToScene(String fxml, ViewModel tempViewModel) {
-        try {
-            GUIApplication.changeScene(fxml);
-            setTempViewModel(tempViewModel);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        GUIApplication.changeScene(fxml);
+        setTempViewModel(tempViewModel);
     }
 
     public void goToScene(String fxml, ViewModel tempViewModel, String[] args) {
-        try {
-            GUIApplication.changeScene(fxml, args);
-            setTempViewModel(tempViewModel);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        GUIApplication.changeScene(fxml, args);
+        setTempViewModel(tempViewModel);
     }
 
     public void setArgs(String[] args) {
