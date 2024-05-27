@@ -9,6 +9,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -28,7 +29,7 @@ abstract public class GUIController {
     // add virtual model
     private VirtualView client; // temp
     private VirtualServer server; // temp
-    private String[] args;
+    private ViewModel tempViewModel;
     private boolean isSceneLoaded = false;
 
     @FXML
@@ -43,12 +44,12 @@ abstract public class GUIController {
 
     abstract public void update(ViewModel viewModel); // non mi piacerebbe avere un attributo di viewModel qui dentro il controller perchè a quel punto sarebbe una copia di quello client, quindi glielo chiedo come parametro e via
 
-    public String[] getArgs() {
-        return args;
+    public ViewModel getTempViewModel() {
+        return tempViewModel;
     }
 
-    public void setArgs(String[] args) {
-        this.args = args;
+    public void setTempViewModel(ViewModel tempViewModel) {
+        this.tempViewModel = tempViewModel;
     }
 
     public VirtualView getClient() {
@@ -86,6 +87,7 @@ abstract public class GUIController {
             }
         });
     }
+
     @FXML
     public void setServerError(String serverMessage) {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
@@ -97,6 +99,7 @@ abstract public class GUIController {
             }
         });
     }
+
     public void clearServerError() {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
@@ -132,7 +135,7 @@ abstract public class GUIController {
         }
     }
 
-    public void goToScene(String fxml, String[] args) {
+    public void goToScene(String fxml, ViewModel tempViewModel) {
         /*Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
@@ -144,7 +147,7 @@ abstract public class GUIController {
             }
         });*/
         try {
-            GUIApplication.changeScene(fxml, args);
+            GUIApplication.changeScene(fxml, tempViewModel);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -199,6 +202,23 @@ abstract public class GUIController {
             // Remove the collected nodes from the root pane
             root.getChildren().removeAll(nodesToRemove);
         });
+    }
+
+    // Method to show a simple alert
+    public void showAlert(Alert.AlertType alertType, String title, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+
+        // Load the custom CSS
+        String css = getClass().getResource("/style/alert.css").toExternalForm();
+        alert.getDialogPane().getStylesheets().add(css);
+
+        // Apply a custom style class to the alert
+        alert.getDialogPane().getStyleClass().add("myAlert");
+
+        alert.showAndWait();
     }
 
 }

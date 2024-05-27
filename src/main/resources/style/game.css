@@ -15,6 +15,7 @@
 
 .plateauContainerGame {
     -fx-padding: 10px;
+    -fx-max-width: 480px;
 }
 
 .blueBackground {

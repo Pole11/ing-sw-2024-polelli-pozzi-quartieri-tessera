@@ -49,7 +49,7 @@ public class GUIApplication extends Application {
          });
     }
 
-    public static void changeScene(String fxml, String[] args) throws IOException {
+    public static void changeScene(String fxml, ViewModel tempViewModel) throws IOException {
         Platform.runLater(() -> {
             FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
             try {
@@ -58,7 +58,7 @@ public class GUIApplication extends Application {
                 throw new RuntimeException(e);
             }
             guiController = fxmlLoader.getController();
-            guiController.setArgs(args);
+            guiController.setTempViewModel(tempViewModel);
             guiController.setClient(client);
             guiController.setServer(server);
         });

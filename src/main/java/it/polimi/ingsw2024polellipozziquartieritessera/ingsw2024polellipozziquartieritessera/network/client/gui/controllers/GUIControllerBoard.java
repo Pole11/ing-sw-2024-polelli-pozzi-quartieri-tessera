@@ -29,14 +29,14 @@ public class GUIControllerBoard extends GUIController {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
-                if (getArgs() != null) {
-                    printBoard(Integer.parseInt(getArgs()[0]));
+                if (getTempViewModel() != null) {
+                    printBoard();
                 }
             }
         });
     }
 
-    public void printBoard(int playerId) {
+    public void printBoard() {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
@@ -47,26 +47,7 @@ public class GUIControllerBoard extends GUIController {
                 int rowOffset = 1;
                 int colOffset = 1;
 
-                ArrayList<ArrayList<Integer>> playerBoard = new ArrayList<>();
-                playerBoard.add(new ArrayList<>(Arrays.asList(null, 2, 6, null)));
-                playerBoard.add(new ArrayList<>(Arrays.asList(3, 1, 4, 5)));
-                playerBoard.add(new ArrayList<>(Arrays.asList(null, 7, 76, null)));
-                playerBoard.add(new ArrayList<>(Arrays.asList(null, 71, 73, null)));
-                playerBoard.add(new ArrayList<>(Arrays.asList(null, 23, 56, null)));
-
-                HashMap<Integer, Side> placedSideMap = new HashMap<>();
-                placedSideMap.put(2, Side.FRONT);
-                placedSideMap.put(6, Side.BACK);
-                placedSideMap.put(3, Side.FRONT);
-                placedSideMap.put(1, Side.FRONT);
-                placedSideMap.put(4, Side.BACK);
-                placedSideMap.put(5, Side.FRONT);
-                placedSideMap.put(7, Side.FRONT);
-                placedSideMap.put(76, Side.FRONT);
-                placedSideMap.put(71, Side.FRONT);
-                placedSideMap.put(73, Side.FRONT);
-                placedSideMap.put(23, Side.FRONT);
-                placedSideMap.put(56, Side.BACK);
+                ArrayList<ArrayList<Integer>> playerBoard = getTempViewModel().getPlayerBoard(getTempViewModel().getPlayerIndex());
 
                 GridPane gridPane = new GridPane();
                 mainContainerBoard.getChildren().add(gridPane);
@@ -77,7 +58,7 @@ public class GUIControllerBoard extends GUIController {
                     for (Integer ele : row) {
                         if (ele != null) {
                             ImageView tempImageView;
-                            if (placedSideMap.get(ele) == Side.FRONT) {
+                            if (getTempViewModel().getPlacedCardSide(ele) == Side.FRONT) {
                                 tempImageView = createCardImageView("/img/carte_fronte/" + ele + ".jpg", boardImageWidth);
                             } else {
                                 tempImageView = createCardImageView("/img/carte_retro/" + ele + ".jpg", boardImageWidth);
