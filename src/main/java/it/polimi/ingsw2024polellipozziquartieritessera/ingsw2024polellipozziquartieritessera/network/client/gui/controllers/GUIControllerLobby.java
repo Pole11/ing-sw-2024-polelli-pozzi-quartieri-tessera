@@ -23,7 +23,7 @@ public class GUIControllerLobby extends GUIController {
     }
 
     @Override
-    public void update(ViewModel viewModel) {
+    public void update() {
         Platform.runLater(() -> {
             System.out.println("[DEBUG] Updating lobby controller");
         });

@@ -47,7 +47,7 @@ public class GUIControllerBoard extends GUIController {
                 int rowOffset = 1;
                 int colOffset = 1;
 
-                ArrayList<ArrayList<Integer>> playerBoard = getTempViewModel().getPlayerBoard(getTempViewModel().getPlayerIndex());
+                ArrayList<ArrayList<Integer>> playerBoard = getTempViewModel().getPlayerBoard(Integer.parseInt(getArgs()[0])); // the first arg is the index of the player to print the board of
 
                 GridPane gridPane = new GridPane();
                 mainContainerBoard.getChildren().add(gridPane);
@@ -77,11 +77,11 @@ public class GUIControllerBoard extends GUIController {
 
     @FXML
     public void handleBackToGame(ActionEvent event) {
-        goToScene("/fxml/game.fxml");
+        goToScene("/fxml/game.fxml", getTempViewModel());
     }
 
     @Override
-    public void update(ViewModel viewModel) {
-
+    public void update() {
+        printBoard();
     }
 }

@@ -29,8 +29,9 @@ abstract public class GUIController {
     // add virtual model
     private VirtualView client; // temp
     private VirtualServer server; // temp
-    private ViewModel tempViewModel;
+    private static ViewModel tempViewModel;
     private boolean isSceneLoaded = false;
+    private String[] args;
 
     @FXML
     private void initialize() {
@@ -42,7 +43,7 @@ abstract public class GUIController {
         return isSceneLoaded;
     }
 
-    abstract public void update(ViewModel viewModel); // non mi piacerebbe avere un attributo di viewModel qui dentro il controller perchè a quel punto sarebbe una copia di quello client, quindi glielo chiedo come parametro e via
+    abstract public void update();
 
     public ViewModel getTempViewModel() {
         return tempViewModel;
@@ -118,16 +119,6 @@ abstract public class GUIController {
     }
 
     public void goToScene(String fxml) {
-        /*Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
-            @Override
-            public void run() {
-                try {
-                    GUIApplication.changeScene(fxml);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });*/
         try {
             GUIApplication.changeScene(fxml);
         } catch (IOException e) {
@@ -136,21 +127,29 @@ abstract public class GUIController {
     }
 
     public void goToScene(String fxml, ViewModel tempViewModel) {
-        /*Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
-            @Override
-            public void run() {
-                try {
-                    GUIApplication.changeScene(fxml, args);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });*/
         try {
-            GUIApplication.changeScene(fxml, tempViewModel);
+            GUIApplication.changeScene(fxml);
+            setTempViewModel(tempViewModel);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void goToScene(String fxml, ViewModel tempViewModel, String[] args) {
+        try {
+            GUIApplication.changeScene(fxml, args);
+            setTempViewModel(tempViewModel);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setArgs(String[] args) {
+        this.args = args;
+    }
+
+    public String[] getArgs() {
+        return this.args;
     }
 
     public ImageView createCardImageView(String url, int width) {

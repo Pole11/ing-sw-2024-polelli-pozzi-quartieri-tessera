@@ -68,9 +68,9 @@ public class GUIControllerStarterCard extends GUIController {
     }
 
     @Override
-    public void update(ViewModel viewModel) {
+    public void update() {
         Platform.runLater(() -> {
-            setStarterCardImage(viewModel.getStarterCard());
+            setStarterCardImage(getTempViewModel().getStarterCard());
         });
     }
 }

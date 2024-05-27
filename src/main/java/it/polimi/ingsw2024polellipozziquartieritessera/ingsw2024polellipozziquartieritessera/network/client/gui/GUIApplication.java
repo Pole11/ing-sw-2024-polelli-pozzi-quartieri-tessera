@@ -19,11 +19,11 @@ public class GUIApplication extends Application {
     private static VirtualView client;
     private static VirtualServer server;
 
-    public static GUIController getGUIController() {
+    public GUIController getGUIController() {
         return guiController;
     }
 
-    public static Stage getMainStage() {
+    public  Stage getMainStage() {
         return mainStage;
     }
 
@@ -31,8 +31,8 @@ public class GUIApplication extends Application {
         return mainStage.getScene() != null;
     }*/
 
-    public static void updateController(ViewModel viewModel) {
-        Platform.runLater(() -> { getGUIController().update(viewModel); });
+    public void updateController() {
+        Platform.runLater(() -> { getGUIController().update(); });
     }
 
      public static void changeScene(String fxml) throws IOException {
@@ -44,12 +44,12 @@ public class GUIApplication extends Application {
                  throw new RuntimeException(e);
              }
              guiController = fxmlLoader.getController();
-            guiController.setClient(client);
-            guiController.setServer(server);
+             guiController.setClient(client);
+             guiController.setServer(server);
          });
     }
 
-    public static void changeScene(String fxml, ViewModel tempViewModel) throws IOException {
+    public static void changeScene(String fxml, String[] args) throws IOException { // this was used when viewModel was not static
         Platform.runLater(() -> {
             FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
             try {
@@ -58,7 +58,7 @@ public class GUIApplication extends Application {
                 throw new RuntimeException(e);
             }
             guiController = fxmlLoader.getController();
-            guiController.setTempViewModel(tempViewModel);
+            guiController.setArgs(args);
             guiController.setClient(client);
             guiController.setServer(server);
         });

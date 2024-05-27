@@ -69,6 +69,7 @@ public class Client {
         meDoGui = true;
         guiApplication = new GUIApplication();
         guiApplication.runGui(client, server);
+        guiApplication.getGUIController().setTempViewModel(viewModel);
     }
 
 
@@ -78,41 +79,41 @@ public class Client {
         if (meDoGui) {
             switch (nextGamePhase) {
                 case GamePhase.NICKNAMEPHASE -> {
-                    guiApplication.getGUIController().goToScene("/fxml/startGame.fxml");
+                    guiApplication.getGUIController().goToScene("/fxml/startGame.fxml", viewModel);
                 }
                 case GamePhase.CHOOSESTARTERSIDEPHASE -> {
-                    guiApplication.getGUIController().goToScene("/fxml/chooseStarter.fxml");
+                    guiApplication.getGUIController().goToScene("/fxml/chooseStarter.fxml", viewModel);
                 }
                 case GamePhase.CHOOSECOLORPHASE -> {
                     System.out.println("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]");
-                    guiApplication.getGUIController().goToScene("/fxml/chooseColor.fxml");
+                    guiApplication.getGUIController().goToScene("/fxml/chooseColor.fxml", viewModel);
                 }
                 case GamePhase.CHOOSEOBJECTIVEPHASE -> {
-                    guiApplication.getGUIController().goToScene("/fxml/chooseObjective.fxml");
+                    guiApplication.getGUIController().goToScene("/fxml/chooseObjective.fxml", viewModel);
                 }
                 case GamePhase.MAINPHASE -> {
                     System.out.println("---Game started---");
-                    guiApplication.getGUIController().goToScene("/fxml/game.fxml");
+                    guiApplication.getGUIController().goToScene("/fxml/game.fxml", viewModel);
                 }
                 case GamePhase.ENDPHASE -> {
                     System.out.println("NON SO CHI reached 20 points o NON SO");
                 }
                 case GamePhase.FINALPHASE -> {
-                    guiApplication.getGUIController().goToScene("/fxml/final.fxml");
+                    guiApplication.getGUIController().goToScene("/fxml/final.fxml", viewModel);
                 }
             }
-            guiApplication.updateController(viewModel);
+            guiApplication.updateController();
         }
     }
 
     public static void updateTurnPhase(TurnPhase nextTurnPhase){
         viewModel.setTurnPhase(nextTurnPhase);
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void sendIndex(int index) throws RemoteException {
         viewModel.setPlayerIndex(index);
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void nicknameUpdate(int playerIndex, String nickname) {
@@ -127,7 +128,7 @@ public class Client {
         } else {
             System.out.println("a new player has connected with the name:" + nickname);
         }
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
 
@@ -148,10 +149,10 @@ public class Client {
                 System.out.println(viewModel.getNickname(playerIndex) + " connected");
             } else {
                 System.out.println(viewModel.getNickname(playerIndex) + " disconnected");
-                if (meDoGui) guiApplication.getGUIController().goToScene("/fxml/final.fxml");
+                if (meDoGui) guiApplication.getGUIController().goToScene("/fxml/final.fxml", viewModel);
             }
         }
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void updateAddHand(int playerIndex, int cardIndex) throws RemoteException {
@@ -162,12 +163,12 @@ public class Client {
         } else {
             System.out.println(viewModel.getNickname(playerIndex) + "drew a card");
         }
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void updateRemoveHand(int playerIndex, int cardIndex) throws RemoteException {
         viewModel.removedCardFromHand(playerIndex, cardIndex);
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
@@ -177,7 +178,7 @@ public class Client {
         } else {
             System.out.println(viewModel.getNickname(playerIndex) + "placed a card");
         }
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void updateColor(int playerIndex, Color color) throws RemoteException {
@@ -187,7 +188,7 @@ public class Client {
         } else {
             System.out.println(viewModel.getNickname(playerIndex) + "chose the color" + color);
         }
-        if (meDoGui)  guiApplication.updateController(viewModel);
+        if (meDoGui)  guiApplication.updateController();
     }
 
     public static void updateCurrentPlayer(int currentPlayerIndex) throws RemoteException {
@@ -198,13 +199,13 @@ public class Client {
         } else {
             System.out.println("it's the turn of" + viewModel.getNickname(currentPlayerIndex));
         }
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void updateHandSide(int cardIndex, Side side) throws RemoteException {
         viewModel.setHandSide(cardIndex, side);
         System.out.println("you flipped your card");
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void updatePoints(int playerIndex, int points) throws RemoteException {
@@ -214,7 +215,7 @@ public class Client {
         } else {
             System.out.println(viewModel.getNickname(playerIndex) + "has" + points + "points");
         }
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void updateSecretObjective(int objectiveCardId1, int objectiveCardId2) throws RemoteException {
@@ -226,14 +227,14 @@ public class Client {
             // TODO: cliController.showSecretObjectives();
 
         }
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
         viewModel.setSharedObjectives(sharedObjectiveCardId1, sharedObjectiveCardId2);
         System.out.println("the shared objectives are: " + sharedObjectiveCardId1 + "," + sharedObjectiveCardId2);
         //TODO: cliController.showSharedObjectvives();
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
@@ -250,12 +251,12 @@ public class Client {
                 System.out.println(viewModel.getNickname(playerIndex) + "has chosen the starter side");
             }
         }
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
         viewModel.setMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
-        if (meDoGui) guiApplication.updateController(viewModel);
+        if (meDoGui) guiApplication.updateController();
     }
 
     public static void ping(String ping) throws RemoteException {
@@ -264,7 +265,7 @@ public class Client {
 
     public static void sendMessage(String message) throws RemoteException {
         if (meDoGui) {
-            //guiApplication.updateController(viewModel);
+            //guiApplication.updateController();
             guiApplication.getGUIController().setServerMessage(message);  // non so se è il modo migliore, to be checked
         }
         System.out.print("\nINFO FROM SERVER: " + message + "\n> ");
@@ -272,7 +273,7 @@ public class Client {
 
     public static void sendError(String error) throws RemoteException {
         if (meDoGui) {
-            //guiApplication.updateController(viewModel);
+            //guiApplication.updateController();
             guiApplication.getGUIController().setServerError(error); // non so se è il modo migliore, to be checked
         }
         System.err.print("\nERROR FROM SERVER: " + error + "\n> ");

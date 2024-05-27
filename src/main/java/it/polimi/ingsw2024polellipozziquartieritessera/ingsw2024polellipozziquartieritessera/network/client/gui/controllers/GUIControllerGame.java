@@ -34,6 +34,9 @@ public class GUIControllerGame extends GUIController {
 
     public GUIControllerGame() {
         clearAllchilds();
+        Platform.runLater(() -> {
+            update();
+        });
     }
 
     private void clearAllchilds() {
@@ -45,7 +48,7 @@ public class GUIControllerGame extends GUIController {
                     plateauContainerGame.getChildren().removeLast(); // the first two are the messages from server
                 }
             }
-            for (int i = 1; i <= 4; i++) {
+            for (int i = 0; i < 4; i++) {
                 if (mainContainerGame.lookup("#player" + i + "ContainerGame") != null) {
                     while (((Pane) mainContainerGame.lookup("#player" + i + "ContainerGame")).getChildren().size() > 1) {
                         ((Pane) mainContainerGame.lookup("#player" + i + "ContainerGame")).getChildren().removeLast();
@@ -74,7 +77,7 @@ public class GUIControllerGame extends GUIController {
     public void initTable(ArrayList<HashMap<Integer, Side>> playerHandCards, HashMap<Integer, String> nicknames, int meId, int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId, int firstCommonObjective, int secondCommonObjective, int secretObjectiveCardId) {
         printCommonObjective(firstCommonObjective, secondCommonObjective);
         printDecks(firstGoldDeckCardId, firstResourceDeckCardId, firstSharedGoldCardId, firstSharedResourceCardId, secondSharedGoldCardId, secondSharedResourceCardId);
-        for (int i = 0; i < playerHandCards.size(); i++) initPlayerHand(i + 1, meId + 1, nicknames, playerHandCards.get(i), secretObjectiveCardId);
+        for (int i = 0; i < playerHandCards.size(); i++) initPlayerHand(i, meId, nicknames, playerHandCards.get(i), secretObjectiveCardId);
     }
 
     public void printCommonObjective(int firstCommonObjective, int secondCommonObjective) {
@@ -150,13 +153,13 @@ public class GUIControllerGame extends GUIController {
         });
     }
 
-    public void highlightCurrentPlayerTable(int idCurrentPlayer) {
+    public void highlightCurrentPlayerTable(int idCurrentPlayer, Color color) {
         Platform.runLater(() -> {
                 // TODO: get current player id
                 Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame");
 
                 // TODO: get current player color
-                Color currentPlayerColor = Color.BLUE;
+                Color currentPlayerColor = color;
                 currentPlayerHBox.getStyleClass().add(currentPlayerColor.toString().toLowerCase() + "Background");
             }
         );
@@ -173,7 +176,7 @@ public class GUIControllerGame extends GUIController {
                 Text nicknameText = new Text(currentPlayerNickname);
                 Button expandButton = new Button("Expand Board");
                 expandButton.setOnMousePressed(mouseEvent -> {
-                    goToScene("/fxml/board.fxml", getTempViewModel());
+                    goToScene("/fxml/board.fxml", getTempViewModel(), new String[]{"" + playerId});
                 });
                 infoContainerVBox.getChildren().addAll(nicknameText, expandButton);
                 infoContainerVBox.setAlignment(Pos.CENTER);
@@ -235,11 +238,12 @@ public class GUIControllerGame extends GUIController {
                                 //Circle clickedCircle = new Circle(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 10);
                                 //mainContainerGame.getChildren().removeIf(n -> n instanceof Circle);
                                 //mainContainerGame.getChildren().add(clickedCircle);
-                                goToScene("/fxml/board.fxml", getTempViewModel());
+                                goToScene("/fxml/board.fxml", getTempViewModel(), new String[]{"" + meId});
                             }
                         });
                     }
                 }
+
                 Separator verticalSeparator = new Separator();
                 verticalSeparator.setOrientation(Orientation.VERTICAL);
                 if (handContainer != null) handContainer.getChildren().add(verticalSeparator);
@@ -289,35 +293,38 @@ public class GUIControllerGame extends GUIController {
     }
 
     @Override
-    public void update(ViewModel viewModel) {
+    public void update() {
         Platform.runLater(() -> {
             clearAllchilds();
 
             // delete everything  or find a way to differentially change the content of the view
             ArrayList<HashMap<Integer, Side>> playerHandCards = new ArrayList<>();
             HashMap<Integer, String> nicknames = new HashMap<>();
-            for (Integer playerId = 0; playerId < viewModel.getPlayersSize(); playerId++) {
+            for (Integer playerId = 0; playerId < getTempViewModel().getPlayersSize(); playerId++) {
                 HashMap<Integer, Side> playerHandCardsMap = new HashMap<>();
-                for (Integer cardId : viewModel.getHand(playerId)) {
-                    playerHandCardsMap.put(cardId, viewModel.getHandCardsSide(cardId));
+                for (Integer cardId : getTempViewModel().getHand(playerId)) {
+                    playerHandCardsMap.put(cardId, getTempViewModel().getHandCardsSide(cardId));
                 }
                 playerHandCards.add(playerHandCardsMap);
-                nicknames.put(playerId, viewModel.getNickname(playerId));
+                nicknames.put(playerId, getTempViewModel().getNickname(playerId));
             }
 
             initTable(playerHandCards,
                     nicknames,
-                    viewModel.getPlayerIndex(),
-                    viewModel.getSharedCards()[0],
-                    viewModel.getSharedCards()[1],
-                    viewModel.getSharedGoldCards()[0],
-                    viewModel.getSharedResourceCards()[0],
-                    viewModel.getSharedGoldCards()[1],
-                    viewModel.getSharedResourceCards()[1],
-                    viewModel.getObjectives()[0],
-                    viewModel.getObjectives()[1],
-                    viewModel.getObjectives()[2]); // !!! get the right secret objective
-            highlightCurrentPlayerTable(viewModel.getCurrentPlayer() + 1); // !!! make it work
+                    getTempViewModel().getPlayerIndex(),
+                    getTempViewModel().getSharedCards()[0],
+                    getTempViewModel().getSharedCards()[1],
+                    getTempViewModel().getSharedGoldCards()[0],
+                    getTempViewModel().getSharedResourceCards()[0],
+                    getTempViewModel().getSharedGoldCards()[1],
+                    getTempViewModel().getSharedResourceCards()[1],
+                    getTempViewModel().getObjectives()[0],
+                    getTempViewModel().getObjectives()[1],
+                    getTempViewModel().getObjectives()[2]); // !!! get the right secret objective
+
+            highlightCurrentPlayerTable(getTempViewModel().getCurrentPlayer(), getTempViewModel().getColorsMap(getTempViewModel().getCurrentPlayer())); // !!! make it work
+
+            this.setTempViewModel(getTempViewModel());
         });
     }
 

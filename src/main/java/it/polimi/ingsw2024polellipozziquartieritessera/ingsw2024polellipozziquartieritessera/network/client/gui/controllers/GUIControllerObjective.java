@@ -80,9 +80,9 @@ public class GUIControllerObjective extends GUIController{
     }
 
     @Override
-    public void update(ViewModel viewModel) {
+    public void update() {
         Platform.runLater(() -> {
-            setObjectiveCardImages(viewModel.getSecretObjectiveCards()[0], viewModel.getSecretObjectiveCards()[1]);
+            setObjectiveCardImages(getTempViewModel().getSecretObjectiveCards()[0], getTempViewModel().getSecretObjectiveCards()[1]);
         });
     }
 }

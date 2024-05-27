@@ -22,13 +22,13 @@ public class GUIControllerStartGame extends GUIController {
     }
 
     @Override
-    public void update(ViewModel viewModel) {
+    public void update() {
         Platform.runLater(() -> {
             System.out.println("[DEBUG] Updating start game controller");
-            String message = "You successfully entered the game with the nickname " + viewModel.getNickname(viewModel.getPlayerIndex()) + ". ";
+            String message = "You successfully entered the game with the nickname " + getTempViewModel().getNickname(getTempViewModel().getPlayerIndex()) + ". ";
             message += "The players currently connected are: | ";
-            for (int i = 0; i < viewModel.getPlayersSize(); i++) {
-                message += viewModel.getNickname(i) + " | ";
+            for (int i = 0; i < getTempViewModel().getPlayersSize(); i++) {
+                message += getTempViewModel().getNickname(i) + " | ";
             }
             setServerMessage(message);
         });
