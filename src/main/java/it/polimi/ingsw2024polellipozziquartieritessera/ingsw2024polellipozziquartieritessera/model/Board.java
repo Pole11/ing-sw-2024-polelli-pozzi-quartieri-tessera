@@ -208,29 +208,4 @@ public class Board {
         goldDeck.removeLast();
         return drawnCard;
     }
-
-    /*
-    public void fillSharedCardsGap(){
-        // verify if the shared cards have some gaps
-        for (int index = 0; index < Config.N_SHARED_RESOURCES; index++){
-            if (sharedResourceCards[index] == null){
-                ResourceCard newCard = getFromResourceDeck();
-                // verify deck is not empty
-                if (newCard != null){
-                    sharedResourceCards[index] = newCard;
-                }
-            }
-        }
-        for (int index = 0; index < Config.N_SHARED_GOLDS; index++){
-            if (sharedGoldCards[index] == null){
-                GoldCard newCard = getFromGoldDeck();
-                // verify deck is not empty
-                if (newCard != null){
-                    sharedGoldCards[index] = newCard;
-                }
-            }
-        }
-    }
-
-     */
 }

@@ -32,6 +32,13 @@ public class ClientHandler implements VirtualView {
             } catch(IllegalArgumentException e) {
                 System.out.println("Invalid command: " + message[0]);
             }
+
+            if (Command.valueOf(message[0]).getType().equals("Local")){
+                System.err.println("message arrived to server that should have been managed in client");
+            } else {
+                Command.valueOf(message[0]).getCommandRunnable(message, server, null, this).executeCLI();
+            }
+            /*
             switch (command) {
                 case Command.ADDUSER:
                     server.addConnectedPlayer(this, message[1]);
@@ -129,17 +136,14 @@ public class ClientHandler implements VirtualView {
                     System.err.println("[INVALID MESSAGE FROM CLIENT]");
                     break;
             }
+
+             */
         }
     }
 
     @Override
     public void ping(String ping) throws RemoteException {
         view.ping(ping);
-    }
-
-    @Override
-    public void sendMessage(String message) throws RemoteException {
-        view.sendMessage(message);
     }
 
     @Override
@@ -230,5 +234,10 @@ public class ClientHandler implements VirtualView {
     @Override
     public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
         view.updateStarterCard(playerIndex, cardId1, side);
+    }
+
+    @Override
+    public void updateWinner(int playerIndex) throws RemoteException {
+        view.updateWinner(playerIndex);
     }
 }

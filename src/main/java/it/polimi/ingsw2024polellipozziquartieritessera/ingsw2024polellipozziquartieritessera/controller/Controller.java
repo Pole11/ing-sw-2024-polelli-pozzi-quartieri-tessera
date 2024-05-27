@@ -238,6 +238,7 @@ public class Controller {
                 default:
             }
             this.gameState.changeCurrentPlayer();
+            gameState.checkGameEnded();
         }
     }
 

@@ -1,5 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
+
 public enum Messages {
     GAMEPHASE,
     TURNPHASE,
@@ -20,5 +22,6 @@ public enum Messages {
     UPDATEPOINTS,
     UPDATESECRETOBJECTIVE,
     UPDATESHAREDOBJECTIVE,
-    UPDATESTARTER
+    UPDATESTARTER,
+    UPDATEWINNER
 }

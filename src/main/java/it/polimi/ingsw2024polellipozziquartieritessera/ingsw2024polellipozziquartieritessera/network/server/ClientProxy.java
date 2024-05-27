@@ -20,12 +20,6 @@ public class ClientProxy implements VirtualView {
         output.flush();
     }
 
-    @Override
-    public void sendMessage(String message) throws RemoteException {
-        output.println(Messages.MESSAGE + "; " + message);
-        output.flush();
-    }
-
     public void sendError(String error) throws RemoteException {
         output.println(Messages.ERROR + "; " + error);
         output.flush();
@@ -138,6 +132,12 @@ public class ClientProxy implements VirtualView {
             sideString = side.toString();
         }
         output.println(Messages.UPDATESTARTER + "; " + playerIndex + "; " + cardId1 + "; " + sideString);
+        output.flush();
+    }
+
+    @Override
+    public void updateWinner(int playerIndex) throws RemoteException {
+        output.println(Messages.UPDATEWINNER+ "; " + playerIndex);
         output.flush();
     }
 }

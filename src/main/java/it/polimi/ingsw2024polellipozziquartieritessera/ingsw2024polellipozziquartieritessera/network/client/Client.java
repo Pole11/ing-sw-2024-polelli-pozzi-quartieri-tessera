@@ -1,51 +1,74 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
-import com.google.gson.Gson;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.MessageEvent;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
-import javafx.application.Platform;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.Socket;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Scanner;
-import java.util.*;
 
-public class Client {
-    private static boolean meDoGui;
-    private static GUIController guiController;
-    private static CLIController cliController = new CLIController();
-    public static GUIApplication guiApplication; // TODO: public only for testing purpose, put private after finished testing
-    public static GUIControllerGame guiControllerOld; // TODO: public only for testing purpose, put private after finished testing
-    private static GamePhase currentGamePhase;
-    private static final ViewModel viewModel = new ViewModel();
+public class Client implements VirtualView {
+    private boolean meDoGui;
+    private CLIController cliController;
+    private GUIApplication guiApplication;
+    private final ViewModel viewModel;
+    private VirtualView client;
+
+    public Client(){
+        this.viewModel = new ViewModel();
+    }
 
     public static void main(String[] args) throws IOException {
         String input = args[0];
         String host = args[1];
         String port = args[2];
 
-        startClient(input, host, port);
+        (new Client()).startClient(input, host, port);
+
     }
 
-    public static void startClient(String input, String host, String port) throws IOException {
+    //GETTER
+    public VirtualView getClient(){
+        return client;
+    }
+
+    public CLIController getCliController() {
+        return cliController;
+    }
+
+    public void startClient(String input, String host, String portString) throws IOException {
         if (input.equalsIgnoreCase("socket")) {
-            SocketClient.execute(host, port);
+            int port = Integer.parseInt(portString);
+            Socket socketToServer = new Socket(host, port);
+
+            InputStreamReader socketRx = new InputStreamReader(socketToServer.getInputStream());
+            OutputStreamWriter socketTx = new OutputStreamWriter(socketToServer.getOutputStream());
+
+            this.client = new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx), this);
+            ((SocketClient) client).run();
         } else { //default rmi
-            RmiClient.execute(host, port);
+            try {
+                Registry registry = LocateRegistry.getRegistry(host, Integer.parseInt(portString));
+                VirtualServer server = (VirtualServer) registry.lookup("VirtualServer");
+                this.client = new RmiClient(server, this);
+                ((RmiClient) client).run();
+            } catch (RemoteException | NotBoundException e) {
+                e.printStackTrace();
+                System.out.println("An error occurred while executing RmiClient!");
+            }
         }
     }
 
-    public static void runCli(VirtualServer server, VirtualView client) {
+    public void runCli(VirtualServer server) {
         meDoGui = false;
+
+        cliController = new CLIController(viewModel);
+
         boolean running = true;
         Scanner scan = new Scanner(System.in);
         System.out.println("Please enter a nickname to start, with the command ADDUSER <nickname>");
@@ -55,7 +78,7 @@ public class Client {
             String[] message = line.split(" ");
             if (line != null && !line.isEmpty() && !line.isBlank() && !line.equals("")) {
                 try {
-                    cliController.manageInput(server, message, client);
+                    cliController.manageInput(server, client, this, message);
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
@@ -65,14 +88,15 @@ public class Client {
         }
     }
 
-    public static void runGui(VirtualServer server, VirtualView client) {
+    public void runGui(VirtualServer server, VirtualView client){
         meDoGui = true;
         guiApplication = new GUIApplication();
         guiApplication.runGui(client, server, viewModel);
     }
 
 
-    public static void changePhase(GamePhase nextGamePhase) {
+    @Override
+    public void updateGamePhase(GamePhase nextGamePhase) {
         viewModel.setGamePhase(nextGamePhase);
 
         if (meDoGui) {
@@ -105,17 +129,20 @@ public class Client {
         }
     }
 
-    public static void updateTurnPhase(TurnPhase nextTurnPhase){
+    @Override
+    public void updateTurnPhase(TurnPhase nextTurnPhase){
         viewModel.setTurnPhase(nextTurnPhase);
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void sendIndex(int index) throws RemoteException {
+    @Override
+    public void sendIndex(int index) throws RemoteException {
         viewModel.setPlayerIndex(index);
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void nicknameUpdate(int playerIndex, String nickname) {
+    @Override
+    public void nicknameUpdate(int playerIndex, String nickname) {
         viewModel.setNickname(playerIndex, nickname);
         viewModel.setConnection(playerIndex, true);
         if (playerIndex == viewModel.getPlayerIndex()){
@@ -131,10 +158,12 @@ public class Client {
     }
 
 
-    public static void start() throws RemoteException {
+    @Override
+    public void start() throws RemoteException {
     }
 
-    public static void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
+    @Override
+    public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
         viewModel.setConnection(playerIndex, connected);
         if (playerIndex == viewModel.getPlayerIndex()){
             if (connected){
@@ -154,7 +183,8 @@ public class Client {
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void updateAddHand(int playerIndex, int cardIndex) throws RemoteException {
+    @Override
+    public void updateAddHand(int playerIndex, int cardIndex) throws RemoteException {
         viewModel.addedCardToHand(playerIndex, cardIndex);
         viewModel.setHandSide(cardIndex, Side.FRONT);
         if (viewModel.getPlayerIndex() == playerIndex) {
@@ -165,12 +195,14 @@ public class Client {
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void updateRemoveHand(int playerIndex, int cardIndex) throws RemoteException {
+    @Override
+    public void updateRemoveHand(int playerIndex, int cardIndex) throws RemoteException {
         viewModel.removedCardFromHand(playerIndex, cardIndex);
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
+    @Override
+    public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
         viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
         if (viewModel.getPlayerIndex() == playerIndex) {
             System.out.println("you placed a card, now you have to draw your card with DRAW [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]");
@@ -180,7 +212,8 @@ public class Client {
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void updateColor(int playerIndex, Color color) throws RemoteException {
+    @Override
+    public void updateColor(int playerIndex, Color color) throws RemoteException {
         viewModel.setColor(playerIndex, color);
         if (viewModel.getPlayerIndex() == playerIndex) {
             System.out.println("you chose the color:" + color);
@@ -190,7 +223,8 @@ public class Client {
         if (meDoGui)  guiApplication.updateController();
     }
 
-    public static void updateCurrentPlayer(int currentPlayerIndex) throws RemoteException {
+    @Override
+    public void updateCurrentPlayer(int currentPlayerIndex) throws RemoteException {
         viewModel.setCurrentPlayer(currentPlayerIndex);
         if (viewModel.getPlayerIndex() == currentPlayerIndex) {
             System.out.println("it's your turn");
@@ -201,13 +235,15 @@ public class Client {
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void updateHandSide(int cardIndex, Side side) throws RemoteException {
+    @Override
+    public void updateHandSide(int cardIndex, Side side) throws RemoteException {
         viewModel.setHandSide(cardIndex, side);
         System.out.println("you flipped your card");
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void updatePoints(int playerIndex, int points) throws RemoteException {
+    @Override
+    public void updatePoints(int playerIndex, int points) throws RemoteException {
         viewModel.setPoints(playerIndex, points);
         if (viewModel.getPlayerIndex() == playerIndex) {
             System.out.println("you now have " + points + "points");
@@ -217,7 +253,8 @@ public class Client {
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void updateSecretObjective(int objectiveCardId1, int objectiveCardId2) throws RemoteException {
+    @Override
+    public void updateSecretObjective(int objectiveCardId1, int objectiveCardId2) throws RemoteException {
         viewModel.setSecretObjective(objectiveCardId1, objectiveCardId2);
         if (objectiveCardId2 == -1){
             System.out.println("you have chosen the objective card: " + objectiveCardId1);
@@ -229,14 +266,16 @@ public class Client {
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
+    @Override
+    public void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
         viewModel.setSharedObjectives(sharedObjectiveCardId1, sharedObjectiveCardId2);
         System.out.println("the shared objectives are: " + sharedObjectiveCardId1 + "," + sharedObjectiveCardId2);
         //TODO: cliController.showSharedObjectvives();
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
+    @Override
+    public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
         if (side == null){
             viewModel.setStarterCard(cardId1);
             System.out.println("Chose your preferred side for the starter card [Front/Back]:");
@@ -253,27 +292,26 @@ public class Client {
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
+    @Override
+    public void updateWinner(int playerIndex){
+        viewModel.addWinner(playerIndex);
+    }
+
+    @Override
+    public void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
         viewModel.setMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
         if (meDoGui) guiApplication.updateController();
     }
 
-    public static void ping(String ping) throws RemoteException {
+    @Override
+    public void ping(String ping) throws RemoteException {
         //TODO : respond to ping to manage disconections
     }
 
-    public static void sendMessage(String message) throws RemoteException {
+    @Override
+    public void sendError(String error) throws RemoteException {
         if (meDoGui) {
-            //guiApplication.updateController();
-            guiApplication.getGUIController().setServerMessage(message);  // non so se è il modo migliore, to be checked
-        }
-        System.out.print("\nINFO FROM SERVER: " + message + "\n> ");
-    }
-
-    public static void sendError(String error) throws RemoteException {
-        if (meDoGui) {
-            //guiApplication.updateController();
-            guiApplication.getGUIController().setServerError(error); // non so se è il modo migliore, to be checked
+            guiApplication.getGUIController().setServerError(error);
         }
         System.err.print("\nERROR FROM SERVER: " + error + "\n> ");
     }

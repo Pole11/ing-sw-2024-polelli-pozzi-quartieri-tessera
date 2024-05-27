@@ -6,21 +6,23 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class MessageEvent extends Event {
-    private final String message;
+public class GameEndedEvent extends Event{
+    private final ArrayList<Integer> winners;
 
-    public MessageEvent(GameState gameState, ArrayList<VirtualView> clients, String message) {
+    public GameEndedEvent(GameState gameState, ArrayList<VirtualView> clients, ArrayList<Integer> winners) {
         super(gameState, clients);
-        this.message = message;
+        this.winners = winners;
     }
 
     @Override
     public void execute() {
-        for (VirtualView clientIterator : this.clients){
-            try {
-                clientIterator.sendMessage(message);
-            } catch (RemoteException e) {
-                this.playerDisconnected(clientIterator);
+        for (VirtualView client: clients) {
+            for (Integer winner: winners) {
+                try {
+                    client.updateWinner(winner);
+                } catch (RemoteException e) {
+                    playerDisconnected(client);
+                }
             }
         }
     }
