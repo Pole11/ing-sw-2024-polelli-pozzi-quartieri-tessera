@@ -16,6 +16,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 
+import java.rmi.RemoteException;
 import java.util.*;
 
 public class GUIControllerGame extends GUIController {
@@ -23,6 +24,7 @@ public class GUIControllerGame extends GUIController {
     @FXML private VBox sharedGoldContainerGame;
     @FXML private VBox plateauContainerGame;
     @FXML private VBox sharedResourceContainerGame;
+    @FXML private Label currentPhase;
 
     public GUIControllerGame() {
         clearAllchilds();
@@ -36,7 +38,7 @@ public class GUIControllerGame extends GUIController {
             if (sharedResourceContainerGame != null) sharedResourceContainerGame.getChildren().clear();
             if (sharedGoldContainerGame != null) sharedGoldContainerGame.getChildren().clear();
             if (plateauContainerGame != null) {
-                while (plateauContainerGame.getChildren().size() > 2) {
+                while (plateauContainerGame.getChildren().size() > 3) {
                     plateauContainerGame.getChildren().removeLast(); // the first two are the messages from server
                 }
             }
@@ -279,10 +281,6 @@ public class GUIControllerGame extends GUIController {
         });
     }
 
-    @FXML
-    public void handlePlaceCard(ActionEvent event) {
-    }
-
     public void handleDrawCard(DrawType drawType) {
         /*try {
             getServer().drawCard(getClient(), drawType);
@@ -327,6 +325,15 @@ public class GUIControllerGame extends GUIController {
                     getViewModel().getObjectives()[2]);
 
             highlightCurrentPlayerTable(getViewModel().getCurrentPlayer(), getViewModel().getColorsMap(getViewModel().getCurrentPlayer()));
+
+            setCurrentPhase();
+        });
+    }
+
+    @FXML
+    public void setCurrentPhase() {
+        Platform.runLater(() -> {
+            currentPhase.setText("The current phase is " + (getViewModel().getTurnPhase() != null ? getViewModel().getTurnPhase() : "BOH") + " and is the turn of " + getViewModel().getNickname(getViewModel().getCurrentPlayer()));
         });
     }
 

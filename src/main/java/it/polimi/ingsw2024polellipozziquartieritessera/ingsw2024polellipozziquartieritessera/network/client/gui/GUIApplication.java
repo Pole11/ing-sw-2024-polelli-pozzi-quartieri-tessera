@@ -72,7 +72,7 @@ public class GUIApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/game.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml"));
         Parent root = fxmlLoader.load();
 
         guiController = fxmlLoader.getController();

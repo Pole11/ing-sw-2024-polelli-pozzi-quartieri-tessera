@@ -28,7 +28,6 @@ public class DrawCardCommandRunnable extends CommandRunnable{
             }
         } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
             System.err.print("INVALID COMMAND\n> ");
-            return;
         }
     }
 

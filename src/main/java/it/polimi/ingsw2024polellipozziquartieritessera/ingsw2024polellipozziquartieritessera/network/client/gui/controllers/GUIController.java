@@ -19,6 +19,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
@@ -214,10 +215,17 @@ abstract public class GUIController {
         });
     }
 
-    public void addHoverBg(Node node) {
+    public void addHoverBgColor(Node node) {
         Platform.runLater(() -> {
             node.setOnMouseEntered(mouseEvent -> { node.getStyleClass().add("backgoundHover"); node.getStyleClass().remove("backgoundNoHover"); });
             node.setOnMouseExited(mouseEvent -> { node.getStyleClass().add("backgoundNoHover"); node.getStyleClass().remove("backgoundHover"); });
+        });
+    }
+
+    public void addHoverBgImage(Node node, String imageUrl) { // non funziona
+        Platform.runLater(() -> {
+            node.setOnMouseEntered(mouseEvent -> { node.setStyle("-fx-background-image: url('" + imageUrl + "')"); node.setStyle("-fx-background-image: none"); System.out.println("-fx-background-image: url('" + imageUrl + "')"); });
+            node.setOnMouseExited(mouseEvent -> { node.setStyle("-fx-background-image: none"); node.setStyle("-fx-background-image: url('" + imageUrl + "')"); });
         });
     }
 
@@ -237,6 +245,15 @@ abstract public class GUIController {
                 event.consume();
             }
         });
+    }
+
+    public Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
+        for (Node node : gridPane.getChildren()) {
+            if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
+                return node;
+            }
+        }
+        return null;
     }
 
     public void disappearAfter(int time, Node target, Pane father) {

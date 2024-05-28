@@ -37,6 +37,8 @@
                 <Label
                         fx:id="serverErrorLabel"
                         styleClass="serverError"/>
+                <Label
+                        fx:id="currentPhase"/>
             </VBox>
             <VBox alignment="CENTER" fx:id="sharedResourceContainerGame"></VBox>
         </HBox>

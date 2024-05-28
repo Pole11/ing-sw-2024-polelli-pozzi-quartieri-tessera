@@ -44,6 +44,7 @@ public class GUITest {
         viewModel.updatePlayerBoard(0, 5, 98, CornerPos.UPLEFT, Side.FRONT);
         viewModel.updatePlayerBoard(0, 15, 5, CornerPos.DOWNLEFT, Side.FRONT);
         viewModel.updatePlayerBoard(0, 25, 5, CornerPos.UPRIGHT, Side.FRONT);
+        viewModel.updatePlayerBoard(0, 17, 5, CornerPos.UPLEFT, Side.FRONT);
 
         GUIApplication guiApplication = new GUIApplication();
         guiApplication.runGui(null, null, null, viewModel);
