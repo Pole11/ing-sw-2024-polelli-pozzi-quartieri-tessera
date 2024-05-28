@@ -17,12 +17,11 @@ public class Config {
 
     public static final String GAME_STATE_PATH = "rescue/gamestate/";
     public static final String CARD_JSON_PATH = "/src/main/java/it/polimi/ingsw2024polellipozziquartieritessera/ingsw2024polellipozziquartieritessera/cards.json";
-
+    public static final String TITLE_CLI_PATH = "/src/main/resources/img/TitleCLI.txt";
     public static int firstResourceCardId = Integer.MAX_VALUE;
     public static int firstGoldCardId = Integer.MAX_VALUE;
     public static int firstStarterCardId = Integer.MAX_VALUE;
     public static int firstObjectiveCardId = Integer.MAX_VALUE;
-
 }
 
 
