@@ -157,9 +157,9 @@ public class Client implements VirtualView {
         if (meDoGui) guiApplication.updateController();
     }
 
-
     @Override
     public void start() throws RemoteException {
+        throw new RuntimeException();
     }
 
     @Override

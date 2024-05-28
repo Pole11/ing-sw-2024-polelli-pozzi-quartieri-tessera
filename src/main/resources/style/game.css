@@ -41,3 +41,12 @@
 .verticalPlayerContainer {
     -fx-padding: 30px;
 }
+
+.backgoundHover {
+    -fx-background-color: rgba(0,0,0,0.4);
+}
+
+.backgoundNoHover {
+    -fx-background-color: none;
+}
+

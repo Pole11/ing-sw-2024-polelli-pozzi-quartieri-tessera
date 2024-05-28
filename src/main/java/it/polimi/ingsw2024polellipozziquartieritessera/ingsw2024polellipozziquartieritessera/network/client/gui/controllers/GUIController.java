@@ -9,6 +9,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -17,12 +18,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 abstract public class GUIController {
@@ -36,7 +39,9 @@ abstract public class GUIController {
     private Client clientContainer;
     private ViewModel viewModel;
     private boolean isSceneLoaded = false;
-    private String[] args;
+    private HashMap<String, Integer> paramsMap;
+    private double pressedX;
+    private double pressedY;
 
     @FXML
     private void initialize() {
@@ -158,6 +163,7 @@ abstract public class GUIController {
             }
         });
     }
+
     public void clearServerMessage() {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
@@ -171,25 +177,19 @@ abstract public class GUIController {
         GUIApplication.changeScene(fxml);
     }
 
-    public void goToScene(String fxml, ViewModel tempViewModel) {
-        GUIApplication.changeScene(fxml);
-        setViewModel(tempViewModel);
+    public void goToScene(String fxml, HashMap<String, Integer> paramsMap) {
+        GUIApplication.changeScene(fxml, paramsMap);
     }
 
-    public void goToScene(String fxml, ViewModel tempViewModel, String[] args) {
-        GUIApplication.changeScene(fxml, args);
-        setViewModel(tempViewModel);
+    public HashMap<String, Integer> getParamsMap() {
+        return paramsMap;
     }
 
-    public void setArgs(String[] args) {
-        this.args = args;
+    public void setParamsMap(HashMap<String, Integer> paramsMap) {
+        this.paramsMap = paramsMap;
     }
 
-    public String[] getArgs() {
-        return this.args;
-    }
-
-    public ImageView createCardImageView(String url, int width) {
+    public ImageView createCardImageView(String url, int height) {
         URL resource = GUIController.class.getResource(url);
         if (resource == null) return null;
         String imageUrl = resource.toExternalForm();
@@ -201,16 +201,41 @@ abstract public class GUIController {
         ImageView imageView = new ImageView(imageWritable);
         imageView.getStyleClass().add("imageWithBorder");
 
-        imageView.setFitHeight(width);
+        imageView.setFitHeight(height);
         imageView.setPreserveRatio(true);
 
         return imageView;
     }
 
-    public void addHover(Node node) {
+    public void addHoverRotate(Node node) {
         Platform.runLater(() -> {
             node.setOnMouseEntered(mouseEvent -> { node.getStyleClass().add("rotateYes"); node.getStyleClass().remove("rotateNo"); });
             node.setOnMouseExited(mouseEvent -> { node.getStyleClass().add("rotateNo"); node.getStyleClass().remove("rotateYes"); });
+        });
+    }
+
+    public void addHoverBg(Node node) {
+        Platform.runLater(() -> {
+            node.setOnMouseEntered(mouseEvent -> { node.getStyleClass().add("backgoundHover"); node.getStyleClass().remove("backgoundNoHover"); });
+            node.setOnMouseExited(mouseEvent -> { node.getStyleClass().add("backgoundNoHover"); node.getStyleClass().remove("backgoundHover"); });
+        });
+    }
+
+    public void addPanning(Node node) {
+        node.setOnMousePressed(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event) {
+                pressedX = event.getX();
+                pressedY = event.getY();
+            }
+        });
+
+        node.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event) {
+                node.setTranslateX(node.getTranslateX() + event.getX() - pressedX);
+                node.setTranslateY(node.getTranslateY() + event.getY() - pressedY);
+
+                event.consume();
+            }
         });
     }
 

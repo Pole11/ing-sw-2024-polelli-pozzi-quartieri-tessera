@@ -45,7 +45,6 @@ public class Controller {
         return gameState.getPlayerIndex(client);
     }
 
-
     public GamePhase getGamePhase() {
         return this.gameState.getCurrentGamePhase();
     }

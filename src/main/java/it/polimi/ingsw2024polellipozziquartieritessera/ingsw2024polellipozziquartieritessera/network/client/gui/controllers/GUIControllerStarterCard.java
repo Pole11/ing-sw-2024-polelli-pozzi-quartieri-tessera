@@ -2,14 +2,11 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseStarterCommandRunnable;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.StartCommandRunnable;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-
-import java.rmi.RemoteException;
 
 public class GUIControllerStarterCard extends GUIController {
     @FXML private StackPane starterCardImageContainerFront;
@@ -64,8 +61,8 @@ public class GUIControllerStarterCard extends GUIController {
                 });
                 starterCardImageContainerFront.getChildren().add(starterCardImageViewFront);
                 starterCardImageContainerBack.getChildren().add(starterCardImageViewBack);
-                addHover(starterCardImageViewFront);
-                addHover(starterCardImageViewBack);
+                addHoverRotate(starterCardImageViewFront);
+                addHoverRotate(starterCardImageViewBack);
             }
         });
     }

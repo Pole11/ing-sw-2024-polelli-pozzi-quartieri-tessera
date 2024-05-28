@@ -1,7 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseObjectiveCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.DrawCardCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.FlipCardCommandRunnable;
 import javafx.application.*;
@@ -17,7 +16,6 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 
-import java.rmi.RemoteException;
 import java.util.*;
 
 public class GUIControllerGame extends GUIController {
@@ -137,12 +135,12 @@ public class GUIControllerGame extends GUIController {
                 firstSharedResourceCardImageView.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.SHAREDRESOURCE1); });
                 secondSharedResourceCardImageView.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.SHAREDRESOURCE2); });
 
-                addHover(goldDeckPane);
-                addHover(firstSharedGoldCardImageView);
-                addHover(secondSharedGoldCardImageView);
-                addHover(resourceDeckPane);
-                addHover(firstSharedResourceCardImageView);
-                addHover(secondSharedResourceCardImageView);
+                addHoverRotate(goldDeckPane);
+                addHoverRotate(firstSharedGoldCardImageView);
+                addHoverRotate(secondSharedGoldCardImageView);
+                addHoverRotate(resourceDeckPane);
+                addHoverRotate(firstSharedResourceCardImageView);
+                addHoverRotate(secondSharedResourceCardImageView);
             }
         });
     }
@@ -170,7 +168,9 @@ public class GUIControllerGame extends GUIController {
                 Text nicknameText = new Text(currentPlayerNickname);
                 Button expandButton = new Button("Expand Board");
                 expandButton.setOnMousePressed(mouseEvent -> {
-                    goToScene("/fxml/board.fxml", getViewModel(), new String[]{"" + playerId});
+                    HashMap<String, Integer> paramsMap = new HashMap<>();
+                    paramsMap.put("playerId", playerId);
+                    goToScene("/fxml/board.fxml", paramsMap);
                 });
                 infoContainerVBox.getChildren().addAll(nicknameText, expandButton);
                 infoContainerVBox.setAlignment(Pos.CENTER);
@@ -232,7 +232,11 @@ public class GUIControllerGame extends GUIController {
                                 //Circle clickedCircle = new Circle(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 10);
                                 //mainContainerGame.getChildren().removeIf(n -> n instanceof Circle);
                                 //mainContainerGame.getChildren().add(clickedCircle);
-                                goToScene("/fxml/board.fxml", getViewModel(), new String[]{"" + meId});
+                                HashMap<String, Integer> paramsMap = new HashMap<>();
+                                paramsMap.put("playerId", meId);
+                                paramsMap.put("cardId", cardId);
+                                paramsMap.put("cornerId", cornerId);
+                                goToScene("/fxml/board.fxml", paramsMap);
                             }
                         });
                     }
@@ -320,11 +324,9 @@ public class GUIControllerGame extends GUIController {
                     getViewModel().getSharedResourceCards()[1],
                     getViewModel().getObjectives()[0],
                     getViewModel().getObjectives()[1],
-                    getViewModel().getObjectives()[2]); // !!! get the right secret objective
+                    getViewModel().getObjectives()[2]);
 
-            highlightCurrentPlayerTable(getViewModel().getCurrentPlayer(), getViewModel().getColorsMap(getViewModel().getCurrentPlayer())); // !!! make it work
-
-            this.setViewModel(getViewModel());
+            highlightCurrentPlayerTable(getViewModel().getCurrentPlayer(), getViewModel().getColorsMap(getViewModel().getCurrentPlayer()));
         });
     }
 
