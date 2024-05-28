@@ -3,14 +3,19 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import com.google.gson.Gson;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.Event;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.time.Instant;
 import java.util.*;
 
 public class CLIController {
@@ -219,40 +224,10 @@ public class CLIController {
     }
 
     public ArrayList<String> getPrintedCard(int cardId, Side side) {
-        String filePath = new File("").getAbsolutePath();
-        String jsonString = null;
         ArrayList<String> cardToPrint = null;
-        try {
-            jsonString = Populate.readJSON(filePath + Config.CARD_JSON_PATH);
-        } catch (IOException e) {
-            System.out.print("Error while loading image, pls try again");
-        }
-        Gson gson = new Gson();
-        Map cards = gson.fromJson(jsonString, Map.class);
+        Card card = viewModel.cardById(cardId);
+        return cardToPrint = printCard(card, side);
 
-
-        for (Object key : cards.keySet()){
-            Map card = gson.fromJson(cards.get(key).toString(), Map.class);
-            int id = Integer.parseInt(key.toString());
-
-            if (id == cardId){
-                switch (card.get("Type").toString()){
-                    case "Objective":
-                        cardToPrint = printObjectiveCard(card);
-                        break;
-                    case "Resource":
-                        cardToPrint = printResourceCard(card, side);
-                        break;
-                    case "Gold":
-                        cardToPrint = printGoldCard(card, side);
-                        break;
-                    case "Starter":
-                        cardToPrint = printStarterCard(card, side);
-                        break;
-                }
-            }
-        }
-        return cardToPrint;
     }
 
     public void printBoard(ArrayList<ArrayList<Integer>> board, ArrayList<Integer> cardsOrder){
@@ -262,13 +237,21 @@ public class CLIController {
         String openString = "", closeString = "";
         ArrayList<ArrayList<Integer>> rotatedBoard = new ArrayList<>();
         ArrayList<ArrayList<String>> printedBoard = new ArrayList<>();
+        ArrayList<String> cardList  = new ArrayList<>();
+        ArrayList<String> cardToPrint = new ArrayList<>();
 
+        for(i = 0; i < 7; i++){
+            cardList.add("");
+        }
         //initialize rotatedBoard
-        //todo: ensures that the board is complete (rows of the same lenght) ora change initialization
-        for(i = 0; i < board.size() + 2; i++){
+        int a = board.size();
+        int b = board.get(0).size();
+        int c = a+b;
+
+        for(i = 0; i < c; i++){
             rotatedBoard.add(new ArrayList<>());
-            for(j  = 0; j < board.get(0).size() + 2; j++){
-                rotatedBoard.get(i).add(-1);
+            for(j  = 0; j < c; j++){
+                rotatedBoard.get(i).add(0);
             }
         }
         //initialize printedBoard
@@ -283,13 +266,17 @@ public class CLIController {
         //rotate board of 45°
         int centeri = (int)Math.floor((double) board.size()/2);
         int centerj = (int)Math.floor((double) board.get(0).size()/2);
+        int rcenteri = (int)Math.floor((double) rotatedBoard.size()/2);
+        int rcenterj = (int)Math.floor((double) rotatedBoard.get(0).size()/2);
+
         for(i = 0; i < board.size(); i++){
             for(j = 0; j < board.get(i).size(); j++){
                 irel = i - centeri;
                 jrel = j - centerj;
-                rotatedBoard.get(centeri + i - jrel).set(centerj + j + irel, board.get(i).get(j));
+                rotatedBoard.get(rcenteri - centeri + i - jrel).set(rcenterj -centerj + j + irel, board.get(i).get(j));
             }
         }
+
         for(int k = 0; k < cardsOrder.size(); k++){
             found = false;
             //search the id idexes in the rotatedBoard
@@ -305,7 +292,7 @@ public class CLIController {
             u = 2*i;
             v = 2*j;
 
-            openString =ColorPrint.BLACK.toString() + ColorPrint.byIndex(i+10).toString();
+            openString =ColorPrint.BLACK.toString() + ColorPrint.byIndex((int)(Math.floor((double) cardsOrder.get(k)/20) +1)).toString();
             closeString = ColorPrint.RESET.toString();
             for(int n = 0; n < 3; n++){
                 for(int m = 0; m < 3; m++){
@@ -319,12 +306,30 @@ public class CLIController {
                     }
                 }
             }
+            Card card = viewModel.cardById(cardsOrder.get(k));
+            cardToPrint = printCard(card, viewModel.getPlacedCardSide(cardsOrder.get(k)));
+            for(i = 0; i < cardList.size(); i++){
+                cardList.get(i).concat(openString + " " + cardToPrint.get(i) + closeString);
+            }
         }
+        for(i = 0; i < printedBoard.size(); i++){
+            for (j = 0; j < printedBoard.get(i).size(); j++){
+                System.out.print(printedBoard.get(i).get(j));
+            }
+            System.out.println();
+        }
+        for (i = 0; i < cardToPrint.size(); i++){
+            System.out.println(cardToPrint);
+        }
+
     }
 
-    private static ArrayList<String> printObjectiveCard(Map card) {
+    private static ArrayList<String> printCard(Card card, Side side){
+        return new ArrayList<>();
+    }
+    private static ArrayList<String> printCard(ObjectiveCard card, Side side) {
         // attributes
-        String points;
+        int points;
         ArrayList<Element> elementChallenge = null;
         Element[][] structureChallenge = null;
         String elementString = "";
@@ -335,34 +340,33 @@ public class CLIController {
         int irel = 0, jrel = 0;
 
         // set points
-        points = card.get("Points").toString();
-
+        points = card.getPoints();
         // set challenge
-        if (card.get("ChallengeType").equals("StructureChallenge")) {
+        if (card.getChallenge() instanceof StructureChallenge) {
             Element[][] configuration = new Element[Config.N_STRUCTURE_CHALLENGE_CONFIGURATION][Config.N_STRUCTURE_CHALLENGE_CONFIGURATION];
             for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++) {
                 for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++) {
-                    configuration[i][j] = Element.valueOf(((ArrayList) card.get("Structure")).get(3 * i + j).toString().toUpperCase());
+                    configuration[i][j] = ((StructureChallenge) card.getChallenge()).getConfiguration()[i][j];
                 }
             }
             structureChallenge = configuration;
-        } else if (card.get("ChallengeType").equals("ElementChallenge")) {
+        } else if (card.getChallenge() instanceof ElementChallenge) {
             ArrayList<Element> elements = new ArrayList<>();
-            for (Object e : (ArrayList) card.get("ChallengeElements")) {
+            for (Object e : ((ElementChallenge) card.getChallenge()).getElements()) {
                 elements.add(Element.valueOf(e.toString().toUpperCase()));
             }
             elementChallenge = elements;
         }
         //printing objects settings
 
-        if(card.get("ChallengeType").equals("ElementChallenge")) {
+        if(card.getChallenge() instanceof ElementChallenge) {
             for (Element e : elementChallenge) {
                 elementString = " " + elementString + e.toString().substring(0, 3).toUpperCase();
             }
             if (elementString.startsWith(" ")) {
                 elementString = elementString.substring(1);
             }
-        } else if (card.get("ChallengeType").equals("StructureChallenge")) {
+        } else if (card.getChallenge() instanceof StructureChallenge) {
             challengeMatrix = new ArrayList<ArrayList<String>>();
             for(int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION + 2; i++){
                 challengeMatrix.add(new ArrayList<String>());
@@ -371,7 +375,7 @@ public class CLIController {
                 }
             }
 
-            //rotation of 45° of the structureChallenge
+            //rotation of 45° of the structureChallenge 3x3 -> 5x5
             int centeri = (int)Math.floor((double) Config.N_STRUCTURE_CHALLENGE_CONFIGURATION/2);
             int centerj = (int)Math.floor((double) Config.N_STRUCTURE_CHALLENGE_CONFIGURATION/2);
             //todo testing
@@ -383,22 +387,22 @@ public class CLIController {
                 }
             }
             //remove empty rows and columns
-            resize(challengeMatrix);
+            resizeS(challengeMatrix);
 
         }
-        if (card.get("ChallengeType").equals("ElementChallenge")) {
+        if (card.getChallenge() instanceof ElementChallenge) {
             output.add("+-----------------+");
-            output.add("|" + getFormattedString(17, card.get("ChallengeType").toString().toUpperCase()) + "|");
-            output.add("|" + getFormattedString(17, "points: "+points.toString()) + "|");
+            output.add("|" + getFormattedString(17, "ELEMENT") + "|");
+            output.add("|" + getFormattedString(17, "points: " + points) + "|");
             output.add("|" + getFormattedString(17, "<"+ elementString +">") + "|");
             output.add("|" + getFormattedString(17, "") + "|");
             output.add("|" + getFormattedString(17, "") + "|");
             output.add("+-----------------+");
             //todo testing
-        } else if (card.get("ChallengeType").equals("StructureChallenge")) {
+        } else if (card.getChallenge() instanceof StructureChallenge) {
             output.add("+-----------------+");
-            output.add("|" + getFormattedString(17, card.get("ChallengeType").toString().toUpperCase()) + "|");
-            output.add("|" + getFormattedString(17, "points: "+points.toString()) + "|");
+            output.add("|" + getFormattedString(17, "STRUCTURE") + "|");
+            output.add("|" + getFormattedString(17, "points: " + points) + "|");
             for(int i = 0; i < challengeMatrix.size(); i++){
                 for(int j = 0; j < challengeMatrix.get(i).size(); j++){
                     if(challengeMatrix.get(i).get(j).isEmpty())
@@ -413,28 +417,28 @@ public class CLIController {
         return output;
     }
 
-    private static ArrayList<String> printResourceCard(Map card, Side side){
+    private static ArrayList<String> printCard(ResourceCard card, Side side){
         // attributes
-        String points;
+        int points;
         Element resource;
         Element[] frontCorners = new Element[Config.N_CORNERS];
         Element[] backCorners = new Element[Config.N_CORNERS];
         ArrayList<String> output = new ArrayList<>();
 
         // set points
-        points = card.get("Points").toString();
+        points = card.getPoints();
 
         // set resource
-        resource = Element.valueOf(card.get("Resource").toString().toUpperCase());
+        resource = card.getResourceType();
 
         // set corners
         //for in frontCorners
         for (int i = 0; i < Config.N_CORNERS; i++){
-            frontCorners[i] = Element.valueOf(((ArrayList) card.get("FrontCorners")).get(i).toString().toUpperCase());
+            frontCorners[i] = card.getFrontCorners()[i].getElement();
         }
         //for in backCorners
         for (int i = 0; i < Config.N_CORNERS; i++) {
-            backCorners[i] = Element.valueOf(((ArrayList) card.get("BackCorners")).get(i).toString().toUpperCase());
+            backCorners[i] = card.getBackCorners()[i].getElement();
         }
 
         if (side == Side.BACK){
@@ -443,23 +447,23 @@ public class CLIController {
             output.add("|" + getFormattedString(17, "") + "|");
             output.add("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
             output.add("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) +"|");
-            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "id: "+card.get("id").toString()) +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "id: "+card.getId() +backCorners[2].toString().substring(0, 3).toUpperCase()+"|"));
             output.add("+-----------------+");
         } else{
             output.add("+-----------------+");
-            output.add("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, points)+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|"+frontCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, String.valueOf(points))+frontCorners[1].toString().substring(0, 3).toUpperCase()+"|");
             output.add("|" + getFormattedString(17, "") + "|");
             output.add("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
             output.add("|" + getFormattedString(17, "") + "|");
-            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.get("id").toString())+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|"+frontCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.getId() +frontCorners[2].toString().substring(0, 3).toUpperCase()+"|"));
             output.add("+-----------------+");
         }
         return output;
     }
 
-    private static ArrayList<String> printGoldCard(Map card, Side side){
+    private static ArrayList<String> printCard(GoldCard card, Side side){
         // attributes
-        String points;
+        int points;
         Element resource;
         Element[] frontCorners = new Element[Config.N_CORNERS];
         Element[] backCorners = new Element[Config.N_CORNERS];
@@ -470,27 +474,27 @@ public class CLIController {
         ArrayList<String> output = new ArrayList<>();
 
         // set points
-        points = card.get("Points").toString();
+        points = card.getPoints();
 
         // set resource
-        resource = Element.valueOf(card.get("Resource").toString().toUpperCase());
+        resource = card.getResourceType();
 
         // set corners
         //for in frontCorners
         for (int i = 0; i < Config.N_CORNERS; i++){
-            frontCorners[i] = Element.valueOf(((ArrayList) card.get("FrontCorners")).get(i).toString().toUpperCase());
+            frontCorners[i] = card.getFrontCorners()[i].getElement();
         }
         //for in backCorners
         for (int i = 0; i < Config.N_CORNERS; i++) {
-            backCorners[i] = Element.valueOf(((ArrayList) card.get("BackCorners")).get(i).toString().toUpperCase());
+            backCorners[i] = card.getBackCorners()[i].getElement();
         }
 
         // set challenge
-        if (card.get("ChallengeType").equals("Coverage")){
+        if (card.getChallenge() instanceof CoverageChallenge){
             coverageChallenge = true;
-        } else if (card.get("ChallengeType").equals("ElementChallenge")){
+        } else if (card.getChallenge() instanceof ElementChallenge){
             ArrayList<Element> elements = new ArrayList<>();
-            for (Object e : (ArrayList) card.get("ChallengeElements")) {
+            for (Element e : ((ElementChallenge) card.getChallenge()).getElements()) {
                 elements.add(Element.valueOf(e.toString().toUpperCase()));
             }
             elementChallenge = elements;
@@ -499,7 +503,7 @@ public class CLIController {
         }
 
         // set needed resources
-        for (Object e : (ArrayList) card.get("ResourceNeeded")) {
+        for (Element e :  card.getResourceNeeded()) {
             resourceNeeded.add(Element.valueOf(e.toString().toUpperCase()));
         }
 
@@ -530,21 +534,21 @@ public class CLIController {
             output.add("|" + getFormattedString(17, "") + "|");
             output.add("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
             output.add("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) +"|");
-            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "id: "+card.get("id".toString())) +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "id: "+card.getId()) +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
             output.add("+-----------------+");
         } else{
             output.add("+-----------------+");
-            output.add("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, points)+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|"+frontCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, ""+ points)+frontCorners[1].toString().substring(0, 3).toUpperCase()+"|");
             output.add("|"+ getFormattedString(17, costString)+"|");
             output.add("|"+ getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
             output.add("|"+ getFormattedString(17, challengeString)+"|");
-            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.get("id").toString())+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|"+frontCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.getId())+frontCorners[2].toString().substring(0, 3).toUpperCase()+"|");
             output.add("+-----------------+");
         }
         return output;
     }
 
-    private static ArrayList<String> printStarterCard(Map card, Side side){
+    private static ArrayList<String> printCard(StarterCard card, Side side){
         // attributes
         Element[] frontCorners = new Element[Config.N_CORNERS];
         Element[] backCorners = new Element[Config.N_CORNERS];
@@ -553,15 +557,15 @@ public class CLIController {
         // set corners
         //for in frontCorners
         for (int i = 0; i < Config.N_CORNERS; i++){
-            frontCorners[i] = Element.valueOf(((ArrayList) card.get("FrontCorners")).get(i).toString().toUpperCase());
+            frontCorners[i] = card.getFrontCorners()[i].getElement();
         }
         //for in backCorners
         for (int i = 0; i < Config.N_CORNERS; i++) {
-            backCorners[i] = Element.valueOf(((ArrayList) card.get("BackCorners")).get(i).toString().toUpperCase());
+            backCorners[i] = card.getBackCorners()[i].getElement();
         }
 
         // set center resources
-        for (Object e : (ArrayList) card.get("CenterResources")) {
+        for (Element e : card.getCenterResources()) {
             centerResources.add(Element.valueOf(e.toString().toUpperCase()));
         }
 
@@ -580,7 +584,7 @@ public class CLIController {
             output.add("|" + getFormattedString(17, "") + "|");
             output.add("|" + getFormattedString(17, "") + "|");
             output.add("|" + getFormattedString(17, "") + "|");
-            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.get("id").toString())+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.getId())+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
             output.add("+-----------------+");
         } else{
             output.add("+-----------------+");
@@ -588,7 +592,7 @@ public class CLIController {
             output.add("|" + getFormattedString(17, "") + "|");
             output.add("|"+ getFormattedString(17, centerString) +"|");
             output.add("|" + getFormattedString(17, "") + "|");
-            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.get("id").toString())+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
+            output.add("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "id: "+card.getId())+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
             output.add("+-----------------+");
         }
         return output;
@@ -619,7 +623,8 @@ public class CLIController {
 
 
 
-    private static void resize(ArrayList<ArrayList<String>> matrix){
+
+    private static void resizeS(ArrayList<ArrayList<String>> matrix){
         //remove empty rows
         for(int j = 0; j < matrix.size(); j++){
             Boolean isEmpty = true;
@@ -655,4 +660,42 @@ public class CLIController {
             }
         }
     }
+
+    private static void resizeI(ArrayList<ArrayList<Integer>> matrix){
+        //remove empty rows
+        for(int j = 0; j < matrix.size(); j++){
+            Boolean isEmpty = true;
+            for(int i = 0; i < matrix.get(j).size() && isEmpty; i++){
+                if(!matrix.get(j).get(i).equals(0)){
+                    isEmpty = false;
+                }
+            }
+            if(isEmpty){
+                matrix.remove(j);
+                j--;
+            }
+        }
+        //remove empty columns
+        ArrayList<Boolean> areEmpty = new ArrayList<>();
+        for(int i = 0; i < matrix.get(0).size(); i++){
+            areEmpty.add(true);
+        }
+
+        for(int i = 0; i < matrix.size(); i++){
+            for (int j = 0; j < matrix.get(i).size(); j++){
+                if(!matrix.get(i).get(j).equals(0)){
+                    areEmpty.set(j, false);
+                }
+            }
+        }
+        for(int j = 0; j < areEmpty.size(); j++){
+            if(areEmpty.get(j).equals(true)){
+                areEmpty.remove(j);
+                for(int i = 0; i < matrix.size(); i++){
+                    matrix.get(i).remove(j);
+                }
+            }
+        }
+    }
+
 }

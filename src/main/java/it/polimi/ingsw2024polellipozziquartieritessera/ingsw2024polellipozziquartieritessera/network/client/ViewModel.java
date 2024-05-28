@@ -1,15 +1,23 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.CornerPos;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.GamePhase;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.TurnPhase;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
+import com.google.gson.Gson;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Chat;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ViewModel {
     private int playerIndex;
@@ -22,6 +30,7 @@ public class ViewModel {
     private GamePhase gamePhase;
     private TurnPhase turnPhase;
     private int currentPlayer;
+    private final HashMap<Integer, Card> cardsMap;
     private final HashMap<Integer,ArrayList<Integer>> handsMap; // mappa delle hands dei player
     private final HashMap<Integer,Side> placedSideMap; // side delle carte sulla board (unico per id)
     private final HashMap<Integer,Side> handsSideMap; // side delle carte in mano (unico per id)
@@ -39,11 +48,13 @@ public class ViewModel {
         Arrays.fill(objectives, -1);
         mainBoard = new int[6];
         Arrays.fill(mainBoard, -1);
+        cardsMap = new HashMap<>();
         handsMap = new HashMap<>();
         boardsMap = new HashMap<>();
         connessionMap = new HashMap<>();
         colorsMap = new HashMap<>();
         pointsMap = new HashMap<>();
+        populateCardsMap();
     }
 
     // BASIC SETTER
@@ -158,6 +169,10 @@ public class ViewModel {
 
     public int[] getObjectives() {
         return objectives;
+    }
+
+    public Card cardById(int id){
+        return cardsMap.get(id);
     }
 
     public int[] getCommonObjectiveCards() {
@@ -319,5 +334,108 @@ public class ViewModel {
                 row.add(-1); // Placeholder for empty cell
             }
         }
+    }
+    private void populateCardsMap() {
+        String filePath = new File("").getAbsolutePath();
+        String jsonString = null;
+        try {
+            jsonString = Populate.readJSON(filePath + Config.CARD_JSON_PATH);
+        } catch (IOException e) {
+            System.out.print("Error while loading image, pls try again");
+        }
+        Gson gson = new Gson();
+        Map cards = gson.fromJson(jsonString, Map.class);
+
+
+        for (Object key : cards.keySet()){
+            Map card = gson.fromJson(cards.get(key).toString(), Map.class);
+            int id = Integer.parseInt(key.toString());
+            // ------ creating challenges ------
+            Challenge challenge = createChallenge(card);
+
+            if (card.get("Type").equals("Objective")){
+                if (id < Config.firstObjectiveCardId) Config.firstObjectiveCardId = id;
+                cardsMap.put(id, new ObjectiveCard(id, challenge, (int) Double.parseDouble(card.get("Points").toString())));
+            } else {
+
+                // ------ creating corners ------
+                Corner[] frontCorners = createCorners("FrontCorners", card, id);
+                Corner[] backCorners = createCorners("BackCorners", card, id);
+
+
+                // ------ creating cards ------
+                if (card.get("Type").equals("Resource")){
+                    if (id < Config.firstResourceCardId) Config.firstResourceCardId = id;
+                    ResourceCard resourceCard = new ResourceCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), (int) Double.parseDouble(card.get("Points").toString()), frontCorners, backCorners);
+                    cardsMap.put(id, resourceCard);
+                } else if (card.get("Type").equals("Gold")){
+                    if (id < Config.firstGoldCardId) Config.firstGoldCardId = id;
+                    ArrayList<Element> elements = new ArrayList<>();
+                    for (Object e : (ArrayList) card.get("ResourceNeeded")){
+                        elements.add(Element.valueOf(e.toString().toUpperCase()));
+                    }
+                    GoldCard goldCard = new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements, (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners);
+                    cardsMap.put(id, goldCard);
+                } else if (card.get("Type").equals("Starter")){
+                    if (id < Config.firstStarterCardId) Config.firstStarterCardId = id;
+                    ArrayList<Element> elements = new ArrayList<>();
+                    for (Object e : (ArrayList) card.get("CenterResources")){
+                        elements.add(Element.valueOf(e.toString().toUpperCase()));
+                    }
+                    cardsMap.put(id, new StarterCard(id, frontCorners, backCorners, elements));
+                }
+            }
+        }
+    }
+    private static Challenge createChallenge(Map card) {
+        Challenge challenge = null;
+        if (card.get("Type").equals("Objective") || card.get("Type").equals("Gold")){
+            if (card.get("ChallengeType").equals("ElementChallenge")){
+                ArrayList<Element> elements = new ArrayList<>();
+                for (Object e : (ArrayList) card.get("ChallengeElements")){
+                    elements.add(Element.valueOf(e.toString().toUpperCase()));
+                }
+
+                challenge = new ElementChallenge(elements);
+            } else if (card.get("ChallengeType").equals("StructureChallenge")){
+                Element[][] configuration = new Element[Config.N_STRUCTURE_CHALLENGE_CONFIGURATION][Config.N_STRUCTURE_CHALLENGE_CONFIGURATION];
+                for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
+                    for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
+                        configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(3*i+j).toString().toUpperCase() );
+                    }
+                }
+                try {
+                    challenge = new StructureChallenge(configuration);
+                } catch (WrongStructureConfigurationSizeException e){
+                    System.err.println("error while initializing a structureChallenge");
+                }
+            } else if (card.get("ChallengeType").equals("CoverageChallenge")){
+                challenge = new CoverageChallenge();
+            } else if (card.get("ChallengeType").equals("NoChallenge")){
+
+            } else {
+                System.out.println(card.get("ChallengeType"));
+                throw new RuntimeException(); //sistema
+            }
+        }
+        return challenge;
+    }
+
+    private static Corner[] createCorners(String side, Map card, Integer id){
+        Corner[] corners = new Corner[Config.N_CORNERS];
+        //for in frontCorners
+        for (int i = 0; i < Config.N_CORNERS; i++){
+            String element = ((ArrayList) card.get(side)).get(i).toString();
+            // card.get("FrontCorners")).getClass() returns ArrayList so casting should be good
+            if (element.equals("Empty")){
+                //probably can be removed because it falls in the else clause, also in line 135
+                corners[i] = new Corner(Element.EMPTY, id, false);
+            } else if(element.equals("Hidden")) {
+                corners[i] = new Corner(Element.EMPTY, id, true);
+            } else {
+                corners[i] = new Corner(Element.valueOf(element.toUpperCase()), id, false);
+            }
+        }
+        return corners;
     }
 }
