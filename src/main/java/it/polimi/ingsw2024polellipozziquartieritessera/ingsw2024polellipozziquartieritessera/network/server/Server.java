@@ -151,10 +151,10 @@ public class Server implements VirtualServer {
     }
 
     @Override
-    public void chooseInitialObjective(VirtualView client, int cardId) throws RemoteException {
+    public void chooseInitialObjective(VirtualView client, int index) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.CHOOSEOBJECTIVEPHASE)) {
             int playerIndex = getPlayerIndex(client);
-            this.controller.chooseInitialObjective(playerIndex, cardId);
+            this.controller.chooseInitialObjective(playerIndex, index);
         }
         else{
             client.sendError("You cannot do this action now");

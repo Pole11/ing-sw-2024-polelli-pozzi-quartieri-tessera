@@ -8,12 +8,16 @@ public class StartCommandRunnable extends CommandRunnable{
         try {
             server.startGame(client);
         } catch (RemoteException e) {
-            this.serverDisconnected();
+            this.serverDisconnectedCLI();
         }
     }
 
     @Override
     public void executeGUI() {
-
+        try {
+            server.startGame(client);
+        } catch (RemoteException e) {
+            this.serverDisconnectedGUI();
+        }
     }
 }

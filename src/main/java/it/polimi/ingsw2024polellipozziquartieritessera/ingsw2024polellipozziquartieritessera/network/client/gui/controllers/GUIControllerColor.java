@@ -4,6 +4,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseColorCommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseStarterCommandRunnable;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,13 +42,16 @@ public class GUIControllerColor extends GUIController {
         Platform.runLater(() -> {
             changeMainContainerBorder(color); // TODO: move from here, put it in the client so that the color is changed only one single time
         });
-        try {
+        /*try {
             getServer().chooseInitialColor(getClient(), color);
         } catch (RemoteException e) {
             Platform.runLater(() -> {
                 setServerError("There was an error while choosing the color, please try again");
             });
-        }
+        }*/
+        ChooseColorCommandRunnable command = new ChooseColorCommandRunnable();
+        command.setColor(color);
+        addCommand(command, this);
     }
 
     private void changeMainContainerBorder(Color color) {

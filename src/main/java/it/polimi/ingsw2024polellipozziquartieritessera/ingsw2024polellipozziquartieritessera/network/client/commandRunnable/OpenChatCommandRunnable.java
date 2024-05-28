@@ -8,12 +8,16 @@ public class OpenChatCommandRunnable extends CommandRunnable{
         try {
             server.openChat();
         } catch (RemoteException e) {
-            serverDisconnected();
+            serverDisconnectedCLI();
         }
     }
 
     @Override
     public void executeGUI() {
-
+        try {
+            server.openChat();
+        } catch (RemoteException e) {
+            this.serverDisconnectedGUI();
+        }
     }
 }

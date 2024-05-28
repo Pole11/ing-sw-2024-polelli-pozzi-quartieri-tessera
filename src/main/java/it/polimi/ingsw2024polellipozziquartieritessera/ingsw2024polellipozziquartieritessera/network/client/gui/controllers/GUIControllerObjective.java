@@ -1,5 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseObjectiveCommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseStarterCommandRunnable;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,13 +29,17 @@ public class GUIControllerObjective extends GUIController{
     }
 
     public void handleChooseObjective(int index) {
-        try {
+        /*try {
             getServer().chooseInitialObjective(getClient(), index);
         } catch (RemoteException e) {
             Platform.runLater(() -> {
                 setServerError("There was an error while choosing the initial objective card, please try again");
             });
-        }
+        }*/
+
+        ChooseObjectiveCommandRunnable command = new ChooseObjectiveCommandRunnable();
+        command.setIndex(index);
+        addCommand(command,this);
     }
 
 

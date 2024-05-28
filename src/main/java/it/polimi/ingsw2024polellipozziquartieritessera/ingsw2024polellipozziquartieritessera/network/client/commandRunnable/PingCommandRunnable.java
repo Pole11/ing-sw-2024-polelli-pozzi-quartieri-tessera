@@ -8,12 +8,16 @@ public class PingCommandRunnable extends CommandRunnable{
         try {
             server.ping(client);
         } catch (RemoteException e) {
-            serverDisconnected();
+            serverDisconnectedCLI();
         }
     }
 
     @Override
     public void executeGUI() {
-
+        try {
+            server.ping(client);
+        } catch (RemoteException e) {
+            this.serverDisconnectedGUI();
+        }
     }
 }

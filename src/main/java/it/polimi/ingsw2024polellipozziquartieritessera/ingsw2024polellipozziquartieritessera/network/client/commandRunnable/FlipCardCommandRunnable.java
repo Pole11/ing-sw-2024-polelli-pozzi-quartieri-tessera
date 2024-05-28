@@ -3,6 +3,12 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import java.rmi.RemoteException;
 
 public class FlipCardCommandRunnable extends CommandRunnable{
+    private int cardId;
+
+    public void setCardId(int cardId) {
+        this.cardId = cardId;
+    }
+
     @Override
     public void executeCLI() {
         try {
@@ -16,7 +22,7 @@ public class FlipCardCommandRunnable extends CommandRunnable{
             try {
                 server.flipCard(client, cardId);
             } catch (RemoteException e) {
-                serverDisconnected();
+                serverDisconnectedCLI();
             }
         } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
             System.err.print("INVALID COMMAND\n> ");
@@ -25,6 +31,10 @@ public class FlipCardCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeGUI() {
-
+        try {
+            server.flipCard(client, this.cardId);
+        } catch (RemoteException e) {
+            serverDisconnectedGUI();
+        }
     }
 }

@@ -91,7 +91,7 @@ public class Client implements VirtualView {
     public void runGui(VirtualServer server, VirtualView client){
         meDoGui = true;
         guiApplication = new GUIApplication();
-        guiApplication.runGui(client, server, viewModel);
+        guiApplication.runGui(client, server, this, viewModel);
     }
 
 

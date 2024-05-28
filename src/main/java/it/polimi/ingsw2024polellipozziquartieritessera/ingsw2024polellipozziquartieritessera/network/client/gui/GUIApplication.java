@@ -1,5 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIController;
@@ -18,6 +19,7 @@ public class GUIApplication extends Application {
     private static Stage mainStage;
     private static VirtualView client;
     private static VirtualServer server;
+    private static Client clientContainer;
 
     public GUIController getGUIController() {
         return guiController;
@@ -62,6 +64,7 @@ public class GUIApplication extends Application {
             guiController.setArgs(args);
             guiController.setClient(client);
             guiController.setServer(server);
+            guiController.setClientContainer(clientContainer);
             guiController.setViewModel(viewModel);
         });
     }
@@ -74,6 +77,7 @@ public class GUIApplication extends Application {
         guiController = fxmlLoader.getController();
         guiController.setClient(client);
         guiController.setServer(server);
+        guiController.setClientContainer(clientContainer);
         guiController.setViewModel(viewModel);
         mainStage = stage;
 
@@ -92,10 +96,10 @@ public class GUIApplication extends Application {
         stage.show();
     }
 
-    //public void runGui(GUIControllerOld guiControllerOld) {
-    public void runGui(VirtualView client, VirtualServer server, ViewModel viewModel) {
+    public void runGui(VirtualView client, VirtualServer server, Client clientContainer, ViewModel viewModel) {
         GUIApplication.client = client;
         GUIApplication.server = server;
+        GUIApplication.clientContainer = clientContainer;
         GUIApplication.viewModel = viewModel;
         launch(); // create the UI thread
     }

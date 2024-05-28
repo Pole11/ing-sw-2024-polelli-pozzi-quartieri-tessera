@@ -5,6 +5,12 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 
 public class ChooseColorCommandRunnable extends CommandRunnable{
+    Color color;
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     @Override
     public void executeCLI() {
         try {
@@ -18,7 +24,7 @@ public class ChooseColorCommandRunnable extends CommandRunnable{
             try {
                 server.chooseInitialColor(client, color);
             } catch (RemoteException e) {
-                serverDisconnected();
+                serverDisconnectedCLI();
             }
         } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
             System.err.print("INVALID COMMAND\n> ");
@@ -29,6 +35,11 @@ public class ChooseColorCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeGUI() {
+        try {
+            server.chooseInitialColor(client, this.color);
+        } catch (RemoteException e) {
+            this.serverDisconnectedGUI();
+        }
 
     }
 }

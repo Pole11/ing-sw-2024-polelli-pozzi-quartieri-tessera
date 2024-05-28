@@ -45,7 +45,7 @@ public class PlaceCardCommandRunnable extends CommandRunnable{
             try {
                 server.placeCard(client, placingCardId, tableCardId, tableCornerPos, placingCardSide);
             } catch (RemoteException e) {
-                serverDisconnected();
+                serverDisconnectedCLI();
             }
         } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
             System.err.print("INVALID COMMAND\n> ");
@@ -63,7 +63,7 @@ public class PlaceCardCommandRunnable extends CommandRunnable{
         try {
             server.placeCard(clientContainer.getClient(), placingCardId, tableCardId, tableCornerPos, placingCardSide);
         } catch (RemoteException e) {
-            serverDisconnected();
+            this.serverDisconnectedGUI();
         }
     }
 

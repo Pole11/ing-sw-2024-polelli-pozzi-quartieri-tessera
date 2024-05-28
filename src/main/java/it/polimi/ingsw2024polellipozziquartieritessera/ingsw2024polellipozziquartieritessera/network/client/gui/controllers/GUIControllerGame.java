@@ -1,6 +1,9 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseObjectiveCommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.DrawCardCommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.FlipCardCommandRunnable;
 import javafx.application.*;
 import javafx.fxml.*;
 import javafx.geometry.Orientation;
@@ -243,13 +246,16 @@ public class GUIControllerGame extends GUIController {
     }
 
     public void flipCard(int cardId) {
-        try {
+        /*try {
             getServer().flipCard(getClient(), cardId);
         } catch (RemoteException e) {
             Platform.runLater(() -> {
                 setServerError("There was an error while flipping the card, please try again");
             });
-        }
+        }*/
+        FlipCardCommandRunnable command = new FlipCardCommandRunnable();
+        command.setCardId(cardId);
+        addCommand(command,this);
     }
 
     public void printPrivateObjective(int playerId, int cardId) {
@@ -274,13 +280,16 @@ public class GUIControllerGame extends GUIController {
     }
 
     public void handleDrawCard(DrawType drawType) {
-        try {
+        /*try {
             getServer().drawCard(getClient(), drawType);
         } catch (RemoteException e) {
             Platform.runLater(() -> {
                 setServerError("There was an error while drawing the card, please try again");
             });
-        }
+        }*/
+        DrawCardCommandRunnable command = new DrawCardCommandRunnable();
+        command.setDrawType(drawType);
+        addCommand(command,this);
     }
 
     @Override

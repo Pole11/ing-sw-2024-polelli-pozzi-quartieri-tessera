@@ -1,7 +1,9 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.animation.KeyFrame;
@@ -19,6 +21,7 @@ import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
 import java.net.URL;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +29,11 @@ abstract public class GUIController {
     @FXML private Label serverMessageLabel;
     @FXML private Label serverErrorLabel;
     // add virtual model
+    private final ArrayDeque<CommandRunnable> commandQueue;
+    private Thread executeCommands;
     private VirtualView client; // temp
     private VirtualServer server; // temp
+    private Client clientContainer;
     private ViewModel viewModel;
     private boolean isSceneLoaded = false;
     private String[] args;
@@ -36,6 +42,42 @@ abstract public class GUIController {
     private void initialize() {
         isSceneLoaded = true;
         System.out.println("[DEBUG] Scene is loaded with " + this.getClass());
+    }
+
+    public GUIController() {
+        this.commandQueue = new ArrayDeque();
+        this.executeCommands = new Thread(this::executeCommandsRunnable);
+        this.executeCommands.start();
+    }
+
+    private void executeCommandsRunnable() {
+        while (true) {
+            synchronized (commandQueue) {
+                while (commandQueue.isEmpty()) {
+                    try {
+                        commandQueue.wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+                commandQueue.remove().executeGUI();
+            }
+        }
+    }
+
+    public void addCommand(CommandRunnable command, GUIController guiController) {
+        command.setClient(getClient());
+        command.setServer(getServer());
+        command.setClientContainer(getClientContainer());
+        command.setGuiController(guiController);
+        ArrayDeque<CommandRunnable> commandQueue = getCommandQueue();
+        synchronized (commandQueue) {
+            commandQueue.addLast(command);
+            commandQueue.notifyAll();
+        }
+    }
+
+    public ArrayDeque<CommandRunnable> getCommandQueue() {
+        return commandQueue;
     }
 
     public boolean isSceneLoaded() {
@@ -66,6 +108,14 @@ abstract public class GUIController {
 
     public void setServer(VirtualServer server) {
         this.server = server;
+    }
+
+    public Client getClientContainer() {
+        return clientContainer;
+    }
+
+    public void setClientContainer(Client clientContainer) {
+        this.clientContainer = clientContainer;
     }
 
     public Label getServerMessageLabel() {

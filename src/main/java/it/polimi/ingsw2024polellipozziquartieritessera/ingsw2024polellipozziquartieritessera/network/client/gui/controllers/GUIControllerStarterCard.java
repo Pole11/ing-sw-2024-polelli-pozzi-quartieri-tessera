@@ -1,6 +1,8 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseStarterCommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.StartCommandRunnable;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,13 +28,17 @@ public class GUIControllerStarterCard extends GUIController {
     }
 
     private void handleChooseSideStarter(Side side) {
-        try {
+        /*try {
             getServer().chooseInitialStarterSide(getClient(), side);
         } catch (RemoteException e) {
             Platform.runLater(() -> {
                 setServerError("There was an error while choosing the side of the starter card, please try again");
             });
-        }
+        }*/
+
+        ChooseStarterCommandRunnable command = new ChooseStarterCommandRunnable();
+        command.setSide(side);
+        addCommand(command, this);
     }
 
     public void setStarterCardImage(int id) {
