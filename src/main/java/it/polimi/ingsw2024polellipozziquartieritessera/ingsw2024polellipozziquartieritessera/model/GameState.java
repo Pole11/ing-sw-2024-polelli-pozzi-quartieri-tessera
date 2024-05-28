@@ -1,13 +1,16 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class GameState {
     private final HashMap<Integer, Card> cardsMap;
@@ -16,37 +19,58 @@ public class GameState {
     private final Chat chat;
 
     private final ArrayList<Player> players; //player[0] is blackPlayer
-    private final ArrayList<Boolean> playersConnected; //player[0] is blackPlayer
     private int currentPlayerIndex;
 
     private GamePhase currentGamePhase;
     private TurnPhase currentGameTurn;
 
-    private Boolean isLastTurn;
+    private final ArrayDeque<Event> eventQueue;
+    private Thread executeEvents;
+    private final HashMap<Integer, Boolean> answered;
+    private Thread pingThread;
+    ArrayList<Thread> playerThreads = new ArrayList<>();
+
+    private Thread timeoutThread;
+    private GamePhase prevGamePhase;
+
+    private int turnToPlay;
 
 
     // CONSTRUCTOR
     public GameState() {
         this.cardsMap = new HashMap<>();
-        this.playersConnected = new ArrayList<>();
+
+        this.mainBoard = new Board();
+        this.chat = new Chat();
 
         this.players = new ArrayList<>();
         this.currentPlayerIndex = 0;
+
         this.currentGamePhase = GamePhase.NICKNAMEPHASE;
         this.currentGameTurn = TurnPhase.PLACINGPHASE;
-        this.chat = new Chat();
-        this.isLastTurn = false;
+        this.prevGamePhase = null;
 
-        this.mainBoard = new Board();
+        this.eventQueue = new ArrayDeque<>();
+
+        this.timeoutThread = null;
+
+        this.executeEvents = new Thread(this::executeEventsRunnable);
+        this.executeEvents.start();
+
+        this.pingThread = new Thread(this::pingThreadRunnable);
+        pingThread.start();
+
+        this.answered = new HashMap<>();
+        resetAnswered();
+
+        //cambia in intMax
+        this.turnToPlay = 1;
+
     }
 
     // GETTER
     public Board getMainBoard() {
         return mainBoard;
-    }
-
-    public ArrayList<Player> getPlayers() {
-        return players;
     }
 
     public Chat getChat() {
@@ -73,6 +97,14 @@ public class GameState {
         return cardsMap.get(cardId);
     }
 
+    public int getPlayersSize() {
+        return this.players.size();
+    }
+
+    public ArrayDeque<Event> getEventQueue() {
+        return eventQueue;
+    }
+
     // SETTER
     public void setCurrentPlayerIndex(int currentPlayerIndex) {
         this.currentPlayerIndex = currentPlayerIndex;
@@ -86,47 +118,279 @@ public class GameState {
         this.currentGameTurn = currentGameTurn;
     }
 
-
-    //ADDER
+    //ADDER/REMOVER
 
     public void addCardToCardsMap(int cardId, Card card) {
         this.cardsMap.put(cardId, card);
     }
 
-
-    // METHODS
-
-    //------disconnections managing-------------
-
-
-    public void setPlayersConnected(int index, boolean connected){
-        playersConnected.set(index, Boolean.valueOf(connected));
+    public void addToEventQueue(Event event) {
+        this.eventQueue.add(event);
     }
 
-    public boolean isConnected(int index){
-        return playersConnected.get(index);
+    public void decrementTurn() {
+        this.turnToPlay--;
     }
 
+    //EVENTQUEUE
 
+    //even if there aren't always 4 players
+    private void resetAnswered() {
+        this.answered.put(0, false);
+        this.answered.put(1, false);
+        this.answered.put(2, false);
+        this.answered.put(3, false);
+    }
 
-    public void setPlayer(int index, Player player) throws NotUniquePlayerNicknameException{
-        for (int j = 0; j < players.size(); j++) {
-            if (player.getNickname().equals(players.get(j).getNickname())) {
-                throw new NotUniquePlayerNicknameException("nickame already used");
+    private int numberAnswered() {
+        //controllare se funziona
+        return this.answered.values().stream().mapToInt(e -> e ? 1 : 0).sum();
+    }
+
+    private void executeEventsRunnable() {
+        while (true) {
+            synchronized (eventQueue) {
+                while (eventQueue.isEmpty()) {
+                    try {
+                        eventQueue.wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+                eventQueue.remove().execute();
             }
         }
-        players.add(index, player);
-        playersConnected.add(true);
-    }
-
-    public int getPlayersSize(){
-        return players.size();
     }
 
 
+    public ArrayList<VirtualView> singleClient(VirtualView client) {
+        ArrayList<VirtualView> clients = new ArrayList<>();
+        clients.add(client);
+        return clients;
+    }
+
+    public ArrayList<VirtualView> otherClients(VirtualView client) {
+        ArrayList<VirtualView> clients = new ArrayList<>();
+        for (Player playerIterator : players) {
+            if (playerIterator.isConnected() && !client.equals(playerIterator.getClient())) {
+                clients.add(playerIterator.getClient());
+            }
+        }
+        return clients;
+    }
+
+    public ArrayList<VirtualView> allClients() {
+        return (ArrayList<VirtualView>) players.stream().filter(Player::isConnected).map(Player::getClient).collect(Collectors.toList());
+    }
 
 
-    //------------ Starting Phases setter --------------------
+    //DISCONNECTIONS
+
+    public void pingThreadRunnable() {
+        while (true) {
+            updatePlayersConnected();
+            int i = 0;
+            for (Thread playerThread : playerThreads) {
+                int finalI = i;
+                playerThread = new Thread(() -> {
+                    int j = finalI;
+                    try {
+                        //wait for the answare of players
+                        Thread.sleep(1000 * 3);
+                    } catch (InterruptedException e) {
+                    }
+                    synchronized (players) {
+                        players.get(j).setConnected(false);
+                        players.notifyAll();
+                    }
+                });
+                playerThread.start();
+                i++;
+            }
+
+            try {
+                //wait to ping another time
+                Thread.sleep(1000 * 5);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    public void pingAnswere(VirtualView client) {
+        synchronized (players) {
+            playerThreads.get(getPlayerIndex(client)).interrupt();
+            players.get(getPlayerIndex(client)).setConnected(true);
+            players.notifyAll();
+        }
+    }
+
+    public void setPlayersConnected(int index, boolean connected) {
+        players.get(index).setConnected(connected);
+        players.get(index).setClient(null);
+    }
+
+    private void manageReconnection(Player player) {
+        synchronized (players) {
+            player.setConnected(true);
+            players.notifyAll();
+        }
+        restoreView(player.getClient());
+        if (this.currentGamePhase.equals(GamePhase.TIMEOUT)) {
+            this.timeoutThread.interrupt();
+            currentGamePhase = prevGamePhase;
+            prevGamePhase = null;
+        }
+    }
+
+
+    public void restoreView(VirtualView client) {
+        //send everything to client
+    }
+
+
+    public void playerDisconnected() {
+        long numberConnected;
+        synchronized (players) {
+            numberConnected = players.stream().filter(Player::isConnected).count();
+            players.notifyAll();
+        }
+        if (numberConnected == 1) {
+            this.prevGamePhase = currentGamePhase;
+            this.currentGamePhase = GamePhase.TIMEOUT;
+            timeoutThread = new Thread(() -> {
+                try {
+                    Thread.sleep(60 * 1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            timeoutThread.start();
+        } else if (numberConnected == 0) {
+            //chiedere specifica
+        }
+    }
+
+    public void changeCurrentPlayer() {
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        //check for disconnetions
+        for (int i = 0; i < players.size(); i++) {
+            if (!getPlayer(getCurrentPlayerIndex()).isConnected()) {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+            } else {
+                break;
+            }
+        }
+        synchronized (eventQueue) {
+            eventQueue.add(new UpdateCurrentPlayer(this, allClients(), currentPlayerIndex));
+            eventQueue.notifyAll();
+        }
+        //TODO: capire se va bene decrementare di 1 in ogni caso
+        if (currentGamePhase.equals(GamePhase.ENDPHASE)) {
+            turnToPlay--;
+        }
+        playerDisconnected();
+
+    }
+
+    private void updatePlayersConnected() {
+        players.stream().map(Player::getClient).forEach(e -> {
+            eventQueue.add(new PingEvent(this, allClients()));
+            eventQueue.notifyAll();
+        });
+    }
+
+
+    //PLAYERS MANAGING
+
+    public Player getCurrentPlayer() {
+        return players.get(this.currentPlayerIndex);
+    }
+
+    public Player getBlackPlayer() {
+        return this.players.getFirst();
+    }
+
+    public Integer getPlayerIndex(VirtualView client) {
+        int i = 0;
+        for (Player playerIterator : this.players) {
+            if (playerIterator.getClient().equals(client)) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+
+    public Integer getPlayerIndex(Player player) {
+        int i = 0;
+        for (Player playerIterator : this.players) {
+            if (playerIterator.equals(player)) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+
+
+    public void addPlayer(String nickname, VirtualView client) {
+        Player player = new Player(nickname, client, this);
+        //TODO: CONTROLLA se salta i null
+        List<VirtualView> clients = allClients();
+        System.out.println("CLIENTS:" + clients.size());
+        if (clients.size() >= Config.MAX_PLAYERS) {
+            synchronized (eventQueue) {
+                eventQueue.add(new ErrorEvent(this, singleClient(client), "The game is full"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+        if (clients.contains(client)) {
+            synchronized (eventQueue) {
+                eventQueue.add(new ErrorEvent(this, singleClient(client), "You already chose a nickname, you cannot change it"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+
+        for (int j = 0; j < players.size(); j++) {
+            if (player.getNickname().equals(players.get(j).getNickname())) {
+                //takes for granted that player connection is updated
+                //if the player is not connected but the gameState doesn't know, the following code fails
+                if (!players.get(j).isConnected()) {
+                    player.setClient(client);
+                    this.manageReconnection(player);
+                    synchronized (eventQueue) {
+                        //only to the client
+                        eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), this.currentGamePhase));
+                        //to all the other clients says that a client reconnected
+                        eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player, true));
+                        eventQueue.notifyAll();
+                    }
+                } else {
+                    //only to the client
+                    synchronized (eventQueue) {
+                        eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The nickname is already used, please choose another one"));
+                        eventQueue.notifyAll();
+                    }
+                }
+                return;
+            }
+        }
+        players.add(player);
+        synchronized (eventQueue) {
+            eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
+            eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
+            //to all the other clients gives the nickname so that they can execute their model
+            eventQueue.add(new NicknameEvent(this, otherClients(player.getClient()), getPlayerIndex(player), player.getNickname()));
+            for (Player playerIterator : players) {
+                eventQueue.add(new NicknameEvent(this, singleClient(player.getClient()), getPlayerIndex(playerIterator), playerIterator.getNickname()));
+            }
+            eventQueue.notifyAll();
+        }
+    }
+
+
+    //STARTING PHASE SETTERS
 
 
     // I: start game / set phase
@@ -144,20 +408,50 @@ public class GameState {
     // un giocatore randomico per essere il blackPlayer (al momento sembra superflua)
 
 
-    public void startPhaseMethod() throws EmptyDeckException {
+    public void startGame(VirtualView client) throws EmptyDeckException {
+        ArrayList<VirtualView> clients = allClients();
+        if (!clients.contains(client)) {
+            synchronized (eventQueue) {
+                eventQueue.add(new ErrorEvent(this, singleClient(client), "Please register before starting the game"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+        if (clients.size() < 2) {
+            if (clients.contains(client)) {
+                synchronized (eventQueue) {
+                    eventQueue.add(new ErrorEvent(this, singleClient(client), "Number of player insufficient"));
+                    eventQueue.notifyAll();
+                }
+            } /*else { //NON CAPISCO A COSA SERVA QUESTO CODICE
+                client.sendError("You must choose your nickname with adduser first");
+            }*/
+            return;
+        }
+
         this.mainBoard.shuffleCards();
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
+        synchronized (eventQueue) {
+            eventQueue.add(new updateMainBoardEvent(this, allClients(), mainBoard));
+            eventQueue.notifyAll();
+        }
         this.initStarters(); // set the starters cards for every player
+        System.out.println("Starting game");
+        this.currentGamePhase = GamePhase.CHOOSESTARTERSIDEPHASE;
+        synchronized (eventQueue) {
+            //eventQueue.add(new StartEvent(this, allClients()));
+            eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSESTARTERSIDEPHASE));
+            eventQueue.notifyAll();
+        }
     }
 
     public void initStarters() {
         // for every player set his starters (you have access to every player from the array players)
-        ArrayList<Player> players = getPlayers();
 
         Set<Integer> randomKeysSet = new HashSet<>(); // a set has no duplicates
         // Generate four different random numbers
-        while (randomKeysSet.size() < getPlayers().size()) {
+        while (randomKeysSet.size() < players.size()) {
             int randomNumber = Config.firstStarterCardId + ThreadLocalRandom.current().nextInt(Config.STARTERQTY); // Adjust range as needed
             randomKeysSet.add(randomNumber);
         }
@@ -170,46 +464,105 @@ public class GameState {
         }
     }
 
-    public void setStarterSide(int playerIndex, Side side){
-        Player player = getPlayerByIndex(playerIndex);
-        player.addToPlacedCardsMap(player.getStarterCard().getId(), side);
+    public void setStarterSide(int playerIndex, Side side) {
+        Player player = this.players.get(playerIndex);
+        if (this.answered.get(playerIndex)) {
+            synchronized (eventQueue) {
+                eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "You already selected the starter card"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+        StarterCard playerStarterCard = player.getStarterCard();
+        //doesn't call updateBoard because the boardMatrix already has the card (without the side)
+        player.addToPlacedCardsMap(playerStarterCard.getId(), side);
+
+        synchronized (eventQueue) {
+            eventQueue.add(new UpdateStarterCardEvent(this, allClients(), playerIndex, playerStarterCard.getId(), side));
+            eventQueue.notifyAll();
+        }
 
         // add the initial elements of the starter card
         for (Element ele : player.getStarterCard().getUncoveredElements(side)) {
-            int currentOccurencies = player.getAllElements().get(ele);
-            player.addToAllElements(ele, currentOccurencies + 1);
+            int currentOccurrences = player.getAllElements().get(ele);
+            player.addToAllElements(ele, currentOccurrences + 1);
+        }
+
+
+        this.answered.put(playerIndex, true);
+        System.out.println("someone chose his startercard, the number of ansewred is: " + numberAnswered());
+        //notify him and all the others about the change
+        if (numberAnswered() == players.size()) {
+            System.out.println("everyone answred");
+            this.currentGamePhase = GamePhase.CHOOSECOLORPHASE;
+            synchronized (eventQueue) {
+                eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSECOLORPHASE));
+                eventQueue.notifyAll();
+            }
+            resetAnswered();
         }
     }
 
-    public void setColor(int playerIndex, Color color) throws NotUniquePlayerColorException {//method called by view when the player chooses the side
+    public void setColor(int playerIndex, Color color) {//method called by view when the player chooses the side
+        Player player = this.players.get(playerIndex);
+        if (this.answered.get(playerIndex)) {
+            synchronized (eventQueue) {
+                eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "You already selected the color"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+
         for (int j = 0; j < players.size(); j++) {
             if (color.equals(players.get(j).getColor())) {
-                throw new NotUniquePlayerColorException("While creating the GameState Object I encountered a problem regarding the creation of players with the same color");
+                synchronized (eventQueue) {
+                    eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The color was already selected by another user, please select a new one"));
+                    eventQueue.notifyAll();
+                }
+                return;
+
             }
         }
-        Player player = getPlayerByIndex(playerIndex);
         player.setColor(color);
+        this.answered.put(playerIndex, true);
+
+        if (numberAnswered() == players.size()) {
+            resetAnswered();
+            try {
+                //send also the cards to the view
+                this.setHands();
+            } catch (EmptyDeckException e) {
+                // if in this moment of the game the deck is empty it's a programming mistake
+                throw new RuntimeException(e);
+            }
+            //send also the cards to the view
+            this.setObjectives();
+            this.currentGamePhase = GamePhase.CHOOSEOBJECTIVEPHASE;
+            synchronized (eventQueue) {
+                eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSEOBJECTIVEPHASE));
+                eventQueue.notifyAll();
+            }
+        }
     }
 
     public void setHands() throws EmptyDeckException {
         // popolate hands for every player
-        for (int i = 0; i < getPlayers().size(); i++) {
+        for (int i = 0; i < players.size(); i++) {
             GoldCard goldCard = mainBoard.drawFromGoldDeck();
             ResourceCard resourceCard1 = mainBoard.drawFromResourceDeck();
             ResourceCard resourceCard2 = mainBoard.drawFromResourceDeck();
 
-
-            getPlayers().get(i).addToHandCardsMap(goldCard.getId(), Side.FRONT); // default is front side
-            getPlayers().get(i).addToHandCardsMap(resourceCard1.getId(), Side.FRONT); // default is front side
-            getPlayers().get(i).addToHandCardsMap(resourceCard2.getId(), Side.FRONT); // default is front side
+            players.get(i).addToHandCardsMap(goldCard.getId(), Side.FRONT); // default is front side
+            players.get(i).addToHandCardsMap(resourceCard1.getId(), Side.FRONT); // default is front side
+            players.get(i).addToHandCardsMap(resourceCard2.getId(), Side.FRONT); // default is front side
         }
     }
 
     //set SecretObjectiveOptions and SharedObjectiveCards
-    public void setObjectives(){
+    public void setObjectives() {
         Set<Integer> randomKeysSet = new HashSet<>(); // a set has no duplicates
         // Generate four different random numbers
-        while (randomKeysSet.size() < 2 * getPlayers().size() + 2) { // 2 for each player and 2 shared
+        while (randomKeysSet.size() < 2 * players.size() + 2) { // 2 for each player and 2 shared
             int randomNumber = Config.firstObjectiveCardId + ThreadLocalRandom.current().nextInt(Config.OBJECTIVEQTY); // Adjust range as needed
             randomKeysSet.add(randomNumber);
         }
@@ -217,7 +570,7 @@ public class GameState {
         ArrayList<Integer> randomKeysList = new ArrayList<>(randomKeysSet); // convert to a list to iterate
         for (int i = 0; i < players.size(); i++) {
             ObjectiveCard objectiveCard0 = (ObjectiveCard) cardsMap.get(randomKeysList.get(i));
-            ObjectiveCard objectiveCard1 = (ObjectiveCard) cardsMap.get(randomKeysList.get(i + getPlayers().size()));
+            ObjectiveCard objectiveCard1 = (ObjectiveCard) cardsMap.get(randomKeysList.get(i + players.size()));
             ObjectiveCard[] objectiveCards = new ObjectiveCard[2];
             objectiveCards[0] = objectiveCard0;
             objectiveCards[1] = objectiveCard1;
@@ -225,141 +578,58 @@ public class GameState {
             players.get(i).setSecretObjectiveCardOptions(objectiveCards);
         }
 
-        mainBoard.setSharedObjectiveCard(0, (ObjectiveCard) cardsMap.get(randomKeysList.get(randomKeysList.size() - 2)));
-        mainBoard.setSharedObjectiveCard(1, (ObjectiveCard) cardsMap.get(randomKeysList.getLast()));
+        ObjectiveCard objectiveCard0 = (ObjectiveCard) cardsMap.get(randomKeysList.get(randomKeysList.size() - 2));
+        ObjectiveCard objectiveCard1 = (ObjectiveCard) cardsMap.get(randomKeysList.getLast());
+
+        mainBoard.setSharedObjectiveCard(0, objectiveCard0);
+        mainBoard.setSharedObjectiveCard(1, objectiveCard1);
+        ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();
+        sharedObjectives.add(objectiveCard0);
+        sharedObjectives.add(objectiveCard1);
+
+        synchronized (eventQueue) {
+            eventQueue.add(new UpdateSharedObjectiveEvent(this, allClients(), sharedObjectives));
+            eventQueue.notifyAll();
+        }
     }
 
 
     //called from controller
-    public void setSecretObjective (int playerIndex, int cardIndex) throws InvalidObjectiveCardException {
-        Player player = getPlayerByIndex(playerIndex);
-        if (cardIndex == 0 || cardIndex == 1){
-            player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
-        } else {
-            throw new InvalidObjectiveCardException("The card choosen was not in the options list");
+    public void setSecretObjective(int playerIndex, int cardIndex) {
+        Player player = this.players.get(playerIndex);
+        if (this.answered.get(playerIndex)) {
+            synchronized (eventQueue) {
+                eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "You already selected the objective card"));
+                eventQueue.notifyAll();
+            }
+            return;
         }
-    }
 
-//-------------------EndGame---------------------
+        if (cardIndex != 0 && cardIndex != 1) {
+            synchronized (eventQueue) {
+                eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The card chosen was not in the options list"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
 
-    public boolean isGameEnded() {
-        // 20 points?
-        for (int i = 0; i < this.getPlayers().size(); i++) {
-            if (this.getPlayers().get(i).getPoints() >= Config.POINTSTOENDPHASE) {
-                return true;
+        player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
+        this.answered.put(playerIndex, true);
+
+        if (numberAnswered() == players.size()) {
+            resetAnswered();
+            currentGamePhase = GamePhase.MAINPHASE;
+            synchronized (eventQueue) {
+                eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.MAINPHASE));
+                eventQueue.add(new UpdateCurrentPlayer(this, allClients(), currentPlayerIndex));
+                eventQueue.notifyAll();
             }
         }
-        // cards ended?
-        if (this.getMainBoard().isResourceDeckEmpty()) {
-            return true;
-        }
-        return this.getMainBoard().isGoldDeckEmpty();
-    }
-
-    void calculateFinalPoints() throws CardNotPlacedException, WrongInstanceTypeException {
-        ObjectiveCard sharedCard1 = this.mainBoard.getSharedObjectiveCard(0);
-        ObjectiveCard sharedCard2 = this.mainBoard.getSharedObjectiveCard(1);
-
-        for (int i = 0; i < this.getPlayers().size(); i++) {
-            Player player = this.getPlayers().get(i);
-            ObjectiveCard objCard = player.getObjectiveCard();
-
-            int points = 0;
-
-            points += objCard.calculatePoints(player);
-            points += sharedCard1.calculatePoints(player);
-            points += sharedCard2.calculatePoints(player);
-
-            this.getPlayers().get(i).addPoints(points);
-        }
-    }
-
-    public ArrayList<Integer> getWinnerPlayerIndex() throws GameIsNotEndedException {
-        int maxPoints = 0;
-        ArrayList<Integer> winnerPlayerIndeces = new ArrayList<>();
-        boolean playerReachedPoints = false;
-        for (int i = 0; i < this.getPlayers().size(); i++) {
-            if (this.getPlayers().get(i).getPoints() >= Config.POINTSTOENDPHASE){
-                playerReachedPoints = true;
-            }
-            if (this.getPlayers().get(i).getPoints() > maxPoints) {
-                winnerPlayerIndeces = new ArrayList<>();
-                winnerPlayerIndeces.add(i);
-                maxPoints = this.getPlayers().get(i).getPoints();
-            } else if (this.getPlayers().get(i).getPoints() == maxPoints) {
-                winnerPlayerIndeces.add(i);
-            }
-        }
-        if (!playerReachedPoints){
-            throw new GameIsNotEndedException("You called getWinnerPlayerIndex even if the game is not ended, no one is at 20 points");
-        }
-
-        // now winnerPlayerIndeces contains who has the maximum number of points
-        // decide the real winner if there is a draw
-        ArrayList<Integer> winnerObjectives = new ArrayList<>();
-        if (winnerPlayerIndeces.size() > 1) {
-            int mostObjectivesWins = -1;
-            for (int i=0; i<winnerPlayerIndeces.size(); i++) {
-                if (this.getPlayers().get(i).getObjectivesWon() > mostObjectivesWins){
-                    winnerObjectives.clear();
-                    winnerObjectives.add(i);
-                    mostObjectivesWins = this.getPlayers().get(i).getObjectivesWon();
-                }
-                else if (this.getPlayers().get(i).getObjectivesWon() == mostObjectivesWins){
-                    winnerObjectives.add(i);
-                }
-            }
-            winnerPlayerIndeces = winnerObjectives;
-        }
-        return(winnerPlayerIndeces);
-    }
-
-//---------------Player managing----------------------
-
-    // return the current player
-    public Player getCurrentPlayer() {
-        return players.get(this.currentPlayerIndex);
-    }
-
-    public Player getBlackPlayer(){
-        return this.players.getFirst();
-    }
-
-    public Player getPlayerByIndex(int index){
-        return this.getPlayers().get(index);
     }
 
 
-//--------------All draw cards called from controller------------------
+    //GAMEPHASE
 
-    public void drawGoldFromDeck(Board board, Player currentPlayer) throws EmptyDeckException {
-        // get new card
-        GoldCard newGoldCard = board.drawFromGoldDeck();
-        // add card to player hand
-        currentPlayer.addToHandCardsMap(newGoldCard.getId(), Side.FRONT); // the front side is the default
-    }
-
-    public void drawResourceFromDeck(Board board, Player currentPlayer) throws EmptyDeckException {
-        // get new card
-        ResourceCard newResourceCard = board.drawFromResourceDeck();
-        // had card to player hand
-        currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
-    }
-
-    public void drawGoldFromShared(Board board, Player currentPlayer, int index) throws EmptyDeckException {
-        // get new gold card
-        GoldCard newGoldCard = board.drawSharedGoldCard(index);
-        // had card to player hand
-        currentPlayer.addToHandCardsMap(newGoldCard.getId(), Side.FRONT);
-    }
-
-
-    public void drawResourceFromShared(Board board, Player currentPlayer, int index) throws EmptyDeckException {
-        // get new resource card
-        ResourceCard newResourceCard = board.drawSharedResourceCard(index);
-        // had card to player hand
-        currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
-    }
 
 //----------------------------place Card--------------------------------
 
@@ -408,6 +678,12 @@ public class GameState {
             }
         }
         updateElements(player, placingCard, placingCardSide);
+        //NON MI PIACE MESSA QUI PERCHE NON E' L'ULTIMA AZIONE DEL CONTROLLER, CERCARE DI CAPIRE COME MODIFIFCARE
+        //ANDRA MESSO NELLO STATE PATTERN
+        synchronized (eventQueue) {
+            eventQueue.add(new UpdateTurnPhaseEvent(this, allClients(), TurnPhase.DRAWPHASE));
+            eventQueue.notifyAll();
+        }
     }
 
     private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {
@@ -436,7 +712,7 @@ public class GameState {
     }
 
 
-    public void updateElements(Player player, CornerCard placingCard, Side placingCardSide){
+    public void updateElements(Player player, CornerCard placingCard, Side placingCardSide) {
         for (Element ele : Element.values()) {
             if (player.getAllElements().get(ele) != null) {
                 int currentOccurencies = player.getAllElements().get(ele);
@@ -446,78 +722,114 @@ public class GameState {
         }
     }
 
+    //ENDGAME
+
+    public void checkGameEnded() {
+        // 20 points?
+        if (!currentGamePhase.equals(GamePhase.ENDPHASE)) {
+            for (int i = 0; i < this.players.size(); i++) {
+                if (this.players.get(i).getPoints() >= Config.POINTSTOENDPHASE) {
+                    currentGamePhase = GamePhase.ENDPHASE;
+                }
+            }
+            if (currentGamePhase.equals(GamePhase.ENDPHASE)) {
+                //currentPlayer is already updated here, it's the one that plays next, right after the previous drew
+                //currentPlayer = 0 => playerSize
+                //currentPlayer = 1 => playerSize + playerSize - 1
+                //currentPlayer = 2 => playerSize + playerSize - 2
+                //currentPlayer = 3 => playerSize + playerSize - 3
+                if (currentPlayerIndex == 0) {
+                    this.turnToPlay = players.size();
+                } else {
+                    this.turnToPlay = 2 * players.size() - currentPlayerIndex;
+                }
+            }
+        }
+
+        // cards ended?
+        if ((this.getMainBoard().isResourceDeckEmpty() && this.getMainBoard().isGoldDeckEmpty()) || turnToPlay == 0) {
+            currentGamePhase = GamePhase.FINALPHASE;
+            calculateFinalPoints();
+            ArrayList<Integer> winners;
+            try {
+                winners = getWinnerPlayerIndex();
+            } catch (GameIsNotEndedException e) {
+                throw new RuntimeException(e);
+            }
+            synchronized (eventQueue) {
+                eventQueue.add(new GameEndedEvent(this, allClients(), winners));
+                eventQueue.notifyAll();
+            }
+        }
+    }
+
+
+    void calculateFinalPoints() {
+        ObjectiveCard sharedCard1 = this.mainBoard.getSharedObjectiveCard(0);
+        ObjectiveCard sharedCard2 = this.mainBoard.getSharedObjectiveCard(1);
+
+        for (int i = 0; i < this.players.size(); i++) {
+            Player player = this.players.get(i);
+            ObjectiveCard objCard = player.getObjectiveCard();
+
+            int points = 0;
+
+            points += objCard.calculatePoints(player);
+            points += sharedCard1.calculatePoints(player);
+            points += sharedCard2.calculatePoints(player);
+
+            this.players.get(i).addPoints(points);
+        }
+    }
+
+    public ArrayList<Integer> getWinnerPlayerIndex() throws GameIsNotEndedException {
+        int maxPoints = 0;
+        ArrayList<Integer> winnerPlayerIndeces = new ArrayList<>();
+        boolean playerReachedPoints = false;
+        for (int i = 0; i < this.players.size(); i++) {
+            if (this.players.get(i).getPoints() >= Config.POINTSTOENDPHASE) {
+                playerReachedPoints = true;
+            }
+            if (this.players.get(i).getPoints() > maxPoints) {
+                winnerPlayerIndeces = new ArrayList<>();
+                winnerPlayerIndeces.add(i);
+                maxPoints = this.players.get(i).getPoints();
+            } else if (this.players.get(i).getPoints() == maxPoints) {
+                winnerPlayerIndeces.add(i);
+            }
+        }
+        if (!playerReachedPoints) {
+            throw new GameIsNotEndedException("You called getWinnerPlayerIndex even if the game is not ended, no one is at 20 points");
+        }
+
+        // now winnerPlayerIndeces contains who has the maximum number of points
+        // decide the real winner if there is a draw
+        ArrayList<Integer> winnerObjectives = new ArrayList<>();
+        if (winnerPlayerIndeces.size() > 1) {
+            int mostObjectivesWins = -1;
+            for (int i = 0; i < winnerPlayerIndeces.size(); i++) {
+                if (this.players.get(i).getObjectivesWon() > mostObjectivesWins) {
+                    winnerObjectives.clear();
+                    winnerObjectives.add(i);
+                    mostObjectivesWins = this.players.get(i).getObjectivesWon();
+                } else if (this.players.get(i).getObjectivesWon() == mostObjectivesWins) {
+                    winnerObjectives.add(i);
+                }
+            }
+            winnerPlayerIndeces = winnerObjectives;
+        }
+        return (winnerPlayerIndeces);
+    }
+
+
 //------------ others --------------------
 
     // !!! to implement !!!
-    public void saveGameState(){
+    public void saveGameState() {
     }
 
     // !!! optional !!!
-    public int getTurnTime(){
+    public int getTurnTime() {
         return 0;
     }
 }
-
-
-/*
-
-    private void playTurn() throws CardNotPlacedException, WrongInstanceTypeException {
-        // notify current player to place card (notify all changes)
-        // wait
-        this.setCurrentGameTurn(TurnPhase.DRAWPHASE);
-        // notify current player to draw a card (notify all changes)
-        //wait
-
-        // Base Case: game ended
-        if (isGameEnded()){
-            this.setCurrentGamePhase(GamePhase.ENDPHASE);
-            this.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
-            playEndTurn();
-        }
-
-        // play next turn
-        else{
-            // update current player
-            this.setCurrentPlayerIndex((this.getCurrentPlayerIndex()+1) % this.getPlayers().size());
-            this.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
-
-            playTurn();
-        }
-    }
-
-    private void playEndTurn() throws CardNotPlacedException, WrongInstanceTypeException {
-        // BASE CASE:
-        if (this.getPlayers().get(getCurrentPlayerIndex()) == this.getBlackPlayer()){
-            if (isLastTurn) {
-                this.setCurrentGamePhase(GamePhase.FINALPHASE);
-                calculateFinalPoints();
-            }
-            else {
-                isLastTurn = true;
-            }
-        }
-
-        // Recursive call of the EndPhaseTurn
-        else{
-            // TODO: 17/04/2024 network place methods
-            // notify current player to place card (notify all changes)
-            // wait
-            this.setCurrentGameTurn(TurnPhase.DRAWPHASE);
-
-            if(this.getMainBoard().getGoldDeck().isEmpty() && this.getMainBoard().getResourceDeck().isEmpty() && this.getMainBoard().getSharedGoldCards().length == 0 && this.getMainBoard().getSharedResourceCards().length == 0){
-                ; //there are no card to be drawn, the game continues without drawing
-            }
-            else{
-                // TODO: 17/04/2024 network draw methods
-                // notify current player to draw a card (notify all changes)
-                //wait
-            }
-            // play next turn
-            // update current player
-            this.setCurrentPlayerIndex((this.getCurrentPlayerIndex()+1) % this.getPlayers().size());
-            this.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
-
-            playEndTurn();
-        }
-    }
- */

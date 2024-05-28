@@ -11,13 +11,12 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.text.Text?>
 
-<!-- <GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController"> -->
-<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" stylesheets="@../style/prepPhase.css">
+<GridPane alignment="CENTER" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml" stylesheets="@../style/prepPhase.css, @../style/main.css"  fx:id="root" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerStartGame">
     <padding>
         <Insets top="50" right="50" bottom="50" left="50"/>
     </padding>
 
-    <VBox>
+    <VBox styleClass="mainContainer" fx:id="mainContainerPrep">
         <Button text="Start Game"
                 onAction="#handleStartGame"/>
         <Label

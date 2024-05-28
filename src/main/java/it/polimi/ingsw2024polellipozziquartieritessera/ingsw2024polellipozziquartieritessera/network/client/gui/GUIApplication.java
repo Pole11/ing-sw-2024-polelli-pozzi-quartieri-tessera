@@ -1,6 +1,9 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIController;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.application.*;
 import javafx.event.EventHandler;
@@ -11,38 +14,74 @@ import javafx.stage.*;
 import java.io.*;
 
 public class GUIApplication extends Application {
-    private static VirtualServer server;
-    private static VirtualView client;
     private static GUIController guiController;
+    private static ViewModel viewModel;
     private static Stage mainStage;
-
-    public void setServer(VirtualServer server) {
-        this.server = server;
-    }
-
-    public void setClient(VirtualView client) {
-        this.client = client;
-    }
+    private static VirtualView client;
+    private static VirtualServer server;
+    private static Client clientContainer;
 
     public GUIController getGUIController() {
-        return this.guiController;
+        return guiController;
     }
 
-    public static void changeScene(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
-        fxmlLoader.setController(guiController);
-        mainStage.getScene().setRoot(fxmlLoader.load());
+    public  Stage getMainStage() {
+        return mainStage;
+    }
+
+    /*public boolean sceneLoaded() {
+        return mainStage.getScene() != null;
+    }*/
+
+    public void updateController() {
+        Platform.runLater(() -> { getGUIController().update(); });
+    }
+
+     public static void changeScene(String fxml) {
+         Platform.runLater(() -> {
+            FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
+             try {
+                 mainStage.getScene().setRoot(fxmlLoader.load());
+             } catch (IOException e) {
+                 throw new RuntimeException(e);
+             }
+             guiController = fxmlLoader.getController();
+             guiController.setClient(client);
+             guiController.setServer(server);
+             guiController.setViewModel(viewModel);
+         });
+    }
+
+    public static void changeScene(String fxml, String[] args) { // this was used when viewModel was not static
+        Platform.runLater(() -> {
+            FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
+            try {
+                mainStage.getScene().setRoot(fxmlLoader.load());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            guiController = fxmlLoader.getController();
+            guiController.setArgs(args);
+            guiController.setClient(client);
+            guiController.setServer(server);
+            guiController.setClientContainer(clientContainer);
+            guiController.setViewModel(viewModel);
+        });
     }
 
     @Override
     public void start(Stage stage) throws IOException {
-        //FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource("/it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui/lobby.fxml"));
-        FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource("/fxml/lobby.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml"));
+        Parent root = fxmlLoader.load();
 
-        fxmlLoader.setController(guiController);
+        guiController = fxmlLoader.getController();
+        guiController.setClient(client);
+        guiController.setServer(server);
+        guiController.setClientContainer(clientContainer);
+        guiController.setViewModel(viewModel);
         mainStage = stage;
 
-        Scene scene = new Scene(fxmlLoader.load(), 920, 920);
+        Scene scene = new Scene(root, 920, 920);
         stage.setTitle("Codex Naturalis");
         stage.setScene(scene);
 
@@ -57,9 +96,11 @@ public class GUIApplication extends Application {
         stage.show();
     }
 
-    public void runGui(GUIController guiController) {
-        //guiController = new GUIController(client, server);
-        this.guiController = guiController;
+    public void runGui(VirtualView client, VirtualServer server, Client clientContainer, ViewModel viewModel) {
+        GUIApplication.client = client;
+        GUIApplication.server = server;
+        GUIApplication.clientContainer = clientContainer;
+        GUIApplication.viewModel = viewModel;
         launch(); // create the UI thread
     }
 }

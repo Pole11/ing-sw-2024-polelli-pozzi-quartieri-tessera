@@ -230,6 +230,8 @@ Per questo motivo sia RMI che Socket utilizzano metodi che hanno come argomenti 
 
 ### Formattazione dei messaggi
 
+Per la formattazione dei messaggi usiamo un protocollo proprietario che si chiama `SUGISTTP`: **S**uper **U**ltra **G**iga **I**per **S**imple **T**ext **T**ransfer **P**rotocol.
+
 #### Client to Server
 
 I messaggi *Client to Server* sono del tipo: `"COMANDO, parametro1, ..., parametro"`.

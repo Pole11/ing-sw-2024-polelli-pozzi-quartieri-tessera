@@ -1,68 +1,84 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
-import com.google.gson.Gson;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIController;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
-import java.io.File;
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Scanner;
-import java.lang.reflect.Array;
+import java.io.*;
 import java.net.Socket;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.*;
+import java.util.Scanner;
 
-public class Client {
-    private static boolean meDoGui;
-    private static GUIApplication guiApplication;
-    private static GUIController guiController;
-    private static GamePhase currentGamePhase;
+public class Client implements VirtualView {
+    private boolean meDoGui;
+    private CLIController cliController;
+    private GUIApplication guiApplication;
+    private final ViewModel viewModel;
+    private VirtualView client;
+
+    public Client(){
+        this.viewModel = new ViewModel();
+    }
 
     public static void main(String[] args) throws IOException {
         String input = args[0];
         String host = args[1];
         String port = args[2];
 
-        startClient(input, host, port);
+        (new Client()).startClient(input, host, port);
+
     }
 
-    public static void startClient(String input, String host, String port) throws IOException {
+    //GETTER
+    public VirtualView getClient(){
+        return client;
+    }
+
+    public CLIController getCliController() {
+        return cliController;
+    }
+
+    public void startClient(String input, String host, String portString) throws IOException {
         if (input.equalsIgnoreCase("socket")) {
-            SocketClient.execute(host, port);
+            int port = Integer.parseInt(portString);
+            Socket socketToServer = new Socket(host, port);
+
+            InputStreamReader socketRx = new InputStreamReader(socketToServer.getInputStream());
+            OutputStreamWriter socketTx = new OutputStreamWriter(socketToServer.getOutputStream());
+
+            this.client = new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx), this);
+            ((SocketClient) client).run();
         } else { //default rmi
-            RmiClient.execute(host, port);
+            try {
+                Registry registry = LocateRegistry.getRegistry(host, Integer.parseInt(portString));
+                VirtualServer server = (VirtualServer) registry.lookup("VirtualServer");
+                this.client = new RmiClient(server, this);
+                ((RmiClient) client).run();
+            } catch (RemoteException | NotBoundException e) {
+                e.printStackTrace();
+                System.out.println("An error occurred while executing RmiClient!");
+            }
         }
     }
 
-    public static void runCli(VirtualServer server, VirtualView client) {
+    public void runCli(VirtualServer server) {
         meDoGui = false;
+
+        cliController = new CLIController(viewModel);
+
         boolean running = true;
         Scanner scan = new Scanner(System.in);
         System.out.println("Please enter a nickname to start, with the command ADDUSER <nickname>");
-
         System.out.print("> "); // print phase
         while (running) {
             String line = scan.nextLine();
             String[] message = line.split(" ");
             if (line != null && !line.isEmpty() && !line.isBlank() && !line.equals("")) {
                 try {
-                    manageInputCli(server, message, client);
+                    cliController.manageInput(server, client, this, message);
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
@@ -72,534 +88,233 @@ public class Client {
         }
     }
 
-    public static void runGui(VirtualServer server, VirtualView client){
+    public void runGui(VirtualServer server, VirtualView client){
         meDoGui = true;
-
         guiApplication = new GUIApplication();
-
-        //guiApplication.setServer(server);
-        //guiApplication.setClient(client);
-
-        // il punto è che dovresti fare questo ma dopo il runGui
-        //guiController = guiApplication.getGUIController();
-        //System.out.println("CCC" + guiController);
-        guiController = new GUIController(client, server);
-
-        guiApplication.runGui(guiController);
+        guiApplication.runGui(client, server, this, viewModel);
     }
 
-    public static void manageInputCli(VirtualServer server, String[] message, VirtualView client) throws RemoteException {
-        try {
-            Command.valueOf(message[0].toUpperCase());
-        } catch(IllegalArgumentException e) {
-            System.err.print("INVALID COMMAND\n> ");
-            return;
-        }
 
-        switch (Command.valueOf(message[0].toUpperCase())) {
-            case Command.HELP:
-                printAllCommands();
-                break;
-            case Command.ADDUSER:
-                try {
-                    server.addConnectedPlayer(client, message[1]);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.SHOWNICKNAME:
-                server.showNickname(client);
-                break;
-            case Command.START:
-                server.startGame(client);
-                break;
-            case Command.SHOWHAND:
-                server.showHand(client);
-                break;
-            case Command.SHOWOBJECTIVES:
-                server.showCommonObjectives(client);
-                break;
-            case Command.CHOOSESTARTER:
-                try {
-                    Side side;
-                    try {
-                        side = Side.valueOf(message[1].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid side, please enter a valid side (Front / Back)"));
-                        return;
-                    }
-                    server.chooseInitialStarterSide(client, side);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.CHOOSECOLOR:
-                try {
-                    Color color;
-                    try {
-                        color = Color.valueOf(message[1].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid color, please enter a valid color (Blue / Green / Yellow / Red)"));
-                        return;
-                    }
-                    server.chooseInitialColor(client, color);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.CHOOSEOBJECTIVE:
-                try {
-                    int cardId;
-                    try {
-                        cardId = Integer.parseInt(message[1]);
-                    } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid card id, please insert a valid card id"));
-                        return;
-                    }
-                    server.chooseInitialObjective(client, cardId);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.PLACECARD:
-                try {
-                    int placingCardId;
-                    int tableCardId;
-                    CornerPos tableCornerPos;
-                    Side placingCardSide;
-                    try {
-                        placingCardId = Integer.parseInt(message[1]);
-                    } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid id of the placing card, please insert a valid id"));
-                        return;
-                    }
-                    try {
-                        tableCardId = Integer.parseInt(message[2]);
-                    } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid id of the table card, please insert a valid id"));
-                        return;
-                    }
-                    try {
-                        tableCornerPos = CornerPos.valueOf(message[3].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid corner, please insert a valid corner position (Upleft / Upright / Downleft / Downright)"));
-                        return;
-                    }
-                    try {
-                        placingCardSide = Side.valueOf(message[4].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid side, please insert a valid side (Front / Back)"));
-                        return;
-                    }
-                    server.placeCard(client, placingCardId, tableCardId, tableCornerPos, placingCardSide);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.DRAWCARD:
-                try {
-                    DrawType drawType;
-                    try {
-                        drawType = DrawType.valueOf(message[1]);
-                    } catch (IllegalArgumentException e) {
-                        System.err.println(("Invalid draw option, please choose a valid option (SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource)"));
-                        return;
-                    }
-                    server.drawCard(client, drawType);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.FLIPCARD:
-                try {
-                    int cardId;
-                    try {
-                        cardId = Integer.parseInt(message[1]);
-                    } catch (NumberFormatException e) {
-                        client.printError("Please enter a valid card id");
-                        return;
-                    }
-                    server.flipCard(client, cardId);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.OPENCHAT:
-                server.openChat();
-                break;
-            default:
-                System.err.print("INVALID COMMAND\n> ");
-                break;
-        }
-    }
+    @Override
+    public void updateGamePhase(GamePhase nextGamePhase) {
+        viewModel.setGamePhase(nextGamePhase);
 
-    public static void printAllCommands() {
-        System.out.print("The possible commands are: [");
-        Arrays.stream(Command.values()).forEach(e->{
-            System.out.print(e + " ");
-        });
-        System.out.print("]\n> ");
-    }
-
-    public static void printCard(int id1, Side side1, int id2, Side side2, int id3, Side side3){
-        printCard(id1, side1);
-        printCard(id2, side2);
-        printCard(id3, side3);
-        // TODO better
-    }
-
-    public static void printCard(int id1, Side side1, int id2, Side side2){
-        printCard(id1, side1);
-        printCard(id2, side2);
-        // TODO better
-    }
-
-    public static void printCard(int cardId, Side side) {
-        String filePath = new File("").getAbsolutePath();
-        String jsonString = null;
-        try {
-            jsonString = Populate.readJSON(filePath + Config.CARD_JSON_PATH);
-        } catch (IOException e) {
-            System.out.println("Error while loading image, pls try again");
-        }
-        Gson gson = new Gson();
-        Map cards = gson.fromJson(jsonString, Map.class);
-
-
-        for (Object key : cards.keySet()){
-            Map card = gson.fromJson(cards.get(key).toString(), Map.class);
-            int id = Integer.parseInt(key.toString());
-
-            if (id == cardId){
-                switch (card.get("Type").toString()){
-                    case "Objective":
-                        printObjectiveCard(card);
-                        break;
-                    case "Resource":
-                        printResourceCard(card, side);
-                        break;
-                    case "Gold":
-                        printGoldCard(card, side);
-                        break;
-                    case "Starter":
-                        printStarterCard(card, side);
-                        break;
-                }
-            }
-        }
-    }
-
-    private static void printObjectiveCard(Map card){
-        // attributes
-        String points;
-        ArrayList<Element> elementChallenge = null;
-        Element[][] structureChallenge = null;
-
-        // set points
-        points = card.get("Points").toString();
-
-        // set challenge
-        if (card.get("ChallengeType").equals("StructureChallenge")){
-            Element[][] configuration = new Element[Config.N_STRUCTURE_CHALLENGE_CONFIGURATION][Config.N_STRUCTURE_CHALLENGE_CONFIGURATION];
-            for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
-                for (int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
-                    configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(3*i+j).toString().toUpperCase() );
-                }
-            }
-            structureChallenge = configuration;
-        } else if (card.get("ChallengeType").equals("ElementChallenge")){
-            ArrayList<Element> elements = new ArrayList<>();
-            for (Object e : (ArrayList) card.get("ChallengeElements")) {
-                elements.add(Element.valueOf(e.toString().toUpperCase()));
-            }
-            elementChallenge = elements;
-        }
-
-        // TODO: printing
-    }
-
-    private static void printResourceCard(Map card, Side side){
-        // attributes
-        String points;
-        Element resource;
-        Element[] frontCorners = new Element[Config.N_CORNERS];
-        Element[] backCorners = new Element[Config.N_CORNERS];
-
-        // set points
-        points = card.get("Points").toString();
-
-        // set resource
-        resource = Element.valueOf(card.get("Resource").toString().toUpperCase());
-
-        // set corners
-        //for in frontCorners
-        for (int i = 0; i < Config.N_CORNERS; i++){
-            frontCorners[i] = Element.valueOf(((ArrayList) card.get("FrontCorners")).get(i).toString().toUpperCase());
-        }
-        //for in backCorners
-        for (int i = 0; i < Config.N_CORNERS; i++) {
-            backCorners[i] = Element.valueOf(((ArrayList) card.get("BackCorners")).get(i).toString().toUpperCase());
-        }
-
-        if (side == Side.BACK){
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
-            System.out.println("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) +"|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
-        } else{
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, points)+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
-        }
-    }
-
-    private static void printGoldCard(Map card, Side side){
-        // attributes
-        String points;
-        Element resource;
-        Element[] frontCorners = new Element[Config.N_CORNERS];
-        Element[] backCorners = new Element[Config.N_CORNERS];
-        boolean coverageChallenge = false;
-        boolean noChallenge = false;
-        ArrayList<Element> elementChallenge = null;
-        ArrayList<Element> resourceNeeded = null;
-
-        // set points
-        points = card.get("Points").toString();
-
-        // set resource
-        resource = Element.valueOf(card.get("Resource").toString().toUpperCase());
-
-        // set corners
-        //for in frontCorners
-        for (int i = 0; i < Config.N_CORNERS; i++){
-            frontCorners[i] = Element.valueOf(((ArrayList) card.get("FrontCorners")).get(i).toString().toUpperCase());
-        }
-        //for in backCorners
-        for (int i = 0; i < Config.N_CORNERS; i++) {
-            backCorners[i] = Element.valueOf(((ArrayList) card.get("BackCorners")).get(i).toString().toUpperCase());
-        }
-
-        // set challenge
-        if (card.get("ChallengeType").equals("Coverage")){
-            coverageChallenge = true;
-        } else if (card.get("ChallengeType").equals("ElementChallenge")){
-            ArrayList<Element> elements = new ArrayList<>();
-            for (Object e : (ArrayList) card.get("ChallengeElements")) {
-                elements.add(Element.valueOf(e.toString().toUpperCase()));
-            }
-            elementChallenge = elements;
-        } else{
-            noChallenge = true;
-        }
-
-        // set needed resources
-        for (Object e : (ArrayList) card.get("ResourceNeeded")) {
-            resourceNeeded.add(Element.valueOf(e.toString().toUpperCase()));
-        }
-
-        // define cost and challenge strings
-        HashMap<Element, Integer> cost = new HashMap<>();
-        for (Element e : resourceNeeded){
-            if(!cost.containsKey(e)){
-                cost.put(e,1);
-            } else{
-                cost.put(e, cost.get(e)+1);
-            }
-        }
-        String costString = "";
-        for (Element key : cost.keySet()){
-            costString = cost.get(key) + key.toString().substring(0,3).toUpperCase();
-        }
-
-        String challengeString = "";
-        if (coverageChallenge){
-            challengeString = "cha: COV";
-        } else if (elementChallenge != null){
-            challengeString = "cha: " + elementChallenge.getFirst().toString().substring(0,3).toUpperCase();
-        }
-
-        if (side == Side.BACK){
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
-            System.out.println("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) +"|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+ getFormattedString(11, "") +backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
-        } else{
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, points)+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|"+ getFormattedString(17, costString)+"|");
-            System.out.println("|"+ getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") +"|");
-            System.out.println("|"+ getFormattedString(17, challengeString)+"|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
-        }
-    }
-
-    private static void printStarterCard(Map card, Side side){
-        // attributes
-        Element[] frontCorners = new Element[Config.N_CORNERS];
-        Element[] backCorners = new Element[Config.N_CORNERS];
-        ArrayList<Element> centerResources = null;
-
-        // set corners
-        //for in frontCorners
-        for (int i = 0; i < Config.N_CORNERS; i++){
-            frontCorners[i] = Element.valueOf(((ArrayList) card.get("FrontCorners")).get(i).toString().toUpperCase());
-        }
-        //for in backCorners
-        for (int i = 0; i < Config.N_CORNERS; i++) {
-            backCorners[i] = Element.valueOf(((ArrayList) card.get("BackCorners")).get(i).toString().toUpperCase());
-        }
-
-        // set center resources
-        for (Object e : (ArrayList) card.get("CenterResources")) {
-            centerResources.add(Element.valueOf(e.toString().toUpperCase()));
-        }
-
-        // create centerString
-        String centerString = "";
-        for (Element e : centerResources){
-            centerString = centerString + " " + e.toString().substring(0, 3).toUpperCase();
-        }
-        if (centerString.startsWith(" ")) {
-            centerString = centerString.substring(1);
-        }
-
-        if (side == Side.BACK){
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
-        } else{
-            System.out.println("+-----------------+");
-            System.out.println("|"+backCorners[0].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[1].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|"+ getFormattedString(17, centerString) +"|");
-            System.out.println("|" + getFormattedString(17, "") + "|");
-            System.out.println("|"+backCorners[3].toString().substring(0, 3).toUpperCase()+getFormattedString(11, "")+backCorners[2].toString().substring(0, 3).toUpperCase()+"|");
-            System.out.println("+-----------------+");
-        }
-    }
-
-    private static int getId(Object key) {
-        return Integer.parseInt(key.toString());
-    }
-
-    private static String getFormattedString(int length, String content){
-        // ------
-        if (length%2 == 0){
-            while (content.length() < length){
-                if (content.length()%2 == 0){
-                    content = " " + content + " ";
-                } else{
-                    content = content + " ";
-                }
-            }
-        } else{
-            while (content.length() < length){
-                if (content.length()%2 == 0){
-                    content = content + " ";
-                } else{
-                    content = " " + content + " ";
-                }
-            }
-        }
-        return content;
-    }
-
-    public static void printMessage(String msg) {
         if (meDoGui) {
-            guiController.setServerMessage(msg);
+            switch (nextGamePhase) {
+                case GamePhase.NICKNAMEPHASE -> {
+                    guiApplication.changeScene("/fxml/startGame.fxml");
+                }
+                case GamePhase.CHOOSESTARTERSIDEPHASE -> {
+                    guiApplication.changeScene("/fxml/chooseStarter.fxml");
+                }
+                case GamePhase.CHOOSECOLORPHASE -> {
+                    System.out.println("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]");
+                    guiApplication.changeScene("/fxml/chooseColor.fxml");
+                }
+                case GamePhase.CHOOSEOBJECTIVEPHASE -> {
+                    guiApplication.changeScene("/fxml/chooseObjective.fxml");
+                }
+                case GamePhase.MAINPHASE -> {
+                    System.out.println("---Game started---");
+                    guiApplication.changeScene("/fxml/game.fxml");
+                }
+                case GamePhase.ENDPHASE -> {
+                    System.out.println("NON SO CHI reached 20 points o NON SO");
+                }
+                case GamePhase.FINALPHASE -> {
+                    guiApplication.changeScene("/fxml/final.fxml");
+                }
+            }
+            guiApplication.updateController();
         }
-        System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
     }
 
-    public static void printError(String msg) {
+    @Override
+    public void updateTurnPhase(TurnPhase nextTurnPhase){
+        viewModel.setTurnPhase(nextTurnPhase);
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void sendIndex(int index) throws RemoteException {
+        viewModel.setPlayerIndex(index);
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void nicknameUpdate(int playerIndex, String nickname) {
+        viewModel.setNickname(playerIndex, nickname);
+        viewModel.setConnection(playerIndex, true);
+        if (playerIndex == viewModel.getPlayerIndex()){
+            if (viewModel.getPlayersSize() == 1){
+                System.out.println("you successfully entered the game with the nickname " + nickname + ", wait for at least two players to start the game");
+            } else {
+                System.out.println("you successfully entered the game with the nickname " + nickname + ", there are " + viewModel.getPlayersSize() + " players connected, to start the game type START");
+            }
+        } else {
+            System.out.println("a new player has connected with the name:" + nickname);
+        }
+        if (meDoGui) guiApplication.updateController();
+    }
+
+
+    @Override
+    public void start() throws RemoteException {
+    }
+
+    @Override
+    public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
+        viewModel.setConnection(playerIndex, connected);
+        if (playerIndex == viewModel.getPlayerIndex()){
+            if (connected){
+                System.out.println("you re-connected to the game");
+            } else {
+                //SISTEMA
+                throw new RuntimeException();
+            }
+        } else {
+            if (connected) {
+                System.out.println(viewModel.getNickname(playerIndex) + " connected");
+            } else {
+                System.out.println(viewModel.getNickname(playerIndex) + " disconnected");
+                if (meDoGui) guiApplication.changeScene("/fxml/final.fxml");
+            }
+        }
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void updateAddHand(int playerIndex, int cardIndex) throws RemoteException {
+        viewModel.addedCardToHand(playerIndex, cardIndex);
+        viewModel.setHandSide(cardIndex, Side.FRONT);
+        if (viewModel.getPlayerIndex() == playerIndex) {
+            System.out.println("you have drawn a card");
+        } else {
+            System.out.println(viewModel.getNickname(playerIndex) + "drew a card");
+        }
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void updateRemoveHand(int playerIndex, int cardIndex) throws RemoteException {
+        viewModel.removedCardFromHand(playerIndex, cardIndex);
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
+        viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
+        if (viewModel.getPlayerIndex() == playerIndex) {
+            System.out.println("you placed a card, now you have to draw your card with DRAW [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]");
+        } else {
+            System.out.println(viewModel.getNickname(playerIndex) + "placed a card");
+        }
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void updateColor(int playerIndex, Color color) throws RemoteException {
+        viewModel.setColor(playerIndex, color);
+        if (viewModel.getPlayerIndex() == playerIndex) {
+            System.out.println("you chose the color:" + color);
+        } else {
+            System.out.println(viewModel.getNickname(playerIndex) + "chose the color" + color);
+        }
+        if (meDoGui)  guiApplication.updateController();
+    }
+
+    @Override
+    public void updateCurrentPlayer(int currentPlayerIndex) throws RemoteException {
+        viewModel.setCurrentPlayer(currentPlayerIndex);
+        if (viewModel.getPlayerIndex() == currentPlayerIndex) {
+            System.out.println("it's your turn");
+            System.out.println("to place your card use the command PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)] to place your card");
+        } else {
+            System.out.println("it's the turn of" + viewModel.getNickname(currentPlayerIndex));
+        }
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void updateHandSide(int cardIndex, Side side) throws RemoteException {
+        viewModel.setHandSide(cardIndex, side);
+        System.out.println("you flipped your card");
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void updatePoints(int playerIndex, int points) throws RemoteException {
+        viewModel.setPoints(playerIndex, points);
+        if (viewModel.getPlayerIndex() == playerIndex) {
+            System.out.println("you now have " + points + "points");
+        } else {
+            System.out.println(viewModel.getNickname(playerIndex) + "has" + points + "points");
+        }
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void updateSecretObjective(int objectiveCardId1, int objectiveCardId2) throws RemoteException {
+        viewModel.setSecretObjective(objectiveCardId1, objectiveCardId2);
+        if (objectiveCardId2 == -1){
+            System.out.println("you have chosen the objective card: " + objectiveCardId1);
+        } else{
+            System.out.println("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1], to see your card use the command SHOWOBJECTIVE");
+            // TODO: cliController.showSecretObjectives();
+
+        }
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
+        viewModel.setSharedObjectives(sharedObjectiveCardId1, sharedObjectiveCardId2);
+        System.out.println("the shared objectives are: " + sharedObjectiveCardId1 + "," + sharedObjectiveCardId2);
+        //TODO: cliController.showSharedObjectvives();
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
+        if (side == null){
+            viewModel.setStarterCard(cardId1);
+            System.out.println("Chose your preferred side for the starter card [Front/Back]:");
+            // TODO : cliController.showStarterSides();
+        } else {
+            viewModel.initializeBoard(playerIndex, cardId1);
+            viewModel.setPlacedSide(cardId1, side);
+            if (viewModel.getPlayerIndex() == playerIndex) {
+                System.out.println("you now have chosen the starter side");
+            } else {
+                System.out.println(viewModel.getNickname(playerIndex) + "has chosen the starter side");
+            }
+        }
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void updateWinner(int playerIndex){
+        viewModel.addWinner(playerIndex);
+    }
+
+    @Override
+    public void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
+        viewModel.setMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
+        if (meDoGui) guiApplication.updateController();
+    }
+
+    @Override
+    public void ping(String ping) throws RemoteException {
+        //TODO : respond to ping to manage disconections
+    }
+
+    @Override
+    public void sendError(String error) throws RemoteException {
         if (meDoGui) {
-            guiController.setServerError(msg);
+            guiApplication.getGUIController().setServerError(error);
         }
-        System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
-
+        System.err.print("\nERROR FROM SERVER: " + error + "\n> ");
     }
-
-    public static void changePhase(String nextGamePhaseString) {
-        if (!meDoGui) {
-            return;
-        }
-        GamePhase nextGamePhase = null;
-        try {
-            nextGamePhase = GamePhase.valueOf(nextGamePhaseString);
-        } catch (Exception e) {
-            System.err.println("Invalid game phase");
-        }
-
-        currentGamePhase = nextGamePhase;
-
-        switch (nextGamePhase) {
-            case GamePhase.NICKNAMEPHASE -> {
-                guiController.goToScene("/fxml/start.fxml");
-            }
-            case GamePhase.CHOOSESTARTERSIDEPHASE -> {
-                guiController.goToScene("/fxml/chooseStarter.fxml");
-            }
-            case GamePhase.CHOOSECOLORPHASE -> {
-                guiController.goToScene("/fxml/chooseColor.fxml");
-            }
-            case GamePhase.CHOOSEOBJECTIVEPHASE -> {
-                guiController.goToScene("/fxml/chooseObjective.fxml");
-            }
-            case GamePhase.MAINPHASE -> {
-                guiController.goToScene("/fxml/game.fxml");
-            }
-            case GamePhase.ENDPHASE -> {
-            }
-            case GamePhase.FINALPHASE -> {
-                guiController.goToScene("/fxml/final.fxml");
-            }
-        }
-
-    }
-
-    /*public static void changePhase(TurnPhase nextTurnPhase) {
-        if (currentGamePhase.equals(GamePhase.MAINPHASE)) {
-            switch (nextTurnPhase) {
-                case TurnPhase.PLACINGPHASE -> {
-
-                }
-                case TurnPhase.DRAWPHASE -> {
-
-                }
-            }
-        }
-    }*/
 }
 
 // TODO: capire come fare a chiamare le print card... da dove, chi lo fa, etc.
-// TODO: la mappa possiamo farla in due modi
-// 1)      2)
-// 2 3     1>2
-// 4 1     ^
-//         3>4
-// TODO: scegliere come printare le objectives
-// 1) testuale (scrivere cosa fanno)
-// 2) visuale (disegnare la objective)

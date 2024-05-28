@@ -10,13 +10,13 @@ public class MessageTest {
     void messageTestConstructor() {
         int k = 1000;
 
-        Player author = new Player("Author Name");
+        Player author = new Player("Author Name", null, null);
         LocalDateTime dt = LocalDateTime.now();
 
         ArrayList<Message> messages = new ArrayList<Message>();
         for (int i = 0; i < k; i++) {
             String content = "contenuto " + i;
-            Message m = new Message(author, dt, content);
+            Message m = new Message(0, dt, content);
             messages.add(m);
         }
 

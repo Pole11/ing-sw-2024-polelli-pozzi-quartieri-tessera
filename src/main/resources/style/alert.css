@@ -1,0 +1,12 @@
+.myAlert {
+    -fx-background-color: rgb(220, 200, 60);
+    -fx-border-width: 10px;
+    -fx-border-style: solid;
+    -fx-border-color: rgb(180, 160, 30);
+    -fx-font-size: 16px;
+    -fx-font-family: 'Comic Neue';
+}
+
+.myAlert .button-bar .button {
+    -fx-background-color: rgb(200, 200, 220);
+}

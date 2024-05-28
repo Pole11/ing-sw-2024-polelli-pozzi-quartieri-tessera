@@ -6,13 +6,13 @@ import java.lang.String;
 public class Message {
     private final int id;
     private static int maxId = 0;
-    private final Player author;
+    private final int author;
     private final LocalDateTime dateTime;
     private final String content;
 
-    public Message(Player author, LocalDateTime dateTime, String content){
+    public Message(int playerIndex, LocalDateTime dateTime, String content){
         maxId++;
-        this.author = author;
+        this.author = playerIndex;
         this.dateTime = dateTime;
         this.content = content;
         this.id = maxId;
@@ -21,7 +21,7 @@ public class Message {
         return id;
     }
 
-    public Player getAuthor() {
+    public int getAuthor() {
         return author;
     }
 

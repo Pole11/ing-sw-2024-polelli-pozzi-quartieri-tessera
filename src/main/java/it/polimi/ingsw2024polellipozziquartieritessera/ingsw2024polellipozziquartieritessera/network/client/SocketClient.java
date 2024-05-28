@@ -1,10 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Command;
-
-
 
 import java.io.*;
 import java.net.*;
@@ -14,25 +10,17 @@ import java.util.*;
 
 
 public class SocketClient implements VirtualView {
-    final BufferedReader input;
-    final ServerProxy server;
+    private final  BufferedReader input;
+    private final ServerProxy server;
+    private final Client clientContainer;
 
-    public SocketClient(BufferedReader input, BufferedWriter output) {
+    public SocketClient(BufferedReader input, BufferedWriter output, Client clientContainer) {
         this.input = input;
         this.server = new ServerProxy(output);
+        this.clientContainer = clientContainer;
     }
 
-    public static void execute(String host, String portString) throws IOException {
-        int port = Integer.parseInt(portString);
-        Socket socketToServer = new Socket(host, port);
-
-        InputStreamReader socketRx = new InputStreamReader(socketToServer.getInputStream());
-        OutputStreamWriter socketTx = new OutputStreamWriter(socketToServer.getOutputStream());
-
-        new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx)).run();
-    }
-
-    private void run() throws RemoteException {
+    public void run() throws RemoteException {
         new Thread(() -> {
             try {
                 runVirtualServer();
@@ -45,10 +33,10 @@ public class SocketClient implements VirtualView {
         System.out.print("Do you GUI? [Y/n] ");
         String input = scan.nextLine();
         if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
-            Client.runGui(server, this);
+            clientContainer.runGui(server, this);
         } else if (input.equalsIgnoreCase("n")) {
             this.server.connectRmi(this);
-            Client.runCli(server, this);
+            clientContainer.runCli(server);
         } else {
             System.out.println("Please enter a valid input!");
         }
@@ -60,19 +48,74 @@ public class SocketClient implements VirtualView {
         String line;
         // Read message type
         while ((line = input.readLine()) != null) {
-            String[] message = line.split("; ");
-            switch (message[0]) {
-                case "MESSAGE":
-                    this.printMessage(message[1]);
+            String[] messageString = line.split("; ");
+            Messages message = Messages.valueOf(messageString[0]);
+            switch (message) {
+                case Messages.GAMEPHASE:
+                    this.updateGamePhase(GamePhase.valueOf(messageString[1]));
                     break;
-                case "ERROR":
-                    this.printError(message[1]);
+                case Messages.TURNPHASE:
+                    this.updateTurnPhase(TurnPhase.valueOf(messageString[1]));
                     break;
-                case "PING":
-                    this.ping(message[1]);
+                case Messages.CONNECTIONINFO:
+                    this.connectionInfo(Integer.parseInt(messageString[1]), Boolean.parseBoolean(messageString[2]));
                     break;
-                case "PHASE":
-                    this.changePhase(message[1]);
+                case Messages.ERROR:
+                    this.sendError(messageString[1]);
+                    break;
+                case Messages.NICKNAME:
+                    this.nicknameUpdate(Integer.parseInt(messageString[1]),messageString[2]);
+                    break;
+                case Messages.PING:
+                    this.ping(messageString[1]);
+                    break;
+                case Messages.SENDINDEX:
+                    this.sendIndex(Integer.parseInt(messageString[1]));
+                    break;
+                case Messages.START:
+                    this.start();
+                    break;
+                case Messages.ADDHAND:
+                    this.updateAddHand(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
+                    break;
+                case Messages.REMOVEHAND:
+                    this.updateRemoveHand(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
+                    break;
+                case Messages.UPDATEPLAYERBOARD:
+                    this.updatePlayerBoard(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]), Integer.parseInt(messageString[3]), CornerPos.valueOf(messageString[4]), Side.valueOf(messageString[5]));
+                    break;
+                case Messages.UPDATEMAINBOARD:
+                    this.updateMainBoard(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]), Integer.parseInt(messageString[3]), Integer.parseInt(messageString[4]), Integer.parseInt(messageString[5]), Integer.parseInt(messageString[6]));
+                    break;
+                case Messages.UPDATECOLOR:
+                    this.updateColor(Integer.parseInt(messageString[1]), Color.valueOf(messageString[2]));
+                    break;
+                case Messages.UPDATECURRENTPLAYER:
+                    this.updateCurrentPlayer(Integer.parseInt(messageString[1]));
+                    break;
+                case Messages.UPDATEHANDSIDE:
+                    this.updateHandSide(Integer.parseInt(messageString[1]), Side.valueOf(messageString[2]));
+                    break;
+                case Messages.UPDATEPOINTS:
+                    this.updatePoints(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
+                    break;
+                case Messages.UPDATESECRETOBJECTIVE:
+                    this.updateSecretObjective(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
+                    break;
+                case Messages.UPDATESHAREDOBJECTIVE:
+                    this.updateSharedObjective(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
+                    break;
+                case Messages.UPDATESTARTER:
+                    Side side;
+                    if (messageString[3].equals("null")) { // if NULL is passed as Side parameter, t
+                        side = null;
+                    } else {
+                        side = Side.valueOf(messageString[3]);
+                    }
+                    this.updateStarterCard(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]), side);
+                    break;
+                case Messages.UPDATEWINNER:
+                    this.updateWinner(Integer.parseInt(messageString[1]));
                     break;
                 default:
                     System.err.println("[5xx INVALID MESSAGE FROM SERVER]");
@@ -82,49 +125,103 @@ public class SocketClient implements VirtualView {
     }
 
     @Override
-    public void printMessage(String msg) {
-        Client.printMessage(msg);
-        //System.out.print("\nINFO FROM SERVER: " + msg + "\n> ");
-    }
-
-    @Override
-    public void printError(String msg) throws RemoteException {
-        Client.printError(msg);
-        //System.err.print("\nERROR FROM SERVER: " + msg + "\n> ");
+    public void sendError(String msg) throws RemoteException {
+        clientContainer.sendError(msg);
     }
 
     @Override
     public void ping(String ping) throws RemoteException {
-
+        clientContainer.ping(ping);
     }
 
     @Override
-    public void printCard(int id1, Side side1, int id2, Side side2, int id3, Side side3) throws RemoteException {
-
+    public void nicknameUpdate(int index, String nickname) throws RemoteException {
+        clientContainer.nicknameUpdate(index, nickname);
     }
 
     @Override
-    public void printCard(int id1, Side side1, int id2, Side side2) throws RemoteException {
-
+    public void sendIndex(int index) throws RemoteException {
+        clientContainer.sendIndex(index);
     }
 
     @Override
-    public void printCard(int id, Side side) throws RemoteException {
-
+    public void updateGamePhase(GamePhase nextGamePhaseString) {
+        clientContainer.updateGamePhase(nextGamePhaseString);
     }
 
     @Override
-    public void changePhase(String nextGamePhaseString) {
-        Client.changePhase(nextGamePhaseString);
-        /*
-        try {
-            System.out.println(nextGamePhaseString);
-            GamePhase nextGamePhase = GamePhase.valueOf(nextGamePhaseString);
-            Client.changePhase(nextGamePhase);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Invalid game phase");
-        }*/
+    public void
+    updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException {
+        clientContainer.updateTurnPhase(nextTurnPhase);
     }
 
+    @Override
+    public void start() throws RemoteException {
+        clientContainer.start();
+    }
+
+    @Override
+    public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
+        clientContainer.connectionInfo(playerIndex, connected);
+    }
+
+    @Override
+    public void updateAddHand(int playerIndex, int cardIndex) throws RemoteException {
+        clientContainer.updateAddHand(playerIndex, cardIndex);
+    }
+
+    @Override
+    public void updateRemoveHand(int playerIndex, int cardIndex) throws RemoteException {
+        clientContainer.updateRemoveHand(playerIndex, cardIndex);
+    }
+
+    @Override
+    public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
+        clientContainer.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
+    }
+
+    @Override
+    public void updateColor(int playerIndex, Color color) throws RemoteException {
+        clientContainer.updateColor(playerIndex, color);
+    }
+
+    @Override
+    public void updateCurrentPlayer(int currentPlayerIndex) throws RemoteException {
+        clientContainer.updateCurrentPlayer(currentPlayerIndex);
+    }
+
+    @Override
+    public void updateHandSide(int cardIndex, Side side) throws RemoteException {
+        clientContainer.updateHandSide(cardIndex, side);
+    }
+
+    @Override
+    public void updatePoints(int playerIndex, int points) throws RemoteException {
+        clientContainer.updatePoints(playerIndex, points);
+    }
+
+    @Override
+    public void updateSecretObjective(int objectiveCardId1, int objectiveCardId2) throws RemoteException {
+        clientContainer.updateSecretObjective(objectiveCardId1, objectiveCardId2);
+    }
+
+    @Override
+    public void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
+        clientContainer.updateSharedObjective(sharedObjectiveCardId1, sharedObjectiveCardId2);
+    }
+
+    @Override
+    public void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
+        clientContainer.updateMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
+    }
+
+    @Override
+    public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
+        clientContainer.updateStarterCard(playerIndex, cardId1, side);
+    }
+
+    @Override
+    public void updateWinner(int playerIndex) throws RemoteException {
+        clientContainer.updateWinner(playerIndex);
+    }
 }

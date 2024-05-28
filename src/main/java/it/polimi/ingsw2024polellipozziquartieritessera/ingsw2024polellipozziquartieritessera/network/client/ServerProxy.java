@@ -27,12 +27,6 @@ public class ServerProxy implements VirtualServer {
     }
 
     @Override
-    public void showNickname(VirtualView client) throws RemoteException {
-        output.println(Command.SHOWNICKNAME);
-        output.flush();
-    }
-
-    @Override
     public void startGame(VirtualView client) throws RemoteException {
         output.println(Command.START);
         output.flush();
@@ -56,20 +50,10 @@ public class ServerProxy implements VirtualServer {
         output.flush();
     }
 
-    @Override
-    public void showHand(VirtualView client) {
-        output.println(Command.SHOWHAND);
-        output.flush();
-    }
-
-    public void showCommonObjectives(VirtualView client) {
-        output.println(Command.SHOWOBJECTIVES);
-        output.flush();
-    }
 
     @Override
     public void placeCard(VirtualView client, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws RemoteException {
-        output.println(Command.PLACECARD + "; " + "; " + placingCardId + "; " + tableCardId + "; " + tableCornerPos.toString() + "; " + placingCardSide.toString());
+        output.println(Command.PLACECARD + "; " + placingCardId + "; " + tableCardId + "; " + tableCornerPos.toString() + "; " + placingCardSide.toString());
         output.flush();
     }
 
@@ -94,6 +78,12 @@ public class ServerProxy implements VirtualServer {
     @Override
     public void addMessage(VirtualView client, String content) throws RemoteException {
         output.println(Command.ADDMESSAGE + "; " + content);
+        output.flush();
+    }
+
+    @Override
+    public void ping(VirtualView client) throws RemoteException {
+        output.println(Command.PING);
         output.flush();
     }
 }

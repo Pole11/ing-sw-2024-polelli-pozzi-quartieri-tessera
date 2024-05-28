@@ -1,0 +1,43 @@
+.root {
+    -fx-background-color: rgb(220, 200, 60);
+    -fx-border-width: 10px;
+    -fx-border-style: solid;
+    -fx-border-color: rgb(180, 160, 30);
+    -fx-font-size: 16px;
+    -fx-font-family: 'Comic Neue';
+}
+
+.cardDeck {
+    -fx-border-width: 0px 3px 3px 0px;
+    -fx-border-style: solid;
+    -fx-border-color: rgb(140, 120, 0);
+}
+
+.plateauContainerGame {
+    -fx-padding: 10px;
+    -fx-max-width: 480px;
+}
+
+.blueBackground {
+    -fx-background-color: rgba(0, 0, 255, 0.4);
+}
+
+.greenBackground {
+    -fx-background-color: rgba(0, 128, 0, 0.4);
+}
+
+.redBackground {
+    -fx-background-color: rgba(255, 0, 0, 0.4);
+}
+
+.yellowBackground {
+    -fx-background-color: rgba(255, 255, 0, 0.4);
+}
+
+.horizontalPlayerContainer {
+    -fx-padding: 30px;
+}
+
+.verticalPlayerContainer {
+    -fx-padding: 30px;
+}
