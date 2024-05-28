@@ -8,10 +8,22 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Starter Card class
+ */
 public class StarterCard extends CornerCard {
-    private final ArrayList<Element> centerResources; // array of center resources in the front side
+    /**
+     * List of center resources given by the front side of the card
+     */
+    private final ArrayList<Element> centerResources;
 
-    // CONSTRUCTOR
+    /**
+     * Starter Card Constructor
+     * @param id Card identifier
+     * @param frontCorners Front corners array
+     * @param backCorners Back corners array
+     * @param centerResource Center resources of the front side array
+     */
     public StarterCard(int id, Corner[] frontCorners, Corner[] backCorners, ArrayList<Element> centerResource) {
         super(id, frontCorners, backCorners, 0);
         this.centerResources = centerResource;
@@ -22,14 +34,7 @@ public class StarterCard extends CornerCard {
         return centerResources;
     }
 
-    @Override
-    public StarterCard getCard(){
-        return this;
-    }
-
     // METHODS
-
-
     @Override
     public Challenge getChallenge() {
         return null;
@@ -40,12 +45,10 @@ public class StarterCard extends CornerCard {
         return 0;
     }
 
-    // return null (it needs to be implemented because it's an abstract method in CornerCard)
     public Element getResourceType() throws WrongInstanceTypeException {
         throw new WrongInstanceTypeException("called a method on starter card that is implemented only on Resource or Gold card");
     }
 
-    // returns the resource visible on the side requested
     public ArrayList<Element> getUncoveredElements(Side side){
         // resource array initialization
         ArrayList<Element> uncoveredResources = new ArrayList<>();

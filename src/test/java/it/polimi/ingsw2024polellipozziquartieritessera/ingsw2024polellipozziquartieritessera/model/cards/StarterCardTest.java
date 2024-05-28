@@ -1,4 +1,5 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
@@ -22,6 +23,8 @@ public class StarterCardTest {
 
             assertEquals(card.getCenterResources().getFirst(), Element.ANIMAL);
             assertEquals(card.getCenterResources().size(), 2);
+            assertNull(card.getChallenge());
+
         } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
                  NotUniquePlayerColorException e) {
             throw new RuntimeException(e);
@@ -33,6 +36,8 @@ public class StarterCardTest {
         // setup
         GameState g = Populate.populate();
         StarterCard card = (StarterCard) g.getCard(84);
+
+        assertThrows(WrongInstanceTypeException.class, card::getResourceType);
     }
 
     @Test
@@ -64,5 +69,16 @@ public class StarterCardTest {
                  NotUniquePlayerColorException  e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    void testCalculatePoints() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
+        GameState g = Populate.populate();
+
+        StarterCard card = (StarterCard) g.getCard(84);
+
+        Player player = new Player("Bob", null, g);
+
+        assertEquals(card.calculatePoints(player), 0);
     }
 }

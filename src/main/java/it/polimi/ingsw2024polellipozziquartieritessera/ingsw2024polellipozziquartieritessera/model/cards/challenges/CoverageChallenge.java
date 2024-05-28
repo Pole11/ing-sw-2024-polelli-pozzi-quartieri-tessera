@@ -5,14 +5,16 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.util.ArrayList;
 
+/**
+ * Coverage Challenge Class
+ */
 public class CoverageChallenge extends Challenge{
 
     @Override
     public int getTimesWon(Player player, GoldCard card) {
         ArrayList<Corner> uncoveredCorners = card.getUncoveredCorners(player.getPlacedCardSide(card.getId()));
         int times = 0;
-        for (int i = 0; i < uncoveredCorners.size(); i++) {
-            Corner corner = uncoveredCorners.get(i);
+        for (Corner corner : uncoveredCorners) {
             Corner linkedCorner = corner.getLinkedCorner();
             if (linkedCorner != null)
                 times++;
@@ -24,6 +26,5 @@ public class CoverageChallenge extends Challenge{
     @Override
     public int getTimesWon(Player player, ObjectiveCard card) {
         throw new RuntimeException();
-        //SISTEMA
     }
 }

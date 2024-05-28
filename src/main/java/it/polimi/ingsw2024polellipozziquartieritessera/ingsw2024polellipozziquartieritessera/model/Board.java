@@ -7,13 +7,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+/**
+ * Board class
+ */
 public class Board {
-    private GoldCard[] sharedGoldCards; // 2 gold cards shared between players
-    private ResourceCard[] sharedResourceCards; // 2 resource cards shared between players
-    private ObjectiveCard[] sharedObjectiveCards; // 2 objective cards shared between players
-    private final ArrayList<GoldCard> goldDeck; // may be final (the reference only)
-    private final ArrayList<ResourceCard> resourceDeck; // may be final (the reference only)
+    /**
+     * Gold cards shared between players
+     */
+    private GoldCard[] sharedGoldCards;
+    /**
+     * Resource cards shared between players
+     */
+    private ResourceCard[] sharedResourceCards;
+    /**
+     * Objective cards shared between players
+     */
+    private ObjectiveCard[] sharedObjectiveCards;
+    /**
+     * List of gold card in deck
+     */
+    private final ArrayList<GoldCard> goldDeck;
+    /**
+     * List of resource card in deck
+     */
+    private final ArrayList<ResourceCard> resourceDeck;
 
+    /**
+     * Board Constructor
+     */
     public Board(){
         sharedGoldCards = new GoldCard[Config.N_SHARED_GOLDS];
         sharedResourceCards = new ResourceCard[Config.N_SHARED_RESOURCES];
@@ -72,80 +93,65 @@ public class Board {
 
     //EMPTINESS
 
+    /**
+     * Check if the resource deck is empty
+     * @return True if empty resource deck
+     */
     public boolean isResourceDeckEmpty(){
         return resourceDeck.isEmpty();
     }
 
+    /**
+     * Check if the gold deck is empty
+     * @return True if empty gold deck
+     */
     public boolean isGoldDeckEmpty(){
         return goldDeck.isEmpty();
     }
 
-
-    //SETTER
-    /*
-    public void setSharedGoldCards(GoldCard[] sharedGoldCards) {
-        this.sharedGoldCards = sharedGoldCards;
-    }
-
-    public void setSharedResourceCards(ResourceCard[] sharedResourceCard) {
-        this.sharedResourceCards = sharedResourceCard;
-    }
-
-    public void setSharedObjectiveCards(ObjectiveCard[] sharedObjectiveCards) {
-        this.sharedObjectiveCards = sharedObjectiveCards;
-    }
-
-    //GETTER
-    public GoldCard[] getSharedGoldCards() {
-        return sharedGoldCards;
-    }
-
-    public ResourceCard[] getSharedResourceCards() {
-        return sharedResourceCards;
-    }
-
-    public ObjectiveCard[] getSharedObjectiveCards() {
-        return sharedObjectiveCards;
-    }
-
-
-    public ArrayList<GoldCard> getGoldDeck() {
-        return new ArrayList<>(goldDeck);
-    }
-
-    public ArrayList<ResourceCard> getResourceDeck() {
-        return new ArrayList<>(resourceDeck);
-    }
-    */
-    //ADDER
-
+    /**
+     * Add a card to the gold deck
+     * @param goldCard Gold card to add
+     */
     public void addToGoldDeck(GoldCard goldCard) {
         goldDeck.add(goldCard);
     }
 
+    /**
+     * Add a card to the resource deck
+     * @param resourceCard Resource card to add
+     */
     public void addToResourceDeck(ResourceCard resourceCard) {
         resourceDeck.add(resourceCard);
     }
 
-    //deck remover are not needed, because the card are remove in the drawcard in this class
-
+    //deck remover are not needed, because the card are removed when drawn
 
     //METHODS
-
     //------------inizitization-----------------
 
+    /**
+     * Initialize the shared gold cards on the board
+     * @throws EmptyDeckException Deck is empty
+     */
     public void initSharedGoldCards() throws EmptyDeckException {
         // it's like fillSharedGaps, look at the draw from shared methods to take inspiration
         this.sharedGoldCards[0] = drawFromGoldDeck();
         this.sharedGoldCards[1] = drawFromGoldDeck();
     }
 
+    /**
+     * Initialize the shared resource cards on the board
+     * @throws EmptyDeckException Deck is empty
+     */
     public void initSharedResourceCards() throws EmptyDeckException {
         this.sharedResourceCards[0] = drawFromResourceDeck();
         this.sharedResourceCards[1] = drawFromResourceDeck();
     }
 
-
+    /**
+     * Shuffle decks
+     */
     public void shuffleCards() {
         Random randStream = new Random();
         for (int i = 0; i < this.goldDeck.size(); i++) {
@@ -165,7 +171,12 @@ public class Board {
 
     //-------------drawCard Methods-----------------------
 
-    // returns the card and replace shared
+    /**
+     * Get a card from the shared golds, removing it from the shared golds
+     * @param pos Position of the shared gold card (1-2)
+     * @return Gold card drawn
+     * @throws EmptyDeckException Deck is empty
+     */
     public GoldCard drawSharedGoldCard(int pos) throws EmptyDeckException {
         // verify position is valid
         if (pos < 1 || pos > this.sharedGoldCards.length) {
@@ -179,7 +190,12 @@ public class Board {
         return drawnCard;
     }
 
-    // returns the card and replace shared
+    /**
+     * Get a card from the shared resources, removing it from the shared resources
+     * @param pos Position of the shared resource card (1-2)
+     * @return Resource card drawn
+     * @throws EmptyDeckException Deck is empty
+     */
     public ResourceCard drawSharedResourceCard(int pos) throws EmptyDeckException {
         // verify position is valid
         if (pos < 1 || pos > this.sharedResourceCards.length) {
@@ -193,6 +209,11 @@ public class Board {
         return drawnCard;
     }
 
+    /**
+     * Get a card from the resource deck, removing it from the deck
+     * @return Resource card drawn
+     * @throws EmptyDeckException Deck is empty
+     */
     //return and remove
     public ResourceCard drawFromResourceDeck() throws EmptyDeckException {
         if (resourceDeck.isEmpty()) throw new EmptyDeckException("The resource deck is empty");
@@ -201,7 +222,11 @@ public class Board {
         return drawnCard;
     }
 
-    //return and remove
+    /**
+     * Get a card from the gold deck, removing it from the deck
+     * @return Gold card drawn
+     * @throws EmptyDeckException Deck is empty
+     */
     public GoldCard drawFromGoldDeck() throws EmptyDeckException {
         if (goldDeck.isEmpty()) throw new EmptyDeckException("The gold deck is empty");
         GoldCard drawnCard = this.goldDeck.getLast();

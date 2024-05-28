@@ -7,12 +7,33 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.util.ArrayList;
 
+/**
+ * Gold Card class
+ */
 public class GoldCard extends CornerCard {
-    private final Element resourceType; // color of the card, determined by the major resourceType
-    private final Challenge challenge; // challenge related to this card (if null, points are gained when played)
-    private final ArrayList<Element> resourceNeeded; // resource needed to place the card
+    /**
+     * Type of the card, determined by the major resourceType
+     */
+    private final Element resourceType;
+    /**
+     * Challenge related to this card (if null, points are gained when played)
+     */
+    private final Challenge challenge;
+    /**
+     * Resource needed to place the card
+     */
+    private final ArrayList<Element> resourceNeeded;
 
-    // CONSTRUCTOR
+    /**
+     * Gold Card Constructor
+     * @param id Identifier of the card
+     * @param resourceType Card element type
+     * @param challenge Challenge on the card
+     * @param resourceNeeded Resources needed for card placement
+     * @param points Number of points given by the card
+     * @param frontCorners Front corners array
+     * @param backCorners Back corners array
+     */
     public GoldCard(int id, Element resourceType, Challenge challenge, ArrayList<Element> resourceNeeded, int points, Corner[] frontCorners, Corner[] backCorners) {
         super(id, frontCorners, backCorners, points);
         this.resourceType = resourceType;
@@ -29,14 +50,7 @@ public class GoldCard extends CornerCard {
         return resourceNeeded;
     }
 
-    @Override
-    public GoldCard getCard() {
-        return this;
-    }
-
     // METHODS
-
-
     @Override
     public Challenge getChallenge() {
         return challenge;
@@ -54,7 +68,6 @@ public class GoldCard extends CornerCard {
         }
     }
 
-    // returns the elements visible on the requested side
     public ArrayList<Element> getUncoveredElements(Side side){
         // resource array initialization
         ArrayList<Element> uncoveredElements = new ArrayList<>();

@@ -7,10 +7,23 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.util.ArrayList;
 
+/**
+ * Resource card class
+ */
 public class ResourceCard extends CornerCard {
-    private final Element resourceType; //color of the card, determined by the major resourceType
+    /**
+     * Type of the card, determined by the major resourceType
+     */
+    private final Element resourceType;
 
-    // CONSTRUCTOR
+    /**
+     * Resource card constructor
+     * @param id Identifier of the card
+     * @param resourceType Card element type
+     * @param points Number of points given by the card
+     * @param frontCorners Front corners array
+     * @param backCorners Back corners array
+     */
     public ResourceCard(int id, Element resourceType, int points, Corner[] frontCorners, Corner[] backCorners) {
         super(id, frontCorners, backCorners, points);
         this.resourceType = resourceType;
@@ -21,14 +34,7 @@ public class ResourceCard extends CornerCard {
         return resourceType;
     }
 
-    @Override
-    public ResourceCard getCard() {
-        return this;
-    }
-
     // METHODS
-
-
     @Override
     public Challenge getChallenge() {
         return null;
@@ -41,7 +47,6 @@ public class ResourceCard extends CornerCard {
         return this.getPoints();
     }
 
-    // returns the resource visible on the side requested
     public ArrayList<Element> getUncoveredElements(Side side){
         // resource array initialization
         ArrayList<Element> uncoveredElements = new ArrayList<>();
@@ -56,7 +61,6 @@ public class ResourceCard extends CornerCard {
                 }
             }
         }
-
         return uncoveredElements;
     }
 }

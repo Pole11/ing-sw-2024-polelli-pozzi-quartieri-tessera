@@ -24,6 +24,7 @@ public class CornerTest {
 
         corner.setLinkedCorner(corner.getLinkedCorner());
         corner.setCovered(corner.getCovered());
+        assertNotNull(corner.getHidden());
 
         assertNotNull(corner.getElement());
         assertEquals(corner.getCard(), card.getId());

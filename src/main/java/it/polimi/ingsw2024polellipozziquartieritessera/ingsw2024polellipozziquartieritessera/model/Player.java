@@ -8,26 +8,77 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.util.*;
 
+/**
+ * Player class
+ */
 public class Player {
+    /**
+     * Player nickname
+     */
     private final String nickname;
+    /**
+     * Player board, structured like a variable matrix of card IDs
+     */
     private final ArrayList<ArrayList<Integer>> playerBoard;
+    /**
+     * The map of all placed cards, that relate a card ID with his played side
+     */
     private final HashMap<Integer, Side> placedCardsMap;
+    /**
+     * The map of all cards in hand, that relate a card ID with his hand side
+     */
     private final HashMap<Integer, Side> handCardsMap;
+    /**
+     * Color of the player
+     */
     private Color color;
-
+    /**
+     * Total points gained by the player
+     */
     private int points;
+    /**
+     * Number of won objective challenges
+     */
     private int objectivesWon;
-    private StarterCard starterCard; // it is the most important card because it is used to create all the composition of the cards
-    private ObjectiveCard objectiveCard; // it is the secret objective
-    private ObjectiveCard[] objectiveCardOptions; // it is the  array of the choice for secret objective
-
+    /**
+     * Starting card for the board, essential to relate all the cards in board
+     */
+    private StarterCard starterCard;
+    /**
+     * Secret objective card, unique for each player
+     */
+    private ObjectiveCard objectiveCard;
+    /**
+     * List of the selectable objective cards
+     */
+    private ObjectiveCard[] objectiveCardOptions;
+    /**
+     * Map of the centerResources of the player cards, relates a card ID with the center Resource
+     */
     private final HashMap<Integer, Element> centerResource;
+    /**
+     * Map of all elements the player currently have, each Element is associated with the number of his occurrences
+     */
     private final HashMap<Element, Integer> allElements;
-
+    /**
+     * True if the player is connected (false if disconnected)
+     */
     private boolean connected;
+    /**
+     * Virtual view associated to the client
+     */
     private VirtualView client;
+    /**
+     * Instance of the GameState, needed to make the player aware of the GameState he is in
+     */
     private final GameState gameState;
 
+    /**
+     * Player Constructor
+     * @param nickname Player nickname string
+     * @param client Virtual view that this player is linked to
+     * @param gameState Instance of the GameState the player is in
+     */
     public Player(String nickname, VirtualView client, GameState gameState){
         this.gameState = gameState;
 
