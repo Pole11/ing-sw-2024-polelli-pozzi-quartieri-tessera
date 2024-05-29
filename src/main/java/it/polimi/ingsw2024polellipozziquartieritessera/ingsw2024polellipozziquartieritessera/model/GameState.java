@@ -128,10 +128,6 @@ public class GameState {
         this.eventQueue.add(event);
     }
 
-    public void decrementTurn() {
-        this.turnToPlay--;
-    }
-
     //EVENTQUEUE
 
     //even if there aren't always 4 players
@@ -253,19 +249,30 @@ public class GameState {
             numberConnected = players.stream().filter(Player::isConnected).count();
             players.notifyAll();
         }
-        if (numberConnected == 1) {
+        if (numberConnected <= 1) {
             this.prevGamePhase = currentGamePhase;
             this.currentGamePhase = GamePhase.TIMEOUT;
             timeoutThread = new Thread(() -> {
                 try {
                     Thread.sleep(60 * 1000);
+                    //if the timeout ends
+                    currentGamePhase = GamePhase.FINALPHASE;
+                    ArrayList<Integer> winners;
+                    synchronized (players) {
+                        winners = (ArrayList<Integer>) players.stream().filter(Player::isConnected).map(this::getPlayerIndex).toList();
+                        players.notifyAll();
+                    }
+                    synchronized (eventQueue) {
+                        eventQueue.add(new GameEndedEvent(this, allClients(), winners));
+                        eventQueue.notifyAll();
+                    }
+                    System.out.println("game ended after timeout expired");
+                    restart();
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             });
             timeoutThread.start();
-        } else if (numberConnected == 0) {
-            //chiedere specifica
         }
     }
 
@@ -760,6 +767,7 @@ public class GameState {
                 eventQueue.add(new GameEndedEvent(this, allClients(), winners));
                 eventQueue.notifyAll();
             }
+            restart();
         }
     }
 
@@ -819,6 +827,10 @@ public class GameState {
             winnerPlayerIndeces = winnerObjectives;
         }
         return (winnerPlayerIndeces);
+    }
+
+    public void restart(){
+        //call pupulate
     }
 
 
