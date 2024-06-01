@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
 import java.io.*;
 import java.net.*;
@@ -14,9 +15,9 @@ public class SocketClient implements VirtualView {
     private final ServerProxy server;
     private final Client clientContainer;
 
-    public SocketClient(BufferedReader input, BufferedWriter output, Client clientContainer) {
+    public SocketClient(BufferedReader input, VirtualServer server, Client clientContainer) {
         this.input = input;
-        this.server = new ServerProxy(output);
+        this.server = (ServerProxy) server;
         this.clientContainer = clientContainer;
     }
 

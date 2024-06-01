@@ -109,10 +109,8 @@ public class Server implements VirtualServer {
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException {
         if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE) || controller.getGamePhase().equals(GamePhase.TIMEOUT)){
-
-            //this.clients.put(this.clients.size(), client);
+            System.out.println("New player tried connecting!");
             this.controller.addPlayer(client, nickname);
-            System.out.println("New player connected!");
         } else {
             client.sendError("You cannot do this action now");
         }
