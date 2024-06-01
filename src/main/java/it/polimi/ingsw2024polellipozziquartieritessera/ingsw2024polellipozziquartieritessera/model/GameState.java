@@ -145,15 +145,19 @@ public class GameState {
 
     private void executeEventsRunnable() {
         while (true) {
+            Event event;
             synchronized (eventQueue) {
                 while (eventQueue.isEmpty()) {
                     try {
+                        eventQueue.notifyAll();
                         eventQueue.wait();
                     } catch (InterruptedException e) {
                     }
                 }
-                eventQueue.remove().execute();
+                event = eventQueue.remove();
+                eventQueue.notifyAll();
             }
+            event.execute();
         }
     }
 
@@ -174,8 +178,12 @@ public class GameState {
         return clients;
     }
 
-    public ArrayList<VirtualView> allClients() {
+    public ArrayList<VirtualView> allConnectedClients() {
         return (ArrayList<VirtualView>) players.stream().filter(Player::isConnected).map(Player::getClient).collect(Collectors.toList());
+    }
+
+    public ArrayList<VirtualView> allClients() {
+        return (ArrayList<VirtualView>) players.stream().map(Player::getClient).collect(Collectors.toList());
     }
 
 
@@ -183,45 +191,52 @@ public class GameState {
 
     public void pingThreadRunnable() {
         while (true) {
-            updatePlayersConnected();
-            int i = 0;
-            for (Thread playerThread : playerThreads) {
+            for (int i = 0; i < playerThreads.size(); i++){
                 int finalI = i;
-                playerThread = new Thread(() -> {
+                playerThreads.set(i, new Thread(() -> {
                     int j = finalI;
                     try {
-                        //wait for the answare of players
-                        Thread.sleep(1000 * 3);
+                        System.out.println(j);
+                        //wait for the answer of players
+                        Thread.sleep(1000 * 5);
+                        System.out.println("client "  + j + " disconnected");
+                        synchronized (players) {
+                            players.get(j).setConnected(false);
+                            players.notifyAll();
+                        }
                     } catch (InterruptedException e) {
+                        players.get(j).setConnected(true);
                     }
-                    synchronized (players) {
-                        players.get(j).setConnected(false);
-                        players.notifyAll();
-                    }
-                });
-                playerThread.start();
-                i++;
+                }));
+                playerThreads.get(i).start();
             }
+
+            updatePlayersConnected();
 
             try {
                 //wait to ping another time
-                Thread.sleep(1000 * 5);
+                Thread.sleep(1000 * 10);
             } catch (InterruptedException e) {
             }
         }
     }
 
-    public void pingAnswere(VirtualView client) {
+    public void pingAnswer(VirtualView client) {
+
         synchronized (players) {
             playerThreads.get(getPlayerIndex(client)).interrupt();
-            players.get(getPlayerIndex(client)).setConnected(true);
+            try {
+                playerThreads.get(getPlayerIndex(client)).join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             players.notifyAll();
         }
     }
 
     public void setPlayersConnected(int index, boolean connected) {
         players.get(index).setConnected(connected);
-        players.get(index).setClient(null);
+        //players.get(index).setClient(null);
     }
 
     private void manageReconnection(Player player) {
@@ -263,7 +278,7 @@ public class GameState {
                         players.notifyAll();
                     }
                     synchronized (eventQueue) {
-                        eventQueue.add(new GameEndedEvent(this, allClients(), winners));
+                        eventQueue.add(new GameEndedEvent(this, allConnectedClients(), winners));
                         eventQueue.notifyAll();
                     }
                     System.out.println("game ended after timeout expired");
@@ -287,7 +302,7 @@ public class GameState {
             }
         }
         synchronized (eventQueue) {
-            eventQueue.add(new UpdateCurrentPlayer(this, allClients(), currentPlayerIndex));
+            eventQueue.add(new UpdateCurrentPlayer(this, allConnectedClients(), currentPlayerIndex));
             eventQueue.notifyAll();
         }
         //TODO: capire se va bene decrementare di 1 in ogni caso
@@ -299,10 +314,10 @@ public class GameState {
     }
 
     private void updatePlayersConnected() {
-        players.stream().map(Player::getClient).forEach(e -> {
+        synchronized (eventQueue){
             eventQueue.add(new PingEvent(this, allClients()));
             eventQueue.notifyAll();
-        });
+        }
     }
 
 
@@ -341,9 +356,7 @@ public class GameState {
 
     public void addPlayer(String nickname, VirtualView client) {
         Player player = new Player(nickname, client, this);
-        //TODO: CONTROLLA se salta i null
-        List<VirtualView> clients = allClients();
-        System.out.println("CLIENTS:" + clients.size());
+        List<VirtualView> clients = allConnectedClients();
         if (clients.size() >= Config.MAX_PLAYERS) {
             synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "The game is full"));
@@ -351,7 +364,8 @@ public class GameState {
             }
             return;
         }
-        if (clients.contains(client)) {
+
+        if (allClients().contains(client)) {
             synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "You already chose a nickname, you cannot change it"));
                 eventQueue.notifyAll();
@@ -384,6 +398,7 @@ public class GameState {
             }
         }
         players.add(player);
+        playerThreads.add(new Thread());
         synchronized (eventQueue) {
             eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
             eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
@@ -416,7 +431,7 @@ public class GameState {
 
 
     public void startGame(VirtualView client) throws EmptyDeckException {
-        ArrayList<VirtualView> clients = allClients();
+        ArrayList<VirtualView> clients = allConnectedClients();
         if (!clients.contains(client)) {
             synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "Please register before starting the game"));
@@ -440,15 +455,15 @@ public class GameState {
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
         synchronized (eventQueue) {
-            eventQueue.add(new updateMainBoardEvent(this, allClients(), mainBoard));
+            eventQueue.add(new updateMainBoardEvent(this, allConnectedClients(), mainBoard));
             eventQueue.notifyAll();
         }
         this.initStarters(); // set the starters cards for every player
         System.out.println("Starting game");
         this.currentGamePhase = GamePhase.CHOOSESTARTERSIDEPHASE;
         synchronized (eventQueue) {
-            //eventQueue.add(new StartEvent(this, allClients()));
-            eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSESTARTERSIDEPHASE));
+            //eventQueue.add(new StartEvent(this, allConnectedClients()));
+            eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), GamePhase.CHOOSESTARTERSIDEPHASE));
             eventQueue.notifyAll();
         }
     }
@@ -485,7 +500,7 @@ public class GameState {
         player.addToPlacedCardsMap(playerStarterCard.getId(), side);
 
         synchronized (eventQueue) {
-            eventQueue.add(new UpdateStarterCardEvent(this, allClients(), playerIndex, playerStarterCard.getId(), side));
+            eventQueue.add(new UpdateStarterCardEvent(this, allConnectedClients(), playerIndex, playerStarterCard.getId(), side));
             eventQueue.notifyAll();
         }
 
@@ -503,7 +518,7 @@ public class GameState {
             System.out.println("everyone answred");
             this.currentGamePhase = GamePhase.CHOOSECOLORPHASE;
             synchronized (eventQueue) {
-                eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSECOLORPHASE));
+                eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), GamePhase.CHOOSECOLORPHASE));
                 eventQueue.notifyAll();
             }
             resetAnswered();
@@ -546,7 +561,7 @@ public class GameState {
             this.setObjectives();
             this.currentGamePhase = GamePhase.CHOOSEOBJECTIVEPHASE;
             synchronized (eventQueue) {
-                eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.CHOOSEOBJECTIVEPHASE));
+                eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), GamePhase.CHOOSEOBJECTIVEPHASE));
                 eventQueue.notifyAll();
             }
         }
@@ -595,7 +610,7 @@ public class GameState {
         sharedObjectives.add(objectiveCard1);
 
         synchronized (eventQueue) {
-            eventQueue.add(new UpdateSharedObjectiveEvent(this, allClients(), sharedObjectives));
+            eventQueue.add(new UpdateSharedObjectiveEvent(this, allConnectedClients(), sharedObjectives));
             eventQueue.notifyAll();
         }
     }
@@ -627,8 +642,8 @@ public class GameState {
             resetAnswered();
             currentGamePhase = GamePhase.MAINPHASE;
             synchronized (eventQueue) {
-                eventQueue.add(new UpdateGamePhaseEvent(this, allClients(), GamePhase.MAINPHASE));
-                eventQueue.add(new UpdateCurrentPlayer(this, allClients(), currentPlayerIndex));
+                eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), GamePhase.MAINPHASE));
+                eventQueue.add(new UpdateCurrentPlayer(this, allConnectedClients(), currentPlayerIndex));
                 eventQueue.notifyAll();
             }
         }
@@ -688,7 +703,7 @@ public class GameState {
         //NON MI PIACE MESSA QUI PERCHE NON E' L'ULTIMA AZIONE DEL CONTROLLER, CERCARE DI CAPIRE COME MODIFIFCARE
         //ANDRA MESSO NELLO STATE PATTERN
         synchronized (eventQueue) {
-            eventQueue.add(new UpdateTurnPhaseEvent(this, allClients(), TurnPhase.DRAWPHASE));
+            eventQueue.add(new UpdateTurnPhaseEvent(this, allConnectedClients(), TurnPhase.DRAWPHASE));
             eventQueue.notifyAll();
         }
     }
@@ -764,7 +779,7 @@ public class GameState {
                 throw new RuntimeException(e);
             }
             synchronized (eventQueue) {
-                eventQueue.add(new GameEndedEvent(this, allClients(), winners));
+                eventQueue.add(new GameEndedEvent(this, allConnectedClients(), winners));
                 eventQueue.notifyAll();
             }
             restart();

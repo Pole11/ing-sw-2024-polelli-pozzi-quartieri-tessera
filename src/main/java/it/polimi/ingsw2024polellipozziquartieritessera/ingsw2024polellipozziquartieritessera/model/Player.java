@@ -167,7 +167,7 @@ public class Player {
     public void setColor(Color color){
         this.color = color;
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateColorEvent(gameState, gameState.allClients(), this, color));
+            gameState.addToEventQueue(new UpdateColorEvent(gameState, gameState.allConnectedClients(), this, color));
             gameState.getEventQueue().notifyAll();
         }
     }
@@ -175,9 +175,10 @@ public class Player {
     public void setConnected(boolean connected){
         this.connected = connected;
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new ConnectionInfoEvent(gameState, gameState.allClients(), this, connected));
+            gameState.addToEventQueue(new ConnectionInfoEvent(gameState, gameState.allConnectedClients(), this, connected));
             gameState.getEventQueue().notifyAll();
         }
+
     }
 
     //ADDER/REMOVER
@@ -193,7 +194,7 @@ public class Player {
     public void addToHandCardsMap(Integer index, Side side){
         this.handCardsMap.put(index, side);
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateAddHandEvent(gameState, gameState.allClients(), this, index));
+            gameState.addToEventQueue(new UpdateAddHandEvent(gameState, gameState.allConnectedClients(), this, index));
             gameState.getEventQueue().notifyAll();
         }
     }
@@ -201,7 +202,7 @@ public class Player {
     public void removeFromHandCardsMap(Integer index){
         this.handCardsMap.remove(index);
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateRemoveHandEvent(gameState, gameState.allClients(), this, index));
+            gameState.addToEventQueue(new UpdateRemoveHandEvent(gameState, gameState.allConnectedClients(), this, index));
             gameState.getEventQueue().notifyAll();
         }
     }
@@ -209,7 +210,7 @@ public class Player {
     public void addPoints(int points) {
         this.points += points;
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdatePointsEvent(gameState, gameState.allClients(), this, points));
+            gameState.addToEventQueue(new UpdatePointsEvent(gameState, gameState.allConnectedClients(), this, points));
             gameState.getEventQueue().notifyAll();
         }
     }
@@ -248,7 +249,7 @@ public class Player {
         updateBoard(placingCardId, tableCardId, tableCornerPos);
         this.centerResource.put(placingCardId, placingCard.getResourceType());
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateBoardEvent(gameState, gameState.allClients(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide));
+            gameState.addToEventQueue(new UpdateBoardEvent(gameState, gameState.allConnectedClients(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide));
             gameState.getEventQueue().notifyAll();
         }
     }

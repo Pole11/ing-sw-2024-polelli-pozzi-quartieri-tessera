@@ -18,6 +18,7 @@ public class Client implements VirtualView {
     private GUIApplication guiApplication;
     private final ViewModel viewModel;
     private VirtualView client;
+    private VirtualServer server;
 
     public Client(){
         this.viewModel = new ViewModel();
@@ -48,13 +49,16 @@ public class Client implements VirtualView {
 
             InputStreamReader socketRx = new InputStreamReader(socketToServer.getInputStream());
             OutputStreamWriter socketTx = new OutputStreamWriter(socketToServer.getOutputStream());
+            BufferedReader bufferedReader = new BufferedReader(socketRx);
+            BufferedWriter bufferedWriter = new BufferedWriter(socketTx);
 
-            this.client = new SocketClient(new BufferedReader(socketRx), new BufferedWriter(socketTx), this);
+            this.server = new ServerProxy(bufferedWriter);
+            this.client = new SocketClient(bufferedReader, server, this);
             ((SocketClient) client).run();
         } else { //default rmi
             try {
                 Registry registry = LocateRegistry.getRegistry(host, Integer.parseInt(portString));
-                VirtualServer server = (VirtualServer) registry.lookup("VirtualServer");
+                this.server = (VirtualServer) registry.lookup("VirtualServer");
                 this.client = new RmiClient(server, this);
                 ((RmiClient) client).run();
             } catch (RemoteException | NotBoundException e) {
@@ -165,6 +169,7 @@ public class Client implements VirtualView {
     @Override
     public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
         viewModel.setConnection(playerIndex, connected);
+        System.out.println("playerIndex is " + viewModel.getPlayerIndex());
         if (playerIndex == viewModel.getPlayerIndex()){
             if (connected){
                 System.out.println("you re-connected to the game");
@@ -305,7 +310,11 @@ public class Client implements VirtualView {
 
     @Override
     public void ping(String ping) throws RemoteException {
-        //TODO : respond to ping to manage disconections
+        if (meDoGui){
+
+        } else {
+            cliController.ping(client, server);
+        }
     }
 
     @Override

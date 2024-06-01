@@ -5,6 +5,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.Event;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
@@ -25,10 +26,12 @@ public class CLIController {
         this.executeCommands = new Thread(this::executeCommandsRunnable);
         this.executeCommands.start();
 
+
     }
 
     private void executeCommandsRunnable() {
         while (true) {
+            CommandRunnable command;
             synchronized (commandQueue) {
                 while (commandQueue.isEmpty()) {
                     try {
@@ -36,21 +39,29 @@ public class CLIController {
                     } catch (InterruptedException e) {
                     }
                 }
-                commandQueue.remove().executeCLI();
+                command = commandQueue.remove();
+                commandQueue.notifyAll();
             }
+            command.executeCLI();
         }
     }
 
 
+
     public void manageInput(VirtualServer server, VirtualView client, Client clientContainer, String[] message) throws RemoteException {
-        if (Command.valueOf(message[0]).getType().equals("Local")){
-            Command.valueOf(message[0]).getCommandRunnable(message, server, clientContainer, client).executeCLI();
-        } else {
-            synchronized (commandQueue){
-                commandQueue.add(Command.valueOf(message[0]).getCommandRunnable(message, server, clientContainer, client));
-                commandQueue.notifyAll();
+        try {
+            if (Command.valueOf(message[0].toUpperCase()).getType().equals("Local")){
+                Command.valueOf(message[0].toUpperCase()).getCommandRunnable(message, server, clientContainer, client).executeCLI();
+            } else {
+                synchronized (commandQueue){
+                    commandQueue.add(Command.valueOf(message[0].toUpperCase()).getCommandRunnable(message, server, clientContainer, client));
+                    commandQueue.notifyAll();
+                }
             }
+        } catch (IllegalArgumentException e) {
+            System.err.print("INVALID COMMAND\n> ");
         }
+
 
 /*
         try {
@@ -200,6 +211,17 @@ public class CLIController {
 
  */
     }
+
+    public void ping(VirtualView client, VirtualServer server){
+        synchronized (commandQueue) {
+            PingCommandRunnable commandRunnable = new PingCommandRunnable();
+            commandRunnable.setClient(client);
+            commandRunnable.setServer(server);
+            commandQueue.add(commandRunnable);
+            commandQueue.notifyAll();
+        }
+    }
+
 
     public void printAllCommands() {
         System.out.print("The possible commands are: [");
