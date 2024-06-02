@@ -48,12 +48,6 @@ public class Populate {
     }
 
     public static GameState populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
-        //superfluo ma cambia dopo merge
-        GameState gameState = createCardsMap();
-        return gameState;
-    }
-
-    public static GameState createCardsMap() throws IOException, WrongStructureConfigurationSizeException {
         GameState gameState = new GameState();
 
         String filePath = new File("").getAbsolutePath();

@@ -18,7 +18,7 @@ public class DrawCardCommandRunnable extends CommandRunnable{
             try {
                 drawType = DrawType.valueOf(messageFromCli[1].toUpperCase());
             } catch (IllegalArgumentException e) {
-                System.err.print(("Invalid draw option, please choose a valid option (SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource)"));
+                System.err.print(("Invalid draw option, please choose a valid option (SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource)\n> "));
                 return;
             }
             try {

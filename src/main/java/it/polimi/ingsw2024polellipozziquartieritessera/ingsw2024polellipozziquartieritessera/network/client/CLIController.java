@@ -1,6 +1,5 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
-import com.google.gson.Gson;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
@@ -9,14 +8,10 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
 
-import java.io.File;
-import java.io.IOException;
 import java.rmi.RemoteException;
-import java.time.Instant;
 import java.util.*;
 
 public class CLIController {
@@ -52,7 +47,6 @@ public class CLIController {
     }
 
 
-
     public void manageInput(VirtualServer server, VirtualView client, Client clientContainer, String[] message) throws RemoteException {
         try {
             if (Command.valueOf(message[0].toUpperCase()).getType().equals("Local")){
@@ -66,155 +60,6 @@ public class CLIController {
         } catch (IllegalArgumentException e) {
             System.err.print("INVALID COMMAND\n> ");
         }
-
-
-/*
-        try {
-            Command.valueOf(message[0].toUpperCase());
-        } catch(IllegalArgumentException e) {
-            System.err.print("INVALID COMMAND\n> ");
-            return;
-        }
-
-        switch (Command.valueOf(message[0].toUpperCase())) {
-            case Command.HELP:
-                printAllCommands();
-                break;
-            case Command.ADDUSER:
-                try {
-                    server.addConnectedPlayer(client, message[1]);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.START:
-                server.startGame(client);
-                break;
-            case Command.CHOOSESTARTER:
-                try {
-                    Side side;
-                    try {
-
-                        side = Side.valueOf(message[1].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.err.print(("Invalid side, please enter a valid side (Front / Back)\n> "));
-                        return;
-                    }
-                    server.chooseInitialStarterSide(client, side);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.CHOOSECOLOR:
-                try {
-                    Color color;
-                    try {
-                        color = Color.valueOf(message[1].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.err.print(("Invalid color, please enter a valid color (Blue / Green / Yellow / Red)\n> "));
-                        return;
-                    }
-                    server.chooseInitialColor(client, color);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.CHOOSEOBJECTIVE:
-                try {
-                    int cardId;
-                    try {
-                        cardId = Integer.parseInt(message[1]);
-                    } catch (IllegalArgumentException e) {
-                        System.err.print(("Invalid card id, please insert a valid card id\n> "));
-                        return;
-                    }
-                    server.chooseInitialObjective(client, cardId);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.PLACECARD:
-                try {
-                    int placingCardId;
-                    int tableCardId;
-                    CornerPos tableCornerPos;
-                    Side placingCardSide;
-                    try {
-                        placingCardId = Integer.parseInt(message[1]);
-                    } catch (IllegalArgumentException e) {
-                        System.err.print(("Invalid id of the placing card, please insert a valid id\n> "));
-                        return;
-                    }
-                    try {
-                        tableCardId = Integer.parseInt(message[2]);
-                    } catch (IllegalArgumentException e) {
-                        System.err.print(("Invalid id of the table card, please insert a valid id\n> "));
-                        return;
-                    }
-                    try {
-                        tableCornerPos = CornerPos.valueOf(message[3].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.err.print(("Invalid corner, please insert a valid corner position (Upleft / Upright / Downleft / Downright)\n> "));
-                        return;
-                    }
-                    try {
-                        placingCardSide = Side.valueOf(message[4].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.err.print(("Invalid side, please insert a valid side (Front / Back)\n> "));
-                        return;
-                    }
-                    server.placeCard(client, placingCardId, tableCardId, tableCornerPos, placingCardSide);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.DRAWCARD:
-                try {
-                    DrawType drawType;
-                    try {
-                        drawType = DrawType.valueOf(message[1].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.err.print(("Invalid draw option, please choose a valid option (SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource)"));
-                        return;
-                    }
-                    server.drawCard(client, drawType);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.FLIPCARD:
-                try {
-                    int cardId;
-                    try {
-                        cardId = Integer.parseInt(message[1]);
-                    } catch (NumberFormatException e) {
-                        client.sendError("Please enter a valid card id");
-                        return;
-                    }
-                    server.flipCard(client, cardId);
-                } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-                    System.err.print("INVALID COMMAND\n> ");
-                    return;
-                }
-                break;
-            case Command.OPENCHAT:
-                server.openChat();
-                break;
-            case Command.PING:
-                server.ping(client);
-                break;
-            default:
-                System.err.print("INVALID COMMAND\n> ");
-                break;
-        }
-
- */
     }
 
     public void ping(VirtualView client, VirtualServer server){
@@ -236,21 +81,21 @@ public class CLIController {
         System.out.print("]\n> ");
     }
 
-    public void printCard(int CardId, Side side){
+/*    public void printCard(int CardId, Side side){
         ArrayList<String> cardToPrint = new ArrayList<>();
         cardToPrint = getPrintedCard(CardId, side);
 
         for(int i = 0; i < cardToPrint.size(); i++){
             System.out.println(cardToPrint.get(i));
         }
-    }
+    }*/
 
-    public ArrayList<String> getPrintedCard(int cardId, Side side) {
+/*    public ArrayList<String> getPrintedCard(int cardId, Side side) {
         ArrayList<String> cardToPrint = null;
         Card card = viewModel.cardById(cardId);
         return cardToPrint = printCard(card, side);
 
-    }
+    }*/
 
     public void printBoard(ArrayList<ArrayList<Integer>> board, ArrayList<Integer> cardsOrder){
         int i = 0, j = 0, u = 0 ,v = 0;
@@ -346,10 +191,42 @@ public class CLIController {
 
     }
 
-    private static ArrayList<String> printCard(Card card, Side side){
-        return new ArrayList<>();
+    public void showHand(){
+        ArrayList<Integer> hand = viewModel.getHand(viewModel.getPlayerIndex());
+        ArrayList<Side> sides = new ArrayList<>();
+        ArrayList<String> output = new ArrayList<>();
+        for(int i = 0; i < hand.size(); i++){
+            sides.add(viewModel.getHandCardsSide(hand.get(i)));
+        }
+        output = printNCards(hand, sides);
+        for(int i = 0; i < output.size(); i++){
+            System.out.println(output.get(i));
+        }
     }
-    private static ArrayList<String> printCard(ObjectiveCard card, Side side) {
+
+    public void ShowSecretObjective(){
+        ArrayList<Integer> cards = new ArrayList<>();
+        ArrayList<Side> sides = new ArrayList<>();
+        ArrayList<String> output = new ArrayList<>();
+
+        cards.add(viewModel.getSecretObjectiveCards()[0]);
+        cards.add(viewModel.getSecretObjectiveCards()[2]);
+        sides.add(Side.FRONT);
+        sides.add(Side.FRONT);
+        output = printNCards(cards, sides);
+        for (int i = 0; i < output.size(); i++){
+            System.out.println(output.get(i));
+        }
+    }
+
+    public void showBoard(int player_index){
+
+    }
+
+    private ArrayList<String> printCard(Card card, Side side){
+        return new ArrayList<String>();
+    }
+    private ArrayList<String> printCard(ObjectiveCard card, Side side) {
         // attributes
         int points;
         ArrayList<Element> elementChallenge = null;
@@ -439,7 +316,7 @@ public class CLIController {
         return output;
     }
 
-    private static ArrayList<String> printCard(ResourceCard card, Side side){
+    private ArrayList<String> printCard(ResourceCard card, Side side){
         // attributes
         int points;
         Element resource;
@@ -483,7 +360,22 @@ public class CLIController {
         return output;
     }
 
-    private static ArrayList<String> printCard(GoldCard card, Side side){
+    private ArrayList<String> printNCards(ArrayList<Integer> cards, ArrayList<Side> sides){
+        ArrayList<String> output = new ArrayList<>();
+        ArrayList<String> temp = new ArrayList<>();
+        for(int i = 0; i < 7; i++){
+            output.add("");
+        }
+        for(int i = 0; i < cards.size(); i++) {
+            temp = printCard(viewModel.cardById(cards.get(i)),sides.get(i)) ;
+            for (int j = 0; j < 7; j++) {
+                output.set(j,output.get(i) + " " + temp.get(j));
+            }
+        }
+        return output;
+    }
+
+    private ArrayList<String> printCard(GoldCard card, Side side){
         // attributes
         int points;
         Element resource;
@@ -570,7 +462,7 @@ public class CLIController {
         return output;
     }
 
-    private static ArrayList<String> printCard(StarterCard card, Side side){
+    private ArrayList<String> printCard(StarterCard card, Side side){
         // attributes
         Element[] frontCorners = new Element[Config.N_CORNERS];
         Element[] backCorners = new Element[Config.N_CORNERS];
@@ -621,7 +513,7 @@ public class CLIController {
     }
 
 
-    private static String getFormattedString(int length, String content){
+    private String getFormattedString(int length, String content){
         // ------
         if (length%2 == 0){
             while (content.length() < length){
@@ -646,7 +538,7 @@ public class CLIController {
 
 
 
-    private static void resizeS(ArrayList<ArrayList<String>> matrix){
+    private void resizeS(ArrayList<ArrayList<String>> matrix){
         //remove empty rows
         for(int j = 0; j < matrix.size(); j++){
             Boolean isEmpty = true;
@@ -683,7 +575,7 @@ public class CLIController {
         }
     }
 
-    private static void resizeI(ArrayList<ArrayList<Integer>> matrix){
+    private  void resizeI(ArrayList<ArrayList<Integer>> matrix){
         //remove empty rows
         for(int j = 0; j < matrix.size(); j++){
             Boolean isEmpty = true;

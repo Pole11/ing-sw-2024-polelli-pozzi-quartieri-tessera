@@ -54,6 +54,7 @@ public class ViewModel {
         connessionMap = new HashMap<>();
         colorsMap = new HashMap<>();
         pointsMap = new HashMap<>();
+        winners = new ArrayList<>();
         populateCardsMap();
     }
 

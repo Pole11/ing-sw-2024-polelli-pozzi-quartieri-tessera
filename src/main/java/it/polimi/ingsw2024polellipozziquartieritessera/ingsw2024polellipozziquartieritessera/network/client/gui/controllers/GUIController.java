@@ -121,6 +121,16 @@ abstract public class GUIController {
         return clientContainer;
     }
 
+    public void ping(VirtualView client, VirtualServer server){
+        synchronized (commandQueue) {
+            PingCommandRunnable commandRunnable = new PingCommandRunnable();
+            commandRunnable.setClient(client);
+            commandRunnable.setServer(server);
+            commandQueue.add(commandRunnable);
+            commandQueue.notifyAll();
+        }
+    }
+
     public void setClientContainer(Client clientContainer) {
         this.clientContainer = clientContainer;
     }

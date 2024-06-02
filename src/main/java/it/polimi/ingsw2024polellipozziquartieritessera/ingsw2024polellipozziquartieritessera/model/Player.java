@@ -175,7 +175,7 @@ public class Player {
     public void setConnected(boolean connected){
         this.connected = connected;
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new ConnectionInfoEvent(gameState, gameState.allConnectedClients(), this, connected));
+            gameState.addToEventQueue(new ConnectionInfoEvent(gameState, gameState.allClients(), this, connected));
             gameState.getEventQueue().notifyAll();
         }
 
