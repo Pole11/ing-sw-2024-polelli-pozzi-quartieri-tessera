@@ -75,8 +75,8 @@ public class Client implements VirtualView {
 
         boolean running = true;
         Scanner scan = new Scanner(System.in);
-        System.out.println("Please enter a nickname to start, with the command ADDUSER <nickname>");
-        System.out.print("> "); // print phase
+
+        System.out.print("Please enter a nickname to start, with the command ADDUSER <nickname>\n> ");
         while (running) {
             String line = scan.nextLine();
             String[] message = line.split(" ");
