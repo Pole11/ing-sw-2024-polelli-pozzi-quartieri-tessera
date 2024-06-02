@@ -17,7 +17,10 @@ public enum Command {
      FLIPCARD(new FlipCardCommandRunnable(), "Network"),
      OPENCHAT(new OpenChatCommandRunnable(), "Network"),
      ADDMESSAGE(new AddMessageCommandRunnable(), "Network"),
-     PING(new PingCommandRunnable(), "Network");
+     PING(new PingCommandRunnable(), "Network"),
+     SHOWSECRETOBJECTIVES(new ShowSecretObjectiveCommandRunnable(),"Local"),
+     SHOWHAND(new showHandCommandRunnable(), "Local"),
+     SHOWBOARD(new ShowBoardCommandRunnable(), "Local");
 
      private final CommandRunnable commandRunnable;
      private final String type;

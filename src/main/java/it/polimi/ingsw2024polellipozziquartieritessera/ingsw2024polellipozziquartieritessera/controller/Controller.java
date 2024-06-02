@@ -262,7 +262,6 @@ public class Controller {
     public void addMessage(int playerIndex, String content){}
 
     public synchronized void ping(VirtualView client){
-        System.out.println(client + "pinged");
         gameState.pingAnswer(client);
 
     }

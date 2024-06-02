@@ -7,12 +7,15 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class GameState {
+    //private final Server server;
+
     private final HashMap<Integer, Card> cardsMap;
 
     private final Board mainBoard;
@@ -38,6 +41,7 @@ public class GameState {
 
     // CONSTRUCTOR
     public GameState() {
+        //this.server = server;
         this.cardsMap = new HashMap<>();
 
         this.mainBoard = new Board();
@@ -196,16 +200,17 @@ public class GameState {
                 playerThreads.set(i, new Thread(() -> {
                     int j = finalI;
                     try {
-                        System.out.println(j);
                         //wait for the answer of players
                         Thread.sleep(1000 * 5);
-                        System.out.println("client "  + j + " disconnected");
-                        synchronized (players) {
-                            players.get(j).setConnected(false);
-                            players.notifyAll();
+                        if (players.get(j).isConnected()){
+                            System.out.println("client "  + j + " disconnected");
+                            synchronized (players) {
+                                players.get(j).setConnected(false);
+                                players.notifyAll();
+                            }
                         }
                     } catch (InterruptedException e) {
-                        players.get(j).setConnected(true);
+                        //players.get(j).setConnected(true);
                     }
                 }));
                 playerThreads.get(i).start();
@@ -274,7 +279,7 @@ public class GameState {
                     currentGamePhase = GamePhase.FINALPHASE;
                     ArrayList<Integer> winners;
                     synchronized (players) {
-                        winners = (ArrayList<Integer>) players.stream().filter(Player::isConnected).map(this::getPlayerIndex).toList();
+                        winners = (ArrayList<Integer>) players.stream().filter(Player::isConnected).map(this::getPlayerIndex).collect(Collectors.toList());
                         players.notifyAll();
                     }
                     synchronized (eventQueue) {
@@ -365,7 +370,7 @@ public class GameState {
             return;
         }
 
-        if (allClients().contains(client)) {
+        if (allClients().contains(client) && players.get(getPlayerIndex(client)).isConnected()) {
             synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "You already chose a nickname, you cannot change it"));
                 eventQueue.notifyAll();
@@ -384,7 +389,8 @@ public class GameState {
                         //only to the client
                         eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), this.currentGamePhase));
                         //to all the other clients says that a client reconnected
-                        eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player, true));
+                        //DOVREBBE ESSERE FATTO IN PLAYER ma non so se funzioni
+                        //eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player, true));
                         eventQueue.notifyAll();
                     }
                 } else {
@@ -512,10 +518,10 @@ public class GameState {
 
 
         this.answered.put(playerIndex, true);
-        System.out.println("someone chose his startercard, the number of ansewred is: " + numberAnswered());
+        System.out.println(playerIndex + " chose his startercard, the number of answered is: " + numberAnswered());
         //notify him and all the others about the change
         if (numberAnswered() == players.size()) {
-            System.out.println("everyone answred");
+            System.out.println("everyone answered");
             this.currentGamePhase = GamePhase.CHOOSECOLORPHASE;
             synchronized (eventQueue) {
                 eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), GamePhase.CHOOSECOLORPHASE));
@@ -547,8 +553,11 @@ public class GameState {
         }
         player.setColor(color);
         this.answered.put(playerIndex, true);
+        System.out.println(playerIndex + " chose his color, the number of answered is: " + numberAnswered());
+
 
         if (numberAnswered() == players.size()) {
+            System.out.println("everyone answered");
             resetAnswered();
             try {
                 //send also the cards to the view
@@ -637,8 +646,11 @@ public class GameState {
 
         player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
         this.answered.put(playerIndex, true);
+        System.out.println(playerIndex + " chose his objective, the number of ansewred is: " + numberAnswered());
+
 
         if (numberAnswered() == players.size()) {
+            System.out.println("everyone answered");
             resetAnswered();
             currentGamePhase = GamePhase.MAINPHASE;
             synchronized (eventQueue) {
@@ -845,7 +857,7 @@ public class GameState {
     }
 
     public void restart(){
-        //call pupulate
+
     }
 
 
