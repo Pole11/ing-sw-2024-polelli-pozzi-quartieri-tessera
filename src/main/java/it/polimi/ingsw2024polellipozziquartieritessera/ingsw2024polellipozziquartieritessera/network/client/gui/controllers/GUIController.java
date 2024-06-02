@@ -243,17 +243,21 @@ abstract public class GUIController {
     public void addPanning(Node node) {
         node.setOnMousePressed(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {
-                pressedX = event.getX();
-                pressedY = event.getY();
+                if (event.isControlDown()) {
+                    pressedX = event.getX();
+                    pressedY = event.getY();
+                }
             }
         });
 
         node.setOnMouseDragged(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {
-                node.setTranslateX(node.getTranslateX() + event.getX() - pressedX);
-                node.setTranslateY(node.getTranslateY() + event.getY() - pressedY);
+                if (event.isControlDown()) {
+                    node.setTranslateX(node.getTranslateX() + event.getX() - pressedX);
+                    node.setTranslateY(node.getTranslateY() + event.getY() - pressedY);
 
-                event.consume();
+                    event.consume();
+                }
             }
         });
     }

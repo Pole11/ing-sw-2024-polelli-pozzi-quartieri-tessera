@@ -7,9 +7,13 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.geometry.Insets?>
-<VBox styleClass="root" fx:id="mainContainerBoard"  stylesheets="@../style/game.css, @../style/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerBoard">
+<?import javafx.scene.control.Separator?>
+<VBox styleClass="root" alignment="TOP_CENTER" fx:id="mainContainerBoard" stylesheets="@../style/game.css, @../style/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerBoard">
     <Button onAction="#handleBackToGame" text="Go back to the main window" />
+    <Separator></Separator>
     <HBox alignment="CENTER" id="playerHandContainerGame"></HBox>
+    <Separator></Separator>
+    <Text>Please first click on a corner from your hand and then a corner on the board</Text>
     <Label
             fx:id="serverMessageLabel"
             styleClass="serverMessage"/>

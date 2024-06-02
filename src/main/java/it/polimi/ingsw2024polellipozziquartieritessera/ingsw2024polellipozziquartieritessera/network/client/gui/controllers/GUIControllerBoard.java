@@ -95,6 +95,31 @@ public class GUIControllerBoard extends GUIController {
                     handCardContainer.getChildren().add(tempImageView);
                     if (handContainer != null) handContainer.getChildren().add(handCardContainer);
 
+                    // hover
+                    GridPane imageGridPane = new GridPane();
+                    imageGridPane.setGridLinesVisible(true);
+
+                    for (int k = 0; k < 2; k++) {
+                        imageGridPane.getRowConstraints().add(new RowConstraints(imageHeight/2));
+                    }
+                    for (int k = 0; k < 2; k++) {
+                        imageGridPane.getColumnConstraints().add(new ColumnConstraints(imageHeight*3/4));
+                    }
+
+                    imageGridPane.add(tempImageView, 0, 0);
+                    imageGridPane.setHalignment(tempImageView, HPos.LEFT);
+                    imageGridPane.setValignment(tempImageView, VPos.TOP);
+                    handCardContainer.getChildren().add(imageGridPane);
+
+                    for (int k = 0; k < 2; k++) {
+                        for (int w = 0; w < 2; w++) {
+                            Pane dummyCell = new Pane();
+                            dummyCell.getStyleClass().add("clickable");
+                            imageGridPane.add(dummyCell, w, k);
+                            addHoverBgColor(dummyCell);
+                        }
+                    }
+
                     if (cardIdIterator == handCardId) {
                         int rectX = 0, rectY = 0;
                         if (cornerId == 0 || cornerId == 3) rectX = 0; else rectX = imageHeight*3/4;
@@ -103,11 +128,14 @@ public class GUIControllerBoard extends GUIController {
                         Rectangle clickedRectangle = new Rectangle(rectX, rectY,imageHeight*3/4, imageHeight/2);
                         clickedRectangle.setFill(new Color(0,0,0,0.4));
 
-                        handCardContainer.getChildren().add(clickedRectangle);
+                        Pane rectanglePane = new Pane();
+                        handCardContainer.getChildren().add(rectanglePane);
+                        rectanglePane.getChildren().add(clickedRectangle);
                     }
 
+                    // handle event
                     tempImageView.getStyleClass().add("clickable");
-                    tempImageView.setOnMousePressed(mouseEvent -> {
+                    imageGridPane.setOnMousePressed(mouseEvent -> {
                         cardId = cardIdIterator;
                         // if phase is placing
                         Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
@@ -188,11 +216,11 @@ public class GUIControllerBoard extends GUIController {
                             }
 
                             imageGridPane.add(tempImageView, 0, 0);
-                            gridPane.add(imageGridPane, j, i);
                             gridPane.setHalignment(imageGridPane, HPos.CENTER);
                             gridPane.setValignment(imageGridPane, VPos.CENTER);
                             imageGridPane.setHalignment(tempImageView, HPos.LEFT);
                             imageGridPane.setValignment(tempImageView, VPos.TOP);
+                            gridPane.add(imageGridPane, j, i);
 
                             for (int k = 0; k < 2; k++) {
                                 for (int w = 0; w < 2; w++) {
@@ -212,15 +240,22 @@ public class GUIControllerBoard extends GUIController {
                                     imageGridPane.add(dummyCell, w, k);
                                     addHoverBgColor(dummyCell);
                                     CornerPos finalTableCornerPos = tableCornerPos;
-                                    dummyCell.setOnMouseClicked((mouseEvent) -> {
-                                        if (cornerId >= 0 && cardId >= 0) {
-                                            PlaceCardCommandRunnable command = new PlaceCardCommandRunnable();
-                                            command.setParams(cardId, ele, finalTableCornerPos, getViewModel().getHandCardsSide(cardId));
-                                            addCommand(command, thisController);
-                                            //showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
-                                            goToScene("/fxml/board.fxml");
-                                        } else {
-                                            showAlert(Alert.AlertType.INFORMATION, "Placed card", "Incorrect card placing");
+                                    dummyCell.setOnMousePressed((mouseEvent) -> {
+                                        if (!mouseEvent.isControlDown()) {
+                                            if (cornerId >= 0 && cardId >= 0) {
+                                                PlaceCardCommandRunnable command = new PlaceCardCommandRunnable();
+                                                command.setParams(cardId, ele, finalTableCornerPos, getViewModel().getHandCardsSide(cardId));
+                                                addCommand(command, thisController);
+                                                //showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
+                                                goToScene("/fxml/board.fxml");
+
+                                                /*System.out.println("Placing card id " + cardId);
+                                                System.out.println("Table card id " + ele);
+                                                System.out.println("Table corner pos " + finalTableCornerPos);
+                                                System.out.println("Placing card side " + getViewModel().getHandCardsSide(cardId));*/
+                                            } else {
+                                                showAlert(Alert.AlertType.INFORMATION, "Placed card", "Incorrect card placing");
+                                            }
                                         }
                                     });
                                 }
