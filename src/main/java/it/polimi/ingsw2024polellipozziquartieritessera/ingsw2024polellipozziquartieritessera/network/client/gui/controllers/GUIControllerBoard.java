@@ -149,103 +149,12 @@ public class GUIControllerBoard extends GUIController {
                                         PlaceCardCommandRunnable command = new PlaceCardCommandRunnable();
                                         command.setParams(getParamsMap().get("cardId"), ele, finalTableCornerPos, getViewModel().getHandCardsSide(getParamsMap().get("cardId")));
                                         addCommand(command, thisController);
-                                        showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
+                                        //showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
                                         goToScene("/fxml/game.fxml");
                                     });
                                 }
                             }
                         }
-                    }
-                }
-            }
-        });
-    }
-
-    public void printBoard2() {
-        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
-            @Override
-            public void run() {
-                int boardImageHeight = 100;
-                int boardImageWidth = boardImageHeight*3/2;
-                int gridPaneVPadding = 50;
-                int gridPaneHgap = 0;
-                int gridPaneVgap = 0;
-                int rowOffset = 1;
-                int colOffset = 1;
-                int cornerWidth = 28;
-                int cornerHeight = 35;
-
-                int playerId = getParamsMap().get("playerId");
-                ArrayList<ArrayList<Integer>> playerBoard = getViewModel().getPlayerBoard(playerId); // the first arg is the index of the player to print the board of
-
-                GridPane gridPane = new GridPane();
-                gridPane.setGridLinesVisible(true);
-                gridPane.setHgap(gridPaneHgap); // Spacing orizzontale
-                gridPane.setVgap(gridPaneVgap); // Spacing verticale
-                gridPane.setPadding(new Insets(gridPaneVPadding)); // Margine di 20 pixel su tutti i lati
-                mainContainerBoard.getChildren().add(gridPane);
-
-                addPanning(gridPane);
-
-                for (int i = 0; i < playerBoard.size() + 2; i++) {
-                    gridPane.getRowConstraints().add(new RowConstraints(boardImageHeight - cornerHeight));
-                }
-                for (int i = 0; i < playerBoard.getFirst().size() + 2; i++) {
-                    gridPane.getColumnConstraints().add(new ColumnConstraints(boardImageWidth - cornerWidth));
-                }
-
-                for (int i = 0; i < playerBoard.size() + 2; i++) {
-                    for (int j = 0; j < playerBoard.getFirst().size() + 2; j++) {
-                        if (i >= rowOffset && j >= colOffset && i <= playerBoard.size() && j <= playerBoard.get(i - rowOffset).size() && playerBoard.get(i - rowOffset) != null && playerBoard.get(i - rowOffset).get(j - colOffset) != null && playerBoard.get(i - rowOffset).get(j - colOffset) != -1) {
-                            int ele = playerBoard.get(i - rowOffset).get(j - colOffset);
-                            ImageView tempImageView;
-                            String imageUrl = null;
-                            if (getViewModel().getPlacedCardSide(ele) == Side.FRONT) {
-                                imageUrl = "/img/carte_fronte/" + ele + ".jpg";
-                            } else {
-                                imageUrl = "/img/carte_retro/" + ele + ".jpg";
-                            }
-                            tempImageView = createCardImageView(imageUrl, boardImageHeight);
-                            tempImageView.setId("" + ele);
-                            gridPane.add(tempImageView, j, i);
-                            gridPane.setHalignment(tempImageView, HPos.CENTER);
-                            gridPane.setValignment(tempImageView, VPos.CENTER);
-                        }
-                    }
-                }
-
-                for (int i = 0; i < playerBoard.size() + 2; i++) {
-                    for (int j = 0; j < playerBoard.getFirst().size() + 2; j++) {
-                        Pane dummyCell = new Pane();
-                        dummyCell.setPrefWidth(boardImageWidth);
-                        dummyCell.setPrefHeight(boardImageHeight);
-                        dummyCell.getStyleClass().add("clickable");
-                        // setta l'id per capire che angolo viene coperto
-                        // come id metti quello di una carta adiacente e che ha un angolo disponibile (se c'è)
-
-                        // initialize the id to -1
-                        // cycle all the 8 positions around the card
-                            // check if there is a card
-                                // if there is card
-                                    // cycle all the touching angles
-                                        // if the touching angles is not hidden
-                                            // set the id (or a property) with the cardId and the cornerId
-
-                        gridPane.add(dummyCell, j, i);
-                        addHoverBgColor(dummyCell);
-                        dummyCell.setOnMouseClicked((mouseEvent) -> {
-                            // chiama il place card
-
-                            // if the id (or a property) of the card > 0
-                                // placecard with the given values
-                        });
-
-                        /*String imageUrl = "../img/carte_" +
-                                (getViewModel().getHandCardsSide(getParamsMap().get("cardId")).equals(Side.FRONT) ? "fronte" : "retro") +
-                                "/" +
-                                getParamsMap().get("cardId") +
-                                ".jpg";
-                        addHoverBgImage(dummyCell, imageUrl);*/
                     }
                 }
             }

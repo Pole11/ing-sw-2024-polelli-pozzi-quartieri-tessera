@@ -139,7 +139,7 @@ abstract public class GUIController {
             public void run() {
                 clearServerError();
                 System.out.println("[DEBUG] Rendering server message: " + serverMessage);
-                serverMessageLabel.setText("INFO FROM SERVER: " + serverMessage);
+                serverMessageLabel.setText(serverMessage);
             }
         });
     }
@@ -151,7 +151,7 @@ abstract public class GUIController {
             public void run() {
                 clearServerMessage();
                 System.err.println("[DEBUG] Rendering server error: " + serverMessage);
-                serverErrorLabel.setText("ERROR FROM SERVER: " + serverMessage);
+                serverErrorLabel.setText(serverMessage);
             }
         });
     }
