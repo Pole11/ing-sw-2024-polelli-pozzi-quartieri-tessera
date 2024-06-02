@@ -4,6 +4,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.animation.KeyFrame;
@@ -180,6 +181,16 @@ abstract public class GUIController {
 
     public void goToScene(String fxml, HashMap<String, Integer> paramsMap) {
         GUIApplication.changeScene(fxml, paramsMap);
+    }
+
+    public void ping(VirtualView client, VirtualServer server){
+        synchronized (commandQueue) {
+            PingCommandRunnable commandRunnable = new PingCommandRunnable();
+            commandRunnable.setClient(client);
+            commandRunnable.setServer(server);
+            commandQueue.add(commandRunnable);
+            commandQueue.notifyAll();
+        }
     }
 
     public HashMap<String, Integer> getParamsMap() {
