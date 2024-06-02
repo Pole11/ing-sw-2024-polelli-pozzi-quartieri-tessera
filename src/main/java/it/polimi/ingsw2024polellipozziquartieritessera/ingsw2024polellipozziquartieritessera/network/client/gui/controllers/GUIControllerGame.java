@@ -207,46 +207,25 @@ public class GUIControllerGame extends GUIController {
                     //tempImageView.getStyleClass().add("imageWithBorder");
                     if (handContainer != null) handContainer.getChildren().add(tempImageView);
 
-                    if (playerId == meId) {
-                        tempImageView.getStyleClass().add("clickable");
-                        tempImageView.setOnMousePressed(mouseEvent -> {
-                            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                                flipCard(cardId);
-                            } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                                // if phase is placing
-                                Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
-                                int cornerId;
-                                if (mouseEvent.getSceneX() < tempImageViewPosition.getX() + tempImageView.getBoundsInLocal().getWidth()/2) { // left
-                                    if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top left
-                                        cornerId = 0;
-                                    } else { // down left
-                                        cornerId = 3;
-                                    }
-                                } else { // right
-                                    if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top right
-                                        cornerId = 1;
-                                    } else { // down right
-                                        cornerId = 2;
-                                    }
-                                }
-                                //Line dragLine = new Line(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 270, 40);
-                                //mainContainerGame.getChildren().add(dragLine);
-                                //Circle clickedCircle = new Circle(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 10);
-                                //mainContainerGame.getChildren().removeIf(n -> n instanceof Circle);
-                                //mainContainerGame.getChildren().add(clickedCircle);
-                                HashMap<String, Integer> paramsMap = new HashMap<>();
-                                paramsMap.put("playerId", meId);
-                                paramsMap.put("cardId", cardId);
-                                paramsMap.put("cornerId", cornerId);
-                                goToScene("/fxml/board.fxml", paramsMap);
-                            }
-                        });
-                    }
+                    tempImageView.getStyleClass().add("clickable");
+                    tempImageView.setOnMousePressed(mouseEvent -> { flipCard(cardId); });
                 }
 
-                Separator verticalSeparator = new Separator();
-                verticalSeparator.setOrientation(Orientation.VERTICAL);
-                if (handContainer != null) handContainer.getChildren().add(verticalSeparator);
+                Separator verticalSeparator1 = new Separator();
+                verticalSeparator1.setOrientation(Orientation.VERTICAL);
+                if (handContainer != null) handContainer.getChildren().add(verticalSeparator1);
+
+                if (playerId == meId) {
+                    Button btnPlaceCard = new Button("Place Card");
+                    btnPlaceCard.setOnAction((mouseEvent) -> {
+                        goToScene("/fxml/board.fxml");
+                    });
+                    if (handContainer != null) handContainer.getChildren().add(btnPlaceCard);
+                }
+
+                Separator verticalSeparator2 = new Separator();
+                verticalSeparator2.setOrientation(Orientation.VERTICAL);
+                if (handContainer != null) handContainer.getChildren().add(verticalSeparator2);
             }
         });
     }

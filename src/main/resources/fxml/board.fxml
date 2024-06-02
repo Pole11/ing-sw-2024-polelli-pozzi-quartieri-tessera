@@ -9,6 +9,7 @@
 <?import javafx.geometry.Insets?>
 <VBox styleClass="root" fx:id="mainContainerBoard"  stylesheets="@../style/game.css, @../style/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerBoard">
     <Button onAction="#handleBackToGame" text="Go back to the main window" />
+    <HBox alignment="CENTER" id="playerHandContainerGame"></HBox>
     <Label
             fx:id="serverMessageLabel"
             styleClass="serverMessage"/>

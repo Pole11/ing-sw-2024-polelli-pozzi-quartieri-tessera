@@ -6,15 +6,15 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
+import javafx.geometry.*;
 import javafx.scene.ImageCursor;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -26,31 +26,33 @@ import java.util.HashMap;
 
 public class GUIControllerBoard extends GUIController {
     @FXML private VBox mainContainerBoard;
+    int cornerId, cardId;
 
     public GUIControllerBoard() {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
                 if (getViewModel() != null) {
-                    if (getParamsMap().get("cardId") != null) printSelectedCorner();
                     printBoard();
+                    updatePlayerHand(-1, -1);
                 }
+                cornerId = -1;
+                cardId = -1;
             }
         });
     }
 
-    public void printSelectedCorner() {
+    public void printSelectedCorner(int cardId, int cornerId) {
         Platform.runLater(() -> {
             int imageHeight = 120;
             String url = "/img/carte_" +
-                    (getViewModel().getHandCardsSide(getParamsMap().get("cardId")).equals(Side.FRONT) ? "fronte" : "retro") +
+                    (getViewModel().getHandCardsSide(cardId).equals(Side.FRONT) ? "fronte" : "retro") +
                     "/" +
-                    getParamsMap().get("cardId") +
+                    cardId +
                     ".jpg";
             Pane handCardContainer = new Pane();
             ImageView handCardImageView = createCardImageView(url, imageHeight);
 
-            int cornerId = getParamsMap().get("cornerId");
             int rectX = 0, rectY = 0;
             if (cornerId == 0 || cornerId == 3) rectX = 0; else rectX = imageHeight*3/4;
             if (cornerId == 0 || cornerId == 1) rectY = 0; else rectY = imageHeight/2;
@@ -63,6 +65,72 @@ public class GUIControllerBoard extends GUIController {
             mainContainerBoard.getChildren().add(handCardContainer);
         });
     }
+
+    public void updatePlayerHand(int handCardId, int handCornerId) {
+        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
+            @Override
+            public void run() {
+                HashMap<Integer, Side> playerHandCards = new HashMap<>();
+                getViewModel().getHand(getViewModel().getPlayerIndex()).forEach(e -> {
+                    playerHandCards.put(e, getViewModel().getHandCardsSide(e));
+                });
+
+                Pane handContainer = null;
+
+                handContainer = (Pane) mainContainerBoard.lookup("#playerHandContainerGame");
+                if (handContainer != null) { handContainer.getChildren().clear(); }
+
+                // TODO: get my player id
+                for (Integer cardIdIterator : playerHandCards.keySet()) {
+                    int imageHeight = 100;
+                    Pane handCardContainer = new Pane();
+                    ImageView tempImageView;
+                    if (playerHandCards.get(cardIdIterator) == Side.FRONT) {
+                        tempImageView = createCardImageView("/img/carte_fronte/" + cardIdIterator + ".jpg", imageHeight);
+                    } else {
+                        tempImageView = createCardImageView("/img/carte_retro/" + cardIdIterator + ".jpg", imageHeight);
+                    }
+                    tempImageView.setId("player" + getViewModel().getPlayerIndex() + "card" + cardIdIterator);
+                    //tempImageView.getStyleClass().add("imageWithBorder");
+                    handCardContainer.getChildren().add(tempImageView);
+                    if (handContainer != null) handContainer.getChildren().add(handCardContainer);
+
+                    if (cardIdIterator == handCardId) {
+                        int rectX = 0, rectY = 0;
+                        if (cornerId == 0 || cornerId == 3) rectX = 0; else rectX = imageHeight*3/4;
+                        if (cornerId == 0 || cornerId == 1) rectY = 0; else rectY = imageHeight/2;
+
+                        Rectangle clickedRectangle = new Rectangle(rectX, rectY,imageHeight*3/4, imageHeight/2);
+                        clickedRectangle.setFill(new Color(0,0,0,0.4));
+
+                        handCardContainer.getChildren().add(clickedRectangle);
+                    }
+
+                    tempImageView.getStyleClass().add("clickable");
+                    tempImageView.setOnMousePressed(mouseEvent -> {
+                        cardId = cardIdIterator;
+                        // if phase is placing
+                        Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
+                        if (mouseEvent.getSceneX() < tempImageViewPosition.getX() + tempImageView.getBoundsInLocal().getWidth()/2) { // left
+                            if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top left
+                                cornerId = 0;
+                            } else { // down left
+                                cornerId = 3;
+                            }
+                        } else { // right
+                            if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top right
+                                cornerId = 1;
+                            } else { // down right
+                                cornerId = 2;
+                            }
+                        }
+                        updatePlayerHand(cardIdIterator, cornerId);
+                    });
+                }
+            }
+        });
+    }
+
 
     public void printBoard() {
         GUIController thisController = this;
@@ -79,8 +147,7 @@ public class GUIControllerBoard extends GUIController {
                 int cornerWidth = 28;
                 int cornerHeight = 35;
 
-                int playerId = getParamsMap().get("playerId");
-                ArrayList<ArrayList<Integer>> playerBoard = getViewModel().getPlayerBoard(playerId); // the first arg is the index of the player to print the board of
+                ArrayList<ArrayList<Integer>> playerBoard = getViewModel().getPlayerBoard(getViewModel().getPlayerIndex()); // the first arg is the index of the player to print the board of
 
                 GridPane gridPane = new GridPane();
                 //gridPane.setGridLinesVisible(true);
@@ -146,11 +213,15 @@ public class GUIControllerBoard extends GUIController {
                                     addHoverBgColor(dummyCell);
                                     CornerPos finalTableCornerPos = tableCornerPos;
                                     dummyCell.setOnMouseClicked((mouseEvent) -> {
-                                        PlaceCardCommandRunnable command = new PlaceCardCommandRunnable();
-                                        command.setParams(getParamsMap().get("cardId"), ele, finalTableCornerPos, getViewModel().getHandCardsSide(getParamsMap().get("cardId")));
-                                        addCommand(command, thisController);
-                                        //showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
-                                        goToScene("/fxml/game.fxml");
+                                        if (cornerId >= 0 && cardId >= 0) {
+                                            PlaceCardCommandRunnable command = new PlaceCardCommandRunnable();
+                                            command.setParams(cardId, ele, finalTableCornerPos, getViewModel().getHandCardsSide(cardId));
+                                            addCommand(command, thisController);
+                                            //showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
+                                            goToScene("/fxml/board.fxml");
+                                        } else {
+                                            showAlert(Alert.AlertType.INFORMATION, "Placed card", "Incorrect card placing");
+                                        }
                                     });
                                 }
                             }
