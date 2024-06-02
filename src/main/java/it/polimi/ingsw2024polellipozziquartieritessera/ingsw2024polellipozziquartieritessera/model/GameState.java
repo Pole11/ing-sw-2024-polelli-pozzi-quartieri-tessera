@@ -12,31 +12,76 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+/**
+ * GameState Class
+ */
 public class GameState {
+    /**
+     * Map of all the cards, that matches an ID with the proper card
+     */
     private final HashMap<Integer, Card> cardsMap;
-
+    /**
+     * Main board of the game, that contains all deck and shared cards
+     */
     private final Board mainBoard;
+    /**
+     * Chat of the game, that contains all messages
+     */
     private final Chat chat;
-
-    private final ArrayList<Player> players; //player[0] is blackPlayer
+    /**
+     * List of all the playing players, player[0] is black Player and the first to start
+     */
+    private final ArrayList<Player> players;
+    /**
+     * Index of the current playing player
+     */
     private int currentPlayerIndex;
-
+    /**
+     * Current game phase
+     */
     private GamePhase currentGamePhase;
+    /**
+     * Current turn phase
+     */
     private TurnPhase currentGameTurn;
-
+    /**
+     * Queue o all the events that the clint could do (for synchronization)
+     */
     private final ArrayDeque<Event> eventQueue;
+    /**
+     * Thread that reads and manages the queque
+     */
     private Thread executeEvents;
+    /**
+     * Map that set if a player has answered to the request or not (useful for starting phases of the game)
+     */
     private final HashMap<Integer, Boolean> answered;
+    /**
+     * Thread that manages pings
+     */
     private Thread pingThread;
-    ArrayList<Thread> playerThreads = new ArrayList<>();
-
+    /**
+     * Thread list that manages all the players, one for each player
+     */
+    private ArrayList<Thread> playerThreads = new ArrayList<>();
+    /**
+     * Thread that manages timeout for curent player
+     */
     private Thread timeoutThread;
+    /**
+     * Saving of the previous game phase
+     */
     private GamePhase prevGamePhase;
 
+    /**
+     * Number of turns left to play
+     */
     private int turnToPlay;
 
 
-    // CONSTRUCTOR
+    /**
+     * GameState Constructor
+     */
     public GameState() {
         this.cardsMap = new HashMap<>();
 
@@ -120,21 +165,28 @@ public class GameState {
 
     //ADDER/REMOVER
 
+    /**
+     * Add a card to the gamestate cards
+     * @param cardId Card Identifier
+     * @param card Card object
+     */
     public void addCardToCardsMap(int cardId, Card card) {
         this.cardsMap.put(cardId, card);
     }
 
+    /**
+     * Add event to the queue
+     * @param event Event to add
+     */
     public void addToEventQueue(Event event) {
         this.eventQueue.add(event);
     }
 
-    public void decrementTurn() {
-        this.turnToPlay--;
-    }
-
     //EVENTQUEUE
 
-    //even if there aren't always 4 players
+    /**
+     * Resets the number of answers (even if there aren't always 4 players)
+     */
     private void resetAnswered() {
         this.answered.put(0, false);
         this.answered.put(1, false);
@@ -142,11 +194,17 @@ public class GameState {
         this.answered.put(3, false);
     }
 
+    /**
+     * Get the number of player that has answered the request
+     * @return Number of answers
+     */
     private int numberAnswered() {
-        //controllare se funziona
         return this.answered.values().stream().mapToInt(e -> e ? 1 : 0).sum();
     }
 
+    /**
+     * Run the event queue listener
+     */
     private void executeEventsRunnable() {
         while (true) {
             synchronized (eventQueue) {
@@ -161,13 +219,22 @@ public class GameState {
         }
     }
 
-
+    /**
+     * Trasform a client to a list
+     * @param client Selected client
+     * @return List of the single client
+     */
     public ArrayList<VirtualView> singleClient(VirtualView client) {
         ArrayList<VirtualView> clients = new ArrayList<>();
         clients.add(client);
         return clients;
     }
 
+    /**
+     * Get a list of all the cient different from the selected one
+     * @param client Client to exclude
+     * @return List of the other clients
+     */
     public ArrayList<VirtualView> otherClients(VirtualView client) {
         ArrayList<VirtualView> clients = new ArrayList<>();
         for (Player playerIterator : players) {
@@ -178,13 +245,19 @@ public class GameState {
         return clients;
     }
 
+    /**
+     * Get all the clients in the gamestate
+     * @return List of all clients
+     */
     public ArrayList<VirtualView> allClients() {
         return (ArrayList<VirtualView>) players.stream().filter(Player::isConnected).map(Player::getClient).collect(Collectors.toList());
     }
 
 
     //DISCONNECTIONS
-
+    /**
+     * Run the ping thread
+     */
     public void pingThreadRunnable() {
         while (true) {
             updatePlayersConnected();
@@ -215,7 +288,11 @@ public class GameState {
         }
     }
 
-    public void pingAnswere(VirtualView client) {
+    /**
+     * Get the ping response from a player
+     * @param client The client who has responded
+     */
+    public void pingAnswer(VirtualView client) {
         synchronized (players) {
             playerThreads.get(getPlayerIndex(client)).interrupt();
             players.get(getPlayerIndex(client)).setConnected(true);
@@ -223,11 +300,20 @@ public class GameState {
         }
     }
 
+    /**
+     * Set the connection of a player (null or connected)
+     * @param index Player index
+     * @param connected Connection status
+     */
     public void setPlayersConnected(int index, boolean connected) {
         players.get(index).setConnected(connected);
         players.get(index).setClient(null);
     }
 
+    /**
+     * Manage the reconnection of a player
+     * @param player Player to be reconnected
+     */
     private void manageReconnection(Player player) {
         synchronized (players) {
             player.setConnected(true);
@@ -241,12 +327,17 @@ public class GameState {
         }
     }
 
-
+    /**
+     * View restoration for reconnection
+     * @param client Client to be reconnected
+     */
     public void restoreView(VirtualView client) {
         //send everything to client
     }
 
-
+    /**
+     * Set and verify the disconnection of a player, and manage the thread call
+     */
     public void playerDisconnected() {
         long numberConnected;
         synchronized (players) {
@@ -269,6 +360,9 @@ public class GameState {
         }
     }
 
+    /**
+     * Change the current playing player
+     */
     public void changeCurrentPlayer() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         //check for disconnetions
@@ -291,6 +385,9 @@ public class GameState {
 
     }
 
+    /**
+     * Send the ping to verify connection
+     */
     private void updatePlayersConnected() {
         players.stream().map(Player::getClient).forEach(e -> {
             eventQueue.add(new PingEvent(this, allClients()));
@@ -301,14 +398,19 @@ public class GameState {
 
     //PLAYERS MANAGING
 
+    /**
+     * Get the current playing player
+     * @return Current player
+     */
     public Player getCurrentPlayer() {
         return players.get(this.currentPlayerIndex);
     }
 
-    public Player getBlackPlayer() {
-        return this.players.getFirst();
-    }
-
+    /**
+     * Get the player index of the requested client
+     * @param client Virtualview of the client
+     * @return Player index
+     */
     public Integer getPlayerIndex(VirtualView client) {
         int i = 0;
         for (Player playerIterator : this.players) {
@@ -320,6 +422,11 @@ public class GameState {
         return -1;
     }
 
+    /**
+     * Get the player index of the requested player
+     * @param player Selected player
+     * @return Player index
+     */
     public Integer getPlayerIndex(Player player) {
         int i = 0;
         for (Player playerIterator : this.players) {
@@ -331,7 +438,11 @@ public class GameState {
         return -1;
     }
 
-
+    /**
+     * Add a player to the game
+     * @param nickname Nickname of the player
+     * @param client VirtualView of the client
+     */
     public void addPlayer(String nickname, VirtualView client) {
         Player player = new Player(nickname, client, this);
         //TODO: CONTROLLA se salta i null
@@ -407,7 +518,11 @@ public class GameState {
     // VII: si potrebbe come da specifica scegliere a questo punto
     // un giocatore randomico per essere il blackPlayer (al momento sembra superflua)
 
-
+    /**
+     * Function to start the game
+     * @param client Client that started the game
+     * @throws EmptyDeckException Deck it's not initialized
+     */
     public void startGame(VirtualView client) throws EmptyDeckException {
         ArrayList<VirtualView> clients = allClients();
         if (!clients.contains(client)) {
@@ -446,6 +561,9 @@ public class GameState {
         }
     }
 
+    /**
+     * Initialization of starter cards
+     */
     public void initStarters() {
         // for every player set his starters (you have access to every player from the array players)
 
@@ -464,6 +582,11 @@ public class GameState {
         }
     }
 
+    /**
+     * Set player choice for starter card side
+     * @param playerIndex Player who wants to set the side
+     * @param side Side chosen
+     */
     public void setStarterSide(int playerIndex, Side side) {
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
@@ -503,6 +626,11 @@ public class GameState {
         }
     }
 
+    /**
+     * Set player choice for the color
+     * @param playerIndex Player who wants to set the color
+     * @param color Color chosen
+     */
     public void setColor(int playerIndex, Color color) {//method called by view when the player chooses the side
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
@@ -545,6 +673,10 @@ public class GameState {
         }
     }
 
+    /**
+     * Initialization of players hands
+     * @throws EmptyDeckException Deck is empty
+     */
     public void setHands() throws EmptyDeckException {
         // popolate hands for every player
         for (int i = 0; i < players.size(); i++) {
@@ -558,7 +690,9 @@ public class GameState {
         }
     }
 
-    //set SecretObjectiveOptions and SharedObjectiveCards
+    /**
+     * Set both secret and shared objectives for each player
+     */
     public void setObjectives() {
         Set<Integer> randomKeysSet = new HashSet<>(); // a set has no duplicates
         // Generate four different random numbers
@@ -593,7 +727,11 @@ public class GameState {
         }
     }
 
-
+    /**
+     * Set player choice of the secret objective
+     * @param playerIndex Player who wants to set the objective
+     * @param cardIndex Index that the player choose (0-1)
+     */
     //called from controller
     public void setSecretObjective(int playerIndex, int cardIndex) {
         Player player = this.players.get(playerIndex);
@@ -633,6 +771,16 @@ public class GameState {
 
 //----------------------------place Card--------------------------------
 
+    /**
+     * Funzion for plaicing a card on the player board
+     * @param player Player who is playcing the card
+     * @param placingCardId Card to place
+     * @param tableCardId Card on the table to be connected to
+     * @param tableCornerPos Corner position of the table card for the connection
+     * @param placingCornerPos Corner posizion of the hand card for the connection
+     * @param placingCardSide Side of the playing card
+     * @throws PlacingOnHiddenCornerException The corner is hidden
+     */
     public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingCardSide) throws PlacingOnHiddenCornerException {
         // check if the indirect corners are hidden
         CornerCard placingCard = (CornerCard) cardsMap.get(placingCardId);
@@ -711,7 +859,12 @@ public class GameState {
 
     }
 
-
+    /**
+     * Update the elements in the player attributes
+     * @param player Player to be updated
+     * @param placingCard Card placed
+     * @param placingCardSide Side of the placed card
+     */
     public void updateElements(Player player, CornerCard placingCard, Side placingCardSide) {
         for (Element ele : Element.values()) {
             if (player.getAllElements().get(ele) != null) {
@@ -724,12 +877,16 @@ public class GameState {
 
     //ENDGAME
 
+    /**
+     * Check if game is ended by one of the possible conditions
+     */
     public void checkGameEnded() {
         // 20 points?
         if (!currentGamePhase.equals(GamePhase.ENDPHASE)) {
-            for (int i = 0; i < this.players.size(); i++) {
-                if (this.players.get(i).getPoints() >= Config.POINTSTOENDPHASE) {
+            for (Player player : this.players) {
+                if (player.getPoints() >= Config.POINTSTOENDPHASE) {
                     currentGamePhase = GamePhase.ENDPHASE;
+                    break;
                 }
             }
             if (currentGamePhase.equals(GamePhase.ENDPHASE)) {
@@ -763,7 +920,9 @@ public class GameState {
         }
     }
 
-
+    /**
+     * Calculation of the points at the end of the game
+     */
     void calculateFinalPoints() {
         ObjectiveCard sharedCard1 = this.mainBoard.getSharedObjectiveCard(0);
         ObjectiveCard sharedCard2 = this.mainBoard.getSharedObjectiveCard(1);
@@ -782,6 +941,11 @@ public class GameState {
         }
     }
 
+    /**
+     * Get the winner player
+     * @return List of indexes of winners
+     * @throws GameIsNotEndedException Game not ended
+     */
     public ArrayList<Integer> getWinnerPlayerIndex() throws GameIsNotEndedException {
         int maxPoints = 0;
         ArrayList<Integer> winnerPlayerIndeces = new ArrayList<>();

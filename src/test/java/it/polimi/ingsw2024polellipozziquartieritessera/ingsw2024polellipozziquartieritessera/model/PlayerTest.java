@@ -7,6 +7,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.SocketClient;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
@@ -25,14 +26,23 @@ public class PlayerTest {
     }
 
     @Test
+    void testSimpleMethods() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
+        GameState g = Populate.populate();
+        Player player = new Player("Bob", null, g);
+
+        int wons = player.getObjectivesWon();
+        player.incrementObjectivesWon();
+        assertEquals(player.getObjectivesWon(),  wons + 1);
+    }
+
+    @Test
     void getCardPointsTest1() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException, EmptyDeckException {
-        /*int resourceCardId1 = 1;
+        int resourceCardId1 = 1;
         int resourceCardId2 = 13;
         int resourceCardId3 = 11;
         int resourceCardId4 = 18;
         int goldCardId1 = 56;
-        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
-
+        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
 
         // create game state
         GameState gs = Populate.createCardsMap();
@@ -65,14 +75,12 @@ public class PlayerTest {
         player.addToHandCardsMap(goldCardId1, Side.FRONT);
         c.placeCard(0, goldCardId1, resourceCardId2, CornerPos.UPLEFT, Side.FRONT);
         assertEquals(4 + 1, player.getPoints());
-        */
     }
 
     // check points and elements
     @Test
     void getCardPointsTest2() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException, EmptyDeckException {
         // create cards map
-        /*
         int starterCardId = 81;
         int resourceCardId1 = 31;
         int goldCardId1 = 59;
@@ -88,7 +96,7 @@ public class PlayerTest {
         int goldCardId4 = 54;
         int resourceCardId9 = 12;
         int goldCardId5 = 58;
-        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
+        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
 
         // create game state
         GameState gs = Populate.createCardsMap();
@@ -279,14 +287,12 @@ public class PlayerTest {
         assertEquals(1, player.getAllElements().get(Element.INKWELL));
         assertEquals(1, player.getAllElements().get(Element.MANUSCRIPT));
         assertEquals(1, player.getAllElements().get(Element.QUILL));
-        */
 
     }
 
     @Test
     void getStructurePointsTest() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException, EmptyDeckException {
         // create cards map
-        /*
         int starterCardId = 81;
         int resourceCardId1 = 3;
         int resourceCardId2 = 4;
@@ -295,7 +301,7 @@ public class PlayerTest {
         int objectiveCardId2 = 90;
 
         // create game state
-        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())));
+        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
 
         GameState gs = Populate.createCardsMap();
         gs.addPlayer("test", client);
@@ -326,24 +332,15 @@ public class PlayerTest {
         player.addToHandCardsMap(resourceCardId3, Side.FRONT);
         c.placeCard(0, resourceCardId3, resourceCardId2, CornerPos.UPRIGHT, Side.BACK);
         assertEquals(1, objective1.getChallenge().getTimesWon(player, objective1));
-        */
     }
 
-/*
     @Test
     public void getAllElementsTest() {
-        Player player = new Player("test");
-        assertEquals(player.getAllElements(), player.allElements);
-        assertFalse(player.getAllElements()==player.allElements);
     }
 
     @Test
     public void getPlayerBorardTest() {
-        Player player = new Player("test");
-        assertEquals(player.getPlayerBoard(), player.playerBoard);
-        assertFalse(player.getPlayerBoard()==player.playerBoard);
     }
-*/
 
 }
 

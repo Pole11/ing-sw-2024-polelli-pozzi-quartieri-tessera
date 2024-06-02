@@ -286,13 +286,27 @@ public class Player {
 
     // METHODS
 
-    //usato dal controller, da cambiare nome, poco esplicativo (plurale)
+    /**
+     * Get the Side of a specific played card on the player board
+     * @param cardId Card identifier
+     * @return Side of the placed card
+     */
     public Side getBoardSide(int cardId) {
         return this.placedCardsMap.get(cardId);
     }
 
 // -------------------Place Cards Map Managing-----------------
 
+    /**
+     * Place the card on the player board
+     * @param placingCardId ID of the card to place
+     * @param placingCard Card to be placed
+     * @param tableCard Card on the board
+     * @param tableCardId ID of the card on the board
+     * @param tableCornerPos Corner position of the board card to which link the placing card
+     * @param placingCardSide Side of placing of the placing card
+     * @throws WrongInstanceTypeException Card not placeable
+     */
     public void updatePlayerCardsMap(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException {
         addToPlacedCardsMap(placingCardId, placingCardSide);
         removeFromHandCardsMap(placingCardId);
@@ -304,7 +318,13 @@ public class Player {
         }
     }
 
-    public static int getElementOccurencies(ArrayList<Element> elements, Element targetElement) {
+    /**
+     * Get occurrences of a specific element inside a List of elements
+     * @param elements List of elements
+     * @param targetElement Element to verify
+     * @return Number of occurrences
+     */
+    public static int getElementOccurrencies(ArrayList<Element> elements, Element targetElement) {
         int count = 0;
         for (Object element : elements) {
             if (element != null && element.equals(targetElement)) {
@@ -316,24 +336,22 @@ public class Player {
 
 // -------------------Board Matrix Managing-----------------------
 
+    /**
+     * Initialization of the player board, as a 1x1 with the StarterCard in the center
+     */
     public void initializeBoard(){
         this.playerBoard.clear(); // re-initialize the board it is previously contained something
-        // Initialization of player board as a 1x1 with the StarterCard in the center
         ArrayList<Integer> row = new ArrayList<>();
         row.add(getStarterCard().getId());
         this.playerBoard.add(row);
     }
 
-    public void printBoard() {
-        for (int i = 0; i < this.playerBoard.size(); i++) {
-            ArrayList<Integer> row = this.playerBoard.get(i);
-            for (int j = 0; j < row.size(); j++) {
-                System.out.print(this.playerBoard.get(i).get(j) + " ");
-            }
-            System.out.println("");
-        }
-    }
-
+    /**
+     * Update the board after a card is placed
+     * @param placingCardId ID of the placed card
+     * @param tableCardId ID of the card on the player board
+     * @param tableCornerPos Corner position of the board card to which the new card is linked
+     */
     public void updateBoard(int placingCardId, int tableCardId, CornerPos tableCornerPos){
         int rowIndex = -1;
         int colIndex = -1;
@@ -386,6 +404,11 @@ public class Player {
         this.playerBoard.get(rowIndex).set(colIndex, placingCardId);
     }
 
+    /**
+     * Helper function to expand the board size if needed
+     * @param rowIndex Final rows number
+     * @param colIndex Final column number
+     */
     private void expandBoard(int rowIndex, int colIndex){
         // Expand the matrix to include the new position (remember that this supports only one execute: row++/-- or col++/--)
         // Expand rows if needed
