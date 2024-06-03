@@ -11,9 +11,13 @@ import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.*;
 
+import java.lang.reflect.Array;
 import java.util.*;
+
+import static javafx.scene.layout.TilePane.setAlignment;
 
 public class GUIControllerGame extends GUIController {
     @FXML private BorderPane mainContainerGame;
@@ -21,12 +25,47 @@ public class GUIControllerGame extends GUIController {
     @FXML private VBox plateauContainerGame;
     @FXML private VBox sharedResourceContainerGame;
     @FXML private Label currentPhase;
+    private HashMap<Integer, ArrayList<Integer>> plateauCoordinatedMap;
+    private final int plateauHeight = 350;
 
     public GUIControllerGame() {
         clearAllchilds();
-        Platform.runLater(() -> {
-            update();
-        });
+        update();
+        populatePlateauCoordinateMap();
+    }
+
+    private void populatePlateauCoordinateMap() {
+        plateauCoordinatedMap = new HashMap<>();
+        plateauCoordinatedMap.put(0, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 20)));
+        plateauCoordinatedMap.put(1, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(2, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(3, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(4, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(5, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(6, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(7, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(8, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(9, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(10, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(11, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(12, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(13, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(14, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(15, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(16, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(17, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(18, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(19, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(20, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(21, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(22, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(23, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(24, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(25, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(26, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(27, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(28, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(29, new ArrayList<>(Arrays.asList(0,0)));
     }
 
     private void clearAllchilds() {
@@ -49,7 +88,7 @@ public class GUIControllerGame extends GUIController {
         });
     }
 
-    private ImageView createPlateauImageView() {
+    private ImageView createPlateauImageView(int plateauHeight) {
         String imageUrl = getClass().getResource("/img/plateau_score.jpg").toExternalForm();
         Image image = new Image(imageUrl);
 
@@ -58,7 +97,7 @@ public class GUIControllerGame extends GUIController {
 
         ImageView imageView = new ImageView(imageWritable);
 
-        imageView.setFitHeight(350);
+        imageView.setFitHeight(plateauHeight);
         imageView.setPreserveRatio(true);
 
         return imageView;
@@ -106,7 +145,12 @@ public class GUIControllerGame extends GUIController {
                 secondSharedGoldCardImageView.getStyleClass().add("clickable");
                 sharedGoldContainerGame.getChildren().add(secondSharedGoldCardImageView);
 
-                plateauContainerGame.getChildren().add(createPlateauImageView());
+                Pane plateauImageViewPane = new Pane();
+                plateauImageViewPane.setPrefHeight(plateauHeight);
+                plateauImageViewPane.setId("plateauImageViewPane");
+                ImageView plateauImageView = createPlateauImageView(plateauHeight);
+                plateauImageViewPane.getChildren().add(plateauImageView);
+                plateauContainerGame.getChildren().add(plateauImageViewPane);
 
                 sharedResourceContainerGame.getChildren().add(new Text("Resource Deck"));
                 ImageView resourceDeckImageView = createCardImageView("/img/carte_retro/" + firstResourceDeckCardId + ".jpg", 75);
@@ -153,6 +197,29 @@ public class GUIControllerGame extends GUIController {
                 currentPlayerHBox.getStyleClass().add(currentPlayerColor.toString().toLowerCase() + "Background");
             }
         );
+    }
+
+    public void updatePoints() {
+        Platform.runLater(() -> {
+            for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
+                Pane plateauImageViewPane = (Pane) mainContainerGame.lookup("#plateauImageViewPane");
+                Circle oldCircle = (Circle) plateauImageViewPane.lookup("circlePoints" + i);
+                plateauImageViewPane.getChildren().remove(oldCircle);
+                //int x = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(0);
+                //int y = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(1);
+                int x = plateauCoordinatedMap.get(0).get(0);
+                int y = plateauCoordinatedMap.get(0).get(1);
+                System.out.println(x);
+                System.out.println(y);
+                Circle circle = new Circle(x, y, 15);
+                circle.setId("circlePoints" + i);
+                plateauImageViewPane.getChildren().add(circle);
+                if (getViewModel().getColorsMap(i) == Color.BLUE) { circle.setFill(javafx.scene.paint.Color.BLUE); }
+                else if (getViewModel().getColorsMap(i) == Color.GREEN) { circle.setFill(javafx.scene.paint.Color.GREEN); }
+                else if (getViewModel().getColorsMap(i) == Color.RED) { circle.setFill(javafx.scene.paint.Color.RED); }
+                else if (getViewModel().getColorsMap(i) == Color.YELLOW) { circle.setFill(javafx.scene.paint.Color.YELLOW); }
+            }
+        });
     }
 
     public void initPlayerHand(int playerId, int meId,  HashMap<Integer, String> nicknames, HashMap<Integer, Side> playerHandCards, int secreteObjCardId) {
@@ -228,13 +295,6 @@ public class GUIControllerGame extends GUIController {
     }
 
     public void flipCard(int cardId) {
-        /*try {
-            getServer().flipCard(getClient(), cardId);
-        } catch (RemoteException e) {
-            Platform.runLater(() -> {
-                setServerError("There was an error while flipping the card, please try again");
-            });
-        }*/
         FlipCardCommandRunnable command = new FlipCardCommandRunnable();
         command.setCardId(cardId);
         addCommand(command,this);
@@ -258,13 +318,6 @@ public class GUIControllerGame extends GUIController {
     }
 
     public void handleDrawCard(DrawType drawType) {
-        /*try {
-            getServer().drawCard(getClient(), drawType);
-        } catch (RemoteException e) {
-            Platform.runLater(() -> {
-                setServerError("There was an error while drawing the card, please try again");
-            });
-        }*/
         DrawCardCommandRunnable command = new DrawCardCommandRunnable();
         command.setDrawType(drawType);
         addCommand(command,this);
@@ -272,6 +325,7 @@ public class GUIControllerGame extends GUIController {
 
     @Override
     public void update() {
+        populatePlateauCoordinateMap(); // only for TEST
         Platform.runLater(() -> {
             clearAllchilds();
 
@@ -301,7 +355,7 @@ public class GUIControllerGame extends GUIController {
                     getViewModel().getObjectives()[2]);
 
             highlightCurrentPlayerTable(getViewModel().getCurrentPlayer(), getViewModel().getColorsMap(getViewModel().getCurrentPlayer()));
-
+            updatePoints();
             setCurrentPhase();
         });
     }

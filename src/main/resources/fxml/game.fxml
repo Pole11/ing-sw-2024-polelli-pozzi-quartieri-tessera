@@ -29,7 +29,6 @@
     </right>
     <center>
         <HBox alignment="CENTER">
-            <VBox alignment="CENTER" fx:id="sharedGoldContainerGame"></VBox>
             <VBox alignment="CENTER" fx:id="plateauContainerGame" styleClass="plateauContainerGame">
                 <Label
                         fx:id="serverMessageLabel"
@@ -40,6 +39,7 @@
                 <Label
                         fx:id="currentPhase"/>
             </VBox>
+            <VBox alignment="CENTER" fx:id="sharedGoldContainerGame"></VBox>
             <VBox alignment="CENTER" fx:id="sharedResourceContainerGame"></VBox>
         </HBox>
     </center>
