@@ -38,6 +38,7 @@ public class ViewModel {
     private int[] mainBoard; // se la carta non c'è viene inizializzata a -1
     private ArrayList<Integer> winners;
     private Chat chat;
+    private ArrayList<Integer> placingCardOrder;
 
     public ViewModel() {
         nicknamesMap = new HashMap<>();
@@ -56,6 +57,8 @@ public class ViewModel {
         pointsMap = new HashMap<>();
         winners = new ArrayList<>();
         populateCardsMap();
+
+        placingCardOrder = new ArrayList<>();
     }
 
     // BASIC SETTER
@@ -247,6 +250,16 @@ public class ViewModel {
         return currentPlayer;
     }
 
+    /**
+     * Verify if the first card is on top or under the second one
+     * @param card1 Card that needs to be verified
+     * @param card2 Referement card on table
+     * @return True if the first card is on top, else false
+     */
+    public boolean isCardOnTop(int card1, int card2){
+        return placingCardOrder.indexOf(card1) > placingCardOrder.indexOf(card2);
+    }
+
     // UTILS METHOD
     public void initializeBoard(int playerIndex, int placingCardId){
         this.boardsMap.put(playerIndex, new ArrayList<>());
@@ -254,6 +267,8 @@ public class ViewModel {
         ArrayList<Integer> row = new ArrayList<>();
         row.add(placingCardId);
         this.boardsMap.get(playerIndex).add(row);
+
+        placingCardOrder.addLast(placingCardId);
     }
 
     private void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos){
@@ -308,6 +323,8 @@ public class ViewModel {
         }
         // Place the new card at the specified position
         playerBoard.get(rowIndex).set(colIndex, placingCardId);
+
+        placingCardOrder.addLast(placingCardId);
     }
 
     private void expandBoard(int rowIndex, int colIndex, ArrayList<ArrayList<Integer>> playerBoard){
