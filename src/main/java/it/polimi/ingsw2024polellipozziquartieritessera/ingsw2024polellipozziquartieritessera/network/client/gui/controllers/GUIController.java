@@ -59,6 +59,7 @@ abstract public class GUIController {
 
     private void executeCommandsRunnable() {
         while (true) {
+            CommandRunnable command;
             synchronized (commandQueue) {
                 while (commandQueue.isEmpty()) {
                     try {
@@ -66,8 +67,10 @@ abstract public class GUIController {
                     } catch (InterruptedException e) {
                     }
                 }
-                commandQueue.remove().executeGUI();
+                command = commandQueue.remove();
+                commandQueue.notifyAll();
             }
+            command.executeGUI();
         }
     }
 
