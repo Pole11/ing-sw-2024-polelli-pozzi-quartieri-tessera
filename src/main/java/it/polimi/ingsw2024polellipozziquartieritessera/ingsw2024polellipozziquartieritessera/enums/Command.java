@@ -18,7 +18,7 @@ public enum Command {
      OPENCHAT(new OpenChatCommandRunnable(), "Network"),
      ADDMESSAGE(new AddMessageCommandRunnable(), "Network"),
      PING(new PingCommandRunnable(), "Network"),
-     SHOWSECRETOBJECTIVES(new ShowSecretObjectiveCommandRunnable(),"Local"),
+     SHOWCOMMONOBJECTIVES(new ShowCommonObjectiveCommandRunnable(),"Local"),
      SHOWHAND(new showHandCommandRunnable(), "Local"),
      SHOWBOARD(new ShowBoardCommandRunnable(), "Local");
 

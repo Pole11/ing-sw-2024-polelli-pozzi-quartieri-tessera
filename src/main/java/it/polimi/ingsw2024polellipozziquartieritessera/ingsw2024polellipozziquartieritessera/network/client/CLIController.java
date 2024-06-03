@@ -204,13 +204,13 @@ public class CLIController {
         }
     }
 
-    public void ShowSecretObjective(){
+    public void ShowCommonObjective(){
         ArrayList<Integer> cards = new ArrayList<>();
         ArrayList<Side> sides = new ArrayList<>();
-        ArrayList<String> output = new ArrayList<>();
+        ArrayList<String> output = null;
 
-        cards.add(viewModel.getSecretObjectiveCards()[0]);
-        cards.add(viewModel.getSecretObjectiveCards()[2]);
+        cards.add(viewModel.getCommonObjectiveCards()[0]);
+        cards.add(viewModel.getCommonObjectiveCards()[1]);
         sides.add(Side.FRONT);
         sides.add(Side.FRONT);
         output = printNCards(cards, sides);
@@ -220,11 +220,22 @@ public class CLIController {
     }
 
     public void showBoard(int player_index){
-
+        ;
     }
 
     private ArrayList<String> printCard(Card card, Side side){
-        return new ArrayList<String>();
+        if(card instanceof ObjectiveCard){
+            return printCard((ObjectiveCard) card, side);
+        } else if(card instanceof ResourceCard){
+            return printCard((ResourceCard) card, side);
+        } else if(card instanceof GoldCard){
+            return printCard((GoldCard) card, side);
+        } else if(card instanceof StarterCard){
+            return printCard((StarterCard) card, side );
+        } else{ //todo: gestire meglio caso d'errore
+            return new ArrayList<>();
+        }
+
     }
     private ArrayList<String> printCard(ObjectiveCard card, Side side) {
         // attributes
@@ -303,8 +314,9 @@ public class CLIController {
             output.add("|" + getFormattedString(17, "STRUCTURE") + "|");
             output.add("|" + getFormattedString(17, "points: " + points) + "|");
             for(int i = 0; i < challengeMatrix.size(); i++){
+                structureString = "";
                 for(int j = 0; j < challengeMatrix.get(i).size(); j++){
-                    if(challengeMatrix.get(i).get(j).isEmpty())
+                    if(challengeMatrix.get(i).get(j).isEmpty() || challengeMatrix.get(i).get(j).equals("EMP"))
                         structureString = structureString + "   ";
                     else
                         structureString = structureString + challengeMatrix.get(i).get(j);
@@ -369,7 +381,7 @@ public class CLIController {
         for(int i = 0; i < cards.size(); i++) {
             temp = printCard(viewModel.cardById(cards.get(i)),sides.get(i)) ;
             for (int j = 0; j < 7; j++) {
-                output.set(j,output.get(i) + " " + temp.get(j));
+                output.set(j, output.get(j) + " " + temp.get(j));
             }
         }
         return output;
@@ -543,7 +555,7 @@ public class CLIController {
         for(int j = 0; j < matrix.size(); j++){
             Boolean isEmpty = true;
             for(int i = 0; i < matrix.get(j).size() && isEmpty; i++){
-                if(!matrix.get(j).get(i).equals("")){
+                if(!matrix.get(j).get(i).equals("") && !matrix.get(j).get(i).equals("EMP")){
                     isEmpty = false;
                 }
             }
@@ -560,17 +572,17 @@ public class CLIController {
 
         for(int i = 0; i < matrix.size(); i++){
             for (int j = 0; j < matrix.get(i).size(); j++){
-                if(!matrix.get(i).get(j).equals("")){
+                if(!matrix.get(i).get(j).equals("") && !matrix.get(i).get(j).equals("EMP")){
                     areEmpty.set(j, false);
                 }
             }
         }
         for(int j = 0; j < areEmpty.size(); j++){
             if(areEmpty.get(j).equals(true)){
-                areEmpty.remove(j);
                 for(int i = 0; i < matrix.size(); i++){
                     matrix.get(i).remove(j);
                 }
+                areEmpty.remove(j--);
             }
         }
     }
@@ -604,10 +616,10 @@ public class CLIController {
         }
         for(int j = 0; j < areEmpty.size(); j++){
             if(areEmpty.get(j).equals(true)){
-                areEmpty.remove(j);
                 for(int i = 0; i < matrix.size(); i++){
                     matrix.get(i).remove(j);
                 }
+                areEmpty.remove(j--);
             }
         }
     }
