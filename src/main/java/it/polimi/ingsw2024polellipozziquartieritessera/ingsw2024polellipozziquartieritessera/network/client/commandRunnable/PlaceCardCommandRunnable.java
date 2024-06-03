@@ -61,7 +61,7 @@ public class PlaceCardCommandRunnable extends CommandRunnable{
 
     public void executeGUI() {
         try {
-            server.placeCard(clientContainer.getClient(), placingCardId, tableCardId, tableCornerPos, placingCardSide);
+            server.placeCard(client, placingCardId, tableCardId, tableCornerPos, placingCardSide);
         } catch (RemoteException e) {
             this.serverDisconnectedGUI();
         }

@@ -6,17 +6,13 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import javafx.application.*;
 import javafx.fxml.*;
 import javafx.geometry.Orientation;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.event.*;
 import javafx.scene.image.*;
-import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 
-import java.rmi.RemoteException;
 import java.util.*;
 
 public class GUIControllerGame extends GUIController {
@@ -208,17 +204,18 @@ public class GUIControllerGame extends GUIController {
                     if (handContainer != null) handContainer.getChildren().add(tempImageView);
 
                     tempImageView.getStyleClass().add("clickable");
-                    tempImageView.setOnMousePressed(mouseEvent -> { flipCard(cardId); });
+                    if(playerId == meId) tempImageView.setOnMousePressed(mouseEvent -> { flipCard(cardId); });
                 }
 
-                Separator verticalSeparator1 = new Separator();
-                verticalSeparator1.setOrientation(Orientation.VERTICAL);
-                if (handContainer != null) handContainer.getChildren().add(verticalSeparator1);
 
                 if (playerId == meId) {
+                    Separator verticalSeparator1 = new Separator();
+                    verticalSeparator1.setOrientation(Orientation.VERTICAL);
+                    if (handContainer != null) handContainer.getChildren().add(verticalSeparator1);
+
                     Button btnPlaceCard = new Button("Place Card");
                     btnPlaceCard.setOnAction((mouseEvent) -> {
-                        goToScene("/fxml/board.fxml");
+                        goToScene("/fxml/place.fxml");
                     });
                     if (handContainer != null) handContainer.getChildren().add(btnPlaceCard);
                 }

@@ -196,16 +196,6 @@ abstract public class GUIController {
         GUIApplication.changeScene(fxml, paramsMap);
     }
 
-    public void ping(VirtualView client, VirtualServer server){
-        synchronized (commandQueue) {
-            PingCommandRunnable commandRunnable = new PingCommandRunnable();
-            commandRunnable.setClient(client);
-            commandRunnable.setServer(server);
-            commandQueue.add(commandRunnable);
-            commandQueue.notifyAll();
-        }
-    }
-
     public HashMap<String, Integer> getParamsMap() {
         return paramsMap;
     }
