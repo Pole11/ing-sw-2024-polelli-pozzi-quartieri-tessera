@@ -175,76 +175,79 @@ public class GUIControllerPlace extends GUIController {
                     gridPane.getColumnConstraints().add(new ColumnConstraints(boardImageWidth - cornerWidth));
                 }
 
-                for (int i = 0; i < playerBoard.size(); i++) {
-                    for (int j = 0; j < playerBoard.getFirst().size(); j++) {
-                        if (playerBoard.get(i).get(j) != -1) {
-                            int ele = playerBoard.get(i).get(j);
-                            ImageView tempImageView;
-                            String imageUrl = null;
-                            if (getViewModel().getPlacedCardSide(ele) == Side.FRONT) {
-                                imageUrl = "/img/carte_fronte/" + ele + ".jpg";
-                            } else {
-                                imageUrl = "/img/carte_retro/" + ele + ".jpg";
-                            }
-                            tempImageView = createCardImageView(imageUrl, boardImageHeight);
-                            GridPane imageGridPane = new GridPane();
-                            imageGridPane.setGridLinesVisible(true);
+                for (int k = 0; k < getViewModel().getPlacingCardOrderMap(getViewModel().getPlayerIndex()).size(); k++) {
+                    for (int i = 0; i < playerBoard.size(); i++) {
+                        for (int j = 0; j < playerBoard.getFirst().size(); j++) {
+                            if (playerBoard.get(i).get(j) != -1 && getViewModel().getPlacingCardOrderMap(getViewModel().getPlayerIndex()).get(k).equals(playerBoard.get(i).get(j))) {
+                                int ele = playerBoard.get(i).get(j);
+                                ImageView tempImageView;
+                                String imageUrl = null;
+                                if (getViewModel().getPlacedCardSide(ele) == Side.FRONT) {
+                                    imageUrl = "/img/carte_fronte/" + ele + ".jpg";
+                                } else {
+                                    imageUrl = "/img/carte_retro/" + ele + ".jpg";
+                                }
+                                tempImageView = createCardImageView(imageUrl, boardImageHeight);
+                                GridPane imageGridPane = new GridPane();
+                                imageGridPane.setGridLinesVisible(true);
 
-                            for (int k = 0; k < 2; k++) {
-                                imageGridPane.getRowConstraints().add(new RowConstraints(boardImageHeight/2));
-                            }
-                            for (int k = 0; k < 2; k++) {
-                                imageGridPane.getColumnConstraints().add(new ColumnConstraints(boardImageWidth/2));
-                            }
-
-                            imageGridPane.add(tempImageView, 0, 0);
-                            gridPane.setHalignment(imageGridPane, HPos.CENTER);
-                            gridPane.setValignment(imageGridPane, VPos.CENTER);
-                            imageGridPane.setHalignment(tempImageView, HPos.LEFT);
-                            imageGridPane.setValignment(tempImageView, VPos.TOP);
-                            gridPane.add(imageGridPane, j, i);
-
-                            for (int k = 0; k < 2; k++) {
                                 for (int w = 0; w < 2; w++) {
-                                    Pane dummyCell = new Pane();
-                                    dummyCell.setPrefWidth(boardImageWidth/2);
-                                    dummyCell.setPrefHeight(boardImageHeight/2);
-                                    dummyCell.getStyleClass().add("clickable");
-                                    int cornerId = (k == 1 && w == 0) ? 3 : k+w;
-                                    CornerPos tableCornerPos = null;
-                                    switch(cornerId) {
-                                        case(0) -> tableCornerPos = CornerPos.UPLEFT;
-                                        case(1) -> tableCornerPos = CornerPos.UPRIGHT;
-                                        case(2) -> tableCornerPos = CornerPos.DOWNRIGHT;
-                                        case(3) -> tableCornerPos = CornerPos.DOWNLEFT;
-                                    }
-                                    dummyCell.setId(ele + "[" + cornerId + "]");
-                                    imageGridPane.add(dummyCell, w, k);
-                                    addHoverBgColor(dummyCell);
-                                    CornerPos finalTableCornerPos = tableCornerPos;
-                                    dummyCell.setOnMousePressed((mouseEvent) -> {
-                                        if (!mouseEvent.isControlDown()) {
-                                            if (cornerId >= 0 && cardId >= 0) {
-                                                PlaceCardCommandRunnable command = new PlaceCardCommandRunnable();
-                                                command.setParams(cardId, ele, finalTableCornerPos, getViewModel().getHandCardsSide(cardId));
-                                                addCommand(command, thisController);
-                                                //showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
-                                                goToScene("/fxml/place.fxml");
+                                    imageGridPane.getRowConstraints().add(new RowConstraints(boardImageHeight/2));
+                                }
+                                for (int w = 0; w < 2; w++) {
+                                    imageGridPane.getColumnConstraints().add(new ColumnConstraints(boardImageWidth/2));
+                                }
 
-                                                /*System.out.println("Placing card id " + cardId);
-                                                System.out.println("Table card id " + ele);
-                                                System.out.println("Table corner pos " + finalTableCornerPos);
-                                                System.out.println("Placing card side " + getViewModel().getHandCardsSide(cardId));*/
-                                            } else {
-                                                showAlert(Alert.AlertType.INFORMATION, "Placed card", "Incorrect card placing");
-                                            }
+                                imageGridPane.add(tempImageView, 0, 0);
+                                gridPane.setHalignment(imageGridPane, HPos.CENTER);
+                                gridPane.setValignment(imageGridPane, VPos.CENTER);
+                                imageGridPane.setHalignment(tempImageView, HPos.LEFT);
+                                imageGridPane.setValignment(tempImageView, VPos.TOP);
+                                gridPane.add(imageGridPane, j, i);
+
+                                for (int u = 0; u < 2; u++) {
+                                    for (int w = 0; w < 2; w++) {
+                                        Pane dummyCell = new Pane();
+                                        dummyCell.setPrefWidth(boardImageWidth/2);
+                                        dummyCell.setPrefHeight(boardImageHeight/2);
+                                        dummyCell.getStyleClass().add("clickable");
+                                        int cornerId = (u == 1 && w == 0) ? 3 : u+w;
+                                        CornerPos tableCornerPos = null;
+                                        switch(cornerId) {
+                                            case(0) -> tableCornerPos = CornerPos.UPLEFT;
+                                            case(1) -> tableCornerPos = CornerPos.UPRIGHT;
+                                            case(2) -> tableCornerPos = CornerPos.DOWNRIGHT;
+                                            case(3) -> tableCornerPos = CornerPos.DOWNLEFT;
                                         }
-                                    });
+                                        dummyCell.setId(ele + "[" + cornerId + "]");
+                                        imageGridPane.add(dummyCell, w, u);
+                                        addHoverBgColor(dummyCell);
+                                        CornerPos finalTableCornerPos = tableCornerPos;
+                                        dummyCell.setOnMousePressed((mouseEvent) -> {
+                                            if (!mouseEvent.isControlDown()) {
+                                                if (cornerId >= 0 && cardId >= 0) {
+                                                    PlaceCardCommandRunnable command = new PlaceCardCommandRunnable();
+                                                    command.setParams(cardId, ele, finalTableCornerPos, getViewModel().getHandCardsSide(cardId));
+                                                    addCommand(command, thisController);
+                                                    //showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
+                                                    goToScene("/fxml/place.fxml");
+
+                                                    /*System.out.println("Placing card id " + cardId);
+                                                    System.out.println("Table card id " + ele);
+                                                    System.out.println("Table corner pos " + finalTableCornerPos);
+                                                    System.out.println("Placing card side " + getViewModel().getHandCardsSide(cardId));*/
+                                                } else {
+                                                    showAlert(Alert.AlertType.INFORMATION, "Placed card", "Incorrect card placing");
+                                                }
+                                            }
+                                        });
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
             }
         });
     }
