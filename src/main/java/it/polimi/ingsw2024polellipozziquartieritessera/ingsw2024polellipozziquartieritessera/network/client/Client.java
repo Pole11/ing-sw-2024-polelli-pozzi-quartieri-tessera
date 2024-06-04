@@ -134,9 +134,16 @@ public class Client implements VirtualView {
             guiApplication.updateController();
         } else {
             switch (nextGamePhase) {
+                case GamePhase.CHOOSESTARTERSIDEPHASE -> {
+                    cliController.showStarterCard();
+                }
                 case GamePhase.CHOOSECOLORPHASE -> {
                     System.out.println("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]\n> ");
                 }
+                case GamePhase.CHOOSEOBJECTIVEPHASE ->  {
+                    cliController.ShowSecretObjective();
+                }
+
                 case GamePhase.MAINPHASE -> {
                     System.out.println("---Game started---");
                 }

@@ -1,5 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable;
 
+import java.util.NoSuchElementException;
+
 public class showHandCommandRunnable extends  CommandRunnable{
 
 
@@ -8,8 +10,7 @@ public class showHandCommandRunnable extends  CommandRunnable{
         try {
             clientContainer.getCliController().showHand();
         } catch (Exception r){
-            //A SCHIUMA: Ricordati di aggiungere \n> \
-            System.err.println("Error: could not get hand\n> ");
+            System.err.println("Error: hand not initialized yet\n> ");
         }
     }
 

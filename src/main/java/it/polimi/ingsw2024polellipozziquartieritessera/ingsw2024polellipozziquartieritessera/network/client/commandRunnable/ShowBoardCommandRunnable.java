@@ -3,7 +3,13 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 public class ShowBoardCommandRunnable extends CommandRunnable {
     @Override
     public void executeCLI() {
-        clientContainer.getCliController();
+        try {
+            Integer playerIndex = Integer.parseInt(messageFromCli[1]);
+            clientContainer.getCliController().showBoard(playerIndex);
+        } catch (Exception r){
+            System.err.print(r + "\nplease insert a valid index");
+        }
+
     }
 
     @Override

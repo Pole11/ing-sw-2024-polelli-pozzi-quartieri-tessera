@@ -19,6 +19,8 @@ public enum Command {
      ADDMESSAGE(new AddMessageCommandRunnable(), "Network"),
      PING(new PingCommandRunnable(), "Network"),
      SHOWCOMMONOBJECTIVES(new ShowCommonObjectiveCommandRunnable(),"Local"),
+
+     SHOWSECRETOBJECTIVES(new ShowSecretObjectiveCommandRunnable(), "local"),
      SHOWHAND(new showHandCommandRunnable(), "Local"),
      SHOWBOARD(new ShowBoardCommandRunnable(), "Local");
 

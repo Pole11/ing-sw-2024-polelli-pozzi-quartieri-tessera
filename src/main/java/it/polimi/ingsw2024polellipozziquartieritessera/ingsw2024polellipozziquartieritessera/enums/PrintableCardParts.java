@@ -13,27 +13,29 @@ public enum PrintableCardParts {
     RIGHT("  |  |",5),
     DOWNLEFT("|  +--", 6),
     DOWN("   ---",7),
-    DOWNRIGHT("+--|  ",8),
+    DOWNRIGHT("  |--+",8),
     EMPTY("      ",9);
 
 
     private final String disposition;
-    private static final int index = 0;
+    private final int index;
 
     private PrintableCardParts(final String disposition, final int index) {
+
         this.disposition = disposition;
+        this.index = index;
     }
 
     public String getDisposition(){return this.disposition;}
     public static PrintableCardParts byIndex(int i){
         for(PrintableCardParts p : PrintableCardParts.values()){
-            if (PrintableCardParts.index == i)
+            if (p.index == i)
                 return  p;
         }
         return PrintableCardParts.EMPTY;
     }
     public String firstRow(){return this.getDisposition().substring(0,3);}
 
-    public String secondRow(){return this.getDisposition().substring(4,6);}
+    public String secondRow(){return this.getDisposition().substring(3,6);}
 }
 
