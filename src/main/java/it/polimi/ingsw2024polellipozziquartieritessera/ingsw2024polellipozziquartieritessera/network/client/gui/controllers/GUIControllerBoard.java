@@ -12,6 +12,7 @@ import javafx.geometry.VPos;
 import javafx.scene.control.Alert;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import org.controlsfx.control.spreadsheet.Grid;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -40,9 +41,11 @@ public class GUIControllerBoard extends GUIController {
                 int playerId = getParamsMap().get("playerId");
 
                 ArrayList<ArrayList<Integer>> playerBoard = getViewModel().getPlayerBoard(playerId); // the first arg is the index of the player to print the board of
+                playerBoard = rotateBoard(playerBoard);
 
                 GridPane gridPane = new GridPane();
                 //gridPane.setGridLinesVisible(true);
+                gridPane.setId("boardGridPane");
                 gridPane.setHgap(gridPaneHgap); // Spacing orizzontale
                 gridPane.setVgap(gridPaneVgap); // Spacing verticale
                 gridPane.setPadding(new Insets(gridPaneVPadding)); // Margine di 20 pixel su tutti i lati
@@ -82,6 +85,13 @@ public class GUIControllerBoard extends GUIController {
 
     public void handleBackToGame(ActionEvent event) {
         goToScene("/fxml/game.fxml");
+    }
+
+    @FXML
+    public void handleRestoreView(ActionEvent event) {
+        GridPane boardGridPane = (GridPane) mainContainerBoard.lookup("#boardGridPane");
+        boardGridPane.setTranslateX(0);
+        boardGridPane.setTranslateY(0);
     }
 
     @Override

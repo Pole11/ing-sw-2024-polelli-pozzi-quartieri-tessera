@@ -1,5 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.Card;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -241,6 +243,41 @@ abstract public class GUIController {
             node.setOnMouseEntered(mouseEvent -> { node.setStyle("-fx-background-image: url('" + imageUrl + "')"); node.setStyle("-fx-background-image: none"); System.out.println("-fx-background-image: url('" + imageUrl + "')"); });
             node.setOnMouseExited(mouseEvent -> { node.setStyle("-fx-background-image: none"); node.setStyle("-fx-background-image: url('" + imageUrl + "')"); });
         });
+    }
+
+    public ArrayList<ArrayList<Integer>> rotateBoard(ArrayList<ArrayList<Integer>> board) {
+        ArrayList<ArrayList<Integer>> rotatedBoard = new ArrayList<>();
+        ArrayList<String> cardList  = new ArrayList<>();
+
+        for(int i = 0; i < 7; i++){
+            cardList.add("");
+        }
+        //initialize rotatedBoard
+        int a = board.size();
+        int b = board.get(0).size();
+        int c = a+b;
+
+        for(int i = 0; i < c; i++){
+            rotatedBoard.add(new ArrayList<>());
+            for(int j  = 0; j < c; j++){
+                rotatedBoard.get(i).add(0);
+            }
+        }
+        //rotate board of 45°
+        int centeri = (int)Math.floor((double) board.size()/2);
+        int centerj = (int)Math.floor((double) board.get(0).size()/2);
+        int rcenteri = (int)Math.floor((double) rotatedBoard.size()/2);
+        int rcenterj = (int)Math.floor((double) rotatedBoard.get(0).size()/2);
+
+        for(int i = 0; i < board.size(); i++){
+            for(int j = 0; j < board.get(i).size(); j++){
+                int irel = i - centeri;
+                int jrel = j - centerj;
+                rotatedBoard.get(rcenteri - centeri + i - jrel).set(rcenterj -centerj + j + irel, board.get(i).get(j));
+            }
+        }
+
+        return new ArrayList<>(rotatedBoard);
     }
 
     public void addPanning(Node node) {

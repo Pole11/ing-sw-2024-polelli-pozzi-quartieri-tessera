@@ -19,6 +19,10 @@
     -fx-max-width: 200px;
 }
 
+.cardDeckContainer {
+    -fx-padding: 10px;
+}
+
 .blueBackground {
     -fx-background-color: rgba(0, 0, 255, 0.4);
 }

@@ -158,9 +158,11 @@ public class GUIControllerPlace extends GUIController {
                 int cornerHeight = 35;
 
                 ArrayList<ArrayList<Integer>> playerBoard = getViewModel().getPlayerBoard(getViewModel().getPlayerIndex()); // the first arg is the index of the player to print the board of
+                playerBoard = rotateBoard(playerBoard);
 
                 GridPane gridPane = new GridPane();
                 //gridPane.setGridLinesVisible(true);
+                gridPane.setId("boardGridPane");
                 gridPane.setHgap(gridPaneHgap); // Spacing orizzontale
                 gridPane.setVgap(gridPaneVgap); // Spacing verticale
                 gridPane.setPadding(new Insets(gridPaneVPadding)); // Margine di 20 pixel su tutti i lati
@@ -278,6 +280,13 @@ public class GUIControllerPlace extends GUIController {
     @FXML
     public void handleBackToGame(ActionEvent event) {
         goToScene("/fxml/game.fxml");
+    }
+
+    @FXML
+    public void handleRestoreView(ActionEvent event) {
+        GridPane boardGridPane = (GridPane) mainContainerBoard.lookup("#boardGridPane");
+        boardGridPane.setTranslateX(0);
+        boardGridPane.setTranslateY(0);
     }
 
     @Override

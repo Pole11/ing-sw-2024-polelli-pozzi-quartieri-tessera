@@ -36,36 +36,36 @@ public class GUIControllerGame extends GUIController {
 
     private void populatePlateauCoordinateMap() {
         plateauCoordinatedMap = new HashMap<>();
-        plateauCoordinatedMap.put(0, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 20)));
-        plateauCoordinatedMap.put(1, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(2, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(3, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(4, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(5, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(6, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(7, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(8, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(9, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(10, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(11, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(12, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(13, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(14, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(15, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(16, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(17, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(18, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(19, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(20, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(21, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(22, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(23, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(24, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(25, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(26, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(27, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(28, new ArrayList<>(Arrays.asList(0,0)));
-        plateauCoordinatedMap.put(29, new ArrayList<>(Arrays.asList(0,0)));
+        plateauCoordinatedMap.put(0, new ArrayList<>(Arrays.asList(plateauHeight/4 - 40,plateauHeight - 24)));
+        plateauCoordinatedMap.put(1, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 24)));
+        plateauCoordinatedMap.put(2, new ArrayList<>(Arrays.asList(plateauHeight/4 + 40,plateauHeight - 24)));
+        plateauCoordinatedMap.put(3, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 61)));
+        plateauCoordinatedMap.put(4, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 61)));
+        plateauCoordinatedMap.put(5, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 61)));
+        plateauCoordinatedMap.put(6, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 61)));
+        plateauCoordinatedMap.put(7, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 98)));
+        plateauCoordinatedMap.put(8, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 98)));
+        plateauCoordinatedMap.put(9, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 98)));
+        plateauCoordinatedMap.put(10, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 98)));
+        plateauCoordinatedMap.put(11, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 135)));
+        plateauCoordinatedMap.put(12, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 135)));
+        plateauCoordinatedMap.put(13, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 135)));
+        plateauCoordinatedMap.put(14, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 135)));
+        plateauCoordinatedMap.put(15, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 172)));
+        plateauCoordinatedMap.put(16, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 172)));
+        plateauCoordinatedMap.put(17, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 172)));
+        plateauCoordinatedMap.put(18, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 172)));
+        plateauCoordinatedMap.put(19, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 209)));
+        plateauCoordinatedMap.put(20, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 229)));
+        plateauCoordinatedMap.put(21, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 209)));
+        plateauCoordinatedMap.put(22, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 248)));
+        plateauCoordinatedMap.put(23, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 287)));
+        plateauCoordinatedMap.put(24, new ArrayList<>(Arrays.asList(plateauHeight/4 - 36,plateauHeight - 320)));
+        plateauCoordinatedMap.put(25, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 325)));
+        plateauCoordinatedMap.put(26, new ArrayList<>(Arrays.asList(plateauHeight/4 + 36,plateauHeight - 320)));
+        plateauCoordinatedMap.put(27, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 287)));
+        plateauCoordinatedMap.put(28, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 248)));
+        plateauCoordinatedMap.put(29, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 278)));
     }
 
     private void clearAllchilds() {
@@ -211,13 +211,15 @@ public class GUIControllerGame extends GUIController {
                 int y = plateauCoordinatedMap.get(0).get(1);
                 System.out.println(x);
                 System.out.println(y);
-                Circle circle = new Circle(x, y, 15);
+                Circle circle = new Circle(x, y, 10);
                 circle.setId("circlePoints" + i);
                 plateauImageViewPane.getChildren().add(circle);
-                if (getViewModel().getColorsMap(i) == Color.BLUE) { circle.setFill(javafx.scene.paint.Color.BLUE); }
-                else if (getViewModel().getColorsMap(i) == Color.GREEN) { circle.setFill(javafx.scene.paint.Color.GREEN); }
-                else if (getViewModel().getColorsMap(i) == Color.RED) { circle.setFill(javafx.scene.paint.Color.RED); }
-                else if (getViewModel().getColorsMap(i) == Color.YELLOW) { circle.setFill(javafx.scene.paint.Color.YELLOW); }
+
+                int offset = 5;
+                if (getViewModel().getColorsMap(i) == Color.BLUE) { circle.setFill(javafx.scene.paint.Color.BLUE); circle.setTranslateX(-offset); circle.setTranslateY(-offset);}
+                else if (getViewModel().getColorsMap(i) == Color.GREEN) { circle.setFill(javafx.scene.paint.Color.GREEN); circle.setTranslateX(offset); circle.setTranslateY(-offset); }
+                else if (getViewModel().getColorsMap(i) == Color.RED) { circle.setFill(javafx.scene.paint.Color.RED); circle.setTranslateX(offset); circle.setTranslateY(offset); }
+                else if (getViewModel().getColorsMap(i) == Color.YELLOW) { circle.setFill(javafx.scene.paint.Color.YELLOW); circle.setTranslateX(-offset); circle.setTranslateY(offset);}
             }
         });
     }
