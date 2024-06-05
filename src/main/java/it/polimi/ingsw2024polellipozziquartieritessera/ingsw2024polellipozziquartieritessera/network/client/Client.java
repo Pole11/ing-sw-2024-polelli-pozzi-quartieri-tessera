@@ -138,7 +138,7 @@ public class Client implements VirtualView {
                     cliController.showStarterCard();
                 }
                 case GamePhase.CHOOSECOLORPHASE -> {
-                    System.out.println("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]\n> ");
+                    System.out.print("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]\n> ");
                 }
                 case GamePhase.CHOOSEOBJECTIVEPHASE ->  {
                     cliController.ShowSecretObjective();
@@ -287,7 +287,7 @@ public class Client implements VirtualView {
         if (objectiveCardId2 == -1){
             System.out.print("you have chosen the objective card: " + objectiveCardId1 + "\n> ");
         } else{
-            System.out.print("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1], to see your card use the command SHOWOBJECTIVE\n> ");
+            System.out.print("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1], \n> to see your card use the command SHOWSECRETOBJECTIVE\n> ");
             // TODO: cliController.showSecretObjectives();
 
         }
@@ -304,6 +304,7 @@ public class Client implements VirtualView {
 
     @Override
     public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
+        viewModel.fillPoints();
         if (side == null){
             viewModel.setStarterCard(cardId1);
             System.out.print("Chose your preferred side for the starter card with the command CHOOSESTARTER[Front/Back]\n> ");
@@ -349,5 +350,3 @@ public class Client implements VirtualView {
         System.err.print("\nERROR FROM SERVER: " + error + "\n> ");
     }
 }
-
-// TODO: capire come fare a chiamare le print card... da dove, chi lo fa, etc.

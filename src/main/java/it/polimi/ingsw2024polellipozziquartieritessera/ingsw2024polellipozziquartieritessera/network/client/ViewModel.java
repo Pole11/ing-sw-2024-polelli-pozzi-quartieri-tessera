@@ -331,6 +331,11 @@ public class ViewModel {
 
         placingCardOrderMap.get(playerIndex).addLast(placingCardId);
     }
+    public void fillPoints(){
+        for (int i = 0; i < nicknamesMap.size(); i++){
+            pointsMap.put(i, 0);
+        }
+    }
 
     private void expandBoard(int rowIndex, int colIndex, ArrayList<ArrayList<Integer>> playerBoard){
         // Expand the matrix to include the new position (remember that this supports only one execute: row++/-- or col++/--)

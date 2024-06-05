@@ -11,6 +11,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -251,6 +252,23 @@ public class CLIController {
         printNCards(cards, sides);
 
     }
+    public void showPlayers(){
+        int n_players = viewModel.getPlayersSize();
+        System.out.println("this are the players nicknames ");
+        for(int i = 0; i < n_players; i++){
+            System.out.println("index: " + i + " nickname: " + viewModel.getNickname(i));
+        }
+        System.out.print("> ");
+;    }
+    public void showPoints(){
+        int n_players = viewModel.getPlayersSize();
+        System.out.println("this are the players points ");
+        for(int i = 0; i < n_players; i++){
+            System.out.println(" nickname: " + viewModel.getNickname(i) + "\tpoints: " + viewModel.getPointsMap(i));
+        }
+        System.out.print("> ");
+
+    }
 
     private ArrayList<String> printCard(Card card, Side side){
         if(card instanceof ObjectiveCard){
@@ -317,7 +335,6 @@ public class CLIController {
             //rotation of 45° of the structureChallenge 3x3 -> 5x5
             int centeri = (int)Math.floor((double) Config.N_STRUCTURE_CHALLENGE_CONFIGURATION/2);
             int centerj = (int)Math.floor((double) Config.N_STRUCTURE_CHALLENGE_CONFIGURATION/2);
-            //todo testing
             for(int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++){
                 for(int j = 0; j < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; j++){
                     irel = i - centeri;
@@ -337,7 +354,7 @@ public class CLIController {
             output.add("|" + getFormattedString(17, "") + "|");
             output.add("|" + getFormattedString(17, "") + "|");
             output.add("+-----------------+");
-            //todo testing
+
         } else if (card.getChallenge() instanceof StructureChallenge) {
             output.add("+-----------------+");
             output.add("|" + getFormattedString(17, "STRUCTURE") + "|");
@@ -500,21 +517,21 @@ public class CLIController {
         }
 
         if (side == Side.BACK){
-            output.add("+-----------------+");
-            output.add("|" + backCornerStrings[0] + getFormattedString(11, "") +backCornerStrings[1] + "|");
-            output.add("|" + getFormattedString(17, "") + "|");
-            output.add("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") + "|");
-            output.add("|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) + "|");
-            output.add("|" + backCornerStrings[3] + getFormattedString(11, "id: "+card.getId()) + backCornerStrings[2] + "|");
-            output.add("+-----------------+");
+            output.add(ColorPrint.GOLD + "+-----------------+" + ColorPrint.RESET);
+            output.add(ColorPrint.GOLD + "|" + backCornerStrings[0] + getFormattedString(11, "") +backCornerStrings[1] + "|" + ColorPrint.RESET);
+            output.add(ColorPrint.GOLD + "|" + getFormattedString(17, "") + "|");
+            output.add(ColorPrint.GOLD + "|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") + "|" + ColorPrint.RESET);
+            output.add(ColorPrint.GOLD + "|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) + "|");
+            output.add(ColorPrint.GOLD + "|" + backCornerStrings[3] + getFormattedString(11, "id: "+card.getId()) + backCornerStrings[2] + "|" + ColorPrint.RESET);
+            output.add(ColorPrint.GOLD + "+-----------------+" + ColorPrint.RESET);
         } else{
-            output.add("+-----------------+");
-            output.add("|" + frontCornerStrings[0] + getFormattedString(11, ""+ points) + frontCornerStrings[1] + "|");
-            output.add("|" + getFormattedString(17, costString)+"|");
-            output.add("|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") + "|");
-            output.add("|" + getFormattedString(17, challengeString)+"|");
-            output.add("|" + frontCornerStrings[3] + getFormattedString(11, "id: "+card.getId()) + frontCornerStrings[2] + "|");
-            output.add("+-----------------+");
+            output.add(ColorPrint.GOLD + "+-----------------+" + ColorPrint.RESET);
+            output.add(ColorPrint.GOLD + "|" + frontCornerStrings[0] + getFormattedString(11, ""+ points) + frontCornerStrings[1] + "|" + ColorPrint.RESET);
+            output.add(ColorPrint.GOLD + "|" + getFormattedString(17, costString)+"|" + ColorPrint.RESET);
+            output.add(ColorPrint.GOLD + "|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") + "|" + ColorPrint.RESET);
+            output.add(ColorPrint.GOLD + "|" + getFormattedString(17, challengeString)+"|" + ColorPrint.RESET);
+            output.add(ColorPrint.GOLD + "|" + frontCornerStrings[3] + getFormattedString(11, "id: "+card.getId()) + frontCornerStrings[2] + "|" + ColorPrint.RESET);
+            output.add(ColorPrint.GOLD + "+-----------------+" + ColorPrint.RESET);
         }
         return output;
     }

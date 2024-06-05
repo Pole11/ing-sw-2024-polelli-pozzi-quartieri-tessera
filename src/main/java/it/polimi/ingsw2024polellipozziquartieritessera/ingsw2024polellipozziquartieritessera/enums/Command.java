@@ -22,6 +22,10 @@ public enum Command {
 
      SHOWSECRETOBJECTIVES(new ShowSecretObjectiveCommandRunnable(), "local"),
      SHOWHAND(new showHandCommandRunnable(), "Local"),
+
+     SHOWPLAYERS(new ShowPlayersCommandRunnable(), "local"),
+     SHOWPOINTS(new ShowPointsCommandRunnable(), "local"),
+
      SHOWBOARD(new ShowBoardCommandRunnable(), "Local");
 
      private final CommandRunnable commandRunnable;

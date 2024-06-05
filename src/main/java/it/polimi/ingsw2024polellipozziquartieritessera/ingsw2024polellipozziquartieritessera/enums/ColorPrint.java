@@ -9,6 +9,7 @@ public enum ColorPrint {
     MAGENTA_BACKGROUND("\033[45m",4), // MAGENTA
     LIGHT_YELLOW_BACKGROUND("\033[48;5;229m", 5),
     BLACK("\033[0;30m", 10),    // BLACK
+    GOLD("\033[38;5;179m", 11),
     WHITE_BACKGROUND("\033[47m",16);   // WHITE
 
 

@@ -7,7 +7,7 @@ public class ShowBoardCommandRunnable extends CommandRunnable {
             Integer playerIndex = Integer.parseInt(messageFromCli[1]);
             clientContainer.getCliController().showBoard(playerIndex);
         } catch (Exception r){
-            System.err.print(r + "\nplease insert a valid index");
+            System.err.println(r + "\nplease insert a valid index");
         }
 
     }
