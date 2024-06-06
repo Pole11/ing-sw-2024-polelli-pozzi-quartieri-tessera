@@ -39,4 +39,9 @@ public class DrawCardCommandRunnable extends CommandRunnable{
             serverDisconnectedGUI();
         }
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }

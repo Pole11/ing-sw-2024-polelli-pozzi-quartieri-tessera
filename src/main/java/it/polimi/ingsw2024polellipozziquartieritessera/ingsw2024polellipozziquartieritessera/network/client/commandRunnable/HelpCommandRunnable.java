@@ -11,4 +11,9 @@ public class HelpCommandRunnable extends CommandRunnable {
     public void executeGUI() {
 
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }

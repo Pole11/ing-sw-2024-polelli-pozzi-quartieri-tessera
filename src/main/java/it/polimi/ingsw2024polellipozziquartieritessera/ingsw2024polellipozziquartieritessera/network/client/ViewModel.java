@@ -36,7 +36,6 @@ public class ViewModel {
     private final HashMap<Integer,Side> handsSideMap; // side delle carte in mano (unico per id)
     private final HashMap<Integer,ArrayList<ArrayList<Integer>>> boardsMap; // mappa delle board dei players
     private int[] mainBoard; // se la carta non c'è viene inizializzata a -1
-    private ArrayList<Integer> winners;
     private Chat chat;
     private ArrayList<Integer> placingCardOrder;
 
@@ -55,7 +54,6 @@ public class ViewModel {
         connessionMap = new HashMap<>();
         colorsMap = new HashMap<>();
         pointsMap = new HashMap<>();
-        winners = new ArrayList<>();
         populateCardsMap();
 
         placingCardOrder = new ArrayList<>();
@@ -151,10 +149,6 @@ public class ViewModel {
     }
     public void setPlacedSide(int cardId, Side side){
         placedSideMap.put(cardId, side);
-    }
-
-    public void addWinner(int playerIndex){
-        winners.add(playerIndex);
     }
 
     // GETTERS FOR CLI&GUI

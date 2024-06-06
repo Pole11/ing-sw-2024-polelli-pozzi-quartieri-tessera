@@ -20,4 +20,9 @@ public class StartCommandRunnable extends CommandRunnable{
             this.serverDisconnectedGUI();
         }
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }

@@ -11,4 +11,9 @@ public class AddMessageCommandRunnable extends CommandRunnable {
     public void executeGUI() {
 
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }

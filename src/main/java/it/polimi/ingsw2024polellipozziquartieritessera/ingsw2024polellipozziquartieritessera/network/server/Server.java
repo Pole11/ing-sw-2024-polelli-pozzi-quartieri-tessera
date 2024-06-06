@@ -23,13 +23,15 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 public class Server implements VirtualServer {
     final Controller controller;
     final ServerSocket listenSocket;
+    final Registry registry;
 
-    public Server(ServerSocket listenSocket, Controller controller) {
+    public Server(ServerSocket listenSocket, Controller controller, Registry registry) {
         this.listenSocket = listenSocket;
         this.controller = controller;
+        this.registry = registry;
     }
 
-    public static void main(String[] argv) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
+    public static void main(String[] argv) throws IOException, WrongStructureConfigurationSizeException {
         String host = argv[0];
         int socketport = Integer.parseInt(argv[1]);
         int rmiport = Integer.parseInt(argv[2]);
@@ -37,28 +39,46 @@ public class Server implements VirtualServer {
         startServer(host, socketport, rmiport);
     }
 
-    public static void startServer(String host, int socketport, int rmiport) throws IOException, WrongStructureConfigurationSizeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException{
-        //setup gamestate
-        GameState gameState = null;
-        boolean store = Populate.existStore(); //FA persistance
-        if (store){
-            // takes data from store
-        } else {
-            gameState = Populate.populate();
-        }
-
+    public static void startServer(String host, int socketport, int rmiport) throws IOException, WrongStructureConfigurationSizeException{
         // listen to socket
         ServerSocket listenSocket = new ServerSocket(socketport);
-        Server server = new Server(listenSocket, new Controller(gameState));
 
         // listen to rmi
         System.setProperty("java.rmi.server.hostname", host);
         String name = "VirtualServer";
-        VirtualServer stub = (VirtualServer) UnicastRemoteObject.exportObject(server, 0);
         Registry registry = LocateRegistry.createRegistry(rmiport);
+
+        Server server = new Server(listenSocket, new Controller(), registry);
+
+
+        //setup gamestate
+        GameState gameState = new GameState(server);
+        //FA persistance
+        boolean store = Populate.existStore();
+        if (store){
+            // takes data from store
+        } else {
+            Populate.populate(gameState);
+        }
+
+        server.controller.setGameState(gameState);
+
+        //start RMI
+        VirtualServer stub = (VirtualServer) UnicastRemoteObject.exportObject(server, 0);
         registry.rebind(name, stub);
 
+        //start socket
         server.runServer();
+    }
+
+    public void restart() {
+        GameState gameState = new GameState(this);
+        try {
+            Populate.populate(gameState);
+        } catch (WrongStructureConfigurationSizeException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        controller.setGameState(gameState);
     }
 
     private void runServer() throws IOException {
@@ -72,6 +92,7 @@ public class Server implements VirtualServer {
             new Thread(() -> {
                 try {
                     handler.runVirtualView();
+                    controller.manageDisconnection();
                     System.out.println("Client disconnected");
                 } catch (IOException e) {
                     throw new RuntimeException(e);

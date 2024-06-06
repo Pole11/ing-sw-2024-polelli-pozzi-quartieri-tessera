@@ -20,4 +20,9 @@ public class PingCommandRunnable extends CommandRunnable{
             this.serverDisconnectedGUI();
         }
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }

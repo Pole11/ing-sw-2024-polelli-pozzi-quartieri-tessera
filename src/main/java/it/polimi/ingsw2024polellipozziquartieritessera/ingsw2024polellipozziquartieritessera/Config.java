@@ -15,9 +15,14 @@ public class Config {
     public static final int OBJECTIVEQTY = 16;
     public static final int STARTERQTY = 6;
 
+    public static final int TIMEOUT_TIME = 3;
+    public static final int NEXT_PING_TIME = 10;
+    public static final int WAIT_FOR_PING_TIME = 5;
+
     public static final String GAME_STATE_PATH = "rescue/gamestate/";
     public static final String CARD_JSON_PATH = "/src/main/java/it/polimi/ingsw2024polellipozziquartieritessera/ingsw2024polellipozziquartieritessera/cards.json";
     public static final String TITLE_CLI_PATH = "/src/main/resources/img/TitleCLI.txt";
+
     public static int firstResourceCardId = Integer.MAX_VALUE;
     public static int firstGoldCardId = Integer.MAX_VALUE;
     public static int firstStarterCardId = Integer.MAX_VALUE;

@@ -67,4 +67,9 @@ public class PlaceCardCommandRunnable extends CommandRunnable{
         }
     }
 
+    @Override
+    public void executeHelp() {
+
+    }
+
 }

@@ -10,13 +10,14 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Client implements VirtualView {
     private boolean meDoGui;
     private CLIController cliController;
     private GUIApplication guiApplication;
-    private final ViewModel viewModel;
+    private ViewModel viewModel;
     private VirtualView client;
     private VirtualServer server;
 
@@ -114,7 +115,7 @@ public class Client implements VirtualView {
                     guiApplication.changeScene("/fxml/chooseStarter.fxml");
                 }
                 case GamePhase.CHOOSECOLORPHASE -> {
-                    System.out.println("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]\n> ");
+                    System.out.print("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]\n> ");
                     guiApplication.changeScene("/fxml/chooseColor.fxml");
                 }
                 case GamePhase.CHOOSEOBJECTIVEPHASE -> {
@@ -191,7 +192,7 @@ public class Client implements VirtualView {
                 System.out.print("you re-connected to the game\n> ");
             } else {
                 //SISTEMA
-                throw new RuntimeException();
+                System.out.println("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>");
             }
         } else {
             if (connected) {
@@ -314,9 +315,29 @@ public class Client implements VirtualView {
     }
 
     @Override
-    public void updateWinner(int playerIndex){
+    public void updateWinner(ArrayList<Integer> playerIndexes){
         System.out.println("---------GAME ENDED----------");
-        viewModel.addWinner(playerIndex);
+        if (playerIndexes.isEmpty()){
+            System.out.println("No one won");
+        }
+        if (playerIndexes.contains(viewModel.getPlayerIndex())){
+            if (playerIndexes.size() == 1){
+                System.out.println("Congratulations! You Won");
+            } else {
+                System.out.print("Congratulations! Congratulations, you tied for first place with ");
+                playerIndexes.stream().filter(e -> e != viewModel.getPlayerIndex()).forEach(e -> {
+                    System.out.print(viewModel.getNickname(e)+ ", ");
+                });
+            }
+            System.out.println();
+        } else {
+            System.out.println("You Lost");
+            playerIndexes.forEach(e -> {
+                System.out.print(viewModel.getNickname(e)+ ", ");
+            });
+            System.out.println("won");
+        }
+        restart();
     }
 
     @Override
@@ -340,6 +361,13 @@ public class Client implements VirtualView {
             guiApplication.getGUIController().setServerError(error);
         }
         System.err.print("\nERROR FROM SERVER: " + error + "\n> ");
+    }
+
+
+    private void restart(){
+        cliController.restartExecuteCommand();
+        viewModel = new ViewModel();
+        System.out.print("the game finished, to enter a new match, use the command ADDUSER <nickname>\n> ");
     }
 }
 

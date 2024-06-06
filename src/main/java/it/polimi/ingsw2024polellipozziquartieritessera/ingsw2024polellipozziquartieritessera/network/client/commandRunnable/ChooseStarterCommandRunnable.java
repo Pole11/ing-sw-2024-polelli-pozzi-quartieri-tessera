@@ -40,4 +40,9 @@ public class ChooseStarterCommandRunnable extends CommandRunnable {
         }
 
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }

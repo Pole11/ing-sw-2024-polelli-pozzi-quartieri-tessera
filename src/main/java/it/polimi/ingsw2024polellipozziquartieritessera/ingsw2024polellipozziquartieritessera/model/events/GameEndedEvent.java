@@ -17,12 +17,10 @@ public class GameEndedEvent extends Event{
     @Override
     public void execute() {
         for (VirtualView client: clients) {
-            for (Integer winner: winners) {
-                try {
-                    client.updateWinner(winner);
-                } catch (RemoteException e) {
-                    playerDisconnected(client);
-                }
+            try {
+                client.updateWinner(winners);
+            } catch (RemoteException e) {
+                playerDisconnected(client);
             }
         }
     }

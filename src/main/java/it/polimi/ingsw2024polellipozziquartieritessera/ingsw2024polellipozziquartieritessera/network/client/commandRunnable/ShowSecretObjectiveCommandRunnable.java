@@ -10,4 +10,9 @@ public class ShowSecretObjectiveCommandRunnable extends CommandRunnable{
     public void executeGUI() {
         ;
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }

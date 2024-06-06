@@ -3,6 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -136,8 +137,12 @@ public class ClientProxy implements VirtualView {
     }
 
     @Override
-    public void updateWinner(int playerIndex) throws RemoteException {
-        output.println(Messages.UPDATEWINNER+ "; " + playerIndex);
+    public void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException {
+        String message = Messages.UPDATEWINNER.toString();
+        for (int playerIndex : playerIndexes) {
+            message += "; " + playerIndex;
+        }
+        output.println(message);
         output.flush();
     }
 }

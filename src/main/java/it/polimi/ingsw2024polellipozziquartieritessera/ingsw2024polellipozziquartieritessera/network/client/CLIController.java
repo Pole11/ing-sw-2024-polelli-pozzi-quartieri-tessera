@@ -18,26 +18,47 @@ public class CLIController {
     private final ViewModel viewModel;
     private final ArrayDeque<CommandRunnable> commandQueue;
     private Thread executeCommands;
+    private boolean executeCommandRunning;
 
     CLIController(ViewModel viewModel){
         this.commandQueue = new ArrayDeque();
         this.viewModel = viewModel;
 
+        executeCommandRunning = true;
+        restartExecuteCommand();
+    }
+
+    public void restartExecuteCommand(){
+        if (executeCommands != null && executeCommands.isAlive()){
+            executeCommandRunning = false;
+            executeCommands.interrupt();
+            synchronized (commandQueue){
+                commandQueue.notifyAll();
+            }
+
+            try {
+                executeCommands.join();
+            } catch (InterruptedException ignored) {}
+
+        }
+        executeCommandRunning = true;
         this.executeCommands = new Thread(this::executeCommandsRunnable);
         this.executeCommands.start();
-
-
     }
 
     private void executeCommandsRunnable() {
-        while (true) {
-            CommandRunnable command;
+        while (executeCommandRunning) {
+            CommandRunnable command = null;
             synchronized (commandQueue) {
                 while (commandQueue.isEmpty()) {
                     try {
                         commandQueue.wait();
                     } catch (InterruptedException e) {
+                        break;
                     }
+                }
+                if (!executeCommandRunning){
+                    break;
                 }
                 command = commandQueue.remove();
                 commandQueue.notifyAll();
@@ -48,6 +69,13 @@ public class CLIController {
 
 
     public void manageInput(VirtualServer server, VirtualView client, Client clientContainer, String[] message) throws RemoteException {
+        try {
+            if (message[1].equals("-h")){
+                Command.valueOf(message[0].toUpperCase()).getCommandRunnable(message, server, clientContainer, client).executeHelp();
+                return;
+            }
+        } catch (Exception ignored) {}
+
         try {
             if (Command.valueOf(message[0].toUpperCase()).getType().equals("Local")){
                 Command.valueOf(message[0].toUpperCase()).getCommandRunnable(message, server, clientContainer, client).executeCLI();
@@ -79,6 +107,7 @@ public class CLIController {
             System.out.print(e + " ");
         });
         System.out.print("]\n> ");
+        System.out.println("To see in more detail: <COMMAND> -h");
     }
 
 /*    public void printCard(int CardId, Side side){

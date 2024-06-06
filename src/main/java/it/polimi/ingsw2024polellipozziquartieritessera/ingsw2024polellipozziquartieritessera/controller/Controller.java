@@ -13,13 +13,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 public class Controller {
     GameState gameState;
-    /*
-    public Thread timeoutThread = null;
-    public GamePhase prevGamePhase = null;
 
-     */
-
-    public Controller(GameState gameState) {
+    public void setGameState(GameState gameState) {
         this.gameState = gameState;
     }
 
@@ -264,6 +259,10 @@ public class Controller {
     public synchronized void ping(VirtualView client){
         gameState.pingAnswer(client);
 
+    }
+
+    public void manageDisconnection(){
+        gameState.updatePlayersConnected();
     }
 
 /*

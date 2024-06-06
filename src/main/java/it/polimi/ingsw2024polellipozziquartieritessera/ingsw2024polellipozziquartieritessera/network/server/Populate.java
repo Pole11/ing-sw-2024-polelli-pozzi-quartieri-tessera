@@ -47,9 +47,7 @@ public class Populate {
         return content;
     }
 
-    public static GameState populate() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
-        GameState gameState = new GameState();
-
+    public static void populate(GameState gameState) throws WrongStructureConfigurationSizeException, IOException {
         String filePath = new File("").getAbsolutePath();
         String jsonString = readJSON(filePath + Config.CARD_JSON_PATH);
         Gson gson = new Gson();
@@ -98,7 +96,6 @@ public class Populate {
                 }
             }
         }
-        return gameState;
     }
 
     private static Challenge createChallenge(Map card) throws WrongStructureConfigurationSizeException {

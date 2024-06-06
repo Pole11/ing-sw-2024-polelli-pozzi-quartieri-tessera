@@ -116,7 +116,11 @@ public class SocketClient implements VirtualView {
                     this.updateStarterCard(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]), side);
                     break;
                 case Messages.UPDATEWINNER:
-                    this.updateWinner(Integer.parseInt(messageString[1]));
+                    ArrayList<Integer> winners = new ArrayList<>();
+                    for (int i = 1; i < messageString.length; i++){
+                        winners.add(Integer.parseInt(messageString[i]));
+                    }
+                    this.updateWinner(winners);
                     break;
                 default:
                     System.err.println("[5xx INVALID MESSAGE FROM SERVER]");
@@ -222,7 +226,7 @@ public class SocketClient implements VirtualView {
     }
 
     @Override
-    public void updateWinner(int playerIndex) throws RemoteException {
-        clientContainer.updateWinner(playerIndex);
+    public void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException {
+        clientContainer.updateWinner(playerIndexes);
     }
 }

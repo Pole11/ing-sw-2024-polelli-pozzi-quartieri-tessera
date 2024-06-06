@@ -36,6 +36,8 @@ public abstract class CommandRunnable {
 
     public abstract void executeGUI();
 
+    public abstract void executeHelp();
+
     public void serverDisconnectedCLI() {
         System.out.print("error in server, server not available\n> ");
     }

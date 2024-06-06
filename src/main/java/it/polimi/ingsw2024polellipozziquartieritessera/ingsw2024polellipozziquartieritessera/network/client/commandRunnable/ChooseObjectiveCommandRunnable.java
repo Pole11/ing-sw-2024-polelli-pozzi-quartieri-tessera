@@ -36,4 +36,9 @@ public class ChooseObjectiveCommandRunnable extends CommandRunnable{
             this.serverDisconnectedGUI();
         }
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }

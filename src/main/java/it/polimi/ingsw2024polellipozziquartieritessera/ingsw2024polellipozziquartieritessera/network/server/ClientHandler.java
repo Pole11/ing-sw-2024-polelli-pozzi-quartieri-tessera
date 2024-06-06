@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 
 public class ClientHandler implements VirtualView {
@@ -136,7 +137,7 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
-    public void updateWinner(int playerIndex) throws RemoteException {
-        view.updateWinner(playerIndex);
+    public void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException {
+        view.updateWinner(playerIndexes);
     }
 }

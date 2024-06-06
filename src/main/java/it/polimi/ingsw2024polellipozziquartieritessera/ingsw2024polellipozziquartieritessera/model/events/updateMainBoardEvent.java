@@ -7,10 +7,10 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class updateMainBoardEvent extends Event{
+public class UpdateMainBoardEvent extends Event{
     private final Board mainBoard;
 
-    public updateMainBoardEvent(GameState gameState, ArrayList<VirtualView> clients, Board mainBoard) {
+    public UpdateMainBoardEvent(GameState gameState, ArrayList<VirtualView> clients, Board mainBoard) {
         super(gameState, clients);
         this.mainBoard = mainBoard;
     }

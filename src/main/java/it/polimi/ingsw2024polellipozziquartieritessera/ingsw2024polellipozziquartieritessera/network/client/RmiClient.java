@@ -139,8 +139,8 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     }
 
     @Override
-    public void updateWinner(int playerIndex) throws RemoteException {
-        clientContainer.updateWinner(playerIndex);
+    public void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException {
+        clientContainer.updateWinner(playerIndexes);
     }
 
 }

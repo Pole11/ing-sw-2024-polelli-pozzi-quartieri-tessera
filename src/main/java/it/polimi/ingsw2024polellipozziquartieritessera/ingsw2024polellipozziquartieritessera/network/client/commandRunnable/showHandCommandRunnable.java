@@ -17,4 +17,9 @@ public class showHandCommandRunnable extends  CommandRunnable{
     public void executeGUI() {
         ;
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }

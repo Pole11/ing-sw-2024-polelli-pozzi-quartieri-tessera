@@ -3,6 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 
 import java.rmi.*;
+import java.util.ArrayList;
 
 //clint che vede il server
 public interface VirtualView extends Remote {
@@ -27,6 +28,6 @@ public interface VirtualView extends Remote {
     void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) throws RemoteException;
     //side is null if is not decided
     void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException;
-    void updateWinner(int playerIndex) throws RemoteException;
+    void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException;
 
 }

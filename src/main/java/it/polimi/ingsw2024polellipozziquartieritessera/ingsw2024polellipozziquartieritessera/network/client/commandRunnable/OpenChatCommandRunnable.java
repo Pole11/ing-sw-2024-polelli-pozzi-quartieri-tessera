@@ -20,4 +20,9 @@ public class OpenChatCommandRunnable extends CommandRunnable{
             this.serverDisconnectedGUI();
         }
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }

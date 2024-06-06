@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class GameState {
-    //private final Server server;
+    private final Server server;
 
     private final HashMap<Integer, Card> cardsMap;
 
@@ -29,8 +29,11 @@ public class GameState {
 
     private final ArrayDeque<Event> eventQueue;
     private Thread executeEvents;
+    private boolean executeEventRunning;
+
     private final HashMap<Integer, Boolean> answered;
     private Thread pingThread;
+    private boolean pingRunning;
     ArrayList<Thread> playerThreads = new ArrayList<>();
 
     private Thread timeoutThread;
@@ -40,8 +43,8 @@ public class GameState {
 
 
     // CONSTRUCTOR
-    public GameState() {
-        //this.server = server;
+    public GameState(Server server) {
+        this.server = server;
         this.cardsMap = new HashMap<>();
 
         this.mainBoard = new Board();
@@ -58,9 +61,11 @@ public class GameState {
 
         this.timeoutThread = null;
 
+        this.executeEventRunning = true;
         this.executeEvents = new Thread(this::executeEventsRunnable);
         this.executeEvents.start();
 
+        this.pingRunning = true;
         this.pingThread = new Thread(this::pingThreadRunnable);
         pingThread.start();
 
@@ -148,18 +153,27 @@ public class GameState {
     }
 
     private void executeEventsRunnable() {
-        while (true) {
-            Event event;
+        while (executeEventRunning) {
+            Event event = null;
             synchronized (eventQueue) {
                 while (eventQueue.isEmpty()) {
                     try {
-                        eventQueue.notifyAll();
                         eventQueue.wait();
                     } catch (InterruptedException e) {
+                        System.out.println("interrupted");
+                        return;
                     }
                 }
+
+                //System.out.println("exited from while");
+
+                if (!executeEventRunning){
+                    break;
+                }
+
                 event = eventQueue.remove();
-                eventQueue.notifyAll();
+
+
             }
             event.execute();
         }
@@ -194,23 +208,23 @@ public class GameState {
     //DISCONNECTIONS
 
     public void pingThreadRunnable() {
-        while (true) {
+        while (pingRunning) {
             for (int i = 0; i < playerThreads.size(); i++){
                 int finalI = i;
                 playerThreads.set(i, new Thread(() -> {
                     int j = finalI;
                     try {
                         //wait for the answer of players
-                        Thread.sleep(1000 * 5);
+                        Thread.sleep(1000*Config.WAIT_FOR_PING_TIME);
                         if (players.get(j).isConnected()){
                             System.out.println("client "  + j + " disconnected");
                             synchronized (players) {
                                 players.get(j).setConnected(false);
-                                players.notifyAll();
                             }
+                            playerDisconnected();
                         }
                     } catch (InterruptedException e) {
-                        //players.get(j).setConnected(true);
+
                     }
                 }));
                 playerThreads.get(i).start();
@@ -220,36 +234,34 @@ public class GameState {
 
             try {
                 //wait to ping another time
-                Thread.sleep(1000 * 10);
+                Thread.sleep(1000*Config.NEXT_PING_TIME);
             } catch (InterruptedException e) {
+                break;
             }
         }
     }
 
     public void pingAnswer(VirtualView client) {
-
         synchronized (players) {
             playerThreads.get(getPlayerIndex(client)).interrupt();
             try {
                 playerThreads.get(getPlayerIndex(client)).join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            players.notifyAll();
+            } catch (InterruptedException e) {}
         }
     }
 
     public void setPlayersConnected(int index, boolean connected) {
-        players.get(index).setConnected(connected);
+        synchronized (players){
+            players.get(index).setConnected(connected);
+        }
         //players.get(index).setClient(null);
     }
 
     private void manageReconnection(Player player) {
+        restoreView(player.getClient());
         synchronized (players) {
             player.setConnected(true);
-            players.notifyAll();
         }
-        restoreView(player.getClient());
         if (this.currentGamePhase.equals(GamePhase.TIMEOUT)) {
             this.timeoutThread.interrupt();
             currentGamePhase = prevGamePhase;
@@ -264,23 +276,26 @@ public class GameState {
 
 
     public void playerDisconnected() {
+        if (currentGamePhase.equals(GamePhase.NICKNAMEPHASE)) {
+            //DA SCEGLIERE DA QUANDO IN POI FARLO, SE COSI VA BENE O DA MAIN
+            return;
+        }
         long numberConnected;
         synchronized (players) {
             numberConnected = players.stream().filter(Player::isConnected).count();
-            players.notifyAll();
         }
         if (numberConnected <= 1) {
             this.prevGamePhase = currentGamePhase;
             this.currentGamePhase = GamePhase.TIMEOUT;
+            System.out.println("Timeout for ending the game started");
             timeoutThread = new Thread(() -> {
                 try {
-                    Thread.sleep(60 * 1000);
+                    Thread.sleep(1000*Config.TIMEOUT_TIME);
                     //if the timeout ends
                     currentGamePhase = GamePhase.FINALPHASE;
                     ArrayList<Integer> winners;
                     synchronized (players) {
                         winners = (ArrayList<Integer>) players.stream().filter(Player::isConnected).map(this::getPlayerIndex).collect(Collectors.toList());
-                        players.notifyAll();
                     }
                     synchronized (eventQueue) {
                         eventQueue.add(new GameEndedEvent(this, allConnectedClients(), winners));
@@ -289,7 +304,6 @@ public class GameState {
                     System.out.println("game ended after timeout expired");
                     restart();
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
                 }
             });
             timeoutThread.start();
@@ -318,7 +332,7 @@ public class GameState {
 
     }
 
-    private void updatePlayersConnected() {
+    public void updatePlayersConnected() {
         synchronized (eventQueue){
             eventQueue.add(new PingEvent(this, allClients()));
             eventQueue.notifyAll();
@@ -361,14 +375,8 @@ public class GameState {
 
     public void addPlayer(String nickname, VirtualView client) {
         Player player = new Player(nickname, client, this);
-        List<VirtualView> clients = allConnectedClients();
-        if (clients.size() >= Config.MAX_PLAYERS) {
-            synchronized (eventQueue) {
-                eventQueue.add(new ErrorEvent(this, singleClient(client), "The game is full"));
-                eventQueue.notifyAll();
-            }
-            return;
-        }
+        //if someone choose his nickname, is inside the match, even if he is temporanely disconnected
+        //TODO: si potrebbe fare in modo che si possa iniziare una partita solo se tutti i giocaatori sono connessi, ma bisognerebbe anche kickare
 
         if (allClients().contains(client) && players.get(getPlayerIndex(client)).isConnected()) {
             synchronized (eventQueue) {
@@ -378,31 +386,43 @@ public class GameState {
             return;
         }
 
+
         for (int j = 0; j < players.size(); j++) {
             if (player.getNickname().equals(players.get(j).getNickname())) {
                 //takes for granted that player connection is updated
                 //if the player is not connected but the gameState doesn't know, the following code fails
                 if (!players.get(j).isConnected()) {
-                    player.setClient(client);
-                    this.manageReconnection(player);
+                    players.get(j).setClient(client);
+                    this.manageReconnection(players.get(j));
                     synchronized (eventQueue) {
                         //only to the client
-                        eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), this.currentGamePhase));
+                        eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(client), this.currentGamePhase));
                         //to all the other clients says that a client reconnected
                         //DOVREBBE ESSERE FATTO IN PLAYER ma non so se funzioni
                         //eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player, true));
                         eventQueue.notifyAll();
                     }
                 } else {
-                    //only to the client
-                    synchronized (eventQueue) {
-                        eventQueue.add(new ErrorEvent(this, singleClient(player.getClient()), "The nickname is already used, please choose another one"));
-                        eventQueue.notifyAll();
+                    if (allConnectedClients().size()<Config.MAX_PLAYERS){
+                        synchronized (eventQueue) {
+                            eventQueue.add(new ErrorEvent(this, singleClient(client), "The nickname is already used, please choose another one"));
+                            eventQueue.notifyAll();
+                        }
                     }
                 }
                 return;
             }
         }
+
+        if (allConnectedClients().size() >= Config.MAX_PLAYERS) {
+            synchronized (eventQueue) {
+                eventQueue.add(new ErrorEvent(this, singleClient(client), "The game is full"));
+                eventQueue.notifyAll();
+            }
+            return;
+        }
+
+
         players.add(player);
         playerThreads.add(new Thread());
         synchronized (eventQueue) {
@@ -451,9 +471,7 @@ public class GameState {
                     eventQueue.add(new ErrorEvent(this, singleClient(client), "Number of player insufficient"));
                     eventQueue.notifyAll();
                 }
-            } /*else { //NON CAPISCO A COSA SERVA QUESTO CODICE
-                client.sendError("You must choose your nickname with adduser first");
-            }*/
+            }
             return;
         }
 
@@ -461,17 +479,12 @@ public class GameState {
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
         synchronized (eventQueue) {
-            eventQueue.add(new updateMainBoardEvent(this, allConnectedClients(), mainBoard));
+            eventQueue.add(new UpdateMainBoardEvent(this, allConnectedClients(), mainBoard));
             eventQueue.notifyAll();
         }
         this.initStarters(); // set the starters cards for every player
         System.out.println("Starting game");
-        this.currentGamePhase = GamePhase.CHOOSESTARTERSIDEPHASE;
-        synchronized (eventQueue) {
-            //eventQueue.add(new StartEvent(this, allConnectedClients()));
-            eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), GamePhase.CHOOSESTARTERSIDEPHASE));
-            eventQueue.notifyAll();
-        }
+        this.currentGamePhase.changePhase(this);
     }
 
     public void initStarters() {
@@ -522,11 +535,7 @@ public class GameState {
         //notify him and all the others about the change
         if (numberAnswered() == players.size()) {
             System.out.println("everyone answered");
-            this.currentGamePhase = GamePhase.CHOOSECOLORPHASE;
-            synchronized (eventQueue) {
-                eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), GamePhase.CHOOSECOLORPHASE));
-                eventQueue.notifyAll();
-            }
+            this.currentGamePhase.changePhase(this);
             resetAnswered();
         }
     }
@@ -568,11 +577,7 @@ public class GameState {
             }
             //send also the cards to the view
             this.setObjectives();
-            this.currentGamePhase = GamePhase.CHOOSEOBJECTIVEPHASE;
-            synchronized (eventQueue) {
-                eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), GamePhase.CHOOSEOBJECTIVEPHASE));
-                eventQueue.notifyAll();
-            }
+            this.currentGamePhase.changePhase(this);
         }
     }
 
@@ -652,9 +657,8 @@ public class GameState {
         if (numberAnswered() == players.size()) {
             System.out.println("everyone answered");
             resetAnswered();
-            currentGamePhase = GamePhase.MAINPHASE;
+            this.currentGamePhase.changePhase(this);
             synchronized (eventQueue) {
-                eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), GamePhase.MAINPHASE));
                 eventQueue.add(new UpdateCurrentPlayer(this, allConnectedClients(), currentPlayerIndex));
                 eventQueue.notifyAll();
             }
@@ -856,8 +860,28 @@ public class GameState {
         return (winnerPlayerIndeces);
     }
 
-    public void restart(){
+    private void restart(){
+        pingRunning = false;
+        executeEventRunning = false;
+        executeEvents.interrupt();
+        try {
+            executeEvents.join();
+        } catch (InterruptedException ignored) {}
+        playerThreads.forEach(Thread::interrupt);
+        pingThread.interrupt();
+        server.restart();
 
+        //NON SO SE SERVA, NON SO SE IL GARBAGE COLLECTOR FACCIA IL SUO LAVORO
+
+        System.out.println(executeEvents.getState());
+        System.out.println(pingThread.getState());
+        playerThreads.forEach(e ->{
+            System.out.println(e.getState());
+        });
+        Thread.currentThread().interrupt();
+
+
+        System.out.println("---------GAME RESTARTED------");
     }
 
 

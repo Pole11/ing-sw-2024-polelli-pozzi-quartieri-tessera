@@ -37,4 +37,9 @@ public class FlipCardCommandRunnable extends CommandRunnable{
             serverDisconnectedGUI();
         }
     }
+
+    @Override
+    public void executeHelp() {
+
+    }
 }
