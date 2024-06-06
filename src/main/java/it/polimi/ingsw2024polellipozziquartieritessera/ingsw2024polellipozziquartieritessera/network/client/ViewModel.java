@@ -37,7 +37,7 @@ public class ViewModel {
     private final HashMap<Integer,ArrayList<ArrayList<Integer>>> boardsMap; // mappa delle board dei players
     private int[] mainBoard; // se la carta non c'è viene inizializzata a -1
     private Chat chat;
-    private ArrayList<Integer> placingCardOrder;
+    private HashMap<Integer,ArrayList<Integer>> placingCardOrderMap;
 
     public ViewModel() {
         nicknamesMap = new HashMap<>();
@@ -56,7 +56,7 @@ public class ViewModel {
         pointsMap = new HashMap<>();
         populateCardsMap();
 
-        placingCardOrder = new ArrayList<>();
+        placingCardOrderMap = new HashMap<>();
     }
 
     // BASIC SETTER
@@ -250,8 +250,12 @@ public class ViewModel {
      * @param card2 Referement card on table
      * @return True if the first card is on top, else false
      */
-    public boolean isCardOnTop(int card1, int card2){
-        return placingCardOrder.indexOf(card1) > placingCardOrder.indexOf(card2);
+    public boolean isCardOnTop(int playerId, int card1, int card2){
+        return placingCardOrderMap.get(playerId).indexOf(card1) > placingCardOrderMap.get(playerId).indexOf(card2);
+    }
+
+    public ArrayList<Integer> getPlacingCardOrderMap(int playerIndex) {
+        return new ArrayList<>(this.placingCardOrderMap.get(playerIndex));
     }
 
     // UTILS METHOD
@@ -262,7 +266,8 @@ public class ViewModel {
         row.add(placingCardId);
         this.boardsMap.get(playerIndex).add(row);
 
-        placingCardOrder.addLast(placingCardId);
+        placingCardOrderMap.put(playerIndex, new ArrayList<>());
+        placingCardOrderMap.get(playerIndex).addLast(placingCardId);
     }
 
     private void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos){
@@ -318,7 +323,7 @@ public class ViewModel {
         // Place the new card at the specified position
         playerBoard.get(rowIndex).set(colIndex, placingCardId);
 
-        placingCardOrder.addLast(placingCardId);
+        placingCardOrderMap.get(playerIndex).addLast(placingCardId);
     }
 
     private void expandBoard(int rowIndex, int colIndex, ArrayList<ArrayList<Integer>> playerBoard){
