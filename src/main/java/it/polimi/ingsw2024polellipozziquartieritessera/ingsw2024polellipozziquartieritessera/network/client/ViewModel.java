@@ -49,6 +49,7 @@ public class ViewModel {
         Arrays.fill(objectives, -1);
         mainBoard = new int[6];
         Arrays.fill(mainBoard, -1);
+        gamePhase = GamePhase.NICKNAMEPHASE;
         cardsMap = new HashMap<>();
         handsMap = new HashMap<>();
         boardsMap = new HashMap<>();

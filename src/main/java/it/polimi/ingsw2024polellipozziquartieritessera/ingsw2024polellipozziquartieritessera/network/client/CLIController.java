@@ -11,9 +11,9 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CLIController {
     private final ViewModel viewModel;
@@ -75,9 +75,12 @@ public class CLIController {
 
 
     public void printAllCommands() {
-        System.out.print("The possible commands are: [");
+        AtomicInteger i = new AtomicInteger();
+        System.out.print("The possible commands are: \n[");
         Arrays.stream(Command.values()).forEach(e->{
             System.out.print(e + " ");
+            if(i.incrementAndGet() % 5 == 0)
+                System.out.print("]\n[");
         });
         System.out.print("]\n> ");
     }
@@ -195,49 +198,65 @@ public class CLIController {
     }
 
     public void showHand(){
-        ArrayList<Integer> hand = viewModel.getHand(viewModel.getPlayerIndex());
-        ArrayList<Side> sides = new ArrayList<>();
-        for(int i = 0; i < hand.size(); i++){
-            sides.add(viewModel.getHandCardsSide(hand.get(i)));
+        if(viewModel.getGamePhase().ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
+            System.err.println("your hand is not initialized yet");
+        } else {
+            ArrayList<Integer> hand = viewModel.getHand(viewModel.getPlayerIndex());
+            ArrayList<Side> sides = new ArrayList<>();
+            for (int i = 0; i < hand.size(); i++) {
+                sides.add(viewModel.getHandCardsSide(hand.get(i)));
+            }
+            System.out.println("this is your hand");
+            printNCards(hand, sides);
         }
-        System.out.println("this is your hand");
-        printNCards(hand, sides);
     }
 
     public void ShowCommonObjective(){
-        ArrayList<Integer> cards = new ArrayList<>();
-        ArrayList<Side> sides = new ArrayList<>();
+        if(viewModel.getGamePhase().ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
+            System.err.print("common objectives are not initialized yet\n> ");
+        }else {
+            ArrayList<Integer> cards = new ArrayList<>();
+            ArrayList<Side> sides = new ArrayList<>();
 
-        cards.add(viewModel.getCommonObjectiveCards()[0]);
-        cards.add(viewModel.getCommonObjectiveCards()[1]);
-        sides.add(Side.FRONT);
-        sides.add(Side.FRONT);
+            cards.add(viewModel.getCommonObjectiveCards()[0]);
+            cards.add(viewModel.getCommonObjectiveCards()[1]);
+            sides.add(Side.FRONT);
+            sides.add(Side.FRONT);
 
-        System.out.println("this are your objective cards to be choosen");
-        printNCards(cards, sides);
+            System.out.println("this are the common objectives for this game");
+            printNCards(cards, sides);
+        }
     }
     public void ShowSecretObjective(){
-        int objectives[] = viewModel.getObjectives();
-        ArrayList<Integer> cards = new ArrayList<>();
-        ArrayList<Side> sides = new ArrayList<>();
+        if(viewModel.getGamePhase().ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
+            System.err.print("Secret objectives not initialized yet\n>   ");
+        } else {
+            int objectives[] = viewModel.getObjectives();
+            ArrayList<Integer> cards = new ArrayList<>();
+            ArrayList<Side> sides = new ArrayList<>();
 
-        cards.add(objectives[2]);
-        sides.add(viewModel.getPlacedCardSide(objectives[2]));
-        if(objectives[3] != -1){
-            cards.add(objectives[3]);
-            sides.add(viewModel.getPlacedCardSide(objectives[3]));
+            cards.add(objectives[2]);
+            sides.add(viewModel.getPlacedCardSide(objectives[2]));
+            if (objectives[3] != -1) {
+                cards.add(objectives[3]);
+                sides.add(viewModel.getPlacedCardSide(objectives[3]));
+            }
+            System.out.println("this are your secret objectives");
+            printNCards(cards, sides);
         }
-        System.out.println("this are your secret objectives");
-        printNCards(cards, sides);
     }
 
     public void showBoard(int player_index){
-        String playerName = viewModel.getNickname(player_index);
-        ArrayList<ArrayList<Integer>> board = viewModel.getPlayerBoard(player_index);
-        ArrayList<Integer> cardsOrder = viewModel.getPlacingCardOrderMap(player_index);
-        System.out.println("this is " + playerName + "'s board");
-        printBoard(board, cardsOrder);
-        System.out.print("\n> ");;
+        if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()){
+            System.err.print("this board does not exists yet\n> ");
+        } else {
+            String playerName = viewModel.getNickname(player_index);
+            ArrayList<ArrayList<Integer>> board = viewModel.getPlayerBoard(player_index);
+            ArrayList<Integer> cardsOrder = viewModel.getPlacingCardOrderMap(player_index);
+            System.out.println("this is " + playerName + "'s board");
+            printBoard(board, cardsOrder);
+            System.out.print("\n> ");
+        }
     }
 
     public void showStarterCard(){
@@ -261,14 +280,17 @@ public class CLIController {
         System.out.print("> ");
 ;    }
     public void showPoints(){
-        int n_players = viewModel.getPlayersSize();
-        System.out.println("this are the players points ");
-        for(int i = 0; i < n_players; i++){
-            System.out.println(" nickname: " + viewModel.getNickname(i) + "\tpoints: " + viewModel.getPointsMap(i));
-        }
-        System.out.print("> ");
+        if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()) {
+            System.err.print("you cant ask players points before the main phase has started\n> ");
+        }else {
+            int n_players = viewModel.getPlayersSize();
+            System.out.println("this are the players points ");
+            for (int i = 0; i < n_players; i++) {
+                System.out.println(" nickname: " + viewModel.getNickname(i) + "\tpoints: " + viewModel.getPointsMap(i));
+            }
+            System.out.print("> ");
 
-    }
+        }    }
 
     private ArrayList<String> printCard(Card card, Side side){
         if(card instanceof ObjectiveCard){
@@ -318,7 +340,7 @@ public class CLIController {
 
         if(card.getChallenge() instanceof ElementChallenge) {
             for (Element e : elementChallenge) {
-                elementString = " " + elementString + e.toString().substring(0, 3).toUpperCase();
+                elementString =  elementString + " " + e.toString().substring(0, 3).toUpperCase();
             }
             if (elementString.startsWith(" ")) {
                 elementString = elementString.substring(1);

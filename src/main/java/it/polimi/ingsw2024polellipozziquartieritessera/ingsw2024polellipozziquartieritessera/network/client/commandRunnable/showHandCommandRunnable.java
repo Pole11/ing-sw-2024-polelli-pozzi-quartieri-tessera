@@ -7,11 +7,8 @@ public class showHandCommandRunnable extends  CommandRunnable{
 
     @Override
     public void executeCLI() {
-        try {
-            clientContainer.getCliController().showHand();
-        } catch (Exception r){
-            System.err.println("Error: hand not initialized yet\n> ");
-        }
+        clientContainer.getCliController().showHand();
+
     }
 
     @Override
