@@ -17,12 +17,6 @@ public class GUIControllerLobby extends GUIController {
 
     @FXML
     public void handleAddUser(ActionEvent event) {
-        /*try {
-            getServer().addConnectedPlayer(getClient(), nicknameTextField.getText());
-        } catch (RemoteException e) {
-            setServerError("There was an error while connecting to the server, please try again");
-        }*/
-
         AdduserCommandRunnable command = new AdduserCommandRunnable();
         command.setNickname(nicknameTextField.getText());
         addCommand(command, this);

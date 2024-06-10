@@ -15,7 +15,12 @@ Separator {
 }
 
 Button {
-    -fx-background-color: rgb(200, 200, 220);
+    -fx-background-color: rgb(220, 200, 60);
+    -fx-border-color: rgb(180, 160, 30);
+    -fx-border-width: 3px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
 }
 
 .rotateYes {

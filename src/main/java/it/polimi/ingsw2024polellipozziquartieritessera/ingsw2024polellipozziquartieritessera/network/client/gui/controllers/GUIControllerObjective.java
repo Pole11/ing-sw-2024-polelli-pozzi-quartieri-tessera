@@ -1,14 +1,11 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseObjectiveCommandRunnable;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseStarterCommandRunnable;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-
-import java.rmi.RemoteException;
 
 public class GUIControllerObjective extends GUIController{
     @FXML
@@ -54,8 +51,8 @@ public class GUIControllerObjective extends GUIController{
                 if (secondObjectiveImageView == null) return;
                 secondObjectiveImageView.getStyleClass().add("clickable");
 
-                addHover(firstObjectiveImageView);
-                addHover(secondObjectiveImageView);
+                addHoverRotate(firstObjectiveImageView);
+                addHoverRotate(secondObjectiveImageView);
 
                 firstObjectiveImageView.setOnMouseClicked(mouseEvent -> {
                     // OPZIONE 1

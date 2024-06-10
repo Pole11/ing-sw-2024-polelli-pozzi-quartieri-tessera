@@ -12,6 +12,7 @@ import javafx.scene.*;
 import javafx.stage.*;
 
 import java.io.*;
+import java.util.HashMap;
 
 public class GUIApplication extends Application {
     private static GUIController guiController;
@@ -52,7 +53,7 @@ public class GUIApplication extends Application {
          });
     }
 
-    public static void changeScene(String fxml, String[] args) { // this was used when viewModel was not static
+    public static void changeScene(String fxml, HashMap<String, Integer> paramsMap) { // this was used when viewModel was not static
         Platform.runLater(() -> {
             FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
             try {
@@ -61,7 +62,7 @@ public class GUIApplication extends Application {
                 throw new RuntimeException(e);
             }
             guiController = fxmlLoader.getController();
-            guiController.setArgs(args);
+            guiController.setParamsMap(paramsMap);
             guiController.setClient(client);
             guiController.setServer(server);
             guiController.setClientContainer(clientContainer);
@@ -71,7 +72,8 @@ public class GUIApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml")); // uncomment for real use
+        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/game.fxml")); // uncomment for testing
         Parent root = fxmlLoader.load();
 
         guiController = fxmlLoader.getController();

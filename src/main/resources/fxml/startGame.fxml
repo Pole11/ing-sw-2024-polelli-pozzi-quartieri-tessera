@@ -17,6 +17,8 @@
     </padding>
 
     <VBox styleClass="mainContainer" fx:id="mainContainerPrep">
+        <ListView fx:id="playersConnectedListView"
+                  styleClass="playersConnectedListView"></ListView>
         <Button text="Start Game"
                 onAction="#handleStartGame"/>
         <Label

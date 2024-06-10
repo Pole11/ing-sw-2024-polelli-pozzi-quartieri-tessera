@@ -9,6 +9,9 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.net.ServerSocket;
+import java.rmi.*;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -37,18 +40,43 @@ public class ControllerTest {
         CornerPos goldCardToTableCornerPos = CornerPos.UPLEFT;
 
         // create game state
-        Populate.populate();
+        Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
+            @Override
+            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+                return null;
+            }
 
-        VirtualView client = new Client();
+            @Override
+            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
 
+            }
 
-        GameState gs = Populate.populate();
-        gs.addPlayer("paolo", client);
-        gs.addPlayer("piergiorgio", client);
-        gs.addPlayer("fungiforme", client);
-        gs.addPlayer("paola", client);
+            @Override
+            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+
+            }
+
+            @Override
+            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+
+            }
+
+            @Override
+            public String[] list() throws RemoteException, AccessException {
+                return new String[0];
+            }
+        });
+        GameState gs = new GameState(s);
+        Populate.populate(gs);
+
+        Populate.populate(gs);
+        gs.addPlayer("paolo", new Client());
+        gs.addPlayer("piergiorgio", new Client());
+        gs.addPlayer("fungiforme", new Client());
+        gs.addPlayer("paola", new Client());
         Player player = gs.getPlayer(0);
-        Controller c = new Controller(gs);
+        Controller c = new Controller();
+        c.setGameState(gs);
         gs.getMainBoard().shuffleCards();
         gs.getMainBoard().initSharedGoldCards();
         gs.getMainBoard().initSharedResourceCards();
@@ -267,14 +295,39 @@ public class ControllerTest {
 
         int starterCardId = 81;
 
-        VirtualView client = new Client();
-
         // create game state
-        GameState gs = Populate.populate();
-        gs.addPlayer("paolo", client);
-        gs.addPlayer("piergiorgio", client);
-        gs.addPlayer("fungiforme", client);
-        gs.addPlayer("paola", client);
+        Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
+            @Override
+            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+                return null;
+            }
+
+            @Override
+            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+
+            }
+
+            @Override
+            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+
+            }
+
+            @Override
+            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+
+            }
+
+            @Override
+            public String[] list() throws RemoteException, AccessException {
+                return new String[0];
+            }
+        });
+        GameState gs = new GameState(s);
+        Populate.populate(gs);
+        gs.addPlayer("paolo", new Client());
+        gs.addPlayer("piergiorgio", new Client());
+        gs.addPlayer("fungiforme", new Client());
+        gs.addPlayer("paola", new Client());
 
         gs.setPlayersConnected(0, true);
         gs.setPlayersConnected(1, true);
@@ -282,7 +335,8 @@ public class ControllerTest {
         gs.setPlayersConnected(3, true);
 
         Player player = gs.getPlayer(0);
-        Controller c = new Controller(gs);
+        Controller c = new Controller();
+        c.setGameState(gs);
         gs.getMainBoard().shuffleCards();
         gs.getMainBoard().initSharedGoldCards();
         gs.getMainBoard().initSharedResourceCards();
@@ -374,15 +428,40 @@ public class ControllerTest {
 
     @Test
     void flipCardTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardIsNotInHandException {
-        VirtualView client = new Client();
+        Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
+            @Override
+            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+                return null;
+            }
 
+            @Override
+            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
 
-        GameState gs = Populate.populate();
-        gs.addPlayer("paolo", client);
-        gs.addPlayer("piergiorgio", client);
-        gs.addPlayer("fungiforme", client);
-        gs.addPlayer("paola", client);
-        Controller c = new Controller(gs);
+            }
+
+            @Override
+            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+
+            }
+
+            @Override
+            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+
+            }
+
+            @Override
+            public String[] list() throws RemoteException, AccessException {
+                return new String[0];
+            }
+        });
+        GameState gs = new GameState(s);
+        Populate.populate(gs);
+        gs.addPlayer("paolo", new Client());
+        gs.addPlayer("piergiorgio", new Client());
+        gs.addPlayer("fungiforme", new Client());
+        gs.addPlayer("paola", new Client());
+        Controller c = new Controller();
+        c.setGameState(gs);
 
         gs.getPlayer(0).addToHandCardsMap(1, Side.FRONT);
         assertEquals(Side.FRONT, gs.getPlayer(0).getHandCardSide(1));

@@ -1,36 +1,71 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.ChooseObjectiveCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.DrawCardCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.FlipCardCommandRunnable;
 import javafx.application.*;
 import javafx.fxml.*;
 import javafx.geometry.Orientation;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.event.*;
 import javafx.scene.image.*;
-import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.*;
 
-import java.rmi.RemoteException;
+import java.lang.reflect.Array;
 import java.util.*;
+
+import static javafx.scene.layout.TilePane.setAlignment;
 
 public class GUIControllerGame extends GUIController {
     @FXML private BorderPane mainContainerGame;
     @FXML private VBox sharedGoldContainerGame;
     @FXML private VBox plateauContainerGame;
     @FXML private VBox sharedResourceContainerGame;
+    @FXML private Label currentPhase;
+    private HashMap<Integer, ArrayList<Integer>> plateauCoordinatedMap;
+    private final int plateauHeight = 350;
 
     public GUIControllerGame() {
         clearAllchilds();
-        Platform.runLater(() -> {
-            update();
-        });
+        update();
+        populatePlateauCoordinateMap();
+    }
+
+    private void populatePlateauCoordinateMap() {
+        plateauCoordinatedMap = new HashMap<>();
+        plateauCoordinatedMap.put(0, new ArrayList<>(Arrays.asList(plateauHeight/4 - 40,plateauHeight - 24)));
+        plateauCoordinatedMap.put(1, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 24)));
+        plateauCoordinatedMap.put(2, new ArrayList<>(Arrays.asList(plateauHeight/4 + 40,plateauHeight - 24)));
+        plateauCoordinatedMap.put(3, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 61)));
+        plateauCoordinatedMap.put(4, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 61)));
+        plateauCoordinatedMap.put(5, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 61)));
+        plateauCoordinatedMap.put(6, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 61)));
+        plateauCoordinatedMap.put(7, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 98)));
+        plateauCoordinatedMap.put(8, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 98)));
+        plateauCoordinatedMap.put(9, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 98)));
+        plateauCoordinatedMap.put(10, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 98)));
+        plateauCoordinatedMap.put(11, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 135)));
+        plateauCoordinatedMap.put(12, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 135)));
+        plateauCoordinatedMap.put(13, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 135)));
+        plateauCoordinatedMap.put(14, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 135)));
+        plateauCoordinatedMap.put(15, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 172)));
+        plateauCoordinatedMap.put(16, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 172)));
+        plateauCoordinatedMap.put(17, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 172)));
+        plateauCoordinatedMap.put(18, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 172)));
+        plateauCoordinatedMap.put(19, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 209)));
+        plateauCoordinatedMap.put(20, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 229)));
+        plateauCoordinatedMap.put(21, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 209)));
+        plateauCoordinatedMap.put(22, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 248)));
+        plateauCoordinatedMap.put(23, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 287)));
+        plateauCoordinatedMap.put(24, new ArrayList<>(Arrays.asList(plateauHeight/4 - 36,plateauHeight - 320)));
+        plateauCoordinatedMap.put(25, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 325)));
+        plateauCoordinatedMap.put(26, new ArrayList<>(Arrays.asList(plateauHeight/4 + 36,plateauHeight - 320)));
+        plateauCoordinatedMap.put(27, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 287)));
+        plateauCoordinatedMap.put(28, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 248)));
+        plateauCoordinatedMap.put(29, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 278)));
     }
 
     private void clearAllchilds() {
@@ -38,7 +73,7 @@ public class GUIControllerGame extends GUIController {
             if (sharedResourceContainerGame != null) sharedResourceContainerGame.getChildren().clear();
             if (sharedGoldContainerGame != null) sharedGoldContainerGame.getChildren().clear();
             if (plateauContainerGame != null) {
-                while (plateauContainerGame.getChildren().size() > 2) {
+                while (plateauContainerGame.getChildren().size() > 3) {
                     plateauContainerGame.getChildren().removeLast(); // the first two are the messages from server
                 }
             }
@@ -53,7 +88,7 @@ public class GUIControllerGame extends GUIController {
         });
     }
 
-    private ImageView createPlateauImageView() {
+    private ImageView createPlateauImageView(int plateauHeight) {
         String imageUrl = getClass().getResource("/img/plateau_score.jpg").toExternalForm();
         Image image = new Image(imageUrl);
 
@@ -62,7 +97,7 @@ public class GUIControllerGame extends GUIController {
 
         ImageView imageView = new ImageView(imageWritable);
 
-        imageView.setFitHeight(350);
+        imageView.setFitHeight(plateauHeight);
         imageView.setPreserveRatio(true);
 
         return imageView;
@@ -110,7 +145,12 @@ public class GUIControllerGame extends GUIController {
                 secondSharedGoldCardImageView.getStyleClass().add("clickable");
                 sharedGoldContainerGame.getChildren().add(secondSharedGoldCardImageView);
 
-                plateauContainerGame.getChildren().add(createPlateauImageView());
+                Pane plateauImageViewPane = new Pane();
+                plateauImageViewPane.setPrefHeight(plateauHeight);
+                plateauImageViewPane.setId("plateauImageViewPane");
+                ImageView plateauImageView = createPlateauImageView(plateauHeight);
+                plateauImageViewPane.getChildren().add(plateauImageView);
+                plateauContainerGame.getChildren().add(plateauImageViewPane);
 
                 sharedResourceContainerGame.getChildren().add(new Text("Resource Deck"));
                 ImageView resourceDeckImageView = createCardImageView("/img/carte_retro/" + firstResourceDeckCardId + ".jpg", 75);
@@ -137,12 +177,12 @@ public class GUIControllerGame extends GUIController {
                 firstSharedResourceCardImageView.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.SHAREDRESOURCE1); });
                 secondSharedResourceCardImageView.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.SHAREDRESOURCE2); });
 
-                addHover(goldDeckPane);
-                addHover(firstSharedGoldCardImageView);
-                addHover(secondSharedGoldCardImageView);
-                addHover(resourceDeckPane);
-                addHover(firstSharedResourceCardImageView);
-                addHover(secondSharedResourceCardImageView);
+                addHoverRotate(goldDeckPane);
+                addHoverRotate(firstSharedGoldCardImageView);
+                addHoverRotate(secondSharedGoldCardImageView);
+                addHoverRotate(resourceDeckPane);
+                addHoverRotate(firstSharedResourceCardImageView);
+                addHoverRotate(secondSharedResourceCardImageView);
             }
         });
     }
@@ -159,6 +199,31 @@ public class GUIControllerGame extends GUIController {
         );
     }
 
+    public void updatePoints() {
+        Platform.runLater(() -> {
+            for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
+                Pane plateauImageViewPane = (Pane) mainContainerGame.lookup("#plateauImageViewPane");
+                Circle oldCircle = (Circle) plateauImageViewPane.lookup("circlePoints" + i);
+                plateauImageViewPane.getChildren().remove(oldCircle);
+                //int x = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(0);
+                //int y = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(1);
+                int x = plateauCoordinatedMap.get(0).get(0); // comment for real use
+                int y = plateauCoordinatedMap.get(0).get(1); // comment for real use
+                System.out.println(x);
+                System.out.println(y);
+                Circle circle = new Circle(x, y, 10);
+                circle.setId("circlePoints" + i);
+                plateauImageViewPane.getChildren().add(circle);
+
+                int offset = 5;
+                if (getViewModel().getColorsMap(i) == Color.BLUE) { circle.setFill(javafx.scene.paint.Color.BLUE); circle.setTranslateX(-offset); circle.setTranslateY(-offset);}
+                else if (getViewModel().getColorsMap(i) == Color.GREEN) { circle.setFill(javafx.scene.paint.Color.GREEN); circle.setTranslateX(offset); circle.setTranslateY(-offset); }
+                else if (getViewModel().getColorsMap(i) == Color.RED) { circle.setFill(javafx.scene.paint.Color.RED); circle.setTranslateX(offset); circle.setTranslateY(offset); }
+                else if (getViewModel().getColorsMap(i) == Color.YELLOW) { circle.setFill(javafx.scene.paint.Color.YELLOW); circle.setTranslateX(-offset); circle.setTranslateY(offset);}
+            }
+        });
+    }
+
     public void initPlayerHand(int playerId, int meId,  HashMap<Integer, String> nicknames, HashMap<Integer, Side> playerHandCards, int secreteObjCardId) {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
@@ -170,7 +235,9 @@ public class GUIControllerGame extends GUIController {
                 Text nicknameText = new Text(currentPlayerNickname);
                 Button expandButton = new Button("Expand Board");
                 expandButton.setOnMousePressed(mouseEvent -> {
-                    goToScene("/fxml/board.fxml", getViewModel(), new String[]{"" + playerId});
+                    HashMap<String, Integer> paramsMap = new HashMap<>();
+                    paramsMap.put("playerId", playerId);
+                    goToScene("/fxml/board.fxml", paramsMap);
                 });
                 infoContainerVBox.getChildren().addAll(nicknameText, expandButton);
                 infoContainerVBox.setAlignment(Pos.CENTER);
@@ -205,54 +272,31 @@ public class GUIControllerGame extends GUIController {
                     //tempImageView.getStyleClass().add("imageWithBorder");
                     if (handContainer != null) handContainer.getChildren().add(tempImageView);
 
-                    if (playerId == meId) {
-                        tempImageView.getStyleClass().add("clickable");
-                        tempImageView.setOnMousePressed(mouseEvent -> {
-                            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                                flipCard(cardId);
-                            } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                                // if phase is placing
-                                Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
-                                int cornerId;
-                                if (mouseEvent.getSceneX() < tempImageViewPosition.getX() + tempImageView.getBoundsInLocal().getWidth()/2) { // left
-                                    if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top left
-                                        cornerId = 0;
-                                    } else { // down left
-                                        cornerId = 3;
-                                    }
-                                } else { // right
-                                    if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top right
-                                        cornerId = 1;
-                                    } else { // down right
-                                        cornerId = 2;
-                                    }
-                                }
-                                //Line dragLine = new Line(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 270, 40);
-                                //mainContainerGame.getChildren().add(dragLine);
-                                //Circle clickedCircle = new Circle(mouseEvent.getSceneX(), mouseEvent.getSceneY(), 10);
-                                //mainContainerGame.getChildren().removeIf(n -> n instanceof Circle);
-                                //mainContainerGame.getChildren().add(clickedCircle);
-                                goToScene("/fxml/board.fxml", getViewModel(), new String[]{"" + meId});
-                            }
-                        });
-                    }
+                    tempImageView.getStyleClass().add("clickable");
+                    if(playerId == meId) tempImageView.setOnMousePressed(mouseEvent -> { flipCard(cardId); });
                 }
 
-                Separator verticalSeparator = new Separator();
-                verticalSeparator.setOrientation(Orientation.VERTICAL);
-                if (handContainer != null) handContainer.getChildren().add(verticalSeparator);
+
+                if (playerId == meId) {
+                    Separator verticalSeparator1 = new Separator();
+                    verticalSeparator1.setOrientation(Orientation.VERTICAL);
+                    if (handContainer != null) handContainer.getChildren().add(verticalSeparator1);
+
+                    Button btnPlaceCard = new Button("Place Card");
+                    btnPlaceCard.setOnAction((mouseEvent) -> {
+                        goToScene("/fxml/place.fxml");
+                    });
+                    if (handContainer != null) handContainer.getChildren().add(btnPlaceCard);
+                }
+
+                Separator verticalSeparator2 = new Separator();
+                verticalSeparator2.setOrientation(Orientation.VERTICAL);
+                if (handContainer != null) handContainer.getChildren().add(verticalSeparator2);
             }
         });
     }
 
     public void flipCard(int cardId) {
-        /*try {
-            getServer().flipCard(getClient(), cardId);
-        } catch (RemoteException e) {
-            Platform.runLater(() -> {
-                setServerError("There was an error while flipping the card, please try again");
-            });
-        }*/
         FlipCardCommandRunnable command = new FlipCardCommandRunnable();
         command.setCardId(cardId);
         addCommand(command,this);
@@ -275,18 +319,7 @@ public class GUIControllerGame extends GUIController {
         });
     }
 
-    @FXML
-    public void handlePlaceCard(ActionEvent event) {
-    }
-
     public void handleDrawCard(DrawType drawType) {
-        /*try {
-            getServer().drawCard(getClient(), drawType);
-        } catch (RemoteException e) {
-            Platform.runLater(() -> {
-                setServerError("There was an error while drawing the card, please try again");
-            });
-        }*/
         DrawCardCommandRunnable command = new DrawCardCommandRunnable();
         command.setDrawType(drawType);
         addCommand(command,this);
@@ -294,6 +327,7 @@ public class GUIControllerGame extends GUIController {
 
     @Override
     public void update() {
+        populatePlateauCoordinateMap(); // only for TEST
         Platform.runLater(() -> {
             clearAllchilds();
 
@@ -320,11 +354,18 @@ public class GUIControllerGame extends GUIController {
                     getViewModel().getSharedResourceCards()[1],
                     getViewModel().getObjectives()[0],
                     getViewModel().getObjectives()[1],
-                    getViewModel().getObjectives()[2]); // !!! get the right secret objective
+                    getViewModel().getObjectives()[2]);
 
-            highlightCurrentPlayerTable(getViewModel().getCurrentPlayer(), getViewModel().getColorsMap(getViewModel().getCurrentPlayer())); // !!! make it work
+            highlightCurrentPlayerTable(getViewModel().getCurrentPlayer(), getViewModel().getColorsMap(getViewModel().getCurrentPlayer()));
+            updatePoints();
+            setCurrentPhase();
+        });
+    }
 
-            this.setViewModel(getViewModel());
+    @FXML
+    public void setCurrentPhase() {
+        Platform.runLater(() -> {
+            currentPhase.setText("The current phase is " + (getViewModel().getTurnPhase() != null ? getViewModel().getTurnPhase() : "BOH") + " and is the turn of " + getViewModel().getNickname(getViewModel().getCurrentPlayer()));
         });
     }
 

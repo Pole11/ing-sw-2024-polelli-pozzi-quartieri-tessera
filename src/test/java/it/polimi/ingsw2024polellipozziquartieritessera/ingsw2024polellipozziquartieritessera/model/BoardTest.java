@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 import static org.junit.jupiter.api.Assertions.*;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.Controller;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.EmptyDeckException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerColorException;
@@ -8,9 +9,13 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.GoldCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ResourceCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.net.ServerSocket;
+import java.rmi.*;
+import java.rmi.registry.Registry;
 import java.util.*;
 
 public class BoardTest {
@@ -20,15 +25,40 @@ public class BoardTest {
     void testGetterSetter() {
         // setup
         try {
-            GameState g = Populate.populate();
-            ;
+            Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
+                @Override
+                public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+                    return null;
+                }
+
+                @Override
+                public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+
+                }
+
+                @Override
+                public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+
+                }
+
+                @Override
+                public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+
+                }
+
+                @Override
+                public String[] list() throws RemoteException, AccessException {
+                    return new String[0];
+                }
+            });
+            GameState g = new GameState(s);
+            Populate.populate(g);
 
             Board b = g.getMainBoard();
 
             b.setSharedObjectiveCard(0,b.getSharedObjectiveCard(0));
             b.setSharedObjectiveCard(1,b.getSharedObjectiveCard(1));
-        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException  e) {
+        } catch (WrongStructureConfigurationSizeException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -37,8 +67,34 @@ public class BoardTest {
     void testDrawSharedCards() {
         // setup
         try {
-            GameState g = Populate.populate();
+            Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
+                @Override
+                public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+                    return null;
+                }
 
+                @Override
+                public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+
+                }
+
+                @Override
+                public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+
+                }
+
+                @Override
+                public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+
+                }
+
+                @Override
+                public String[] list() throws RemoteException, AccessException {
+                    return new String[0];
+                }
+            });
+            GameState g = new GameState(s);
+            Populate.populate(g);
             Board b = g.getMainBoard();
             b.initSharedResourceCards();
             b.initSharedGoldCards();
@@ -75,8 +131,7 @@ public class BoardTest {
             // test if launch exception
             assertThrows(IllegalArgumentException.class, () -> b.drawSharedGoldCard(4));
             assertThrows(IllegalArgumentException.class, () -> b.drawSharedResourceCard(4));
-        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException  e) {
+        } catch (WrongStructureConfigurationSizeException | IOException e) {
             throw new RuntimeException(e);
         } catch (EmptyDeckException e) {
             throw new RuntimeException(e);
@@ -87,7 +142,34 @@ public class BoardTest {
     void testGetFromResourceDeck() throws EmptyDeckException {
         // setup
         try {
-            GameState g = Populate.populate();
+            Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
+                @Override
+                public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+                    return null;
+                }
+
+                @Override
+                public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+
+                }
+
+                @Override
+                public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+
+                }
+
+                @Override
+                public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+
+                }
+
+                @Override
+                public String[] list() throws RemoteException, AccessException {
+                    return new String[0];
+                }
+            });
+            GameState g = new GameState(s);
+            Populate.populate(g);
             Board b = g.getMainBoard();
 
             // function to test
@@ -102,8 +184,7 @@ public class BoardTest {
 
             // If deck is ended
             assertThrows(EmptyDeckException.class, ()->b.drawFromResourceDeck());
-        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException e) {
+        } catch (WrongStructureConfigurationSizeException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -112,8 +193,34 @@ public class BoardTest {
     void testdrawFromGoldDeck() throws EmptyDeckException {
         // setup
         try {
-            GameState g = Populate.populate();
+            Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
+                @Override
+                public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+                    return null;
+                }
 
+                @Override
+                public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+
+                }
+
+                @Override
+                public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+
+                }
+
+                @Override
+                public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+
+                }
+
+                @Override
+                public String[] list() throws RemoteException, AccessException {
+                    return new String[0];
+                }
+            });
+            GameState g = new GameState(s);
+            Populate.populate(g);
             Board b = g.getMainBoard();
 
 
@@ -130,8 +237,7 @@ public class BoardTest {
 
             // If deck is ended
             assertThrows(EmptyDeckException.class, ()->b.drawFromGoldDeck());
-        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException  e) {
+        } catch (WrongStructureConfigurationSizeException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -209,7 +315,34 @@ public class BoardTest {
 
     @Test
     void testShuffleCards2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
-        GameState g = Populate.populate();
+        Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
+            @Override
+            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+                return null;
+            }
+
+            @Override
+            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+
+            }
+
+            @Override
+            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+
+            }
+
+            @Override
+            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+
+            }
+
+            @Override
+            public String[] list() throws RemoteException, AccessException {
+                return new String[0];
+            }
+        });
+        GameState g = new GameState(s);
+        Populate.populate(g);
         Board b = g.getMainBoard();
 
         // Save initial length

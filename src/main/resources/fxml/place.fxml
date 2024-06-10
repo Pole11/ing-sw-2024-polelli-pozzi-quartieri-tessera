@@ -8,10 +8,13 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Separator?>
-<VBox styleClass="root" alignment="TOP_CENTER" fx:id="mainContainerBoard" stylesheets="@../style/game.css, @../style/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerBoard">
+<VBox styleClass="root" alignment="TOP_CENTER" fx:id="mainContainerBoard" stylesheets="@../style/game.css, @../style/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerPlace">
     <Button onAction="#handleBackToGame" text="Go back to the main window" />
     <Button onAction="#handleRestoreView" text="Board position to default" />
     <Separator></Separator>
+    <HBox alignment="CENTER" id="playerHandContainerGame"></HBox>
+    <Separator></Separator>
+    <Text>Please first click on a corner from your hand and then a corner on the board</Text>
     <Text>You can pan the view of the board by holding CTRL</Text>
     <Label
             fx:id="serverMessageLabel"

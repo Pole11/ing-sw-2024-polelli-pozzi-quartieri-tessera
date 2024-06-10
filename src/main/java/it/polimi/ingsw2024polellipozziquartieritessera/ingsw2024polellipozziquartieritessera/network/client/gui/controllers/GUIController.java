@@ -1,5 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.Card;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -10,6 +12,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -18,12 +21,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 abstract public class GUIController {
@@ -37,7 +43,9 @@ abstract public class GUIController {
     private Client clientContainer;
     private ViewModel viewModel;
     private boolean isSceneLoaded = false;
-    private String[] args;
+    private HashMap<String, Integer> paramsMap;
+    private double pressedX;
+    private double pressedY;
 
     @FXML
     private void initialize() {
@@ -53,6 +61,7 @@ abstract public class GUIController {
 
     private void executeCommandsRunnable() {
         while (true) {
+            CommandRunnable command;
             synchronized (commandQueue) {
                 while (commandQueue.isEmpty()) {
                     try {
@@ -60,8 +69,10 @@ abstract public class GUIController {
                     } catch (InterruptedException e) {
                     }
                 }
-                commandQueue.remove().executeGUI();
+                command = commandQueue.remove();
+                commandQueue.notifyAll();
             }
+            command.executeGUI();
         }
     }
 
@@ -144,7 +155,7 @@ abstract public class GUIController {
             public void run() {
                 clearServerError();
                 System.out.println("[DEBUG] Rendering server message: " + serverMessage);
-                serverMessageLabel.setText("INFO FROM SERVER: " + serverMessage);
+                serverMessageLabel.setText(serverMessage);
             }
         });
     }
@@ -156,7 +167,7 @@ abstract public class GUIController {
             public void run() {
                 clearServerMessage();
                 System.err.println("[DEBUG] Rendering server error: " + serverMessage);
-                serverErrorLabel.setText("ERROR FROM SERVER: " + serverMessage);
+                serverErrorLabel.setText(serverMessage);
             }
         });
     }
@@ -169,6 +180,7 @@ abstract public class GUIController {
             }
         });
     }
+
     public void clearServerMessage() {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
@@ -182,25 +194,19 @@ abstract public class GUIController {
         GUIApplication.changeScene(fxml);
     }
 
-    public void goToScene(String fxml, ViewModel tempViewModel) {
-        GUIApplication.changeScene(fxml);
-        setViewModel(tempViewModel);
+    public void goToScene(String fxml, HashMap<String, Integer> paramsMap) {
+        GUIApplication.changeScene(fxml, paramsMap);
     }
 
-    public void goToScene(String fxml, ViewModel tempViewModel, String[] args) {
-        GUIApplication.changeScene(fxml, args);
-        setViewModel(tempViewModel);
+    public HashMap<String, Integer> getParamsMap() {
+        return paramsMap;
     }
 
-    public void setArgs(String[] args) {
-        this.args = args;
+    public void setParamsMap(HashMap<String, Integer> paramsMap) {
+        this.paramsMap = paramsMap;
     }
 
-    public String[] getArgs() {
-        return this.args;
-    }
-
-    public ImageView createCardImageView(String url, int width) {
+    public ImageView createCardImageView(String url, int height) {
         URL resource = GUIController.class.getResource(url);
         if (resource == null) return null;
         String imageUrl = resource.toExternalForm();
@@ -212,17 +218,97 @@ abstract public class GUIController {
         ImageView imageView = new ImageView(imageWritable);
         imageView.getStyleClass().add("imageWithBorder");
 
-        imageView.setFitHeight(width);
+        imageView.setFitHeight(height);
         imageView.setPreserveRatio(true);
 
         return imageView;
     }
 
-    public void addHover(Node node) {
+    public void addHoverRotate(Node node) {
         Platform.runLater(() -> {
             node.setOnMouseEntered(mouseEvent -> { node.getStyleClass().add("rotateYes"); node.getStyleClass().remove("rotateNo"); });
             node.setOnMouseExited(mouseEvent -> { node.getStyleClass().add("rotateNo"); node.getStyleClass().remove("rotateYes"); });
         });
+    }
+
+    public void addHoverBgColor(Node node) {
+        Platform.runLater(() -> {
+            node.setOnMouseEntered(mouseEvent -> { node.getStyleClass().add("backgoundHover"); node.getStyleClass().remove("backgoundNoHover"); });
+            node.setOnMouseExited(mouseEvent -> { node.getStyleClass().add("backgoundNoHover"); node.getStyleClass().remove("backgoundHover"); });
+        });
+    }
+
+    public void addHoverBgImage(Node node, String imageUrl) { // non funziona
+        Platform.runLater(() -> {
+            node.setOnMouseEntered(mouseEvent -> { node.setStyle("-fx-background-image: url('" + imageUrl + "')"); node.setStyle("-fx-background-image: none"); System.out.println("-fx-background-image: url('" + imageUrl + "')"); });
+            node.setOnMouseExited(mouseEvent -> { node.setStyle("-fx-background-image: none"); node.setStyle("-fx-background-image: url('" + imageUrl + "')"); });
+        });
+    }
+
+    public ArrayList<ArrayList<Integer>> rotateBoard(ArrayList<ArrayList<Integer>> board) {
+        ArrayList<ArrayList<Integer>> rotatedBoard = new ArrayList<>();
+        ArrayList<String> cardList  = new ArrayList<>();
+
+        for(int i = 0; i < 7; i++){
+            cardList.add("");
+        }
+        //initialize rotatedBoard
+        int a = board.size();
+        int b = board.get(0).size();
+        int c = a+b;
+
+        for(int i = 0; i < c; i++){
+            rotatedBoard.add(new ArrayList<>());
+            for(int j  = 0; j < c; j++){
+                rotatedBoard.get(i).add(0);
+            }
+        }
+        //rotate board of 45°
+        int centeri = (int)Math.floor((double) board.size()/2);
+        int centerj = (int)Math.floor((double) board.get(0).size()/2);
+        int rcenteri = (int)Math.floor((double) rotatedBoard.size()/2);
+        int rcenterj = (int)Math.floor((double) rotatedBoard.get(0).size()/2);
+
+        for(int i = 0; i < board.size(); i++){
+            for(int j = 0; j < board.get(i).size(); j++){
+                int irel = i - centeri;
+                int jrel = j - centerj;
+                rotatedBoard.get(rcenteri - centeri + i - jrel).set(rcenterj -centerj + j + irel, board.get(i).get(j));
+            }
+        }
+
+        return new ArrayList<>(rotatedBoard);
+    }
+
+    public void addPanning(Node node) {
+        node.setOnMousePressed(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event) {
+                if (event.isControlDown()) {
+                    pressedX = event.getX();
+                    pressedY = event.getY();
+                }
+            }
+        });
+
+        node.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event) {
+                if (event.isControlDown()) {
+                    node.setTranslateX(node.getTranslateX() + event.getX() - pressedX);
+                    node.setTranslateY(node.getTranslateY() + event.getY() - pressedY);
+
+                    event.consume();
+                }
+            }
+        });
+    }
+
+    public Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
+        for (Node node : gridPane.getChildren()) {
+            if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
+                return node;
+            }
+        }
+        return null;
     }
 
     public void disappearAfter(int time, Node target, Pane father) {

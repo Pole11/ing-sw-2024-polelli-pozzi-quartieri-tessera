@@ -6,6 +6,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <BorderPane styleClass="root" fx:id="mainContainerGame" stylesheets="@../style/game.css, @../style/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerGame">
     <top>
         <HBox alignment="TOP_CENTER" id="player0ContainerGame" styleClass="horizontalPlayerContainer">
@@ -29,7 +30,6 @@
     </right>
     <center>
         <HBox alignment="CENTER">
-            <VBox alignment="CENTER" fx:id="sharedGoldContainerGame"></VBox>
             <VBox alignment="CENTER" fx:id="plateauContainerGame" styleClass="plateauContainerGame">
                 <Label
                         fx:id="serverMessageLabel"
@@ -37,8 +37,11 @@
                 <Label
                         fx:id="serverErrorLabel"
                         styleClass="serverError"/>
+                <Label
+                        fx:id="currentPhase"/>
             </VBox>
-            <VBox alignment="CENTER" fx:id="sharedResourceContainerGame"></VBox>
+            <VBox alignment="CENTER" fx:id="sharedGoldContainerGame" styleClass="cardDeckContainer"></VBox>
+            <VBox alignment="CENTER" fx:id="sharedResourceContainerGame" styleClass="cardDeckContainer"></VBox>
         </HBox>
     </center>
 </BorderPane>

@@ -5,6 +5,7 @@
     -fx-border-color: rgb(180, 160, 30);
     -fx-font-size: 16px;
     -fx-font-family: 'Comic Neue';
+    image-bg-url: none;
 }
 
 .cardDeck {
@@ -15,7 +16,11 @@
 
 .plateauContainerGame {
     -fx-padding: 10px;
-    -fx-max-width: 480px;
+    -fx-max-width: 200px;
+}
+
+.cardDeckContainer {
+    -fx-padding: 10px;
 }
 
 .blueBackground {
@@ -41,3 +46,12 @@
 .verticalPlayerContainer {
     -fx-padding: 30px;
 }
+
+.backgoundHover {
+    -fx-background-color: rgba(0,0,0,0.4);
+}
+
+.backgoundNoHover {
+    -fx-background-color: none;
+}
+
