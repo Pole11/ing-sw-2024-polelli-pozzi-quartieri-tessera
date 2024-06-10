@@ -13,10 +13,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -145,4 +142,34 @@ public class Populate {
         }
         return corners;
     }
+
+
+    public static void saveState(GameState gameState) {
+        Gson gson = new Gson();
+
+        // write to this file
+        String filePath = new File("").getAbsolutePath();
+        try (Writer writer = new FileWriter(filePath + Config.GAME_STATE_PATH)) {
+            gson.toJson(gameState, writer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void restoreState(GameState gameState){
+        Gson gson = new Gson();
+
+        // Read JSON from a file
+        String filePath = new File("").getAbsolutePath();
+        try (Reader reader = new FileReader(filePath + Config.GAME_STATE_PATH)) {
+
+            // convert the JSON data to a Java object
+            gameState = gson.fromJson(reader, GameState.class);
+            System.out.println(gameState);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

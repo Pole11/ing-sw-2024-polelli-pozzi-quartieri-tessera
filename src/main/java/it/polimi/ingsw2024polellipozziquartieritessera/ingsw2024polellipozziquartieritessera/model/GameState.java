@@ -7,6 +7,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
 
 import java.util.*;
@@ -28,16 +29,19 @@ public class GameState {
     private TurnPhase currentGameTurn;
 
     private final ArrayDeque<Event> eventQueue;
-    private Thread executeEvents;
+    private final Thread executeEvents;
     private boolean executeEventRunning;
 
     private final HashMap<Integer, Boolean> answered;
-    private Thread pingThread;
+    private final Thread pingThread;
     private boolean pingRunning;
-    ArrayList<Thread> playerThreads = new ArrayList<>();
+    ArrayList<Thread> playerThreads;
 
     private Thread timeoutThread;
     private GamePhase prevGamePhase;
+
+    private final Thread saveStateThread;
+    private boolean saveStateRunning;
 
     private int turnToPlay;
 
@@ -65,12 +69,18 @@ public class GameState {
         this.executeEvents = new Thread(this::executeEventsRunnable);
         this.executeEvents.start();
 
+        this.playerThreads = new ArrayList<>();
+
         this.pingRunning = true;
         this.pingThread = new Thread(this::pingThreadRunnable);
         pingThread.start();
 
         this.answered = new HashMap<>();
         resetAnswered();
+
+        this.saveStateRunning = true;
+        this.saveStateThread = new Thread(this::saveStateThreadRunnable);
+        //saveStateThread.start();
 
         //cambia in intMax
         this.turnToPlay = 1;
@@ -863,15 +873,15 @@ public class GameState {
     private void restart(){
         pingRunning = false;
         executeEventRunning = false;
+        saveStateRunning = false;
         executeEvents.interrupt();
         try {
             executeEvents.join();
         } catch (InterruptedException ignored) {}
         playerThreads.forEach(Thread::interrupt);
         pingThread.interrupt();
+        saveStateThread.interrupt();
         server.restart();
-
-        //NON SO SE SERVA, NON SO SE IL GARBAGE COLLECTOR FACCIA IL SUO LAVORO
 
         System.out.println(executeEvents.getState());
         System.out.println(pingThread.getState());
@@ -882,6 +892,19 @@ public class GameState {
 
 
         System.out.println("---------GAME RESTARTED------");
+    }
+
+    private void saveStateThreadRunnable(){
+        while (saveStateRunning){
+            System.out.println("he");
+            try {
+                Thread.sleep(1000*Config.WAIT_FOR_SAVE_TIME);
+            } catch (InterruptedException e) {
+                break;
+            }
+            Populate.saveState(this);
+            Populate.restoreState(this);
+        }
     }
 
 

@@ -56,7 +56,7 @@ public class Server implements VirtualServer {
         //FA persistance
         boolean store = Populate.existStore();
         if (store){
-            // takes data from store
+            Populate.restoreState(gameState);
         } else {
             Populate.populate(gameState);
         }
@@ -92,6 +92,8 @@ public class Server implements VirtualServer {
             new Thread(() -> {
                 try {
                     handler.runVirtualView();
+                    //non funziona come vorrei
+                    
                     controller.manageDisconnection();
                     System.out.println("Client disconnected");
                 } catch (IOException e) {
