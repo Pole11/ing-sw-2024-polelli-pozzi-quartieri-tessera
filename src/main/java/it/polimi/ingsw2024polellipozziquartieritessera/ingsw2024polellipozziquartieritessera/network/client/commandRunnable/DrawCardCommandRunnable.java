@@ -34,6 +34,7 @@ public class DrawCardCommandRunnable extends CommandRunnable{
     @Override
     public void executeGUI() {
         try {
+            System.out.println("[DEBUG] Drawing Card " + this.drawType);
             server.drawCard(client, this.drawType);
         } catch (RemoteException e) {
             serverDisconnectedGUI();
