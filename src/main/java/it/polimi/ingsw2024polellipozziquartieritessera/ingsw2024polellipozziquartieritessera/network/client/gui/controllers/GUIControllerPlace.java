@@ -2,6 +2,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.CornerPos;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PlaceCardCommandRunnable;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -284,9 +285,11 @@ public class GUIControllerPlace extends GUIController {
 
     @FXML
     public void handleRestoreView(ActionEvent event) {
-        GridPane boardGridPane = (GridPane) mainContainerBoard.lookup("#boardGridPane");
-        boardGridPane.setTranslateX(0);
-        boardGridPane.setTranslateY(0);
+        Platform.runLater(() -> {
+            GridPane boardGridPane = (GridPane) mainContainerBoard.lookup("#boardGridPane");
+            boardGridPane.setTranslateX(0);
+            boardGridPane.setTranslateY(0);
+        });
     }
 
     @Override

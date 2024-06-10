@@ -207,8 +207,8 @@ public class GUIControllerGame extends GUIController {
                 plateauImageViewPane.getChildren().remove(oldCircle);
                 //int x = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(0);
                 //int y = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(1);
-                int x = plateauCoordinatedMap.get(0).get(0);
-                int y = plateauCoordinatedMap.get(0).get(1);
+                int x = plateauCoordinatedMap.get(0).get(0); // comment for real use
+                int y = plateauCoordinatedMap.get(0).get(1); // comment for real use
                 System.out.println(x);
                 System.out.println(y);
                 Circle circle = new Circle(x, y, 10);

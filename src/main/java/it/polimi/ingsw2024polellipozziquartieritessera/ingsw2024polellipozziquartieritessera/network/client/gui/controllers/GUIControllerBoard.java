@@ -89,9 +89,11 @@ public class GUIControllerBoard extends GUIController {
 
     @FXML
     public void handleRestoreView(ActionEvent event) {
-        GridPane boardGridPane = (GridPane) mainContainerBoard.lookup("#boardGridPane");
-        boardGridPane.setTranslateX(0);
-        boardGridPane.setTranslateY(0);
+        Platform.runLater(() -> {
+            GridPane boardGridPane = (GridPane) mainContainerBoard.lookup("#boardGridPane");
+            boardGridPane.setTranslateX(0);
+            boardGridPane.setTranslateY(0);
+        });
     }
 
     @Override
