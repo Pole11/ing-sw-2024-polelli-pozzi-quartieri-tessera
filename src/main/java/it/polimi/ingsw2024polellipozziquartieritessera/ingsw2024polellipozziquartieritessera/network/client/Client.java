@@ -218,7 +218,7 @@ public class Client implements VirtualView {
         if (viewModel.getPlayerIndex() == playerIndex) {
             System.out.print("you have drawn a card\n> ");
         } else {
-            System.out.print(viewModel.getNickname(playerIndex) + "drew a card\n> ");
+            System.out.print(viewModel.getNickname(playerIndex) + " drew a card\n> ");
         }
         if (meDoGui) guiApplication.updateController();
     }
@@ -235,7 +235,7 @@ public class Client implements VirtualView {
         if (viewModel.getPlayerIndex() == playerIndex) {
             System.out.print("you placed a card, now you have to draw your card with DRAW [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");
         } else {
-            System.out.print(viewModel.getNickname(playerIndex) + "placed a card\n> ");
+            System.out.print(viewModel.getNickname(playerIndex) + " placed a card\n> ");
         }
         if (meDoGui) guiApplication.updateController();
     }
@@ -274,9 +274,9 @@ public class Client implements VirtualView {
     public void updatePoints(int playerIndex, int points) throws RemoteException {
         viewModel.setPoints(playerIndex, points);
         if (viewModel.getPlayerIndex() == playerIndex) {
-            System.out.print("you now have " + points + "points\n> ");
+            System.out.print("you now have " + points + " points\n> ");
         } else {
-            System.out.print(viewModel.getNickname(playerIndex) + "has" + points + "points\n> ");
+            System.out.print(viewModel.getNickname(playerIndex) + " has " + points + " points\n> ");
         }
         if (meDoGui) guiApplication.updateController();
     }
@@ -287,8 +287,7 @@ public class Client implements VirtualView {
         if (objectiveCardId2 == -1){
             System.out.print("you have chosen the objective card: " + objectiveCardId1 + "\n> ");
         } else{
-            System.out.print("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1], \n> to see your card use the command SHOWSECRETOBJECTIVE\n> ");
-            // TODO: cliController.showSecretObjectives();
+            System.out.print("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1], \n to see your card use the command SHOWSECRETOBJECTIVE\n");
 
         }
         if (meDoGui) guiApplication.updateController();
@@ -297,8 +296,7 @@ public class Client implements VirtualView {
     @Override
     public void updateSharedObjective(int sharedObjectiveCardId1, int sharedObjectiveCardId2) throws RemoteException {
         viewModel.setSharedObjectives(sharedObjectiveCardId1, sharedObjectiveCardId2);
-        System.out.print("the shared objectives are: " + sharedObjectiveCardId1 + "," + sharedObjectiveCardId2 + "\n> ");
-        //TODO: cliController.showSharedObjectvives();
+        System.out.print("the shared objectives are: " + sharedObjectiveCardId1 + "," + sharedObjectiveCardId2 + "\n");
         if (meDoGui) guiApplication.updateController();
     }
 
@@ -307,8 +305,7 @@ public class Client implements VirtualView {
         viewModel.fillPoints();
         if (side == null){
             viewModel.setStarterCard(cardId1);
-            System.out.print("Chose your preferred side for the starter card with the command CHOOSESTARTER[Front/Back]\n> ");
-            // TODO : cliController.showStarterSides();
+            System.out.print("Chose your preferred side for the starter card with the command CHOOSESTARTER[Front/Back]\n");
         } else {
             viewModel.initializeBoard(playerIndex, cardId1);
             viewModel.setPlacedSide(cardId1, side);

@@ -127,7 +127,7 @@ public class ViewModel {
     }
 
     public void removedCardFromHand(int playerIndex, int cardId){
-        handsMap.get(playerIndex).remove(cardId);
+        handsMap.get(playerIndex).remove(handsMap.get(playerIndex).indexOf(cardId));
         handsSideMap.remove(cardId);
     }
 

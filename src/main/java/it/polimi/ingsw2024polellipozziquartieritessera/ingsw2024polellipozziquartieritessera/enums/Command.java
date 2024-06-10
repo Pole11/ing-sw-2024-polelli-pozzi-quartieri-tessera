@@ -25,7 +25,7 @@ public enum Command {
 
      SHOWPLAYERS(new ShowPlayersCommandRunnable(), "local"),
      SHOWPOINTS(new ShowPointsCommandRunnable(), "local"),
-
+     SHOWDECKS(new ShowDecksCommandRunnable(), "local"),
      SHOWBOARD(new ShowBoardCommandRunnable(), "Local");
 
      private final CommandRunnable commandRunnable;

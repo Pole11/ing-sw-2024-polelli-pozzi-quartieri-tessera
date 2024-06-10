@@ -2,6 +2,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
@@ -151,10 +152,10 @@ public class CLIController {
                 printedBoard.get(i*2 + 1).add(PrintableCardParts.EMPTY.secondRow());
             }
         }
-        //calculate printboard
+        //calculate printBoard
         for(int k = 0; k < cardsOrder.size(); k++){
             found = false;
-            //search the id idexes in the rotatedBoard
+            //search the id indexes in the rotatedBoard
             for(i = 0; !found && i < rotatedBoard.size(); i++){
                 for(j = 0; !found && j < rotatedBoard.get(i).size(); j++){
                     if(rotatedBoard.get(i).get(j) == cardsOrder.get(k)){
@@ -193,6 +194,7 @@ public class CLIController {
             }
             System.out.println();
         }
+        System.out.println("this are the card placed in the board");
         printNCards(cardsOrder, sides);
 
     }
@@ -250,13 +252,17 @@ public class CLIController {
         if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()){
             System.err.print("this board does not exists yet\n> ");
         } else {
-            String playerName = viewModel.getNickname(player_index);
+            String playerName = viewModel.getNickname(player_index) + " 's";
             ArrayList<ArrayList<Integer>> board = viewModel.getPlayerBoard(player_index);
             ArrayList<Integer> cardsOrder = viewModel.getPlacingCardOrderMap(player_index);
-            System.out.println("this is " + playerName + "'s board");
+            if(player_index == viewModel.getPlayerIndex())
+                playerName = "your";
+            System.out.println("this is " + playerName + " board");
             printBoard(board, cardsOrder);
-            System.out.print("\n> ");
         }
+    }
+    public void showBoard(){
+        showBoard(viewModel.getPlayerIndex());
     }
 
     public void showStarterCard(){
@@ -273,11 +279,15 @@ public class CLIController {
     }
     public void showPlayers(){
         int n_players = viewModel.getPlayersSize();
-        System.out.println("this are the players nicknames ");
-        for(int i = 0; i < n_players; i++){
-            System.out.println("index: " + i + " nickname: " + viewModel.getNickname(i));
+        if(n_players < 1){
+            System.out.print("there are no players registered\n> ");
+        } else {
+            System.out.println("this are the players nicknames ");
+            for(int i = 0; i < n_players; i++){
+                System.out.println("index: " + i + " nickname: " + viewModel.getNickname(i));
+            }
+            System.out.print("> ");
         }
-        System.out.print("> ");
 ;    }
     public void showPoints(){
         if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()) {
@@ -290,7 +300,30 @@ public class CLIController {
             }
             System.out.print("> ");
 
-        }    }
+        }
+    }
+
+    public void showDecks(){
+        if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()) {
+            System.err.print("you cant ask to see the decks before the main phase has starter\n> ");
+        } else {
+            ArrayList<Integer> cards = new ArrayList<>();
+            ArrayList<Side> sides = new ArrayList<>();
+            int decks[] = viewModel.getSharedCards();
+            String titles[] = {"SHARED RESOURCE 0","SHARED RESOURCE 1","SHARED GOLD 0","SHARED GOLD 1","RESOURCE DECK","GOLD DECK"};
+
+            for (int i = 0; i < decks.length; i++) {
+                cards.add(decks[i]);
+                sides.add(Side.FRONT);
+            }
+            System.out.println("this is the current main board");
+            for(int i = 0; i < titles.length; i++){
+                System.out.print(getFormattedString(20,titles[i]));
+            }
+            System.out.println();
+            printNCards(cards, sides);
+        }
+    }
 
     private ArrayList<String> printCard(Card card, Side side){
         if(card instanceof ObjectiveCard){
@@ -534,7 +567,7 @@ public class CLIController {
         String challengeString = "";
         if (coverageChallenge){
             challengeString = "cha: COV";
-        } else if (elementChallenge != null){
+        } else if (!elementChallenge.isEmpty()){
             challengeString = "cha: " + elementChallenge.getFirst().toString().substring(0,3).toUpperCase();
         }
 
