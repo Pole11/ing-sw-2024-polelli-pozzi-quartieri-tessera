@@ -192,7 +192,7 @@ public class Client implements VirtualView {
                 System.out.print("you re-connected to the game\n> ");
             } else {
                 //SISTEMA
-                System.out.println("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>");
+                System.out.println("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>\n> ");
             }
         } else {
             if (connected) {
@@ -349,7 +349,7 @@ public class Client implements VirtualView {
     @Override
     public void ping(String ping) throws RemoteException {
         if (meDoGui){
-            //guiApplication.getGUIController().ping(client, server);
+            guiApplication.getGUIController().ping(client, server);
         } else {
             cliController.ping(client, server);
         }

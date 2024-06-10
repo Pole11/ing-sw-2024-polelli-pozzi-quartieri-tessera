@@ -192,7 +192,9 @@ public class GameState {
 
     public ArrayList<VirtualView> singleClient(VirtualView client) {
         ArrayList<VirtualView> clients = new ArrayList<>();
-        clients.add(client);
+        if (getPlayer(getPlayerIndex(client)).isConnected()){
+            clients.add(client);
+        }
         return clients;
     }
 
@@ -314,6 +316,7 @@ public class GameState {
                     System.out.println("game ended after timeout expired");
                     restart();
                 } catch (InterruptedException e) {
+                    System.out.println("timout ended");
                 }
             });
             timeoutThread.start();
@@ -344,7 +347,7 @@ public class GameState {
 
     public void updatePlayersConnected() {
         synchronized (eventQueue){
-            eventQueue.add(new PingEvent(this, allClients()));
+            eventQueue.add(new PingEvent(this, allConnectedClients()));
             eventQueue.notifyAll();
         }
     }
@@ -445,6 +448,7 @@ public class GameState {
             }
             eventQueue.notifyAll();
         }
+        System.out.println(nickname + " connected");
     }
 
 
@@ -488,13 +492,17 @@ public class GameState {
         this.mainBoard.shuffleCards();
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
+        updateMainBoard();
+        this.initStarters(); // set the starters cards for every player
+        System.out.println("Starting game");
+        this.currentGamePhase.changePhase(this);
+    }
+
+    public void updateMainBoard(){
         synchronized (eventQueue) {
             eventQueue.add(new UpdateMainBoardEvent(this, allConnectedClients(), mainBoard));
             eventQueue.notifyAll();
         }
-        this.initStarters(); // set the starters cards for every player
-        System.out.println("Starting game");
-        this.currentGamePhase.changePhase(this);
     }
 
     public void initStarters() {
@@ -888,6 +896,9 @@ public class GameState {
         playerThreads.forEach(e ->{
             System.out.println(e.getState());
         });
+
+        //TODO: distruggi rescue
+
         Thread.currentThread().interrupt();
 
 

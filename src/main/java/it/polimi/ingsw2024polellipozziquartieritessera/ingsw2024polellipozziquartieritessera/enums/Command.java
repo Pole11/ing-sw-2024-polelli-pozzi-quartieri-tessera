@@ -5,28 +5,32 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
-public enum Command {
-     HELP(new HelpCommandRunnable(), "Local"),
-     ADDUSER(new AdduserCommandRunnable(), "Network"),
-     START(new StartCommandRunnable(), "Network"),
-     CHOOSESTARTER(new ChooseStarterCommandRunnable(), "Network"),
-     CHOOSECOLOR(new ChooseColorCommandRunnable(), "Network"),
-     CHOOSEOBJECTIVE(new ChooseObjectiveCommandRunnable(), "Network"),
-     PLACECARD(new PlaceCardCommandRunnable(), "Network"),
-     DRAWCARD(new DrawCardCommandRunnable(), "Network"),
-     FLIPCARD(new FlipCardCommandRunnable(), "Network"),
-     OPENCHAT(new OpenChatCommandRunnable(), "Network"),
-     ADDMESSAGE(new AddMessageCommandRunnable(), "Network"),
-     PING(new PingCommandRunnable(), "Network"),
-     SHOWSECRETOBJECTIVES(new ShowSecretObjectiveCommandRunnable(),"Local"),
-     SHOWHAND(new showHandCommandRunnable(), "Local"),
-     SHOWBOARD(new ShowBoardCommandRunnable(), "Local");
+import java.util.function.Supplier;
 
-     private final CommandRunnable commandRunnable;
+public enum Command {
+     HELP(HelpCommandRunnable::new, "Local"),
+     ADDUSER(AdduserCommandRunnable::new, "Network"),
+     START(StartCommandRunnable::new, "Network"),
+     CHOOSESTARTER(ChooseStarterCommandRunnable::new, "Network"),
+     CHOOSECOLOR(ChooseColorCommandRunnable::new, "Network"),
+     CHOOSEOBJECTIVE(ChooseObjectiveCommandRunnable::new, "Network"),
+     PLACECARD(PlaceCardCommandRunnable::new, "Network"),
+     DRAWCARD(DrawCardCommandRunnable::new, "Network"),
+     FLIPCARD(FlipCardCommandRunnable::new, "Network"),
+     OPENCHAT(OpenChatCommandRunnable::new, "Network"),
+     ADDMESSAGE(AddMessageCommandRunnable::new, "Network"),
+     PING(PingCommandRunnable::new, "Network"),
+     SHOWSECRETOBJECTIVES(ShowSecretObjectiveCommandRunnable::new, "Local"),
+     SHOWHAND(ShowHandCommandRunnable::new, "Local"),
+     SHOWBOARD(ShowBoardCommandRunnable::new, "Local");
+
+     private final Supplier<? extends CommandRunnable> commandSupplier;
+
+     //private final CommandRunnable commandRunnable;
      private final String type;
 
-     private Command(final CommandRunnable commandRunnable, final String type) {
-          this.commandRunnable = commandRunnable;
+     Command(Supplier<? extends CommandRunnable> commandSupplier, String type) {
+          this.commandSupplier = commandSupplier;
           this.type = type;
      }
 
@@ -35,6 +39,7 @@ public enum Command {
      }
 
      public CommandRunnable getCommandRunnable(String[] message, VirtualServer server, Client clientContainer, VirtualView client) {
+          CommandRunnable commandRunnable = commandSupplier.get();
           commandRunnable.setServer(server);
           commandRunnable.setMessageFromCli(message);
           commandRunnable.setClientContainer(clientContainer);

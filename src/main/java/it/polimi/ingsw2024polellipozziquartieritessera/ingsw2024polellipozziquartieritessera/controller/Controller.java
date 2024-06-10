@@ -234,6 +234,7 @@ public class Controller {
             }
             this.gameState.changeCurrentPlayer();
             gameState.checkGameEnded();
+            gameState.updateMainBoard();
         }
     }
 
@@ -258,7 +259,6 @@ public class Controller {
 
     public synchronized void ping(VirtualView client){
         gameState.pingAnswer(client);
-
     }
 
     public void manageDisconnection(){

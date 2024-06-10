@@ -1,5 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.GamePhase;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -20,10 +21,20 @@ public class ConnectionInfoEvent extends Event{
     @Override
     public void execute() {
         for (VirtualView client :clients){
-            try {
-                client.connectionInfo(gameState.getPlayerIndex(player), connected);
-            } catch (RemoteException e) {
-                playerDisconnected(client);
+            if (client.equals(player.getClient())){
+                try {
+                    //TODO: nuova fase
+                    client.connectionInfo(gameState.getPlayerIndex(player), connected);
+                    client.updateGamePhase(GamePhase.NICKNAMEPHASE);
+                } catch (RemoteException e) {
+                    playerDisconnected(client);
+                }
+            } else {
+                try {
+                    client.connectionInfo(gameState.getPlayerIndex(player), connected);
+                } catch (RemoteException e) {
+                    playerDisconnected(client);
+                }
             }
         }
     }

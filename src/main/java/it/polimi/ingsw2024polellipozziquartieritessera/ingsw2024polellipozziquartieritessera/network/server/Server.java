@@ -92,10 +92,7 @@ public class Server implements VirtualServer {
             new Thread(() -> {
                 try {
                     handler.runVirtualView();
-                    //non funziona come vorrei
-                    
-                    controller.manageDisconnection();
-                    System.out.println("Client disconnected");
+                    //controller.manageDisconnection();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -110,6 +107,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException {
+        //TODO: controlla fase
         System.out.println("New player tried connecting!");
         this.controller.addPlayer(client, nickname);
     }

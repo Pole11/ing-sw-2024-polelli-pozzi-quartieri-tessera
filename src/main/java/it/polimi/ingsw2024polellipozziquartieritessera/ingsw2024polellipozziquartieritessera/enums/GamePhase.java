@@ -20,7 +20,7 @@ public enum GamePhase {
     public void changePhase(GameState gameState){
         GamePhase nextPhase = GamePhase.values()[this.ordinal() + 1];
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateGamePhaseEvent(gameState, gameState.allClients(), nextPhase));
+            gameState.addToEventQueue(new UpdateGamePhaseEvent(gameState, gameState.allConnectedClients(), nextPhase));
             gameState.getEventQueue().notifyAll();
         }
         gameState.setCurrentGamePhase(nextPhase);

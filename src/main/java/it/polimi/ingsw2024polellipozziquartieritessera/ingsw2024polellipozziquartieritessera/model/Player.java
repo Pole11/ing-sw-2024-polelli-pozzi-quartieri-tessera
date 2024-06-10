@@ -178,7 +178,6 @@ public class Player {
             gameState.addToEventQueue(new ConnectionInfoEvent(gameState, gameState.allClients(), this, connected));
             gameState.getEventQueue().notifyAll();
         }
-
     }
 
     //ADDER/REMOVER

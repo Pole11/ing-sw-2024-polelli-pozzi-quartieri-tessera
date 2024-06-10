@@ -1,6 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable;
 
-public class showHandCommandRunnable extends  CommandRunnable{
+public class ShowHandCommandRunnable extends  CommandRunnable{
 
 
     @Override
