@@ -8,21 +8,25 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.util.function.Supplier;
 
 public enum Command {
-     HELP(HelpCommandRunnable::new, "Local"),
+     ADDMESSAGE(AddMessageCommandRunnable::new, "Network"),
      ADDUSER(AdduserCommandRunnable::new, "Network"),
-     START(StartCommandRunnable::new, "Network"),
-     CHOOSESTARTER(ChooseStarterCommandRunnable::new, "Network"),
      CHOOSECOLOR(ChooseColorCommandRunnable::new, "Network"),
      CHOOSEOBJECTIVE(ChooseObjectiveCommandRunnable::new, "Network"),
-     PLACECARD(PlaceCardCommandRunnable::new, "Network"),
+     CHOOSESTARTER(ChooseStarterCommandRunnable::new, "Network"),
      DRAWCARD(DrawCardCommandRunnable::new, "Network"),
      FLIPCARD(FlipCardCommandRunnable::new, "Network"),
+     HELP(HelpCommandRunnable::new, "Local"),
      OPENCHAT(OpenChatCommandRunnable::new, "Network"),
-     ADDMESSAGE(AddMessageCommandRunnable::new, "Network"),
      PING(PingCommandRunnable::new, "Network"),
-     SHOWSECRETOBJECTIVES(ShowSecretObjectiveCommandRunnable::new, "Local"),
+     PLACECARD(PlaceCardCommandRunnable::new, "Network"),
+     SHOWBOARD(ShowBoardCommandRunnable::new, "Local"),
+     SHOWCOMMONOBJECTIVE(ShowCommonObjectiveCommandRunnable::new, "Local"),
+     SHOWDECKS(ShowDecksCommandRunnable::new, "Local"),
      SHOWHAND(ShowHandCommandRunnable::new, "Local"),
-     SHOWBOARD(ShowBoardCommandRunnable::new, "Local");
+     SHOWPLAYERS(ShowPlayersCommandRunnable::new, "Local"),
+     SHOWPOINTS(ShowPointsCommandRunnable::new, "Local"),
+     SHOWSECRETOBJECTIVES(ShowSecretObjectiveCommandRunnable::new, "Local"),
+     START(StartCommandRunnable::new, "Network");
 
      private final Supplier<? extends CommandRunnable> commandSupplier;
 

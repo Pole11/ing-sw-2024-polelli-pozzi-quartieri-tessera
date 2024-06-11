@@ -3,27 +3,35 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 public enum ColorPrint {
     //Color end string, color reset
     RESET("\033[0m", 0),
+    RED_BACKGROUND("\033[41m",1),     // RED
+    GREEN_BACKGROUND("\033[42m",2),   // GREEN
+    BLUE_BACKGROUND("\033[44m",3),    // BLUE
+    MAGENTA_BACKGROUND("\033[45m",4), // MAGENTA
+    LIGHT_YELLOW_BACKGROUND("\033[48;5;229m", 5),
+    BLACK("\033[0;30m", 10),    // BLACK
+    GOLD("\033[38;5;179m", 11),
+    WHITE_BACKGROUND("\033[47m",16);   // WHITE
 
+
+    /*
     // Regular Colors. Normal color, no bold, background color etc.
-    BLACK("\033[0;30m", 1),    // BLACK
-    RED("\033[0;31m",2),      // RED
-    GREEN("\033[0;32m",3),    // GREEN
+    RED("\033[0;31m",10),      // RED
+    GREEN("\033[0;32m",11),    // GREEN
     YELLOW("\033[0;33m",4),   // YELLOW
-    BLUE("\033[0;34m",5),     // BLUE
-    MAGENTA("\033[0;35m",6),  // MAGENTA
+    BLUE("\033[0;34m",13),     // BLUE
+    MAGENTA("\033[0;35m",14),  // MAGENTA
     CYAN("\033[0;36m",7),     // CYAN
     WHITE("\033[0;37m",8),    // WHITE
 
     // Background
-    BLACK_BACKGROUND("\033[40m",9),   // BLACK
-    RED_BACKGROUND("\033[41m",10),     // RED
-    GREEN_BACKGROUND("\033[42m",11),   // GREEN
+
+    RED_BACKGROUND("\033[41m",1),     // RED
+
     YELLOW_BACKGROUND("\033[43m",12),  // YELLOW
-    BLUE_BACKGROUND("\033[44m",13),    // BLUE
-    MAGENTA_BACKGROUND("\033[45m",14), // MAGENTA
     CYAN_BACKGROUND("\033[46m",15),    // CYAN
     WHITE_BACKGROUND("\033[47m",16);   // WHITE
 
+*/
 
     private final String code;
     private final int index;

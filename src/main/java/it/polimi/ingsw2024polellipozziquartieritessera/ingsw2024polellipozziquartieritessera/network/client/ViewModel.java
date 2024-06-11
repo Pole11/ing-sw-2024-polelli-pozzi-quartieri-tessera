@@ -48,6 +48,7 @@ public class ViewModel {
         Arrays.fill(objectives, -1);
         mainBoard = new int[6];
         Arrays.fill(mainBoard, -1);
+        gamePhase = GamePhase.NICKNAMEPHASE;
         cardsMap = new HashMap<>();
         handsMap = new HashMap<>();
         boardsMap = new HashMap<>();
@@ -124,7 +125,7 @@ public class ViewModel {
     }
 
     public void removedCardFromHand(int playerIndex, int cardId){
-        handsMap.get(playerIndex).remove(cardId);
+        handsMap.get(playerIndex).remove(handsMap.get(playerIndex).indexOf(cardId));
         handsSideMap.remove(cardId);
     }
 
@@ -324,6 +325,11 @@ public class ViewModel {
         playerBoard.get(rowIndex).set(colIndex, placingCardId);
 
         placingCardOrderMap.get(playerIndex).addLast(placingCardId);
+    }
+    public void fillPoints(){
+        for (int i = 0; i < nicknamesMap.size(); i++){
+            pointsMap.put(i, 0);
+        }
     }
 
     private void expandBoard(int rowIndex, int colIndex, ArrayList<ArrayList<Integer>> playerBoard){
