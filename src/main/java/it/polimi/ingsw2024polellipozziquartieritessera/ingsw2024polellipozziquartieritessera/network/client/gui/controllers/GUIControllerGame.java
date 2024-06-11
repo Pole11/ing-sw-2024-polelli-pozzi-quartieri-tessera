@@ -29,7 +29,6 @@ public class GUIControllerGame extends GUIController {
     private final int plateauHeight = 350;
 
     public GUIControllerGame() {
-        clearAllchilds();
         update();
         populatePlateauCoordinateMap();
     }
@@ -103,9 +102,24 @@ public class GUIControllerGame extends GUIController {
         return imageView;
     }
 
-    public void initTable(ArrayList<HashMap<Integer, Side>> playerHandCards, HashMap<Integer, String> nicknames, int meId, int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId, int firstCommonObjective, int secondCommonObjective, int secretObjectiveCardId) {
+    public void initTable() {
+        ArrayList<HashMap<Integer, Side>> playerHandCards = new ArrayList<>();
+        HashMap<Integer, String> nicknames = new HashMap<>();
+        for (Integer playerId = 0; playerId < getViewModel().getPlayersSize(); playerId++) {
+            HashMap<Integer, Side> playerHandCardsMap = new HashMap<>();
+            for (Integer cardId : getViewModel().getHand(playerId)) {
+                playerHandCardsMap.put(cardId, getViewModel().getHandCardsSide(cardId));
+            }
+            playerHandCards.add(playerHandCardsMap);
+            nicknames.put(playerId, getViewModel().getNickname(playerId));
+        }
+
+        int firstCommonObjective = getViewModel().getObjectives()[0];
+        int secondCommonObjective = getViewModel().getObjectives()[1];
+        int secretObjectiveCardId = getViewModel().getObjectives()[2];
         printCommonObjective(firstCommonObjective, secondCommonObjective);
-        printDecks(firstGoldDeckCardId, firstResourceDeckCardId, firstSharedGoldCardId, firstSharedResourceCardId, secondSharedGoldCardId, secondSharedResourceCardId);
+        printDecks();
+        int meId = getViewModel().getPlayerIndex();
         for (int i = 0; i < playerHandCards.size(); i++) initPlayerHand(i, meId, nicknames, playerHandCards.get(i), secretObjectiveCardId);
     }
 
@@ -124,12 +138,12 @@ public class GUIControllerGame extends GUIController {
         });
     }
 
-    public void printDecks(int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId) {
+    public void printDecks() {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
                 sharedGoldContainerGame.getChildren().add(new Text("Gold Deck"));
-                ImageView goldDeckImageView = createCardImageView("/img/carte_retro/" + firstGoldDeckCardId + ".jpg", 75);
+                ImageView goldDeckImageView = createCardImageView("/img/carte_retro/" + getViewModel().getSharedCards()[5] + ".jpg", 75);
                 goldDeckImageView.getStyleClass().add("clickable");
                 BorderPane goldDeckPane = new BorderPane(goldDeckImageView);
                 goldDeckPane.getStyleClass().add("cardDeck");
@@ -137,11 +151,11 @@ public class GUIControllerGame extends GUIController {
                 sharedGoldContainerGame.getChildren().add(goldDeckPane);
                 sharedGoldContainerGame.getChildren().add(new Text("Shared Gold"));
                 // add event
-                ImageView firstSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + firstSharedGoldCardId + ".jpg", 75);
+                ImageView firstSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedGoldCards()[0] + ".jpg", 75);
                 firstSharedGoldCardImageView.getStyleClass().add("clickable");
                 sharedGoldContainerGame.getChildren().add(firstSharedGoldCardImageView);
                 // add event
-                ImageView secondSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + secondSharedGoldCardId + ".jpg", 75);
+                ImageView secondSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedGoldCards()[1] + ".jpg", 75);
                 secondSharedGoldCardImageView.getStyleClass().add("clickable");
                 sharedGoldContainerGame.getChildren().add(secondSharedGoldCardImageView);
 
@@ -153,7 +167,7 @@ public class GUIControllerGame extends GUIController {
                 plateauContainerGame.getChildren().add(plateauImageViewPane);
 
                 sharedResourceContainerGame.getChildren().add(new Text("Resource Deck"));
-                ImageView resourceDeckImageView = createCardImageView("/img/carte_retro/" + firstResourceDeckCardId + ".jpg", 75);
+                ImageView resourceDeckImageView = createCardImageView("/img/carte_retro/" + getViewModel().getSharedCards()[4] + ".jpg", 75);
                 resourceDeckImageView.getStyleClass().add("clickable");
                 BorderPane resourceDeckPane = new BorderPane(resourceDeckImageView);
                 resourceDeckPane.getStyleClass().add("cardDeck");
@@ -162,11 +176,11 @@ public class GUIControllerGame extends GUIController {
 
                 sharedResourceContainerGame.getChildren().add(new Text("Shared Resource"));
                 // add event
-                ImageView firstSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + firstSharedResourceCardId + ".jpg", 75);
+                ImageView firstSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedResourceCards()[0] + ".jpg", 75);
                 firstSharedResourceCardImageView.getStyleClass().add("clickable");
                 sharedResourceContainerGame.getChildren().add(firstSharedResourceCardImageView);
                 // add event
-                ImageView secondSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + secondSharedResourceCardId + ".jpg", 75);
+                ImageView secondSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedResourceCards()[1] + ".jpg", 75);
                 secondSharedResourceCardImageView.getStyleClass().add("clickable");
                 sharedResourceContainerGame.getChildren().add(secondSharedResourceCardImageView);
 
@@ -187,7 +201,10 @@ public class GUIControllerGame extends GUIController {
         });
     }
 
-    public void highlightCurrentPlayerTable(int idCurrentPlayer, Color color) {
+    public void highlightCurrentPlayerTable() {
+        int idCurrentPlayer = getViewModel().getCurrentPlayer();
+        Color color = getViewModel().getColorsMap(getViewModel().getCurrentPlayer());
+
         Platform.runLater(() -> {
                 // TODO: un-highlight
                 for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
@@ -338,33 +355,8 @@ public class GUIControllerGame extends GUIController {
         populatePlateauCoordinateMap(); // only for TEST
         Platform.runLater(() -> {
             clearAllchilds();
-
-            // delete everything  or find a way to differentially change the content of the view
-            ArrayList<HashMap<Integer, Side>> playerHandCards = new ArrayList<>();
-            HashMap<Integer, String> nicknames = new HashMap<>();
-            for (Integer playerId = 0; playerId < getViewModel().getPlayersSize(); playerId++) {
-                HashMap<Integer, Side> playerHandCardsMap = new HashMap<>();
-                for (Integer cardId : getViewModel().getHand(playerId)) {
-                    playerHandCardsMap.put(cardId, getViewModel().getHandCardsSide(cardId));
-                }
-                playerHandCards.add(playerHandCardsMap);
-                nicknames.put(playerId, getViewModel().getNickname(playerId));
-            }
-
-            initTable(playerHandCards,
-                    nicknames,
-                    getViewModel().getPlayerIndex(),
-                    getViewModel().getSharedCards()[0],
-                    getViewModel().getSharedCards()[1],
-                    getViewModel().getSharedGoldCards()[0],
-                    getViewModel().getSharedResourceCards()[0],
-                    getViewModel().getSharedGoldCards()[1],
-                    getViewModel().getSharedResourceCards()[1],
-                    getViewModel().getObjectives()[0],
-                    getViewModel().getObjectives()[1],
-                    getViewModel().getObjectives()[2]);
-
-            highlightCurrentPlayerTable(getViewModel().getCurrentPlayer(), getViewModel().getColorsMap(getViewModel().getCurrentPlayer()));
+            initTable();
+            highlightCurrentPlayerTable();
             updatePoints();
             setCurrentPhase();
         });

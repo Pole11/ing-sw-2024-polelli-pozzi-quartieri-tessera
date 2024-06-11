@@ -175,6 +175,7 @@ public class Controller {
             }
 
             player.addPoints(placingCard.calculatePoints(player));
+            gameState.updateMainBoard();
             gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE);
         }
     }
@@ -234,6 +235,7 @@ public class Controller {
             this.gameState.changeCurrentPlayer();
             gameState.checkGameEnded();
             this.gameState.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
+            gameState.updateMainBoard();
         }
     }
 

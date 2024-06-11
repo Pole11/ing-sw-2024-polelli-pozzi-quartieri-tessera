@@ -488,13 +488,19 @@ public class GameState {
         this.mainBoard.shuffleCards();
         this.mainBoard.initSharedGoldCards();
         this.mainBoard.initSharedResourceCards();
-        synchronized (eventQueue) {
-            eventQueue.add(new UpdateMainBoardEvent(this, allConnectedClients(), mainBoard));
-            eventQueue.notifyAll();
-        }
+        updateMainBoard();
         this.initStarters(); // set the starters cards for every player
         System.out.println("Starting game");
         this.currentGamePhase.changePhase(this);
+    }
+
+    public void updateMainBoard() {
+        synchronized (eventQueue) {
+            eventQueue.add(new UpdateMainBoardEvent(this, allConnectedClients(), mainBoard));
+            System.out.println("UPDATE DELLA MAIN BOARD");
+            System.out.println(eventQueue);
+            eventQueue.notifyAll();
+        }
     }
 
     public void initStarters() {

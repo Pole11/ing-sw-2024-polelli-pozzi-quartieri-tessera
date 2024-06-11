@@ -9,7 +9,7 @@
 }
 
 .cardDeck {
-    -fx-border-width: 0px 3px 3px 0px;
+    -fx-border-width: 0px 5px 5px 0px;
     -fx-border-style: solid;
     -fx-border-color: rgb(140, 120, 0);
 }
