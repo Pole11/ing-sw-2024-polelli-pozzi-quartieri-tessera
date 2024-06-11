@@ -12,14 +12,16 @@
     <Button onAction="#handleBackToGame" text="Go back to the main window" />
     <Button onAction="#handleRestoreView" text="Board position to default" />
     <Separator></Separator>
-    <HBox alignment="CENTER" id="playerHandContainerGame"></HBox>
-    <Separator></Separator>
     <Text>Please first click on a corner from your hand and then a corner on the board</Text>
     <Text>You can pan the view of the board by holding CTRL</Text>
+    <Text>Right click to flip card</Text>
     <Label
             fx:id="serverMessageLabel"
             styleClass="serverMessage"/>
     <Label
             fx:id="serverErrorLabel"
             styleClass="serverError"/>
+    <Separator></Separator>
+    <HBox alignment="CENTER" id="playerHandContainerGame"></HBox>
+
 </VBox>

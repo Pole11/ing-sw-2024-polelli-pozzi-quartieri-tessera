@@ -210,7 +210,7 @@ public class Player {
     public void addPoints(int points) {
         this.points += points;
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdatePointsEvent(gameState, gameState.allConnectedClients(), this, points));
+            gameState.addToEventQueue(new UpdatePointsEvent(gameState, gameState.allConnectedClients(), this, this.points));
             gameState.getEventQueue().notifyAll();
         }
     }

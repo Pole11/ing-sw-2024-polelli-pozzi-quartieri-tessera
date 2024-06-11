@@ -349,7 +349,7 @@ public class Client implements VirtualView {
     @Override
     public void ping(String ping) throws RemoteException {
         if (meDoGui){
-            //guiApplication.getGUIController().ping(client, server);
+            guiApplication.getGUIController().ping(client, server);
         } else {
             cliController.ping(client, server);
         }

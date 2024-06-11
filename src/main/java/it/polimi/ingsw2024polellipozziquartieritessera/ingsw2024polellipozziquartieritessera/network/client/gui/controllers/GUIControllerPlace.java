@@ -3,6 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.CornerPos;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.FlipCardCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PlaceCardCommandRunnable;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -119,23 +120,27 @@ public class GUIControllerPlace extends GUIController {
                     // handle event
                     tempImageView.getStyleClass().add("clickable");
                     imageGridPane.setOnMousePressed(mouseEvent -> {
-                        cardId = cardIdIterator;
-                        // if phase is placing
-                        Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
-                        if (mouseEvent.getSceneX() < tempImageViewPosition.getX() + tempImageView.getBoundsInLocal().getWidth()/2) { // left
-                            if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top left
-                                cornerId = 0;
-                            } else { // down left
-                                cornerId = 3;
+                        if (mouseEvent.isPrimaryButtonDown()) {
+                            cardId = cardIdIterator;
+                            // if phase is placing
+                            Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
+                            if (mouseEvent.getSceneX() < tempImageViewPosition.getX() + tempImageView.getBoundsInLocal().getWidth()/2) { // left
+                                if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top left
+                                    cornerId = 0;
+                                } else { // down left
+                                    cornerId = 3;
+                                }
+                            } else { // right
+                                if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top right
+                                    cornerId = 1;
+                                } else { // down right
+                                    cornerId = 2;
+                                }
                             }
-                        } else { // right
-                            if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top right
-                                cornerId = 1;
-                            } else { // down right
-                                cornerId = 2;
-                            }
+                            updatePlayerHand(cardIdIterator, cornerId);
+                        } else if (mouseEvent.isSecondaryButtonDown()) {
+                            flipCard(cardIdIterator);
                         }
-                        updatePlayerHand(cardIdIterator, cornerId);
                     });
                 }
             }
@@ -158,11 +163,18 @@ public class GUIControllerPlace extends GUIController {
                 int cornerWidth = 28;
                 int cornerHeight = 35;
 
-                ArrayList<ArrayList<Integer>> playerBoard = getViewModel().getPlayerBoard(getViewModel().getPlayerIndex()); // the first arg is the index of the player to print the board of
+                ViewModel vm = getViewModel();
+                ArrayList<ArrayList<Integer>> playerBoard = vm.getPlayerBoard(getViewModel().getPlayerIndex()); // the first arg is the index of the player to print the board of
                 playerBoard = rotateBoard(playerBoard);
+                resizeI(playerBoard);
 
                 GridPane gridPane = new GridPane();
                 //gridPane.setGridLinesVisible(true);
+                try {
+                    mainContainerBoard.getChildren().remove(mainContainerBoard.lookup("#boardGridPane"));
+                } catch (Exception e) {
+                    // TODO
+                }
                 gridPane.setId("boardGridPane");
                 gridPane.setHgap(gridPaneHgap); // Spacing orizzontale
                 gridPane.setVgap(gridPaneVgap); // Spacing verticale
@@ -233,6 +245,7 @@ public class GUIControllerPlace extends GUIController {
                                                     command.setParams(cardId, ele, finalTableCornerPos, getViewModel().getHandCardsSide(cardId));
                                                     addCommand(command, thisController);
                                                     //showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
+
                                                     goToScene("/fxml/place.fxml");
 
                                                     /*System.out.println("Placing card id " + cardId);
@@ -273,7 +286,6 @@ public class GUIControllerPlace extends GUIController {
             public void run() {
                 System.err.println("[DEBUG] Rendering server error: " + serverMessage);
                 showAlert(Alert.AlertType.WARNING, "Error from server", serverMessage);
-                goToScene("/fxml/game.fxml");
             }
         });
     }
@@ -290,6 +302,12 @@ public class GUIControllerPlace extends GUIController {
             boardGridPane.setTranslateX(0);
             boardGridPane.setTranslateY(0);
         });
+    }
+
+    public void flipCard(int cardId) {
+        FlipCardCommandRunnable command = new FlipCardCommandRunnable();
+        command.setCardId(cardId);
+        addCommand(command,this);
     }
 
     @Override

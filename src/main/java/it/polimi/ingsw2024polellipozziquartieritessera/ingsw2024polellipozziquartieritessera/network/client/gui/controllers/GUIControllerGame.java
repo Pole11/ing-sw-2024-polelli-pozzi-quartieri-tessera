@@ -189,6 +189,12 @@ public class GUIControllerGame extends GUIController {
 
     public void highlightCurrentPlayerTable(int idCurrentPlayer, Color color) {
         Platform.runLater(() -> {
+                // TODO: un-highlight
+                for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
+                    Node tempNode = mainContainerGame.lookup("#player" + i + "ContainerGame");
+                    tempNode.getStyleClass().remove(getViewModel().getColorsMap(i).toString().toLowerCase() + "Background");
+                }
+
                 // TODO: get current player id
                 Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame");
 
@@ -203,14 +209,16 @@ public class GUIControllerGame extends GUIController {
         Platform.runLater(() -> {
             for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
                 Pane plateauImageViewPane = (Pane) mainContainerGame.lookup("#plateauImageViewPane");
-                Circle oldCircle = (Circle) plateauImageViewPane.lookup("circlePoints" + i);
+                Circle oldCircle = (Circle) plateauImageViewPane.lookup("#circlePoints" + i);
                 plateauImageViewPane.getChildren().remove(oldCircle);
-                //int x = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(0);
-                //int y = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(1);
-                int x = plateauCoordinatedMap.get(0).get(0); // comment for real use
-                int y = plateauCoordinatedMap.get(0).get(1); // comment for real use
-                System.out.println(x);
-                System.out.println(y);
+                int x, y;
+                try {
+                    x = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(0);
+                    y = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(1);
+                } catch(NullPointerException e) {
+                    x = plateauCoordinatedMap.get(0).get(0); // comment for real use
+                    y = plateauCoordinatedMap.get(0).get(1); // comment for real use
+                }
                 Circle circle = new Circle(x, y, 10);
                 circle.setId("circlePoints" + i);
                 plateauImageViewPane.getChildren().add(circle);
