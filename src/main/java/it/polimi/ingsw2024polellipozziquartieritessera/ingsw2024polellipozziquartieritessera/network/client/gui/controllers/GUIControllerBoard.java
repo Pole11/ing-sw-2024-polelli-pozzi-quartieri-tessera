@@ -42,7 +42,6 @@ public class GUIControllerBoard extends GUIController {
 
                 ArrayList<ArrayList<Integer>> playerBoard = getViewModel().getPlayerBoard(playerId); // the first arg is the index of the player to print the board of
                 playerBoard = rotateBoard(playerBoard);
-                resizeI(playerBoard);
 
                 GridPane gridPane = new GridPane();
                 //gridPane.setGridLinesVisible(true);

@@ -280,44 +280,6 @@ abstract public class GUIController {
         return new ArrayList<>(rotatedBoard);
     }
 
-    public void resizeI(ArrayList<ArrayList<Integer>> matrix){
-        //remove empty rows
-        for(int j = 0; j < matrix.size(); j++){
-            Boolean isEmpty = true;
-            for(int i = 0; i < matrix.get(j).size() && isEmpty; i++){
-                if(!matrix.get(j).get(i).equals(0)){
-                    isEmpty = false;
-                }
-            }
-            if(isEmpty){
-                matrix.remove(j);
-                j--;
-            }
-        }
-        //remove empty columns
-        ArrayList<Boolean> areEmpty = new ArrayList<>();
-        for(int i = 0; i < matrix.get(0).size(); i++){
-            areEmpty.add(true);
-        }
-
-        for(int i = 0; i < matrix.size(); i++){
-            for (int j = 0; j < matrix.get(i).size(); j++){
-                if(!matrix.get(i).get(j).equals(0)){
-                    areEmpty.set(j, false);
-                }
-            }
-        }
-        for(int j = 0; j < areEmpty.size(); j++){
-            if(areEmpty.get(j).equals(true)){
-                for(int i = 0; i < matrix.size(); i++){
-                    matrix.get(i).remove(j);
-                }
-                areEmpty.remove(j--);
-            }
-        }
-    }
-
-
     public void addPanning(Node node) {
         node.setOnMousePressed(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {

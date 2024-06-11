@@ -51,7 +51,7 @@ public class GameState {
         this.server = server;
         this.cardsMap = new HashMap<>();
 
-        this.mainBoard = new Board(this);
+        this.mainBoard = new Board();
         this.chat = new Chat();
 
         this.players = new ArrayList<>();

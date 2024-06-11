@@ -197,6 +197,7 @@ public class Controller {
 
     public void drawCard(DrawType drawType) throws InvalidHandException, EmptyDeckException {
         synchronized (this.gameState) {
+            this.gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE);
             Board board = this.gameState.getMainBoard();
             Player currentPlayer = this.gameState.getCurrentPlayer();
 
@@ -233,7 +234,6 @@ public class Controller {
             }
             this.gameState.changeCurrentPlayer();
             gameState.checkGameEnded();
-            this.gameState.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
         }
     }
 

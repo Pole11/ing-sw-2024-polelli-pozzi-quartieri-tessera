@@ -3,10 +3,6 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.Event;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateMainBoardEvent;
-
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -18,16 +14,12 @@ public class Board {
     private final ArrayList<GoldCard> goldDeck; // may be final (the reference only)
     private final ArrayList<ResourceCard> resourceDeck; // may be final (the reference only)
 
-    private final GameState gameState;
-
-    public Board(GameState gameState){
+    public Board(){
         sharedGoldCards = new GoldCard[Config.N_SHARED_GOLDS];
         sharedResourceCards = new ResourceCard[Config.N_SHARED_RESOURCES];
         sharedObjectiveCards = new ObjectiveCard[Config.N_SHARED_OBJECTIVES];
         goldDeck = new ArrayList<>();
         resourceDeck  = new ArrayList<>();
-
-        this.gameState = gameState;
     }
 
     //GETTER
@@ -183,11 +175,6 @@ public class Board {
         GoldCard drawnCard = this.sharedGoldCards[pos - 1];
         // replace card in shared
         this.sharedGoldCards[pos - 1] = drawFromGoldDeck();
-
-        synchronized (gameState.getEventQueue()) {
-            gameState.getEventQueue().add(new UpdateMainBoardEvent(gameState, gameState.allConnectedClients(), gameState.getMainBoard()));
-            gameState.getEventQueue().notifyAll();
-        }
         // return the specified card
         return drawnCard;
     }
@@ -202,11 +189,6 @@ public class Board {
         ResourceCard drawnCard = this.sharedResourceCards[pos - 1];
         // replace card in shared
         this.sharedResourceCards[pos - 1] = drawFromResourceDeck();
-
-        synchronized (gameState.getEventQueue()) {
-            gameState.getEventQueue().add(new UpdateMainBoardEvent(gameState, gameState.allConnectedClients(), gameState.getMainBoard()));
-            gameState.getEventQueue().notifyAll();
-        }
         // return the card
         return drawnCard;
     }
@@ -216,12 +198,6 @@ public class Board {
         if (resourceDeck.isEmpty()) throw new EmptyDeckException("The resource deck is empty");
         ResourceCard drawnCard = this.resourceDeck.getLast();
         resourceDeck.removeLast();
-
-        synchronized (gameState.getEventQueue()) {
-            gameState.getEventQueue().add(new UpdateMainBoardEvent(gameState, gameState.allConnectedClients(), gameState.getMainBoard()));
-            gameState.getEventQueue().notifyAll();
-        }
-
         return drawnCard;
     }
 
@@ -230,12 +206,6 @@ public class Board {
         if (goldDeck.isEmpty()) throw new EmptyDeckException("The gold deck is empty");
         GoldCard drawnCard = this.goldDeck.getLast();
         goldDeck.removeLast();
-
-        synchronized (gameState.getEventQueue()) {
-            gameState.getEventQueue().add(new UpdateMainBoardEvent(gameState, gameState.allConnectedClients(), gameState.getMainBoard()));
-            gameState.getEventQueue().notifyAll();
-        }
-
         return drawnCard;
     }
 }
