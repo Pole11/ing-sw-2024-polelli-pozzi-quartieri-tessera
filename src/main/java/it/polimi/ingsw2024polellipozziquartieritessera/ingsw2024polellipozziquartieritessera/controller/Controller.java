@@ -185,7 +185,7 @@ public class Controller {
             boolean cardIsPlaceable = true;
             if (placingCard instanceof GoldCard && placingCardSide.equals(Side.FRONT)) {
                 for (Element ele : Element.values()) {
-                    if (player.getAllElements().get(ele) < player.getElementOccurencies(((GoldCard) placingCard).getResourceNeeded(), ele)) {
+                    if (player.getAllElements().get(ele) < player.getElementOccurrencies(((GoldCard) placingCard).getResourceNeeded(), ele)) {
                         cardIsPlaceable = false;
                         break;
                     }

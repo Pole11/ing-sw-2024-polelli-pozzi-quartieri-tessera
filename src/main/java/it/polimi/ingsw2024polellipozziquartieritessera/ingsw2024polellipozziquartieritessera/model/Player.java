@@ -8,26 +8,77 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.util.*;
 
+/**
+ * Player class
+ */
 public class Player {
+    /**
+     * Player nickname
+     */
     private final String nickname;
+    /**
+     * Player board, structured like a variable matrix of card IDs
+     */
     private final ArrayList<ArrayList<Integer>> playerBoard;
+    /**
+     * The map of all placed cards, that relate a card ID with his played side
+     */
     private final HashMap<Integer, Side> placedCardsMap;
+    /**
+     * The map of all cards in hand, that relate a card ID with his hand side
+     */
     private final HashMap<Integer, Side> handCardsMap;
+    /**
+     * Color of the player
+     */
     private Color color;
-
+    /**
+     * Total points gained by the player
+     */
     private int points;
+    /**
+     * Number of won objective challenges
+     */
     private int objectivesWon;
-    private StarterCard starterCard; // it is the most important card because it is used to create all the composition of the cards
-    private ObjectiveCard objectiveCard; // it is the secret objective
-    private ObjectiveCard[] objectiveCardOptions; // it is the  array of the choice for secret objective
-
+    /**
+     * Starting card for the board, essential to relate all the cards in board
+     */
+    private StarterCard starterCard;
+    /**
+     * Secret objective card, unique for each player
+     */
+    private ObjectiveCard objectiveCard;
+    /**
+     * List of the selectable objective cards
+     */
+    private ObjectiveCard[] objectiveCardOptions;
+    /**
+     * Map of the centerResources of the player cards, relates a card ID with the center Resource
+     */
     private final HashMap<Integer, Element> centerResource;
+    /**
+     * Map of all elements the player currently have, each Element is associated with the number of his occurrences
+     */
     private final HashMap<Element, Integer> allElements;
-
+    /**
+     * True if the player is connected (false if disconnected)
+     */
     private boolean connected;
+    /**
+     * Virtual view associated to the client
+     */
     private VirtualView client;
+    /**
+     * Instance of the GameState, needed to make the player aware of the GameState he is in
+     */
     private final GameState gameState;
 
+    /**
+     * Player Constructor
+     * @param nickname Player nickname string
+     * @param client Virtual view that this player is linked to
+     * @param gameState Instance of the GameState the player is in
+     */
     public Player(String nickname, VirtualView client, GameState gameState){
         this.gameState = gameState;
 
@@ -144,6 +195,7 @@ public class Player {
             gameState.addToEventQueue(new UpdateSecretObjectiveEvent(gameState, gameState.singleClient(this.getClient()), new ArrayList<>(List.of(objectiveCard))));
             gameState.getEventQueue().notifyAll();
         }
+
     }
 
     public void setStarterCard(StarterCard starterCard) {
@@ -235,13 +287,27 @@ public class Player {
 
     // METHODS
 
-    //usato dal controller, da cambiare nome, poco esplicativo (plurale)
+    /**
+     * Get the Side of a specific played card on the player board
+     * @param cardId Card identifier
+     * @return Side of the placed card
+     */
     public Side getBoardSide(int cardId) {
         return this.placedCardsMap.get(cardId);
     }
 
 // -------------------Place Cards Map Managing-----------------
 
+    /**
+     * Place the card on the player board
+     * @param placingCardId ID of the card to place
+     * @param placingCard Card to be placed
+     * @param tableCard Card on the board
+     * @param tableCardId ID of the card on the board
+     * @param tableCornerPos Corner position of the board card to which link the placing card
+     * @param placingCardSide Side of placing of the placing card
+     * @throws WrongInstanceTypeException Card not placeable
+     */
     public void updatePlayerCardsMap(int placingCardId, CornerCard placingCard, CornerCard tableCard, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongInstanceTypeException {
         addToPlacedCardsMap(placingCardId, placingCardSide);
         removeFromHandCardsMap(placingCardId);
@@ -253,7 +319,13 @@ public class Player {
         }
     }
 
-    public static int getElementOccurencies(ArrayList<Element> elements, Element targetElement) {
+    /**
+     * Get occurrences of a specific element inside a List of elements
+     * @param elements List of elements
+     * @param targetElement Element to verify
+     * @return Number of occurrences
+     */
+    public static int getElementOccurrencies(ArrayList<Element> elements, Element targetElement) {
         int count = 0;
         for (Object element : elements) {
             if (element != null && element.equals(targetElement)) {
@@ -265,24 +337,22 @@ public class Player {
 
 // -------------------Board Matrix Managing-----------------------
 
+    /**
+     * Initialization of the player board, as a 1x1 with the StarterCard in the center
+     */
     public void initializeBoard(){
         this.playerBoard.clear(); // re-initialize the board it is previously contained something
-        // Initialization of player board as a 1x1 with the StarterCard in the center
         ArrayList<Integer> row = new ArrayList<>();
         row.add(getStarterCard().getId());
         this.playerBoard.add(row);
     }
 
-    public void printBoard() {
-        for (int i = 0; i < this.playerBoard.size(); i++) {
-            ArrayList<Integer> row = this.playerBoard.get(i);
-            for (int j = 0; j < row.size(); j++) {
-                System.out.print(this.playerBoard.get(i).get(j) + " ");
-            }
-            System.out.println("");
-        }
-    }
-
+    /**
+     * Update the board after a card is placed
+     * @param placingCardId ID of the placed card
+     * @param tableCardId ID of the card on the player board
+     * @param tableCornerPos Corner position of the board card to which the new card is linked
+     */
     public void updateBoard(int placingCardId, int tableCardId, CornerPos tableCornerPos){
         int rowIndex = -1;
         int colIndex = -1;
@@ -335,6 +405,11 @@ public class Player {
         this.playerBoard.get(rowIndex).set(colIndex, placingCardId);
     }
 
+    /**
+     * Helper function to expand the board size if needed
+     * @param rowIndex Final rows number
+     * @param colIndex Final column number
+     */
     private void expandBoard(int rowIndex, int colIndex){
         // Expand the matrix to include the new position (remember that this supports only one execute: row++/-- or col++/--)
         // Expand rows if needed

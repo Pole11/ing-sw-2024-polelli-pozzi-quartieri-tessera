@@ -2,16 +2,39 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 
+/**
+ * Corner class
+ */
 public class Corner {
-    private final Element element; // contains the resource/item on the corner (empty if has no element)
-    private final int cardId; // identifier of the parent card (from 1 to 102)
+    /**
+     * Contains the resource/item on the corner (empty if has no element)
+     */
+    private final Element element;
+    /**
+     * Identifier of the parent card (from 1 to 102)
+     */
+    private final int cardId;
+    /**
+     * True if the corner does not allow a linked card (false otherwise)
+     */
     private final Boolean hidden;
-    private Boolean covered; //true if there is another card on top (false otherwise)
-    private Corner linkedCorner; // the corner linked to this one (null if not exists)
+    /**
+     * True if there is another card on top (false otherwise)
+     */
+    private Boolean covered;
+    /**
+     * The corner linked to this one (null if not set)
+     */
+    private Corner linkedCorner;
 
     //corner is null in the array of corners if it is hidden
 
-    //CONSTRUCTOR
+    /**
+     * Corner Constructor
+     * @param element Element given by the corner
+     * @param cardId Parent card identifier
+     * @param hidden Hidden corner specifier
+     */
     public Corner(Element element, int cardId, Boolean hidden) {
         covered = false;
         this.hidden = hidden;
@@ -29,12 +52,10 @@ public class Corner {
         return element;
     }
 
-    // return the corner linked to this one
     public Corner getLinkedCorner() {
         return linkedCorner;
     }
 
-    // return the parent card of this corner
     public int getCard() {
         return cardId;
     }
@@ -51,6 +72,4 @@ public class Corner {
     public void setLinkedCorner(Corner linkedCorner) {
         this.linkedCorner = linkedCorner;
     }
-
-
 }

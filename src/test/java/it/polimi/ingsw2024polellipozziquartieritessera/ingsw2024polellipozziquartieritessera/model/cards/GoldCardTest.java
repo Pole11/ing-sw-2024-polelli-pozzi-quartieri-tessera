@@ -1,6 +1,9 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.Controller;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.CardNotPlacedException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerColorException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerNicknameException;
@@ -14,6 +17,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.rmi.*;
 import java.rmi.registry.Registry;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,10 +56,11 @@ public class GoldCardTest {
         Populate.populate(g);
         GoldCard card = (GoldCard) g.getCard(45);
 
+        assertNotNull(card.getLinkedCards());
+        assertNotNull(card.getChallenge());
+        assertEquals(card.getPoints(), 2);
+        assertEquals(card.getResourceType(), Element.FUNGI);
         assertNotNull(card.getResourceNeeded());
-        assertNotNull(card.getResourceType());
-        card.getChallenge();
-        card.getPoints();
     }
 
     @Test
@@ -108,7 +113,22 @@ public class GoldCardTest {
         // try with the back
         assertEquals(card.getUncoveredElements(Side.BACK).getFirst(), Element.PLANT);
         assertEquals(card.getUncoveredElements(Side.BACK).toArray().length, 1);
+    }
 
+    @Test
+    void testCalculatePoints() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException {
+        // setup
+        GameState g = Populate.populate();
 
+        GoldCard card1 = (GoldCard) g.getCard(46);
+        GoldCard card2 = (GoldCard) g.getCard(47);
+
+        Player player = new Player("Bob", null, g);
+
+        player.addToPlacedCardsMap(46, Side.FRONT);
+        player.addToPlacedCardsMap(47, Side.FRONT);
+
+        assertEquals(card1.calculatePoints(player), 0);
+        assertEquals(card2.calculatePoints(player), 3);
     }
 }

@@ -29,7 +29,6 @@ public class StructureChallenge extends Challenge{
     @Override
     public int getTimesWon(Player player, GoldCard card) {
         throw new RuntimeException();
-        //SISTEMA
     }
 
     @Override
@@ -92,7 +91,6 @@ public class StructureChallenge extends Challenge{
                 }
             }
         }
-
         return recurrences;
     }
 }

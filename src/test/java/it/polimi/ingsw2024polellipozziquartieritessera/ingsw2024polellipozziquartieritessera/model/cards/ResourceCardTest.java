@@ -54,7 +54,10 @@ public class ResourceCardTest {
             ResourceCard card = (ResourceCard) g.getCard(32);
 
             assertEquals(card.getResourceType(), Element.INSECT);
-        } catch (WrongStructureConfigurationSizeException | IOException e) {
+            assertNull(card.getChallenge());
+
+        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
+                 NotUniquePlayerColorException  e) {
             throw new RuntimeException(e);
         }
 

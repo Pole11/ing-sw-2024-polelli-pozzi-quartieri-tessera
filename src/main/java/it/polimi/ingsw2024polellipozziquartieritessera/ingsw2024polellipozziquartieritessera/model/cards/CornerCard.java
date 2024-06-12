@@ -9,12 +9,30 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Corner card class
+ */
 public abstract class CornerCard extends Card {
-    private final Corner[] frontCorners; // the corners of the front side (from top-left clockwise) 0 1
-    private final Corner[] backCorners; // the corners of the back side (from top-left clockwise)   3 2
+    /**
+     * Corners of the front side (from top-left clockwise)
+     */
+    private final Corner[] frontCorners;
+    /**
+     * Corners of the back side (from top-left clockwise)
+     */
+    private final Corner[] backCorners;
+    /**
+     * Base points of the card
+     */
     private final int points;
 
-    // CONSTRUCTOR
+    /**
+     * CornerCard Constructor
+     * @param id Card identifier
+     * @param frontCorners Front coners array
+     * @param backCorners Back corners array
+     * @param points Number of points given by the card
+     */
     public CornerCard(int id, Corner[] frontCorners, Corner[] backCorners, int points) {
         super(id);
         this.frontCorners = frontCorners;
@@ -33,17 +51,21 @@ public abstract class CornerCard extends Card {
 
     public int getPoints() { return points; }
 
-    @Override
-    public abstract CornerCard getCard();
-
     // METHODS
 
     public abstract int calculatePoints(Player player) throws CardNotPlacedException;
 
+    /**
+     * Get the card challenge
+     * @return Current card challenge
+     */
     public abstract Challenge getChallenge();
 
 
-    // return all the corners of the card (back and front)
+    /**
+     * Get all card corners
+     * @return All corners of the card (back and front)
+     */
     public ArrayList<Corner> getCorners() {
         // corner array initialization
         ArrayList<Corner> corners = new ArrayList<>();
@@ -54,6 +76,11 @@ public abstract class CornerCard extends Card {
         return corners;
     }
 
+    /**
+     * Returns all corners of a specific card side
+     * @param side Specifies the desired side
+     * @return Corners of the specified side
+     */
     public ArrayList<Corner> getCorners(Side side) {
         if (side == Side.FRONT) {
             ArrayList<Corner> corners = new ArrayList<>();
@@ -67,7 +94,10 @@ public abstract class CornerCard extends Card {
         }
     }
 
-    // return the linked cards to this one
+    /**
+     * Get the cards linked to this one
+     * @return Linked card
+     */
     public ArrayList<Integer> getLinkedCards() {
         // card array initialization
         ArrayList<Integer> linkedCards = new ArrayList<>();
@@ -81,7 +111,11 @@ public abstract class CornerCard extends Card {
         return linkedCards;
     }
 
-    // return all uncovered corners of the card
+    /**
+     * Get all uncovered corners of the card
+     * @param side Specification of the side
+     * @return List of uncovered card corners
+     */
     public ArrayList<Corner> getUncoveredCorners(Side side) {
         // corner array initialization
         ArrayList<Corner> uncoveredCorners = new ArrayList<>();
@@ -104,10 +138,17 @@ public abstract class CornerCard extends Card {
         return uncoveredCorners;
     }
 
-    // returns the element of the card (null if StarterCard)
+    /**
+     * Get the resource type of the card (null if StarterCard)
+     * @return Element type of the card
+     * @throws WrongInstanceTypeException Card has no resource type
+     */
     public abstract Element getResourceType() throws WrongInstanceTypeException;
 
-
-    // this method will be overrided by all the corner cards subclasses
+    /**
+     * Get all the uncovered elements on the card
+     * @param side Current card side
+     * @return List of uncovered elements
+     */
     public abstract ArrayList<Element> getUncoveredElements(Side side);
 }

@@ -1,5 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.Controller;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
@@ -54,7 +55,10 @@ public class StarterCardTest {
 
             assertEquals(card.getCenterResources().getFirst(), Element.ANIMAL);
             assertEquals(card.getCenterResources().size(), 2);
-        } catch (WrongStructureConfigurationSizeException | IOException e) {
+            assertNull(card.getChallenge());
+
+        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
+                 NotUniquePlayerColorException e) {
             throw new RuntimeException(e);
         }
     }
@@ -91,6 +95,8 @@ public class StarterCardTest {
         GameState g = new GameState(s);
         Populate.populate(g);
         StarterCard card = (StarterCard) g.getCard(84);
+
+        assertThrows(WrongInstanceTypeException.class, card::getResourceType);
     }
 
     @Test
@@ -148,5 +154,16 @@ public class StarterCardTest {
         } catch (WrongStructureConfigurationSizeException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    void testCalculatePoints() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
+        GameState g = Populate.populate();
+
+        StarterCard card = (StarterCard) g.getCard(84);
+
+        Player player = new Player("Bob", null, g);
+
+        assertEquals(card.calculatePoints(player), 0);
     }
 }
