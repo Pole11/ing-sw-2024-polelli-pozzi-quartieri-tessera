@@ -217,8 +217,8 @@ public class Board {
     //return and remove
     public ResourceCard drawFromResourceDeck() throws EmptyDeckException {
         if (resourceDeck.isEmpty()) throw new EmptyDeckException("The resource deck is empty");
-        ResourceCard drawnCard = this.resourceDeck.getLast();
-        resourceDeck.removeLast();
+        ResourceCard drawnCard = this.resourceDeck.getFirst();
+        resourceDeck.removeFirst();
         return drawnCard;
     }
 
@@ -229,8 +229,8 @@ public class Board {
      */
     public GoldCard drawFromGoldDeck() throws EmptyDeckException {
         if (goldDeck.isEmpty()) throw new EmptyDeckException("The gold deck is empty");
-        GoldCard drawnCard = this.goldDeck.getLast();
-        goldDeck.removeLast();
+        GoldCard drawnCard = this.goldDeck.getFirst();
+        goldDeck.removeFirst();
         return drawnCard;
     }
 }
