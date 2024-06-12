@@ -12,10 +12,12 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,6 +26,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -35,6 +38,7 @@ import java.util.List;
 abstract public class GUIController {
     @FXML private Label serverMessageLabel;
     @FXML private Label serverErrorLabel;
+    @FXML private Button handleMuteButton;
     // add virtual model
     private final ArrayDeque<CommandRunnable> commandQueue;
     private Thread executeCommands;
@@ -46,17 +50,35 @@ abstract public class GUIController {
     private HashMap<String, Integer> paramsMap;
     private double pressedX;
     private double pressedY;
+    private MediaPlayer mediaPlayer;
 
     @FXML
     private void initialize() {
         isSceneLoaded = true;
         System.out.println("[DEBUG] Scene is loaded with " + this.getClass());
+        Platform.runLater(() -> {
+            handleMuteButton.setText(getMediaPlayer().isMute() ? "Unmute" : "Mute");
+        });
     }
 
     public GUIController() {
         this.commandQueue = new ArrayDeque();
         this.executeCommands = new Thread(this::executeCommandsRunnable);
         this.executeCommands.start();
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
+    public void setMediaPlayer(MediaPlayer mediaPlayer) {
+        this.mediaPlayer = mediaPlayer;
+    }
+
+    @FXML
+    public void handleMuteMusic(ActionEvent event) {
+        getMediaPlayer().setMute(!getMediaPlayer().isMute());
+        handleMuteButton.setText(getMediaPlayer().isMute() ? "Unmute" : "Mute");
     }
 
     private void executeCommandsRunnable() {
@@ -279,6 +301,44 @@ abstract public class GUIController {
 
         return new ArrayList<>(rotatedBoard);
     }
+
+    public void resizeI(ArrayList<ArrayList<Integer>> matrix){
+        //remove empty rows
+        for(int j = 0; j < matrix.size(); j++){
+            Boolean isEmpty = true;
+            for(int i = 0; i < matrix.get(j).size() && isEmpty; i++){
+                if(!matrix.get(j).get(i).equals(0)){
+                    isEmpty = false;
+                }
+            }
+            if(isEmpty){
+                matrix.remove(j);
+                j--;
+            }
+        }
+        //remove empty columns
+        ArrayList<Boolean> areEmpty = new ArrayList<>();
+        for(int i = 0; i < matrix.get(0).size(); i++){
+            areEmpty.add(true);
+        }
+
+        for(int i = 0; i < matrix.size(); i++){
+            for (int j = 0; j < matrix.get(i).size(); j++){
+                if(!matrix.get(i).get(j).equals(0)){
+                    areEmpty.set(j, false);
+                }
+            }
+        }
+        for(int j = 0; j < areEmpty.size(); j++){
+            if(areEmpty.get(j).equals(true)){
+                for(int i = 0; i < matrix.size(); i++){
+                    matrix.get(i).remove(j);
+                }
+                areEmpty.remove(j--);
+            }
+        }
+    }
+
 
     public void addPanning(Node node) {
         node.setOnMousePressed(new EventHandler<MouseEvent>() {

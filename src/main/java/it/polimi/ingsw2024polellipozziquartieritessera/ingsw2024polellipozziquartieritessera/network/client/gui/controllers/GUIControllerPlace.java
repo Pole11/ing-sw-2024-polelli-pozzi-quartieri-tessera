@@ -3,6 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.CornerPos;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.FlipCardCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PlaceCardCommandRunnable;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -37,10 +38,7 @@ public class GUIControllerPlace extends GUIController {
             ImageView handCardImageView = createCardImageView(url, imageHeight);
 
             int rectX = 0, rectY = 0;
-            if (cornerId == 0 || cornerId == 3) rectX = 0; else rectX = imageHeight*3/4;
-            if (cornerId == 0 || cornerId == 1) rectY = 0; else rectY = imageHeight/2;
-
-            Rectangle clickedRectangle = new Rectangle(rectX, rectY,imageHeight*3/4 + 2, imageHeight/2);
+            Rectangle clickedRectangle = new Rectangle(rectX, rectY,imageHeight*3/2, imageHeight);
             clickedRectangle.setFill(new Color(0,0,0,0.4));
 
             handCardContainer.getChildren().add(handCardImageView);
@@ -49,7 +47,7 @@ public class GUIControllerPlace extends GUIController {
         });
     }
 
-    public void updatePlayerHand(int handCardId, int handCornerId) {
+    public void updatePlayerHand(int handCardId) {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
@@ -82,33 +80,20 @@ public class GUIControllerPlace extends GUIController {
                     GridPane imageGridPane = new GridPane();
                     imageGridPane.setGridLinesVisible(true);
 
-                    for (int k = 0; k < 2; k++) {
-                        imageGridPane.getRowConstraints().add(new RowConstraints(imageHeight/2));
-                    }
-                    for (int k = 0; k < 2; k++) {
-                        imageGridPane.getColumnConstraints().add(new ColumnConstraints(imageHeight*3/4));
-                    }
-
                     imageGridPane.add(tempImageView, 0, 0);
                     imageGridPane.setHalignment(tempImageView, HPos.LEFT);
                     imageGridPane.setValignment(tempImageView, VPos.TOP);
                     handCardContainer.getChildren().add(imageGridPane);
 
-                    for (int k = 0; k < 2; k++) {
-                        for (int w = 0; w < 2; w++) {
-                            Pane dummyCell = new Pane();
-                            dummyCell.getStyleClass().add("clickable");
-                            imageGridPane.add(dummyCell, w, k);
-                            addHoverBgColor(dummyCell);
-                        }
-                    }
+                    Pane dummyCell = new Pane();
+                    dummyCell.getStyleClass().add("clickable");
+                    imageGridPane.add(dummyCell, 0, 0);
+                    addHoverBgColor(dummyCell);
 
                     if (cardIdIterator == handCardId) {
                         int rectX = 0, rectY = 0;
-                        if (cornerId == 0 || cornerId == 3) rectX = 0; else rectX = imageHeight*3/4;
-                        if (cornerId == 0 || cornerId == 1) rectY = 0; else rectY = imageHeight/2;
 
-                        Rectangle clickedRectangle = new Rectangle(rectX, rectY,imageHeight*3/4, imageHeight/2);
+                        Rectangle clickedRectangle = new Rectangle(rectX, rectY,imageHeight*3/2, imageHeight);
                         clickedRectangle.setFill(new Color(0,0,0,0.4));
 
                         Pane rectanglePane = new Pane();
@@ -119,23 +104,14 @@ public class GUIControllerPlace extends GUIController {
                     // handle event
                     tempImageView.getStyleClass().add("clickable");
                     imageGridPane.setOnMousePressed(mouseEvent -> {
-                        cardId = cardIdIterator;
-                        // if phase is placing
-                        Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
-                        if (mouseEvent.getSceneX() < tempImageViewPosition.getX() + tempImageView.getBoundsInLocal().getWidth()/2) { // left
-                            if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top left
-                                cornerId = 0;
-                            } else { // down left
-                                cornerId = 3;
-                            }
-                        } else { // right
-                            if (mouseEvent.getSceneY() < tempImageViewPosition.getY() + tempImageView.getBoundsInLocal().getHeight()/2) { // top right
-                                cornerId = 1;
-                            } else { // down right
-                                cornerId = 2;
-                            }
+                        if (mouseEvent.isPrimaryButtonDown()) {
+                            cardId = cardIdIterator;
+                            // if phase is placing
+                            Point2D tempImageViewPosition = tempImageView.localToScene(0,0);
+                            updatePlayerHand(cardIdIterator);
+                        } else if (mouseEvent.isSecondaryButtonDown()) {
+                            flipCard(cardIdIterator);
                         }
-                        updatePlayerHand(cardIdIterator, cornerId);
                     });
                 }
             }
@@ -158,11 +134,18 @@ public class GUIControllerPlace extends GUIController {
                 int cornerWidth = 28;
                 int cornerHeight = 35;
 
-                ArrayList<ArrayList<Integer>> playerBoard = getViewModel().getPlayerBoard(getViewModel().getPlayerIndex()); // the first arg is the index of the player to print the board of
+                ViewModel vm = getViewModel();
+                ArrayList<ArrayList<Integer>> playerBoard = vm.getPlayerBoard(getViewModel().getPlayerIndex()); // the first arg is the index of the player to print the board of
                 playerBoard = rotateBoard(playerBoard);
+                resizeI(playerBoard);
 
                 GridPane gridPane = new GridPane();
                 //gridPane.setGridLinesVisible(true);
+                try {
+                    mainContainerBoard.getChildren().remove(mainContainerBoard.lookup("#boardGridPane"));
+                } catch (Exception e) {
+                    // TODO
+                }
                 gridPane.setId("boardGridPane");
                 gridPane.setHgap(gridPaneHgap); // Spacing orizzontale
                 gridPane.setVgap(gridPaneVgap); // Spacing verticale
@@ -233,6 +216,7 @@ public class GUIControllerPlace extends GUIController {
                                                     command.setParams(cardId, ele, finalTableCornerPos, getViewModel().getHandCardsSide(cardId));
                                                     addCommand(command, thisController);
                                                     //showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
+
                                                     goToScene("/fxml/place.fxml");
 
                                                     /*System.out.println("Placing card id " + cardId);
@@ -273,7 +257,6 @@ public class GUIControllerPlace extends GUIController {
             public void run() {
                 System.err.println("[DEBUG] Rendering server error: " + serverMessage);
                 showAlert(Alert.AlertType.WARNING, "Error from server", serverMessage);
-                goToScene("/fxml/game.fxml");
             }
         });
     }
@@ -292,6 +275,12 @@ public class GUIControllerPlace extends GUIController {
         });
     }
 
+    public void flipCard(int cardId) {
+        FlipCardCommandRunnable command = new FlipCardCommandRunnable();
+        command.setCardId(cardId);
+        addCommand(command,this);
+    }
+
     @Override
     public void update() {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
@@ -299,7 +288,7 @@ public class GUIControllerPlace extends GUIController {
             public void run() {
                 if (getViewModel() != null) {
                     printBoard();
-                    updatePlayerHand(-1, -1);
+                    updatePlayerHand(-1);
                 }
                 cornerId = -1;
                 cardId = -1;

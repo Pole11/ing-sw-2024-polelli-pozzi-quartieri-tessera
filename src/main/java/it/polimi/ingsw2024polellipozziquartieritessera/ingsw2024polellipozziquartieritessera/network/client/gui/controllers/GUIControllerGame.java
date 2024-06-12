@@ -29,9 +29,9 @@ public class GUIControllerGame extends GUIController {
     private final int plateauHeight = 350;
 
     public GUIControllerGame() {
-        clearAllchilds();
-        update();
+        //rotatePlayerContainer();
         populatePlateauCoordinateMap();
+        update();
     }
 
     private void populatePlateauCoordinateMap() {
@@ -73,7 +73,7 @@ public class GUIControllerGame extends GUIController {
             if (sharedResourceContainerGame != null) sharedResourceContainerGame.getChildren().clear();
             if (sharedGoldContainerGame != null) sharedGoldContainerGame.getChildren().clear();
             if (plateauContainerGame != null) {
-                while (plateauContainerGame.getChildren().size() > 3) {
+                while (plateauContainerGame.getChildren().size() > 4) {
                     plateauContainerGame.getChildren().removeLast(); // the first two are the messages from server
                 }
             }
@@ -103,9 +103,24 @@ public class GUIControllerGame extends GUIController {
         return imageView;
     }
 
-    public void initTable(ArrayList<HashMap<Integer, Side>> playerHandCards, HashMap<Integer, String> nicknames, int meId, int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId, int firstCommonObjective, int secondCommonObjective, int secretObjectiveCardId) {
+    public void initTable() {
+        ArrayList<HashMap<Integer, Side>> playerHandCards = new ArrayList<>();
+        HashMap<Integer, String> nicknames = new HashMap<>();
+        for (Integer playerId = 0; playerId < getViewModel().getPlayersSize(); playerId++) {
+            HashMap<Integer, Side> playerHandCardsMap = new HashMap<>();
+            for (Integer cardId : getViewModel().getHand(playerId)) {
+                playerHandCardsMap.put(cardId, getViewModel().getHandCardsSide(cardId));
+            }
+            playerHandCards.add(playerHandCardsMap);
+            nicknames.put(playerId, getViewModel().getNickname(playerId));
+        }
+
+        int firstCommonObjective = getViewModel().getObjectives()[0];
+        int secondCommonObjective = getViewModel().getObjectives()[1];
+        int secretObjectiveCardId = getViewModel().getObjectives()[2];
         printCommonObjective(firstCommonObjective, secondCommonObjective);
-        printDecks(firstGoldDeckCardId, firstResourceDeckCardId, firstSharedGoldCardId, firstSharedResourceCardId, secondSharedGoldCardId, secondSharedResourceCardId);
+        printDecks();
+        int meId = getViewModel().getPlayerIndex();
         for (int i = 0; i < playerHandCards.size(); i++) initPlayerHand(i, meId, nicknames, playerHandCards.get(i), secretObjectiveCardId);
     }
 
@@ -124,12 +139,12 @@ public class GUIControllerGame extends GUIController {
         });
     }
 
-    public void printDecks(int firstGoldDeckCardId, int firstResourceDeckCardId, int firstSharedGoldCardId, int firstSharedResourceCardId, int secondSharedGoldCardId, int secondSharedResourceCardId) {
+    public void printDecks() {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
                 sharedGoldContainerGame.getChildren().add(new Text("Gold Deck"));
-                ImageView goldDeckImageView = createCardImageView("/img/carte_retro/" + firstGoldDeckCardId + ".jpg", 75);
+                ImageView goldDeckImageView = createCardImageView("/img/carte_retro/" + getViewModel().getSharedCards()[5] + ".jpg", 75);
                 goldDeckImageView.getStyleClass().add("clickable");
                 BorderPane goldDeckPane = new BorderPane(goldDeckImageView);
                 goldDeckPane.getStyleClass().add("cardDeck");
@@ -137,11 +152,11 @@ public class GUIControllerGame extends GUIController {
                 sharedGoldContainerGame.getChildren().add(goldDeckPane);
                 sharedGoldContainerGame.getChildren().add(new Text("Shared Gold"));
                 // add event
-                ImageView firstSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + firstSharedGoldCardId + ".jpg", 75);
+                ImageView firstSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedGoldCards()[0] + ".jpg", 75);
                 firstSharedGoldCardImageView.getStyleClass().add("clickable");
                 sharedGoldContainerGame.getChildren().add(firstSharedGoldCardImageView);
                 // add event
-                ImageView secondSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + secondSharedGoldCardId + ".jpg", 75);
+                ImageView secondSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedGoldCards()[1] + ".jpg", 75);
                 secondSharedGoldCardImageView.getStyleClass().add("clickable");
                 sharedGoldContainerGame.getChildren().add(secondSharedGoldCardImageView);
 
@@ -153,7 +168,7 @@ public class GUIControllerGame extends GUIController {
                 plateauContainerGame.getChildren().add(plateauImageViewPane);
 
                 sharedResourceContainerGame.getChildren().add(new Text("Resource Deck"));
-                ImageView resourceDeckImageView = createCardImageView("/img/carte_retro/" + firstResourceDeckCardId + ".jpg", 75);
+                ImageView resourceDeckImageView = createCardImageView("/img/carte_retro/" + getViewModel().getSharedCards()[4] + ".jpg", 75);
                 resourceDeckImageView.getStyleClass().add("clickable");
                 BorderPane resourceDeckPane = new BorderPane(resourceDeckImageView);
                 resourceDeckPane.getStyleClass().add("cardDeck");
@@ -162,11 +177,11 @@ public class GUIControllerGame extends GUIController {
 
                 sharedResourceContainerGame.getChildren().add(new Text("Shared Resource"));
                 // add event
-                ImageView firstSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + firstSharedResourceCardId + ".jpg", 75);
+                ImageView firstSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedResourceCards()[0] + ".jpg", 75);
                 firstSharedResourceCardImageView.getStyleClass().add("clickable");
                 sharedResourceContainerGame.getChildren().add(firstSharedResourceCardImageView);
                 // add event
-                ImageView secondSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + secondSharedResourceCardId + ".jpg", 75);
+                ImageView secondSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedResourceCards()[1] + ".jpg", 75);
                 secondSharedResourceCardImageView.getStyleClass().add("clickable");
                 sharedResourceContainerGame.getChildren().add(secondSharedResourceCardImageView);
 
@@ -187,10 +202,19 @@ public class GUIControllerGame extends GUIController {
         });
     }
 
-    public void highlightCurrentPlayerTable(int idCurrentPlayer, Color color) {
+    public void highlightCurrentPlayerTable() {
+        int idCurrentPlayer = getViewModel().getCurrentPlayer();
+        Color color = getViewModel().getColorsMap(getViewModel().getCurrentPlayer());
+
         Platform.runLater(() -> {
+                // TODO: un-highlight
+                for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
+                    Node tempNode = mainContainerGame.lookup("#player" + i + "ContainerGame");
+                    tempNode.getStyleClass().remove(getViewModel().getColorsMap(i).toString().toLowerCase() + "Background");
+                }
+
                 // TODO: get current player id
-                Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame");
+                Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame"); // ROTATE HERE
 
                 // TODO: get current player color
                 Color currentPlayerColor = color;
@@ -203,14 +227,16 @@ public class GUIControllerGame extends GUIController {
         Platform.runLater(() -> {
             for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
                 Pane plateauImageViewPane = (Pane) mainContainerGame.lookup("#plateauImageViewPane");
-                Circle oldCircle = (Circle) plateauImageViewPane.lookup("circlePoints" + i);
+                Circle oldCircle = (Circle) plateauImageViewPane.lookup("#circlePoints" + i);
                 plateauImageViewPane.getChildren().remove(oldCircle);
-                //int x = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(0);
-                //int y = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(1);
-                int x = plateauCoordinatedMap.get(0).get(0); // comment for real use
-                int y = plateauCoordinatedMap.get(0).get(1); // comment for real use
-                System.out.println(x);
-                System.out.println(y);
+                int x, y;
+                try {
+                    x = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(0);
+                    y = plateauCoordinatedMap.get(getViewModel().getPointsMap(i)).get(1);
+                } catch(NullPointerException e) {
+                    x = plateauCoordinatedMap.get(0).get(0); // comment for real use
+                    y = plateauCoordinatedMap.get(0).get(1); // comment for real use
+                }
                 Circle circle = new Circle(x, y, 10);
                 circle.setId("circlePoints" + i);
                 plateauImageViewPane.getChildren().add(circle);
@@ -242,7 +268,7 @@ public class GUIControllerGame extends GUIController {
                 infoContainerVBox.getChildren().addAll(nicknameText, expandButton);
                 infoContainerVBox.setAlignment(Pos.CENTER);
 
-                Pane playerContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+                Pane playerContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "ContainerGame"); // ROTATE HERE
                 playerContainer.getChildren().add(infoContainerVBox);
 
                 updatePlayerHand(playerId, meId, playerHandCards);
@@ -257,7 +283,7 @@ public class GUIControllerGame extends GUIController {
             public void run() {
                 Pane handContainer = null;
 
-                handContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
+                handContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "HandContainerGame"); // ROTATE HERE
                 if (handContainer != null) { handContainer.getChildren().clear(); }
 
                 // TODO: get my player id
@@ -310,7 +336,7 @@ public class GUIControllerGame extends GUIController {
                 if (tempImageView == null) return;
                 //tempImageView.getStyleClass().add("imageWithBorder");
 
-                Pane playerContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
+                Pane playerContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "HandContainerGame"); // ROTATE HERE
                 playerContainer.getChildren().add(tempImageView);
                 Separator verticalSeparator = new Separator();
                 verticalSeparator.setOrientation(Orientation.VERTICAL);
@@ -325,38 +351,44 @@ public class GUIControllerGame extends GUIController {
         addCommand(command,this);
     }
 
+    public void rotatePlayerContainer() {
+        Platform.runLater(() -> {
+            /*
+            int meId = getViewModel().getPlayerIndex();
+            int offset[] = {0,0,0,0};
+
+            switch(meId) {
+                case(0) -> { offset[0] = 1; offset[1] = 0; offset[2] = 3; offset[3] = 2; }
+                case(1) -> { offset[0] = 0; offset[1] = 0; offset[2] = 0; offset[3] = 0; }
+                case(2) -> { offset[0] = 3; offset[1] = 2; offset[2] = 0; offset[3] = 1; }
+                case(3) -> { offset[0] = 2; offset[1] = 3; offset[2] = 1; offset[3] = 0; }
+            }
+
+            for (int i = 0; i < 4; i++) {
+                Node container = mainContainerGame.lookup("#player" + i + "ContainerGame");
+                container.setId("player" + offset[i] + "ContainerGameTemp");
+                Node containerHand = mainContainerGame.lookup("#player" + i + "HandContainerGame");
+                containerHand.setId("player" + offset[i] + "HandContainerGameTemp");
+            }
+
+            for (int i = 0; i < 4; i++) {
+                Node container = mainContainerGame.lookup("#player" + i + "ContainerGameTemp");
+                container.setId("player" + i + "ContainerGame");
+                Node containerHand = mainContainerGame.lookup("#player" + i + "HandContainerGameTemp");
+                containerHand.setId("player" + offset[i] + "HandContainerGame");
+            }*/
+
+            // prova con setTop, setBottom ...
+        });
+    }
+
     @Override
     public void update() {
         populatePlateauCoordinateMap(); // only for TEST
         Platform.runLater(() -> {
             clearAllchilds();
-
-            // delete everything  or find a way to differentially change the content of the view
-            ArrayList<HashMap<Integer, Side>> playerHandCards = new ArrayList<>();
-            HashMap<Integer, String> nicknames = new HashMap<>();
-            for (Integer playerId = 0; playerId < getViewModel().getPlayersSize(); playerId++) {
-                HashMap<Integer, Side> playerHandCardsMap = new HashMap<>();
-                for (Integer cardId : getViewModel().getHand(playerId)) {
-                    playerHandCardsMap.put(cardId, getViewModel().getHandCardsSide(cardId));
-                }
-                playerHandCards.add(playerHandCardsMap);
-                nicknames.put(playerId, getViewModel().getNickname(playerId));
-            }
-
-            initTable(playerHandCards,
-                    nicknames,
-                    getViewModel().getPlayerIndex(),
-                    getViewModel().getSharedCards()[0],
-                    getViewModel().getSharedCards()[1],
-                    getViewModel().getSharedGoldCards()[0],
-                    getViewModel().getSharedResourceCards()[0],
-                    getViewModel().getSharedGoldCards()[1],
-                    getViewModel().getSharedResourceCards()[1],
-                    getViewModel().getObjectives()[0],
-                    getViewModel().getObjectives()[1],
-                    getViewModel().getObjectives()[2]);
-
-            highlightCurrentPlayerTable(getViewModel().getCurrentPlayer(), getViewModel().getColorsMap(getViewModel().getCurrentPlayer()));
+            initTable();
+            highlightCurrentPlayerTable();
             updatePoints();
             setCurrentPhase();
         });

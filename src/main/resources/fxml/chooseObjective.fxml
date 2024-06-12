@@ -25,6 +25,7 @@
         <Label>Secondo opziono:</Label>
         <StackPane styleClass="objectiveCardImageContainer" fx:id="secondObjectiveImageContainer">
         </StackPane>
+        <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
         <Label
                 fx:id="serverMessageLabel"
                 styleClass="serverMessage"/>

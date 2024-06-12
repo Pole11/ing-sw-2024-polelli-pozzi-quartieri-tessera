@@ -37,6 +37,7 @@
                 <Label
                         fx:id="serverErrorLabel"
                         styleClass="serverError"/>
+                <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
                 <Label
                         fx:id="currentPhase"/>
             </VBox>

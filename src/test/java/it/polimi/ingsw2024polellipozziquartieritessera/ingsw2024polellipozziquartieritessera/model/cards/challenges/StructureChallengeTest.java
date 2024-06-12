@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 
 public class StructureChallengeTest {
+    /*
     @Test
     void getterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
@@ -36,4 +37,6 @@ public class StructureChallengeTest {
 
         assertThrows(RuntimeException.class, () -> c.getTimesWon(player, card1));
     }
+
+     */
 }

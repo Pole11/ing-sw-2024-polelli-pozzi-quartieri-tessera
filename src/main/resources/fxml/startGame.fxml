@@ -21,6 +21,7 @@
                   styleClass="playersConnectedListView"></ListView>
         <Button text="Start Game"
                 onAction="#handleStartGame"/>
+        <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
         <Label
                 fx:id="serverMessageLabel"
                 styleClass="serverMessage"/>

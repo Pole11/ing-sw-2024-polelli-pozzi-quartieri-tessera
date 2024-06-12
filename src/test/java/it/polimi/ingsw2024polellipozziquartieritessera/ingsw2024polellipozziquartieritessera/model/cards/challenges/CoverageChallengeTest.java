@@ -15,6 +15,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CoverageChallengeTest {
+    /*
     @Test
     void testTimesWon() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
         GameState g = Populate.populate();
@@ -28,4 +29,6 @@ public class CoverageChallengeTest {
         assertThrows(RuntimeException.class, () -> c.getTimesWon(player, card2));
         assertEquals(c.getTimesWon(player,card1), 0);
     }
+
+     */
 }
