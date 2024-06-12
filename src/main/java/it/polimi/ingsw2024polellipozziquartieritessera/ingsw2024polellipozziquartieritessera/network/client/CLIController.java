@@ -22,7 +22,7 @@ public class CLIController {
     private Thread executeCommands;
     private boolean executeCommandRunning;
 
-    CLIController(ViewModel viewModel){
+    public CLIController(ViewModel viewModel){
         this.commandQueue = new ArrayDeque();
         this.viewModel = viewModel;
 
