@@ -20,6 +20,9 @@
         <TextField fx:id="nicknameTextField" />
         <Separator/>
         <Button onAction="#handleAddUser" text="Register" />
+        <Text>Remember that you can mute the music by pressing the m key</Text>
+        <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
+        <Separator/>
         <Label
                 fx:id="serverMessageLabel"
                 styleClass="serverMessage"/>

@@ -13,6 +13,7 @@
     <Button onAction="#handleRestoreView" text="Board position to default" />
     <Separator></Separator>
     <Text>You can pan the view of the board by holding CTRL</Text>
+    <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
     <Label
             fx:id="serverMessageLabel"
             styleClass="serverMessage"/>

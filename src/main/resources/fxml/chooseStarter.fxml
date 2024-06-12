@@ -22,6 +22,7 @@
         <Label>Back:</Label>
         <StackPane styleClass="starterCardImageContainer" fx:id="starterCardImageContainerBack">
         </StackPane>
+        <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
         <Label fx:id="serverMessageLabel" styleClass="serverMessage" />
         <Label fx:id="serverErrorLabel" styleClass="serverError" />
     </VBox>

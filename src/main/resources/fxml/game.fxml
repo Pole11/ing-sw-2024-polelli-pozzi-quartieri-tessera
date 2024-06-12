@@ -39,6 +39,7 @@
                         styleClass="serverError"/>
                 <Label
                         fx:id="currentPhase"/>
+                <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
             </VBox>
             <VBox alignment="CENTER" fx:id="sharedGoldContainerGame" styleClass="cardDeckContainer"></VBox>
             <VBox alignment="CENTER" fx:id="sharedResourceContainerGame" styleClass="cardDeckContainer"></VBox>

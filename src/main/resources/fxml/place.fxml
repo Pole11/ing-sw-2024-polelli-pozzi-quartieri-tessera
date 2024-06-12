@@ -15,6 +15,7 @@
     <Text>Please first click on a corner from your hand and then a corner on the board</Text>
     <Text>You can pan the view of the board by holding CTRL</Text>
     <Text>Right click to flip card</Text>
+    <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
     <Label
             fx:id="serverMessageLabel"
             styleClass="serverMessage"/>

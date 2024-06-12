@@ -9,10 +9,14 @@ import javafx.application.*;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
+import javafx.scene.input.KeyCode;
 import javafx.stage.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class GUIApplication extends Application {
     private static GUIController guiController;
@@ -21,6 +25,11 @@ public class GUIApplication extends Application {
     private static VirtualView client;
     private static VirtualServer server;
     private static Client clientContainer;
+    private static MediaPlayer mediaPlayer;
+
+    public static MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
 
     public GUIController getGUIController() {
         return guiController;
@@ -50,6 +59,7 @@ public class GUIApplication extends Application {
              guiController.setClient(client);
              guiController.setServer(server);
              guiController.setViewModel(viewModel);
+             guiController.setMediaPlayer(mediaPlayer);
          });
     }
 
@@ -67,25 +77,38 @@ public class GUIApplication extends Application {
             guiController.setServer(server);
             guiController.setClientContainer(clientContainer);
             guiController.setViewModel(viewModel);
+            guiController.setMediaPlayer(mediaPlayer);
         });
     }
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml")); // uncomment for real use
-        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/game.fxml")); // uncomment for testing
+        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml")); // uncomment for real use
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/place.fxml")); // uncomment for testing
         Parent root = fxmlLoader.load();
+
+        String audioFilePath = "/sounds/soundtrack.mp3";
+        Media sound = new Media(Objects.requireNonNull(getClass().getResource(audioFilePath)).toExternalForm());
+        mediaPlayer = new MediaPlayer(sound);
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        mediaPlayer.play();
 
         guiController = fxmlLoader.getController();
         guiController.setClient(client);
         guiController.setServer(server);
         guiController.setClientContainer(clientContainer);
         guiController.setViewModel(viewModel);
+        guiController.setMediaPlayer(mediaPlayer);
+
         mainStage = stage;
 
         Scene scene = new Scene(root, 920, 920);
         stage.setTitle("Codex Naturalis");
         stage.setScene(scene);
+
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode().equals(KeyCode.M)) mediaPlayer.setMute(!mediaPlayer.isMute());
+        });
 
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override

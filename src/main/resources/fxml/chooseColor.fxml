@@ -48,6 +48,7 @@
                     GridPane.columnIndex="1" GridPane.rowIndex="1"
                     onAction="#handleChooseRedColor"/>
         </GridPane>
+        <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
 
         <Label
                 fx:id="serverMessageLabel"

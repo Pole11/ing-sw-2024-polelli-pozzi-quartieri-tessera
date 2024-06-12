@@ -29,8 +29,9 @@ public class GUIControllerGame extends GUIController {
     private final int plateauHeight = 350;
 
     public GUIControllerGame() {
-        update();
+        //rotatePlayerContainer();
         populatePlateauCoordinateMap();
+        update();
     }
 
     private void populatePlateauCoordinateMap() {
@@ -213,7 +214,7 @@ public class GUIControllerGame extends GUIController {
                 }
 
                 // TODO: get current player id
-                Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame");
+                Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame"); // ROTATE HERE
 
                 // TODO: get current player color
                 Color currentPlayerColor = color;
@@ -267,7 +268,7 @@ public class GUIControllerGame extends GUIController {
                 infoContainerVBox.getChildren().addAll(nicknameText, expandButton);
                 infoContainerVBox.setAlignment(Pos.CENTER);
 
-                Pane playerContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "ContainerGame");
+                Pane playerContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "ContainerGame"); // ROTATE HERE
                 playerContainer.getChildren().add(infoContainerVBox);
 
                 updatePlayerHand(playerId, meId, playerHandCards);
@@ -282,7 +283,7 @@ public class GUIControllerGame extends GUIController {
             public void run() {
                 Pane handContainer = null;
 
-                handContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
+                handContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "HandContainerGame"); // ROTATE HERE
                 if (handContainer != null) { handContainer.getChildren().clear(); }
 
                 // TODO: get my player id
@@ -335,7 +336,7 @@ public class GUIControllerGame extends GUIController {
                 if (tempImageView == null) return;
                 //tempImageView.getStyleClass().add("imageWithBorder");
 
-                Pane playerContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "HandContainerGame");
+                Pane playerContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "HandContainerGame"); // ROTATE HERE
                 playerContainer.getChildren().add(tempImageView);
                 Separator verticalSeparator = new Separator();
                 verticalSeparator.setOrientation(Orientation.VERTICAL);
@@ -348,6 +349,37 @@ public class GUIControllerGame extends GUIController {
         DrawCardCommandRunnable command = new DrawCardCommandRunnable();
         command.setDrawType(drawType);
         addCommand(command,this);
+    }
+
+    public void rotatePlayerContainer() {
+        Platform.runLater(() -> {
+            /*
+            int meId = getViewModel().getPlayerIndex();
+            int offset[] = {0,0,0,0};
+
+            switch(meId) {
+                case(0) -> { offset[0] = 1; offset[1] = 0; offset[2] = 3; offset[3] = 2; }
+                case(1) -> { offset[0] = 0; offset[1] = 0; offset[2] = 0; offset[3] = 0; }
+                case(2) -> { offset[0] = 3; offset[1] = 2; offset[2] = 0; offset[3] = 1; }
+                case(3) -> { offset[0] = 2; offset[1] = 3; offset[2] = 1; offset[3] = 0; }
+            }
+
+            for (int i = 0; i < 4; i++) {
+                Node container = mainContainerGame.lookup("#player" + i + "ContainerGame");
+                container.setId("player" + offset[i] + "ContainerGameTemp");
+                Node containerHand = mainContainerGame.lookup("#player" + i + "HandContainerGame");
+                containerHand.setId("player" + offset[i] + "HandContainerGameTemp");
+            }
+
+            for (int i = 0; i < 4; i++) {
+                Node container = mainContainerGame.lookup("#player" + i + "ContainerGameTemp");
+                container.setId("player" + i + "ContainerGame");
+                Node containerHand = mainContainerGame.lookup("#player" + i + "HandContainerGameTemp");
+                containerHand.setId("player" + offset[i] + "HandContainerGame");
+            }*/
+
+            // prova con setTop, setBottom ...
+        });
     }
 
     @Override
