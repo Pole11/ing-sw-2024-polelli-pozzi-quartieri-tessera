@@ -1,23 +1,38 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.DrawType;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.DrawCardCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.FlipCardCommandRunnable;
-import javafx.application.*;
-import javafx.fxml.*;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.image.*;
-import javafx.scene.layout.*;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.*;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
-import java.lang.reflect.Array;
-import java.util.*;
-
-import static javafx.scene.layout.TilePane.setAlignment;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class GUIControllerGame extends GUIController {
     @FXML private BorderPane mainContainerGame;
@@ -27,6 +42,7 @@ public class GUIControllerGame extends GUIController {
     @FXML private Label currentPhase;
     private HashMap<Integer, ArrayList<Integer>> plateauCoordinatedMap;
     private final int plateauHeight = 350;
+
 
     public GUIControllerGame() {
         //rotatePlayerContainer();
@@ -380,6 +396,31 @@ public class GUIControllerGame extends GUIController {
 
             // prova con setTop, setBottom ...
         });
+    }
+
+    @FXML
+    private void handleOpenGameRules(ActionEvent event) {
+        // Create a new stage for the image viewer
+        Stage imageStage = new Stage();
+        imageStage.initModality(Modality.APPLICATION_MODAL);
+        imageStage.initStyle(StageStyle.DECORATED);
+        imageStage.setTitle("Game Rules");
+
+        // Create an ImageView to display the image
+        javafx.scene.image.Image image = new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResource("/img/rulebook.png")).toExternalForm());
+        javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView(image);
+        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(582);  // Adjust the width as needed
+
+        // Create a ScrollPane to make the ImageView scrollable
+        javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(imageView);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        // Create a Scene for the new Stage
+        Scene scene = new Scene(scrollPane, 600, 400);
+        imageStage.setScene(scene);
+        imageStage.show();
     }
 
     @Override

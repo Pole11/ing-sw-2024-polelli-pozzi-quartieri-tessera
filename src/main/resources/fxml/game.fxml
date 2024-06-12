@@ -38,6 +38,7 @@
                         fx:id="serverErrorLabel"
                         styleClass="serverError"/>
                 <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
+                <Button onAction="#handleOpenGameRules" text="Game Rules" />
                 <Label
                         fx:id="currentPhase"/>
             </VBox>
