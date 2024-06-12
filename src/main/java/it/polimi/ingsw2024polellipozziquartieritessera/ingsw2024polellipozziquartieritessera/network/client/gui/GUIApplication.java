@@ -9,10 +9,12 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -107,6 +109,16 @@ public class GUIApplication extends Application {
         Scene scene = new Scene(root, 920, 920);
         stage.setTitle("Codex Naturalis");
         stage.setScene(scene);
+        stage.setResizable(true); // Ensure the stage is resizable
+
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        // Calculate the desired window size based on screen resolution
+        double width = screenBounds.getWidth() * 0.89;  // 80% of screen width
+        double height = screenBounds.getHeight() * 0.89;  // 80% of screen height
+        // Apply scaling to the root layout
+        double scaleFactor = Math.min(width / 920, height / 920); // assuming 800x600 is the original size
+        root.setScaleX(scaleFactor);
+        root.setScaleY(scaleFactor);
 
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
