@@ -73,7 +73,7 @@ public class GUIControllerGame extends GUIController {
             if (sharedResourceContainerGame != null) sharedResourceContainerGame.getChildren().clear();
             if (sharedGoldContainerGame != null) sharedGoldContainerGame.getChildren().clear();
             if (plateauContainerGame != null) {
-                while (plateauContainerGame.getChildren().size() > 3) {
+                while (plateauContainerGame.getChildren().size() > 4) {
                     plateauContainerGame.getChildren().removeLast(); // the first two are the messages from server
                 }
             }
