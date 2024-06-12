@@ -1,7 +1,5 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.Card;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -23,6 +21,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -58,6 +57,10 @@ abstract public class GUIController {
         System.out.println("[DEBUG] Scene is loaded with " + this.getClass());
         Platform.runLater(() -> {
             handleMuteButton.setText(getMediaPlayer().isMute() ? "Unmute" : "Mute");
+
+            handleMuteButton.getScene().setOnKeyPressed(event -> {
+                if (event.getCode().equals(KeyCode.M)) muteMusic();
+            });
         });
     }
 
@@ -77,6 +80,12 @@ abstract public class GUIController {
 
     @FXML
     public void handleMuteMusic(ActionEvent event) {
+        Platform.runLater(() -> {
+            muteMusic();
+        });
+    }
+
+    public void muteMusic() {
         getMediaPlayer().setMute(!getMediaPlayer().isMute());
         handleMuteButton.setText(getMediaPlayer().isMute() ? "Unmute" : "Mute");
     }

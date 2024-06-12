@@ -5,16 +5,18 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIController;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
-import javafx.application.*;
+import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.*;
-import javafx.scene.input.KeyCode;
-import javafx.stage.*;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -105,10 +107,6 @@ public class GUIApplication extends Application {
         Scene scene = new Scene(root, 920, 920);
         stage.setTitle("Codex Naturalis");
         stage.setScene(scene);
-
-        scene.setOnKeyPressed(event -> {
-            if (event.getCode().equals(KeyCode.M)) mediaPlayer.setMute(!mediaPlayer.isMute());
-        });
 
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
