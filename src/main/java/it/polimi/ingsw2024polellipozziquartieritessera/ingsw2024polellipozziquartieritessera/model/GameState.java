@@ -45,7 +45,6 @@ public class GameState {
 
     private int turnToPlay;
 
-
     // CONSTRUCTOR
     public GameState(Server server) {
         this.server = server;
@@ -73,7 +72,7 @@ public class GameState {
 
         this.pingRunning = true;
         this.pingThread = new Thread(this::pingThreadRunnable);
-        pingThread.start();
+        //pingThread.start();
 
         this.answered = new HashMap<>();
         resetAnswered();
@@ -88,6 +87,8 @@ public class GameState {
     }
 
     // GETTER
+
+
     public Board getMainBoard() {
         return mainBoard;
     }
@@ -333,8 +334,10 @@ public class GameState {
                 break;
             }
         }
+        this.currentGameTurn.changePhase(this);
+
         synchronized (eventQueue) {
-            eventQueue.add(new UpdateCurrentPlayer(this, allConnectedClients(), currentPlayerIndex));
+            eventQueue.add(new UpdateCurrentPlayerEvent(this, allConnectedClients(), currentPlayerIndex));
             eventQueue.notifyAll();
         }
         //TODO: capire se va bene decrementare di 1 in ogni caso
@@ -342,7 +345,6 @@ public class GameState {
             turnToPlay--;
         }
         playerDisconnected();
-
     }
 
     public void updatePlayersConnected() {
@@ -388,9 +390,9 @@ public class GameState {
 
     public void addPlayer(String nickname, VirtualView client) {
         Player player = new Player(nickname, client, this);
-        //if someone choose his nickname, is inside the match, even if he is temporanely disconnected
-        //TODO: si potrebbe fare in modo che si possa iniziare una partita solo se tutti i giocaatori sono connessi, ma bisognerebbe anche kickare
+        //if someone choose his nickname, he is inside the match, even if he is temporanely disconnected
 
+        //TOOD: isConnected can be removed
         if (allClients().contains(client) && players.get(getPlayerIndex(client)).isConnected()) {
             synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "You already chose a nickname, you cannot change it"));
@@ -399,7 +401,7 @@ public class GameState {
             return;
         }
 
-
+        //checks for reconnections or same nickname exception
         for (int j = 0; j < players.size(); j++) {
             if (player.getNickname().equals(players.get(j).getNickname())) {
                 //takes for granted that player connection is updated
@@ -408,11 +410,7 @@ public class GameState {
                     players.get(j).setClient(client);
                     this.manageReconnection(players.get(j));
                     synchronized (eventQueue) {
-                        //only to the client
                         eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(client), this.currentGamePhase));
-                        //to all the other clients says that a client reconnected
-                        //DOVREBBE ESSERE FATTO IN PLAYER ma non so se funzioni
-                        //eventQueue.add(new ConnectionInfoEvent(this, otherClients(player.getClient()), player, true));
                         eventQueue.notifyAll();
                     }
                 } else {
@@ -436,19 +434,28 @@ public class GameState {
         }
 
 
-        players.add(player);
-        playerThreads.add(new Thread());
-        synchronized (eventQueue) {
-            eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
-            eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
-            //to all the other clients gives the nickname so that they can execute their model
-            eventQueue.add(new NicknameEvent(this, otherClients(player.getClient()), getPlayerIndex(player), player.getNickname()));
-            for (Player playerIterator : players) {
-                eventQueue.add(new NicknameEvent(this, singleClient(player.getClient()), getPlayerIndex(playerIterator), playerIterator.getNickname()));
+        if (currentGamePhase.equals(GamePhase.NICKNAMEPHASE)){
+            players.add(player);
+            playerThreads.add(new Thread());
+            synchronized (eventQueue) {
+                eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
+                eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
+                //to all the other clients gives the nickname so that they can execute their model
+                eventQueue.add(new NicknameEvent(this, otherClients(player.getClient()), getPlayerIndex(player), player.getNickname()));
+                for (Player playerIterator : players) {
+                    eventQueue.add(new NicknameEvent(this, singleClient(player.getClient()), getPlayerIndex(playerIterator), playerIterator.getNickname()));
+                }
+                eventQueue.notifyAll();
             }
-            eventQueue.notifyAll();
+            System.out.println(nickname + " connected");
+        } else {
+            //TODO: probabilmente il controllo in singleClient della connesione lancia un eccezione
+            synchronized (eventQueue) {
+                eventQueue.add(new ErrorEvent(this, singleClient(client), "the game is already started"));
+                eventQueue.notifyAll();
+            }
         }
-        System.out.println(nickname + " connected");
+
     }
 
 
@@ -511,7 +518,7 @@ public class GameState {
         Set<Integer> randomKeysSet = new HashSet<>(); // a set has no duplicates
         // Generate four different random numbers
         while (randomKeysSet.size() < players.size()) {
-            int randomNumber = Config.firstStarterCardId + ThreadLocalRandom.current().nextInt(Config.STARTERQTY); // Adjust range as needed
+            int randomNumber = Global.firstStarterCardId + ThreadLocalRandom.current().nextInt(Config.STARTERQTY); // Adjust range as needed
             randomKeysSet.add(randomNumber);
         }
 
@@ -524,6 +531,7 @@ public class GameState {
     }
 
     public void setStarterSide(int playerIndex, Side side) {
+        //TODO: try catch id player not registerred
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
             synchronized (eventQueue) {
@@ -617,7 +625,7 @@ public class GameState {
         Set<Integer> randomKeysSet = new HashSet<>(); // a set has no duplicates
         // Generate four different random numbers
         while (randomKeysSet.size() < 2 * players.size() + 2) { // 2 for each player and 2 shared
-            int randomNumber = Config.firstObjectiveCardId + ThreadLocalRandom.current().nextInt(Config.OBJECTIVEQTY); // Adjust range as needed
+            int randomNumber = Global.firstObjectiveCardId + ThreadLocalRandom.current().nextInt(Config.OBJECTIVEQTY); // Adjust range as needed
             randomKeysSet.add(randomNumber);
         }
 
@@ -677,7 +685,7 @@ public class GameState {
             resetAnswered();
             this.currentGamePhase.changePhase(this);
             synchronized (eventQueue) {
-                eventQueue.add(new UpdateCurrentPlayer(this, allConnectedClients(), currentPlayerIndex));
+                eventQueue.add(new UpdateCurrentPlayerEvent(this, allConnectedClients(), currentPlayerIndex));
                 eventQueue.notifyAll();
             }
         }
@@ -734,12 +742,6 @@ public class GameState {
             }
         }
         updateElements(player, placingCard, placingCardSide);
-        //NON MI PIACE MESSA QUI PERCHE NON E' L'ULTIMA AZIONE DEL CONTROLLER, CERCARE DI CAPIRE COME MODIFIFCARE
-        //ANDRA MESSO NELLO STATE PATTERN
-        synchronized (eventQueue) {
-            eventQueue.add(new UpdateTurnPhaseEvent(this, allConnectedClients(), TurnPhase.DRAWPHASE));
-            eventQueue.notifyAll();
-        }
     }
 
     private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {

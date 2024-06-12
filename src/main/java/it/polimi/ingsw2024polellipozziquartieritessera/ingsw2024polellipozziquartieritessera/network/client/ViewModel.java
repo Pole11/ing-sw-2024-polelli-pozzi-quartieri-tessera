@@ -2,6 +2,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import com.google.gson.Gson;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Global;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Chat;
@@ -358,6 +359,8 @@ public class ViewModel {
             }
         }
     }
+
+    //TODO: guardare se servono le modifiche di Global
     private void populateCardsMap() {
         String filePath = new File("").getAbsolutePath();
         String jsonString = null;
@@ -377,7 +380,7 @@ public class ViewModel {
             Challenge challenge = createChallenge(card);
 
             if (card.get("Type").equals("Objective")){
-                if (id < Config.firstObjectiveCardId) Config.firstObjectiveCardId = id;
+                if (id < Global.firstObjectiveCardId) Global.firstObjectiveCardId = id;
                 cardsMap.put(id, new ObjectiveCard(id, challenge, (int) Double.parseDouble(card.get("Points").toString())));
             } else {
 
@@ -388,11 +391,11 @@ public class ViewModel {
 
                 // ------ creating cards ------
                 if (card.get("Type").equals("Resource")){
-                    if (id < Config.firstResourceCardId) Config.firstResourceCardId = id;
+                    if (id < Global.firstResourceCardId) Global.firstResourceCardId = id;
                     ResourceCard resourceCard = new ResourceCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), (int) Double.parseDouble(card.get("Points").toString()), frontCorners, backCorners);
                     cardsMap.put(id, resourceCard);
                 } else if (card.get("Type").equals("Gold")){
-                    if (id < Config.firstGoldCardId) Config.firstGoldCardId = id;
+                    if (id < Global.firstGoldCardId) Global.firstGoldCardId = id;
                     ArrayList<Element> elements = new ArrayList<>();
                     for (Object e : (ArrayList) card.get("ResourceNeeded")){
                         elements.add(Element.valueOf(e.toString().toUpperCase()));
@@ -400,7 +403,7 @@ public class ViewModel {
                     GoldCard goldCard = new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements, (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners);
                     cardsMap.put(id, goldCard);
                 } else if (card.get("Type").equals("Starter")){
-                    if (id < Config.firstStarterCardId) Config.firstStarterCardId = id;
+                    if (id < Global.firstStarterCardId) Global.firstStarterCardId = id;
                     ArrayList<Element> elements = new ArrayList<>();
                     for (Object e : (ArrayList) card.get("CenterResources")){
                         elements.add(Element.valueOf(e.toString().toUpperCase()));

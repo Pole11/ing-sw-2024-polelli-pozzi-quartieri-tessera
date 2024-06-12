@@ -24,5 +24,6 @@ public enum GamePhase {
             gameState.getEventQueue().notifyAll();
         }
         gameState.setCurrentGamePhase(nextPhase);
+        System.out.println("the gamePhase has changed: " + nextPhase);
     }
 }

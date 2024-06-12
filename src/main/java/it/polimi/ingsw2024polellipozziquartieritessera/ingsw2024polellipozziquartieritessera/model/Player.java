@@ -228,7 +228,7 @@ public class Player {
     public void changeHandSide(Integer index, Side side){
         this.handCardsMap.replace(index, side);
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateHandSide(gameState, gameState.singleClient(this.getClient()), index, side));
+            gameState.addToEventQueue(new UpdateHandSideEvent(gameState, gameState.singleClient(this.getClient()), index, side));
             gameState.getEventQueue().notifyAll();
         }
     }

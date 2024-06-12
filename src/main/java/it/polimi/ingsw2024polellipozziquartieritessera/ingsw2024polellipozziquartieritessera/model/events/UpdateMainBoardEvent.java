@@ -23,7 +23,7 @@ public class UpdateMainBoardEvent extends Event{
         int sharedResourceCard2 = mainBoard.getSharedResourceCard(1).getId();
         int firtGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
         int firstResourceDeckCard = mainBoard.getFirstResourceDeckCard().getId();
-
+        System.out.println(firstResourceDeckCard + "," + firtGoldDeckCard);
         for (VirtualView client : clients) {
             try {
                 client.updateMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);

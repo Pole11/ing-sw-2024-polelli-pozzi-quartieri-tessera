@@ -88,6 +88,7 @@ public class CLIController {
                 }
             }
         } catch (IllegalArgumentException e) {
+
             System.err.print("INVALID COMMAND\n> ");
         }
     }
@@ -111,8 +112,8 @@ public class CLIController {
             if(i.incrementAndGet() % 5 == 0)
                 System.out.print("]\n[");
         });
-        System.out.print("]\n> ");
-        System.out.println("To see in more detail: <COMMAND> -h");
+        System.out.print("]\n");
+        System.out.println("To see in more detail: <COMMAND> -h\n> ");
     }
 
 /*    public void printCard(int CardId, Side side){

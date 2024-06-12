@@ -102,13 +102,13 @@ public class Server implements VirtualServer {
 
     @Override
     public void connectRmi(VirtualView client) throws RemoteException {
-        System.out.println("New RMI client connected");
+        System.out.println("New RMI " +
+                "" +
+                "client connected");
     }
 
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException {
-        //TODO: controlla fase
-        System.out.println("New player tried connecting!");
         this.controller.addPlayer(client, nickname);
     }
 

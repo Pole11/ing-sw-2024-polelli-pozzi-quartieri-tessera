@@ -175,7 +175,8 @@ public class Controller {
             }
 
             player.addPoints(placingCard.calculatePoints(player));
-            gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE);
+
+            gameState.getCurrentGameTurn().changePhase(gameState);
         }
     }
 
@@ -197,7 +198,6 @@ public class Controller {
 
     public void drawCard(DrawType drawType) throws InvalidHandException, EmptyDeckException {
         synchronized (this.gameState) {
-            this.gameState.setCurrentGameTurn(TurnPhase.DRAWPHASE);
             Board board = this.gameState.getMainBoard();
             Player currentPlayer = this.gameState.getCurrentPlayer();
 
@@ -222,20 +222,22 @@ public class Controller {
                     break;
                 case DrawType.DECKRESOURCE:
                     newResourceCard = board.drawFromResourceDeck();
-                    currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);                    break;
+                    currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
+                    break;
                 case DrawType.SHAREDRESOURCE1:
                     newResourceCard = board.drawSharedResourceCard(1);
-                    currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);                    break;
+                    currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
+                    break;
                 case DrawType.SHAREDRESOURCE2:
                     newResourceCard = board.drawSharedResourceCard(2);
                     currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
                     break;
                 default:
             }
-            this.gameState.changeCurrentPlayer();
-            gameState.checkGameEnded();
-            gameState.updateMainBoard();
         }
+        this.gameState.changeCurrentPlayer();
+        gameState.checkGameEnded();
+        gameState.updateMainBoard();
     }
 
     public void flipCard(int playerIndex, int cardId) throws CardIsNotInHandException {
