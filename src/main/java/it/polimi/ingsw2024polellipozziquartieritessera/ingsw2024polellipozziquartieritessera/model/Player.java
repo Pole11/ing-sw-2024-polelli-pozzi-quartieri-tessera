@@ -102,6 +102,9 @@ public class Player {
         return this.connected;
     }
 
+    public HashMap<Integer, Side> getHandCardsMap() {
+        return new HashMap<>(handCardsMap);
+    }
     //--------size------------
 
     public int getHandSize(){
@@ -144,6 +147,9 @@ public class Player {
             gameState.addToEventQueue(new UpdateSecretObjectiveEvent(gameState, gameState.singleClient(this.getClient()), new ArrayList<>(List.of(objectiveCard))));
             gameState.getEventQueue().notifyAll();
         }
+        // set options to null in order to manage reconnections
+        objectiveCardOptions[0] = null;
+        objectiveCardOptions[1] = null;
     }
 
     public void setStarterCard(StarterCard starterCard) {
@@ -248,8 +254,10 @@ public class Player {
         updateBoard(placingCardId, tableCardId, tableCornerPos);
         this.centerResource.put(placingCardId, placingCard.getResourceType());
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateBoardEvent(gameState, gameState.allConnectedClients(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide));
+            Event event = new UpdateBoardEvent(gameState, gameState.allConnectedClients(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide);
+            gameState.addToEventQueue(event);
             gameState.getEventQueue().notifyAll();
+            gameState.addPlacedEvent(event);
         }
     }
 
