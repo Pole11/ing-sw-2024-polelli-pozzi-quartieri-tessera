@@ -60,10 +60,7 @@ public class GUIApplication extends Application {
                  throw new RuntimeException(e);
              }
              guiController = fxmlLoader.getController();
-             guiController.setClient(client);
-             guiController.setServer(server);
-             guiController.setViewModel(viewModel);
-             guiController.setMediaPlayer(mediaPlayer);
+             initGameController(guiController);
          });
     }
 
@@ -76,12 +73,8 @@ public class GUIApplication extends Application {
                 throw new RuntimeException(e);
             }
             guiController = fxmlLoader.getController();
+            initGameController(guiController);
             guiController.setParamsMap(paramsMap);
-            guiController.setClient(client);
-            guiController.setServer(server);
-            guiController.setClientContainer(clientContainer);
-            guiController.setViewModel(viewModel);
-            guiController.setMediaPlayer(mediaPlayer);
         });
     }
 
@@ -97,28 +90,16 @@ public class GUIApplication extends Application {
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         mediaPlayer.play();
 
-        guiController = fxmlLoader.getController();
-        guiController.setClient(client);
-        guiController.setServer(server);
-        guiController.setClientContainer(clientContainer);
-        guiController.setViewModel(viewModel);
-        guiController.setMediaPlayer(mediaPlayer);
-
         mainStage = stage;
 
-        Scene scene = new Scene(root, 920, 920);
+        double screenWidth = getScreenWidth();
+        double screenHeight = getScreenHeight();
+        int size = screenWidth > screenHeight ? (int) (screenHeight * 0.85) : (int) (screenWidth * 0.85);
+
+        Scene scene = new Scene(root, size*1.2, size);
         stage.setTitle("Codex Naturalis");
         stage.setScene(scene);
         stage.setResizable(true); // Ensure the stage is resizable
-
-        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        // Calculate the desired window size based on screen resolution
-        double width = screenBounds.getWidth() * 0.89;  // 80% of screen width
-        double height = screenBounds.getHeight() * 0.89;  // 80% of screen height
-        // Apply scaling to the root layout
-        double scaleFactor = Math.min(width / 920, height / 920); // assuming 800x600 is the original size
-        root.setScaleX(scaleFactor);
-        root.setScaleY(scaleFactor);
 
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -127,8 +108,37 @@ public class GUIApplication extends Application {
                 System.exit(0);
             }
         });
-
         stage.show();
+
+        guiController = fxmlLoader.getController();
+        initGameController(guiController);
+
+        System.out.println((int) mainStage.getHeight());
+    }
+
+    public static double getScreenWidth() {
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getBounds();
+
+        double screenWidth = bounds.getWidth();
+        return screenWidth;
+    }
+
+    public static double getScreenHeight() {
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getBounds();
+
+        double screenHeight = bounds.getHeight();
+        return screenHeight;
+    }
+
+    private static void initGameController(GUIController guiController) {
+        guiController.setClient(client);
+        guiController.setServer(server);
+        guiController.setClientContainer(clientContainer);
+        guiController.setViewModel(viewModel);
+        guiController.setMediaPlayer(mediaPlayer);
+        guiController.setWindowHeight((int) mainStage.getHeight());
     }
 
     public void runGui(VirtualView client, VirtualServer server, Client clientContainer, ViewModel viewModel) {

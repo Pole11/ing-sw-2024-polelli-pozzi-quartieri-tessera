@@ -3,7 +3,9 @@
     -fx-border-width: 10px;
     -fx-border-style: solid;
     -fx-border-color: rgb(180, 160, 30);
+    /*
     -fx-font-size: 16px;
+    */
     -fx-font-family: 'Comic Neue';
     image-bg-url: none;
 }

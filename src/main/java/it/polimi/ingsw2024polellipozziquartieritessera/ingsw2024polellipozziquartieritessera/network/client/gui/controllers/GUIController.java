@@ -14,13 +14,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.WritableImage;
+import javafx.scene.image.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -50,6 +49,7 @@ abstract public class GUIController {
     private double pressedX;
     private double pressedY;
     private MediaPlayer mediaPlayer;
+    private int windowHeight = 920;
 
     @FXML
     private void initialize() {
@@ -68,6 +68,14 @@ abstract public class GUIController {
         this.commandQueue = new ArrayDeque();
         this.executeCommands = new Thread(this::executeCommandsRunnable);
         this.executeCommands.start();
+    }
+
+    public int getWindowHeight() {
+        return windowHeight;
+    }
+
+    public void setWindowHeight(int windowHeight) {
+        this.windowHeight = windowHeight;
     }
 
     public MediaPlayer getMediaPlayer() {
@@ -117,6 +125,12 @@ abstract public class GUIController {
             commandQueue.addLast(command);
             commandQueue.notifyAll();
         }
+    }
+
+    public void setFontSize(Node root) {
+        Platform.runLater(() -> {
+            root.setStyle("-fx-font-size: " + getWindowHeight()*0.017 + "px");
+        });
     }
 
     public ArrayDeque<CommandRunnable> getCommandQueue() {
@@ -247,9 +261,9 @@ abstract public class GUIController {
         WritableImage imageWritable = new WritableImage(reader, 103, 101, 823, 547);
 
         ImageView imageView = new ImageView(imageWritable);
+        imageView.setFitHeight(height);
         imageView.getStyleClass().add("imageWithBorder");
 
-        imageView.setFitHeight(height);
         imageView.setPreserveRatio(true);
 
         return imageView;
@@ -348,6 +362,21 @@ abstract public class GUIController {
         }
     }
 
+    public static WritableImage resizeWritableImage(WritableImage originalImage, double newWidth, double newHeight) {
+        // Create a Canvas to draw the resized image
+        Canvas canvas = new Canvas(newWidth, newHeight);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Draw the original image onto the canvas, scaling it to fit the new dimensions
+        gc.drawImage(originalImage, 0, 0, newWidth, newHeight);
+
+        // Create a new WritableImage and transfer the canvas content to it
+        WritableImage resizedImage = new WritableImage((int) newWidth, (int) newHeight);
+        PixelWriter pw = resizedImage.getPixelWriter();
+        canvas.snapshot(null, resizedImage);
+
+        return resizedImage;
+    }
 
     public void addPanning(Node node) {
         node.setOnMousePressed(new EventHandler<MouseEvent>() {

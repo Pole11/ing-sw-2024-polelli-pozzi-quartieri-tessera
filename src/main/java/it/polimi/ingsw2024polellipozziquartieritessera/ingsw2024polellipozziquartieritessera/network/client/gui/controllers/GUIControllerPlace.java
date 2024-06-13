@@ -23,6 +23,7 @@ public class GUIControllerPlace extends GUIController {
     int cornerId, cardId;
 
     public GUIControllerPlace() {
+        setFontSize(mainContainerBoard);
         this.update();
     }
 
