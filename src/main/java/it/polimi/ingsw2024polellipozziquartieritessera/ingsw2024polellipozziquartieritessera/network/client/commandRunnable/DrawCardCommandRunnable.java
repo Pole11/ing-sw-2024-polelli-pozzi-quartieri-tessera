@@ -27,7 +27,6 @@ public class DrawCardCommandRunnable extends CommandRunnable{
                 serverDisconnectedCLI();
             }
         } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-            System.out.println("ono proprioi io");
             System.err.print("INVALID COMMAND\n> ");
         }
     }

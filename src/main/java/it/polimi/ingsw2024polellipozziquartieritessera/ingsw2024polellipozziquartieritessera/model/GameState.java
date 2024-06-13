@@ -915,6 +915,7 @@ public class GameState {
             }
         }
         updateElements(player, placingCard, placingCardSide);
+        System.out.println(player.getNickname() + "placed a card");
     }
 
     private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {
@@ -1098,14 +1099,13 @@ public class GameState {
 
     private void saveStateThreadRunnable(){
         while (saveStateRunning){
-            System.out.println("he");
             try {
                 Thread.sleep(1000*Config.WAIT_FOR_SAVE_TIME);
             } catch (InterruptedException e) {
                 break;
             }
             Populate.saveState(this);
-            Populate.restoreState(this);
+            //Populate.restoreState(this);
         }
     }
 

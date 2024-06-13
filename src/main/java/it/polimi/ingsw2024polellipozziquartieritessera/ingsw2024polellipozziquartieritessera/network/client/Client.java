@@ -234,7 +234,7 @@ public class Client implements VirtualView {
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
         viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
         if (viewModel.getPlayerIndex() == playerIndex) {
-            System.out.print("you placed a card, now you have to draw your card with DRAW [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");
+            System.out.print("you placed a card, now you have to draw your card with DRAWCARD [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");
         } else {
             System.out.print(viewModel.getNickname(playerIndex) + " placed a card\n> ");
         }
@@ -288,7 +288,7 @@ public class Client implements VirtualView {
         if (objectiveCardId2 == -1){
             System.out.print("you have chosen the objective card: " + objectiveCardId1 + "\n> ");
         } else{
-            System.out.print("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1], \n to see your card use the command SHOWSECRETOBJECTIVE\n");
+            System.out.print("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1],\n to see your card use the command SHOWSECRETOBJECTIVES\n");
 
         }
         if (meDoGui) guiApplication.updateController();

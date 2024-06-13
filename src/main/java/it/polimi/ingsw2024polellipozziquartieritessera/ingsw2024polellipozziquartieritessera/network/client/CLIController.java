@@ -113,7 +113,7 @@ public class CLIController {
                 System.out.print("]\n[");
         });
         System.out.print("]\n");
-        System.out.println("To see in more detail: <COMMAND> -h\n> ");
+        System.out.print("To see in more detail: <COMMAND> -h\n> ");
     }
 
 /*    public void printCard(int CardId, Side side){
@@ -313,8 +313,11 @@ public class CLIController {
             System.out.print("there are no players registered\n> ");
         } else {
             System.out.println("this are the players nicknames ");
+            System.out.println("You are the player with index: " + viewModel.getPlayerIndex() + ", your nickname is " + viewModel.getNickname(viewModel.getPlayerIndex()));
             for(int i = 0; i < n_players; i++){
-                System.out.println("index: " + i + " nickname: " + viewModel.getNickname(i));
+                if (i != viewModel.getPlayerIndex()){
+                    System.out.println("index: " + i + " nickname: " + viewModel.getNickname(i));
+                }
             }
             System.out.print("> ");
         }
