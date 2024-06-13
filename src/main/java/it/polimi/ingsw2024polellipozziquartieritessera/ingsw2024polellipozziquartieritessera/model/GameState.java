@@ -31,11 +31,11 @@ public class GameState {
     /**
      * Chat of the game, that contains all messages
      */
-    private final Chat chat;
+    private Chat chat;
     /**
      * List of all the playing players, player[0] is black Player and the first to start
      */
-    private final ArrayList<Player> players;
+    private ArrayList<Player> players;
     /**
      * Index of the current playing player
      */
@@ -55,16 +55,16 @@ public class GameState {
     /**
      * Thread that reads and manages the queque
      */
-    private Thread executeEvents;
+    private final Thread executeEvents;
     private boolean executeEventRunning;
     /**
      * Map that set if a player has answered to the request or not (useful for starting phases of the game)
      */
-    private final HashMap<Integer, Boolean> answered;
+    private HashMap<Integer, Boolean> answered;
     /**
      * Thread that manages pings
      */
-    private Thread pingThread;
+    private final Thread pingThread;
     private boolean pingRunning;
     /**
      * Thread list that manages all the players, one for each player
@@ -117,22 +117,44 @@ public class GameState {
 
         this.pingRunning = true;
         this.pingThread = new Thread(this::pingThreadRunnable);
-        //pingThread.start();
+        pingThread.start();
 
         this.answered = new HashMap<>();
         resetAnswered();
 
         this.saveStateRunning = true;
         this.saveStateThread = new Thread(this::saveStateThreadRunnable);
-        //saveStateThread.start();
+        saveStateThread.start();
 
-        //cambia in intMax
-        this.turnToPlay = 1;
+        this.turnToPlay = Integer.MAX_VALUE;
 
+    }
+
+    //helper of constructor used also for FA persistance (restart all the threads)
+    public void restoreData(Chat chat, int currentPlayerIndex, ArrayList<Player> players, GamePhase currentGamePhase, TurnPhase currentGameTurn,HashMap<Integer, Boolean> answered, int turnToPlay, GamePhase prevGamePhase){
+        this.chat = chat;
+        this.currentPlayerIndex = currentPlayerIndex;
+        this.players = players;
+        this.currentGamePhase = currentGamePhase;
+        this.currentGameTurn = currentGameTurn;
+        this.answered = answered;
+        this.turnToPlay = turnToPlay;
+        this.prevGamePhase = prevGamePhase;
     }
 
     // GETTER
 
+    public HashMap<Integer, Boolean> getAnswered(){
+        return new HashMap<>(answered);
+    }
+
+    public int getTurnToPlay(){
+        return turnToPlay;
+    }
+
+    public GamePhase getPrevGamePhase(){
+        return prevGamePhase;
+    }
 
     public Board getMainBoard() {
         return mainBoard;

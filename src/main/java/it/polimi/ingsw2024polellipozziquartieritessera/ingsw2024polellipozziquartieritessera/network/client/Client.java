@@ -347,7 +347,6 @@ public class Client implements VirtualView {
 
     @Override
     public void updateMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
-        System.out.println(sharedGoldCard1 + " " + sharedGoldCard2 + " " + sharedResourceCard1 + " " +sharedResourceCard2 + " " +firtGoldDeckCard + " " +firstResourceDeckCard);
         viewModel.setMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
         if (meDoGui) guiApplication.updateController();
     }

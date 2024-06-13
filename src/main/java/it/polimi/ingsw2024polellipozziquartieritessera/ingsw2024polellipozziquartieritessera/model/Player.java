@@ -55,7 +55,7 @@ public class Player {
     /**
      * Map of the centerResources of the player cards, relates a card ID with the center Resource
      */
-    private final HashMap<Integer, Element> centerResource;
+    private final HashMap<Integer, Element> centerResources;
     /**
      * Map of all elements the player currently have, each Element is associated with the number of his occurrences
      */
@@ -93,7 +93,7 @@ public class Player {
         this.placedCardsMap = new HashMap<Integer, Side>();
         this.handCardsMap = new HashMap<Integer, Side>();
         this.objectivesWon = 0;
-        this.centerResource = new HashMap<>();
+        this.centerResources = new HashMap<>();
 
         this.allElements = new HashMap<>();
         for (Element element : Element.values()) {
@@ -104,6 +104,7 @@ public class Player {
     }
 
     //GETTER
+
 
     public String getNickname() {
         return this.nickname;
@@ -142,7 +143,7 @@ public class Player {
     }
 
     public Element getCenterResource(int index) {
-        return centerResource.get(index);
+        return centerResources.get(index);
     }
 
     public VirtualView getClient(){
@@ -168,6 +169,28 @@ public class Player {
 
     public ArrayList<ArrayList<Integer>> getPlayerBoard() {
         return new ArrayList<>(this.playerBoard);
+    }
+
+
+    public HashMap<Integer, Side> getPlacedCardsMap() {
+        return new HashMap<>(placedCardsMap);
+    }
+
+    public HashMap<Integer, Side> getHandCardsMap() {
+        return new HashMap<>(handCardsMap);
+    }
+
+    public ObjectiveCard[] getObjectiveCardOptions() {
+        if (objectiveCardOptions == null) {
+            return null;
+        }
+        ObjectiveCard[] copy = new ObjectiveCard[objectiveCardOptions.length];
+        System.arraycopy(objectiveCardOptions, 0, copy, 0, objectiveCardOptions.length);
+        return copy;
+    }
+
+    public HashMap<Integer, Element> getCenterResources() {
+        return new HashMap<>(centerResources);
     }
 
     //--------------contains-------------
@@ -312,7 +335,7 @@ public class Player {
         addToPlacedCardsMap(placingCardId, placingCardSide);
         removeFromHandCardsMap(placingCardId);
         updateBoard(placingCardId, tableCardId, tableCornerPos);
-        this.centerResource.put(placingCardId, placingCard.getResourceType());
+        this.centerResources.put(placingCardId, placingCard.getResourceType());
         synchronized (gameState.getEventQueue()){
             gameState.addToEventQueue(new UpdateBoardEvent(gameState, gameState.allConnectedClients(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide));
             gameState.getEventQueue().notifyAll();

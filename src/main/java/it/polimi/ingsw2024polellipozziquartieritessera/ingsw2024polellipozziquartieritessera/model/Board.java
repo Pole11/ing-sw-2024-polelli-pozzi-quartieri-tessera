@@ -45,6 +45,35 @@ public class Board {
 
     //GETTER
 
+    //----plain----
+
+    public GoldCard[] getSharedGoldCards() {
+        GoldCard[] copy = new GoldCard[sharedGoldCards.length];
+        System.arraycopy(sharedGoldCards, 0, copy, 0, sharedGoldCards.length);
+        return copy;
+    }
+
+    public ResourceCard[] getSharedResourceCards() {
+        ResourceCard[] copy = new ResourceCard[sharedResourceCards.length];
+        System.arraycopy(sharedResourceCards, 0, copy, 0, sharedResourceCards.length);
+        return copy;
+    }
+
+    public ObjectiveCard[] getSharedObjectiveCards() {
+        ObjectiveCard[] copy = new ObjectiveCard[sharedObjectiveCards.length];
+        System.arraycopy(sharedObjectiveCards, 0, copy, 0, sharedObjectiveCards.length);
+        return copy;
+    }
+
+    public ArrayList<GoldCard> getGoldDeck() {
+        return new ArrayList<>(goldDeck);
+    }
+
+    public ArrayList<ResourceCard> getResourceDeck() {
+        return new ArrayList<>(resourceDeck);
+    }
+
+
     //-----card------
 
     public GoldCard getSharedGoldCard(int index) {

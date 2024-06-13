@@ -22,4 +22,6 @@ module it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
     opens it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers to javafx.fxml;
     exports it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
+    exports it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums;
+
 }

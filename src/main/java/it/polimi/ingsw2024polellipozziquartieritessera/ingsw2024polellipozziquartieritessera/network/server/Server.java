@@ -8,9 +8,11 @@ import java.rmi.server.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
+import com.google.gson.Gson;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.Controller;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
@@ -36,10 +38,44 @@ public class Server implements VirtualServer {
         int socketport = Integer.parseInt(argv[1]);
         int rmiport = Integer.parseInt(argv[2]);
 
+        HashMap<String, Integer[]> hashInnerArray = new HashMap<>();
+        Integer[] a = new Integer[2];
+        a[0] = 2;
+        a[1] = 4;
+        hashInnerArray.put("array", a);
+
+        HashMap<String, ArrayList<Integer>> hashInnerArrayList = new HashMap<>();
+        ArrayList<Integer> l = new ArrayList<>();
+        l.add(13);
+        l.add(42);
+        hashInnerArrayList.put("arrayList", l);
+
+        HashMap<String, Object> hash1 = new HashMap<>();
+        hash1.put("mid1", hashInnerArray);
+        hash1.put("mid2", hashInnerArrayList);
+        hash1.put("color", true);
+
+        HashMap<String, Object> hashMapHashMap = new HashMap<>();
+        hashMapHashMap.put("outer",  hash1);
+
+
+
+        Gson gson = new Gson();
+        String filePath = new File("").getAbsolutePath();
+        try (Writer writer = new FileWriter(filePath + Config.GAME_STATE_PATH)) {
+            gson.toJson(hashMapHashMap, writer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+
+
         startServer(host, socketport, rmiport);
     }
 
-    public static void startServer(String host, int socketport, int rmiport) throws IOException, WrongStructureConfigurationSizeException{
+    public static void startServer(String host, int socketport, int rmiport) throws IOException{
         // listen to socket
         ServerSocket listenSocket = new ServerSocket(socketport);
 
@@ -53,12 +89,12 @@ public class Server implements VirtualServer {
 
         //setup gamestate
         GameState gameState = new GameState(server);
+        Populate.populate(gameState);
+
         //FA persistance
         boolean store = Populate.existStore();
-        if (store){
+        if (store) {
             Populate.restoreState(gameState);
-        } else {
-            Populate.populate(gameState);
         }
 
         server.controller.setGameState(gameState);
@@ -75,7 +111,7 @@ public class Server implements VirtualServer {
         GameState gameState = new GameState(this);
         try {
             Populate.populate(gameState);
-        } catch (WrongStructureConfigurationSizeException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         controller.setGameState(gameState);

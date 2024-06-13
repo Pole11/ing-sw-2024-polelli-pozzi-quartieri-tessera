@@ -430,11 +430,7 @@ public class ViewModel {
                         configuration[i][j] = Element.valueOf( ( (ArrayList) card.get("Structure") ).get(3*i+j).toString().toUpperCase() );
                     }
                 }
-                try {
-                    challenge = new StructureChallenge(configuration);
-                } catch (WrongStructureConfigurationSizeException e){
-                    System.err.println("error while initializing a structureChallenge");
-                }
+                challenge = new StructureChallenge(configuration);
             } else if (card.get("ChallengeType").equals("CoverageChallenge")){
                 challenge = new CoverageChallenge();
             } else if (card.get("ChallengeType").equals("NoChallenge")){
