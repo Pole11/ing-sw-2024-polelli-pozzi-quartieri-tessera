@@ -91,6 +91,7 @@ public class GameState {
      * Number of turns left to play
      */
     private int turnToPlay;
+    private ArrayList<Event> placedEventList;
 
 
     /**
@@ -131,8 +132,9 @@ public class GameState {
         this.saveStateThread = new Thread(this::saveStateThreadRunnable);
         //saveStateThread.start();
 
-        this.turnToPlay = Integer.MAX_VALUE;
 
+        this.turnToPlay = Integer.MAX_VALUE;
+        this.placedEventList = new ArrayList<>();
     }
 
     public void startThreads(){
@@ -400,12 +402,82 @@ public class GameState {
         }
     }
 
+    public void addPlacedEvent(Event event){
+        placedEventList.add(event);
+    }
+    
+    
     /**
      * View restoration for reconnection
      * @param client Client to be reconnected
      */
     public void restoreView(VirtualView client) {
         //send everything to client
+        ArrayList<VirtualView> clients = singleClient(client);
+        Player reconnectingPlayer = getPlayer(getPlayerIndex(client));
+        //send player index
+        if(reconnectingPlayer.getNickname() != null) {
+            eventQueue.add(new SendIndexEvent(this, clients, getPlayerIndex(client)));
+        }
+        //for every player, send nickname, isConnected, color, points, hands
+        for(int i = 0; i < players.size(); i++){
+            Player currentPlayer = players.get(i);
+            eventQueue.add(new NicknameEvent(this, clients, i, currentPlayer.getNickname()));
+            eventQueue.add(new ConnectionInfoEvent(this, clients, currentPlayer, currentPlayer.isConnected()));
+            if(currentPlayer.getColor() != null) {
+                eventQueue.add((new UpdateColorEvent(this, clients, currentPlayer, currentPlayer.getColor())));
+            }
+            eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
+            //send hands
+            if(currentGamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
+                Set<Integer> handCardsSet = currentPlayer.getHandCardsMap().keySet();
+                for(Integer k : handCardsSet){
+                    eventQueue.add(new UpdateAddHandEvent(this, clients, currentPlayer, k));
+                }
+            }
+        }
+        // send Starter card
+        if(reconnectingPlayer.getStarterCard() != null) {
+            eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), reconnectingPlayer.getStarterCard().getId(), reconnectingPlayer.getPlacedCardSide(reconnectingPlayer.getStarterCard().getId())));
+        }
+        //send common objectives
+        if(currentGamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
+            ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();
+            sharedObjectives.add(mainBoard.getSharedObjectiveCard(0));
+            sharedObjectives.add(mainBoard.getSharedObjectiveCard(1));
+            eventQueue.add((new UpdateSharedObjectiveEvent(this, clients, sharedObjectives)));
+        }
+        //send correct secret objective
+        ArrayList<ObjectiveCard> secretObjectives = new ArrayList<>();
+        //if the secret objective is already choosen
+        if(reconnectingPlayer.getObjectiveCard() != null){
+            secretObjectives.add(reconnectingPlayer.getObjectiveCard());
+            eventQueue.add(new UpdateSecretObjectiveEvent(this, clients, secretObjectives));
+        } else //if the secret objective options is not already given
+            if(currentGamePhase.ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
+            ;
+        } else { //the player has to choose between two secrets
+                secretObjectives.add(reconnectingPlayer.getObjectiveCardOption(0));
+                secretObjectives.add(reconnectingPlayer.getObjectiveCardOption(1));
+                eventQueue.add(new UpdateSecretObjectiveEvent(this, clients, secretObjectives));
+        }
+        // send gamePhase and turnPhase if exists
+        eventQueue.add(new UpdateGamePhaseEvent(this, clients, currentGamePhase));
+        if(currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()){
+            eventQueue.add(new UpdateTurnPhaseEvent(this, clients, currentGameTurn));
+        }
+        // send current player
+        eventQueue.add(new UpdateCurrentPlayer(this, clients, currentPlayerIndex));
+
+        // for every placingCardEvent, place a card in the boardsMap and in placedOrderCardMap
+        placedEventList.stream().forEach( e ->{
+            eventQueue.add(e);
+        });
+        // send mainBoard
+        eventQueue.add(new UpdateMainBoardEvent(this, clients, mainBoard));
+        //todo send Chat
+
+
     }
 
     /**
@@ -606,7 +678,6 @@ public class GameState {
     public void addPlayer(Player player){
         players.add(player);
     }
-
 
     //STARTING PHASE SETTERS
 
