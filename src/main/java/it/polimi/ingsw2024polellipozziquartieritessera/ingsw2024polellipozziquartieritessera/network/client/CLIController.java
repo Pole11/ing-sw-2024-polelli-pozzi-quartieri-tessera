@@ -197,7 +197,7 @@ public class CLIController {
             }
             u = 2*i;
             v = 2*j;
-            colorIndex = Math.min((int)(Math.floor((double) cardsOrder.get(k)/20) +1), 5);
+            colorIndex = ColorPrint.getColorIndex(cardsOrder.get(k));
             openString = ColorPrint.BLACK.toString() + ColorPrint.byIndex(colorIndex).toString();
             closeString = ColorPrint.RESET.toString();
             for(int n = 0; n < 3; n++){
@@ -607,9 +607,9 @@ public class CLIController {
         if (side == Side.BACK){
             output.add(ColorPrint.GOLD + "+-----------------+" + ColorPrint.RESET);
             output.add(ColorPrint.GOLD + "|" + backCornerStrings[0] + getFormattedString(11, "") +backCornerStrings[1] + "|" + ColorPrint.RESET);
-            output.add(ColorPrint.GOLD + "|" + getFormattedString(17, "") + "|");
+            output.add(ColorPrint.GOLD + "|" + getFormattedString(17, "") + "|" + ColorPrint.RESET);
             output.add(ColorPrint.GOLD + "|" + getFormattedString(17, "<"+resource.toString().substring(0,3).toUpperCase()+">") + "|" + ColorPrint.RESET);
-            output.add(ColorPrint.GOLD + "|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) + "|");
+            output.add(ColorPrint.GOLD + "|" + getFormattedString(17, resource.toString().substring(0,3).toUpperCase()) + "|" + ColorPrint.RESET);
             output.add(ColorPrint.GOLD + "|" + backCornerStrings[3] + getFormattedString(11, "id: "+card.getId()) + backCornerStrings[2] + "|" + ColorPrint.RESET);
             output.add(ColorPrint.GOLD + "+-----------------+" + ColorPrint.RESET);
         } else{
