@@ -23,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
@@ -46,7 +47,7 @@ public class GUIControllerGame extends GUIController {
     private HashMap<Integer, ArrayList<Integer>> plateauCoordinatedMap;
 
     public GUIControllerGame() {
-        //rotatePlayerContainer();
+        rotatePlayerContainer();
         populatePlateauCoordinateMap();
         setFontSize(mainContainerGame);
         update();
@@ -280,7 +281,7 @@ public class GUIControllerGame extends GUIController {
                 VBox infoContainerVBox = new VBox();
                 infoContainerVBox.setId("infoContainerPlayer" + playerId);
                 String currentPlayerNickname = nicknames.get(playerId);
-                Text nicknameText = new Text(currentPlayerNickname);
+                Text nicknameText = new Text(currentPlayerNickname + " (" + getViewModel().getColorsMap(playerId) + " " + getViewModel().getPointsMap(playerId) + ")");
                 Button expandButton = new Button("Expand Board");
                 expandButton.setOnMousePressed(mouseEvent -> {
                     HashMap<String, Integer> paramsMap = new HashMap<>();
@@ -324,11 +325,10 @@ public class GUIControllerGame extends GUIController {
                     if(playerId == meId) tempImageView.setOnMousePressed(mouseEvent -> { flipCard(cardId); });
                 }
 
-
                 if (playerId == meId) {
-                    Separator verticalSeparator1 = new Separator();
-                    verticalSeparator1.setOrientation(Orientation.VERTICAL);
-                    if (handContainer != null) handContainer.getChildren().add(verticalSeparator1);
+                    Separator sep1 = new Separator();
+                    sep1.setOrientation(Orientation.VERTICAL);
+                    if (handContainer != null) handContainer.getChildren().add(sep1);
 
                     Button btnPlaceCard = new Button("Place Card");
                     btnPlaceCard.setOnAction((mouseEvent) -> {
@@ -337,9 +337,9 @@ public class GUIControllerGame extends GUIController {
                     if (handContainer != null) handContainer.getChildren().add(btnPlaceCard);
                 }
 
-                Separator verticalSeparator2 = new Separator();
-                verticalSeparator2.setOrientation(Orientation.VERTICAL);
-                if (handContainer != null) handContainer.getChildren().add(verticalSeparator2);
+                Separator sep2 = new Separator();
+                sep2.setOrientation(Orientation.VERTICAL);
+                if (handContainer != null) handContainer.getChildren().add(sep2);
             }
         });
     }
@@ -375,32 +375,62 @@ public class GUIControllerGame extends GUIController {
 
     public void rotatePlayerContainer() {
         Platform.runLater(() -> {
-            /*
+            HBox topContainer = new HBox();
+            topContainer.setAlignment(Pos.TOP_CENTER);
+            topContainer.getStyleClass().add("horizontalPlayerContainer");
+            HBox topContainerHand = new HBox();
+            topContainerHand.setAlignment(Pos.CENTER);
+            topContainer.getChildren().add(topContainerHand);
+
+            HBox bottomContainer = new HBox();
+            bottomContainer.setAlignment(Pos.TOP_CENTER);
+            bottomContainer.getStyleClass().add("horizontalPlayerContainer");
+            HBox bottomContainerHand = new HBox();
+            bottomContainerHand.setAlignment(Pos.CENTER);
+            bottomContainer.getChildren().add(bottomContainerHand);
+
+            VBox leftContainer = new VBox();
+            leftContainer.setAlignment(Pos.CENTER_LEFT);
+            leftContainer.getStyleClass().add("verticalPlayerContainer");
+            VBox leftContainerHand = new VBox();
+            leftContainerHand.setAlignment(Pos.CENTER);
+            leftContainer.getChildren().add(leftContainerHand);
+
+            VBox rightContainer = new VBox();
+            rightContainer.setAlignment(Pos.CENTER_RIGHT);
+            rightContainer.getStyleClass().add("verticalPlayerContainer");
+            VBox rightContainerHand = new VBox();
+            rightContainerHand.setAlignment(Pos.CENTER);
+            rightContainer.getChildren().add(rightContainerHand);
+
+            mainContainerGame.setTop(topContainer);
+            mainContainerGame.setBottom(bottomContainer);
+            mainContainerGame.setLeft(leftContainer);
+            mainContainerGame.setRight(rightContainer);
+
             int meId = getViewModel().getPlayerIndex();
-            int offset[] = {0,0,0,0};
-
             switch(meId) {
-                case(0) -> { offset[0] = 1; offset[1] = 0; offset[2] = 3; offset[3] = 2; }
-                case(1) -> { offset[0] = 0; offset[1] = 0; offset[2] = 0; offset[3] = 0; }
-                case(2) -> { offset[0] = 3; offset[1] = 2; offset[2] = 0; offset[3] = 1; }
-                case(3) -> { offset[0] = 2; offset[1] = 3; offset[2] = 1; offset[3] = 0; }
+                case(0) -> { bottomContainer.setId("player0ContainerGame"); bottomContainerHand.setId("player0HandContainerGame");
+                    topContainer.setId("player1ContainerGame"); topContainerHand.setId("player1HandContainerGame");
+                    leftContainer.setId("player3ContainerGame"); leftContainerHand.setId("player3HandContainerGame");
+                    rightContainer.setId("player2ContainerGame"); rightContainerHand.setId("player2HandContainerGame");
+                }
+                case(1) -> { bottomContainer.setId("player1ContainerGame"); bottomContainerHand.setId("player1HandContainerGame");
+                    topContainer.setId("player0ContainerGame"); topContainerHand.setId("player0HandContainerGame");
+                    leftContainer.setId("player2ContainerGame"); leftContainerHand.setId("player2HandContainerGame");
+                    rightContainer.setId("player3ContainerGame"); rightContainerHand.setId("player3HandContainerGame");
+                }
+                case(2) -> { bottomContainer.setId("player2ContainerGame"); bottomContainerHand.setId("player2HandContainerGame");
+                    topContainer.setId("player3ContainerGame"); topContainerHand.setId("player3HandContainerGame");
+                    leftContainer.setId("player0ContainerGame"); leftContainerHand.setId("player0HandContainerGame");
+                    rightContainer.setId("player1ContainerGame"); rightContainerHand.setId("player1HandContainerGame");
+                }
+                case(3) -> { bottomContainer.setId("player3ContainerGame"); bottomContainerHand.setId("player3HandContainerGame");
+                    topContainer.setId("player2ContainerGame"); topContainerHand.setId("player2HandContainerGame");
+                    leftContainer.setId("player1ContainerGame"); leftContainerHand.setId("player1HandContainerGame");
+                    rightContainer.setId("player0ContainerGame"); rightContainerHand.setId("player0HandContainerGame");
+                }
             }
-
-            for (int i = 0; i < 4; i++) {
-                Node container = mainContainerGame.lookup("#player" + i + "ContainerGame");
-                container.setId("player" + offset[i] + "ContainerGameTemp");
-                Node containerHand = mainContainerGame.lookup("#player" + i + "HandContainerGame");
-                containerHand.setId("player" + offset[i] + "HandContainerGameTemp");
-            }
-
-            for (int i = 0; i < 4; i++) {
-                Node container = mainContainerGame.lookup("#player" + i + "ContainerGameTemp");
-                container.setId("player" + i + "ContainerGame");
-                Node containerHand = mainContainerGame.lookup("#player" + i + "HandContainerGameTemp");
-                containerHand.setId("player" + offset[i] + "HandContainerGame");
-            }*/
-
-            // prova con setTop, setBottom ...
         });
     }
 

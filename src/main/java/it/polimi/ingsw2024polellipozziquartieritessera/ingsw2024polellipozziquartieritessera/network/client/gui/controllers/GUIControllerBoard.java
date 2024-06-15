@@ -45,6 +45,8 @@ public class GUIControllerBoard extends GUIController {
                 playerBoard = rotateBoard(playerBoard);
                 resizeI(playerBoard);
 
+                mainContainerBoard.getChildren().remove(mainContainerBoard.lookup("#boardGridPane"));
+
                 GridPane gridPane = new GridPane();
                 //gridPane.setGridLinesVisible(true);
                 gridPane.setId("boardGridPane");
