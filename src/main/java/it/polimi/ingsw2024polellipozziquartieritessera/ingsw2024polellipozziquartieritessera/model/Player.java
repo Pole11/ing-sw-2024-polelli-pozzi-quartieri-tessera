@@ -376,7 +376,7 @@ public class Player {
      * @param tableCardId ID of the card on the player board
      * @param tableCornerPos Corner position of the board card to which the new card is linked
      */
-    public void updateBoard(int placingCardId, int tableCardId, CornerPos tableCornerPos){
+    public void updateBoard(int placingCardId, int tableCardId, CornerPos tableCornerPos) {
         int rowIndex = -1;
         int colIndex = -1;
 
@@ -399,7 +399,7 @@ public class Player {
         }
 
         // Define the position of the new card
-        switch(tableCornerPos) {
+        switch (tableCornerPos) {
             case CornerPos.UPLEFT:
                 rowIndex--;
                 break;
@@ -418,14 +418,40 @@ public class Player {
         if (rowIndex < 0 || rowIndex >= this.playerBoard.size() || colIndex < 0 || colIndex >= this.playerBoard.getFirst().size()) {
             // Expand the matrix if necessary
             expandBoard(rowIndex, colIndex);
-            if (rowIndex < 0){
-                rowIndex ++;
-            } else if (colIndex < 0){
-                colIndex ++;
+            if (rowIndex < 0) {
+                rowIndex++;
+            } else if (colIndex < 0) {
+                colIndex++;
             }
         }
+
+        //******
+        //TODO: remove (only testing)
+        // Check if rowIndex is within bounds
+        if (rowIndex < 0 || rowIndex >= playerBoard.size()) {
+            printPlayerBoard();
+            throw new IllegalArgumentException("Invalid row index: " + rowIndex);
+        }
+
+        // Check if colIndex is within bounds
+        if (colIndex < 0 || colIndex >= playerBoard.get(rowIndex).size()) {
+            printPlayerBoard();
+            throw new IllegalArgumentException("Invalid column index: " + colIndex);
+        }
+        //******
+
+
         // Place the new card at the specified position
         this.playerBoard.get(rowIndex).set(colIndex, placingCardId);
+    }
+
+    public void printPlayerBoard() {
+        for (ArrayList<Integer> row : this.playerBoard) {
+            for (int col : row) {
+                System.out.printf("%4d", col); // Adjust the width as needed
+            }
+            System.out.println();
+        }
     }
 
     /**
