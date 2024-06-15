@@ -1,6 +1,9 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.ToNumberPolicy;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Global;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
@@ -16,16 +19,15 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Populate {
-
-    public static boolean existStore(){
-        //check if exists store
-        return false;
-    }
 
     public static String readJSON(String fileName) throws IOException {
         BufferedReader reader= null;
@@ -48,13 +50,14 @@ public class Populate {
 
     public static void populate(GameState gameState) throws IOException {
         String filePath = new File("").getAbsolutePath();
-        String jsonString = readJSON(filePath + Config.CARD_JSON_PATH);
-        Gson gson = new Gson();
-        Map cards = gson.fromJson(jsonString, Map.class);
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map<String, ?> cards = mapper.readValue(Paths.get(filePath + Config.CARD_JSON_PATH).toFile(), Map.class);;
+
 
         for (Object key : cards.keySet()) {
-            Map card = gson.fromJson(cards.get(key).toString(), Map.class);
-            Integer id = Integer.parseInt(key.toString());
+            Map<String, ?> card = (Map) cards.get(String.valueOf(key));
+            int id = Integer.parseInt(key.toString());
             if (card.get("Type").equals("Objective") || card.get("Type").equals("Starter")){
                 gameState.addCardToCardsMap(id, createCard(true, card, id));
             } else {
@@ -71,7 +74,7 @@ public class Populate {
     }
 
 
-    public static Card createCard(boolean setup, Map card, Integer id) {
+    public static Card createCard(boolean setup, Map<String, ?> card, Integer id) {
         Card returnCard = null;
 
         // ------ creating challenges ------
@@ -103,8 +106,8 @@ public class Populate {
                     if (id < Global.firstGoldCardId) Global.firstGoldCardId = id;
                 }
                 ArrayList<Element> elements = new ArrayList<>();
-                for (Object e : (ArrayList) card.get("ResourceNeeded")){
-                    elements.add(Element.valueOf(e.toString().toUpperCase()));
+                for (String e : (ArrayList<String>) card.get("ResourceNeeded")){
+                    elements.add(Element.valueOf(e.toUpperCase()));
                 }
                 returnCard = new GoldCard(id, Element.valueOf(card.get("ResourceType").toString().toUpperCase()), challenge, elements, (int) Double.parseDouble(card.get("Points").toString()) , frontCorners, backCorners);
             } else if (card.get("Type").equals("Starter")){
@@ -113,8 +116,8 @@ public class Populate {
                     if (id < Global.firstStarterCardId) Global.firstStarterCardId = id;
                 }
                 ArrayList<Element> elements = new ArrayList<>();
-                for (Object e : (ArrayList) card.get("CenterResources")){
-                    elements.add(Element.valueOf(e.toString().toUpperCase()));
+                for (String e : (ArrayList<String>) card.get("CenterResources")){
+                    elements.add(Element.valueOf(e.toUpperCase()));
                 }
                 returnCard = new StarterCard(id, frontCorners, backCorners, elements);
             }
@@ -122,13 +125,13 @@ public class Populate {
         return returnCard;
     }
 
-    private static Challenge createChallenge(Map card) {
+    private static Challenge createChallenge(Map<String, ?> card) {
         Challenge challenge = null;
         if (card.get("Type").equals("Objective") || card.get("Type").equals("Gold")){
             if (card.get("ChallengeType").equals("ElementChallenge")){
                 ArrayList<Element> elements = new ArrayList<>();
-                for (Object e : (ArrayList) card.get("ChallengeElements")){
-                    elements.add(Element.valueOf(e.toString().toUpperCase()));
+                for (String e : (ArrayList<String>) card.get("ChallengeElements")){
+                    elements.add(Element.valueOf(e.toUpperCase()));
                 }
 
                 challenge = new ElementChallenge(elements);
@@ -152,7 +155,7 @@ public class Populate {
         return challenge;
     }
 
-    private static Corner[] createCorners(String side, Map card, Integer id){
+    private static Corner[] createCorners(String side, Map<String, ?> card, Integer id){
         Corner[] corners = new Corner[Config.N_CORNERS];
         //for in frontCorners
         for (int i = 0; i < Config.N_CORNERS; i++){
@@ -173,12 +176,11 @@ public class Populate {
     public static void saveState(GameState gameState) {
         Gson gson = new Gson();
 
-        HashMap<String, Object> map = createSaveMap(gameState);
-
+        //todo: cambia Gson con Jackson
         // write to this file
         String filePath = new File("").getAbsolutePath();
         try (Writer writer = new FileWriter(filePath + Config.GAME_STATE_PATH)) {
-            gson.toJson(map, writer);
+            gson.toJson(createSaveMap(gameState), writer);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -209,13 +211,13 @@ public class Populate {
 
     public static HashMap<String, Object> createMainBoardSave(Board mainBoard){
         HashMap<String, Object> saveMap = new HashMap<>();
-        //to re-parse this use (ArrayList) card.get("sharedGold")
 
         saveMap.put("sharedGoldCards", Arrays.stream(mainBoard.getSharedGoldCards()).filter(e -> e != null).map(GoldCard::getId).toList());
         saveMap.put("sharedResourceCards", Arrays.stream(mainBoard.getSharedResourceCards()).filter(e -> e != null).map(ResourceCard::getId).toList());
         saveMap.put("sharedObjectiveCards", Arrays.stream(mainBoard.getSharedObjectiveCards()).filter(e -> e != null).map(ObjectiveCard::getId).toList());
         saveMap.put("goldDeck", mainBoard.getGoldDeck().stream().filter(e -> e != null).map(GoldCard::getId).toList());
         saveMap.put("resourceDeck", mainBoard.getResourceDeck().stream().filter(e -> e != null).map(ResourceCard::getId).toList());
+
         return saveMap;
     }
 
@@ -243,63 +245,148 @@ public class Populate {
         HashMap <Element, Integer> allElements = player.getAllElements();
         allElements.keySet().stream().map(e -> e.toString());
         saveMap.put("allElements", allElements);
-        saveMap.put("connected", player.isConnected());
         return saveMap;
     }
 
-    public static void restoreState(GameState gameState) {
+    public static void restoreState(GameState gameState) throws IOException {
         String filePath = new File("").getAbsolutePath();
-        Gson gson = new Gson();
+        ObjectMapper mapper = new ObjectMapper();
 
-        String jsonCardsPath = null;
+        Map<String, ?> jsonState = null;
         try {
-            jsonCardsPath = readJSON(filePath + Config.CARD_JSON_PATH);
+            jsonState = mapper.readValue(Paths.get(filePath + Config.GAME_STATE_PATH).toFile(), Map.class);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getClass());
+            System.out.println("there is no state");
+            return;
         }
-        Map cards = gson.fromJson(jsonCardsPath, Map.class);
+
+        final Map<String, ?> cards = mapper.readValue(Paths.get(filePath + Config.CARD_JSON_PATH).toFile(), Map.class);;
 
 
-        String jsonStatePath = null;
-        try {
-            jsonStatePath = readJSON(filePath + Config.GAME_STATE_PATH);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        //if the json is an empty object
+        if (jsonState.isEmpty()){
+            System.out.println("there is no state");
+            return;
         }
-        Map jsonState = gson.fromJson(jsonStatePath, Map.class);
 
         //restore MainBoard
-        Map jsonBoard = (Map) jsonState.get("mainBoard");
-        List sharedGold = (List) jsonBoard.get("sharedGoldCards");
-        List sharedResource = (List) jsonBoard.get("sharedResourceCards");
+        Map<String, ?> jsonBoard = (Map<String, ?>) jsonState.get("mainBoard");
+        List<Integer> sharedGold = (List<Integer>) jsonBoard.get("sharedGoldCards");
+        List<Integer> sharedResource = (List<Integer>) jsonBoard.get("sharedResourceCards");
+        List<Integer> sharedObjectives = (List<Integer>) jsonBoard.get("sharedObjectiveCards");
+
         for (int i = 0; i<sharedGold.size(); i++){
             int goldId = (int) sharedGold.get(i);
-            gameState.getMainBoard().setSharedGoldCard(i, (GoldCard) createCard(false, (Map) cards.get(goldId), goldId));
+            gameState.getMainBoard().setSharedGoldCard(i, (GoldCard) createCard(false, (Map) cards.get(String.valueOf(goldId)), goldId));
         }
         for (int i = 0; i<sharedResource.size(); i++){
             int resourceId = (int) sharedResource.get(i);
-            gameState.getMainBoard().setSharedResourceCard(0,(ResourceCard) createCard(false, (Map) cards.get(resourceId), resourceId));
+            gameState.getMainBoard().setSharedResourceCard(i,(ResourceCard) createCard(false, (Map) cards.get(String.valueOf(resourceId)), resourceId));
+        }
+        for (int i = 0; i<sharedObjectives.size(); i++){
+            int objectiveId = (int) sharedObjectives.get(i);
+            gameState.getMainBoard().setSharedObjectiveCard(i,(ObjectiveCard) createCard(false, (Map) cards.get(String.valueOf(objectiveId)), objectiveId));
         }
 
         ArrayList<Integer> goldDeckInt = (ArrayList<Integer>) jsonBoard.get("goldDeck");
         ArrayList<Integer> resourceDeckInt = (ArrayList<Integer>) jsonBoard.get("resourceDeck");
-
         ArrayList<GoldCard> goldDeck = new ArrayList<>();
         ArrayList<ResourceCard> resourceDeck = new ArrayList<>();
 
-        goldDeckInt.stream().forEach(e -> {
-            goldDeck.add((GoldCard) createCard(false, (Map) cards.get(e), e));
-        });
 
-        resourceDeckInt.stream().forEach(e -> {
-            resourceDeck.add((ResourceCard) createCard(false, (Map) cards.get(e), e));
+        goldDeckInt.forEach(e -> {
+            goldDeck.add((GoldCard) createCard(false, (Map) cards.get(String.valueOf(e)), e));
         });
+        gameState.getMainBoard().setGoldDeck(goldDeck);
+
+        resourceDeckInt.forEach(e -> {
+            resourceDeck.add((ResourceCard) createCard(false, (Map) cards.get(String.valueOf(e)), e));
+        });
+        gameState.getMainBoard().setResourceDeck(resourceDeck);
 
         //NON HO ANCORA ASSEGNATO I DECKS
 
-        System.out.println(gameState.getMainBoard());
+        //restore players
+        ArrayList<?> players = (ArrayList<?>) jsonState.get("players");
+        for (int i = 0; i < players.size(); i++){
+            Map playerJson = (Map) players.get(i);
+            Player player = new Player((String) playerJson.get("nickname"), null, gameState);
 
-        ArrayList<Object> players = (ArrayList<Object>) jsonState.get("players");
+            player.setConnected(false);
+            player.addPoints( (int) playerJson.get("points"));
+            player.setPlayerBoard((ArrayList<ArrayList<Integer>>) playerJson.get("playerBoard"));
+
+            Map<?, ?> placedJson = (Map<?, ?>) playerJson.get("placedCardsMap");
+            HashMap<Integer, Side> placedCardsMap = new HashMap<>();
+            for (Object key : placedJson.keySet()){
+                placedCardsMap.put(Integer.parseInt((String) key), Side.valueOf((String) placedJson.get(key)));
+            }
+            player.setPlacedCardsMap(placedCardsMap);
+
+
+            Map<?, ?> handJson = (Map<?, ?>) playerJson.get("handCardsMap");
+            HashMap<Integer, Side> handCardsMap = new HashMap<>();
+            for (Object key : handJson.keySet()){
+                handCardsMap.put(Integer.parseInt((String) key), Side.valueOf((String) handJson.get(key)));
+            }
+            player.setHandCardsMap(handCardsMap);
+
+            Color color = null;
+            if (playerJson.get("color") != ""){
+                color = Color.valueOf((String) playerJson.get("color"));
+            }
+            player.setColor(color);
+
+            int objectivesWon = (int) playerJson.get("objectivesWon");
+            player.setObjectivesWon(objectivesWon);
+
+            StarterCard starterCard = (StarterCard) createCard(false, (Map) cards.get(String.valueOf(playerJson.get("starterCard"))) , (Integer) playerJson.get("starterCard"));
+            player.setStarterCard(starterCard);
+
+            ObjectiveCard objectiveCard = (ObjectiveCard) createCard(false, (Map) cards.get(String.valueOf(playerJson.get("objectiveCard"))) , (Integer) playerJson.get("objectiveCard"));
+            player.setObjectiveCard(objectiveCard);
+
+
+            if (playerJson.get("objectiveCardOptions") != ""){
+                ObjectiveCard[] ObjectiveCardOptions = new ObjectiveCard[2];
+                ArrayList<Integer> ids = (ArrayList<Integer>) playerJson.get("objectiveCardOptions");
+                ObjectiveCardOptions[0] = (ObjectiveCard) createCard(false, (Map) cards.get(String.valueOf(ids.get(0))), ids.get(0));
+                ObjectiveCardOptions[1] = (ObjectiveCard) createCard(false, (Map) cards.get(String.valueOf(ids.get(1))), ids.get(1));
+                player.setSecretObjectiveCardOptions(ObjectiveCardOptions);
+            }
+
+            Map<?, ?> centerJson = (Map<?, ?>) playerJson.get("centerResource");
+            HashMap<Integer, Element> centerResources = new HashMap<>();
+            for (Object key : centerJson.keySet()){
+                centerResources.put(Integer.parseInt((String) key), Element.valueOf((String) centerJson.get(key)));
+            }
+            player.setCenterResources(centerResources);
+
+
+            Map<?, ?> elementJson = (Map<?, ?>) playerJson.get("allElements");
+            HashMap<Element, Integer> allElements = new HashMap<>();
+            for (Object key : elementJson.keySet()){
+                allElements.put(Element.valueOf((String) key),(int) elementJson.get(key));
+            }
+            player.setAllElements(allElements);
+
+            gameState.addPlayer(player);
+            player.setConnected(true);
+
+        }
+        //System.out.println("j");
+        /*
+
+
+
+        HashMap <Element, Integer> allElements = player.getAllElements();
+        allElements.keySet().stream().map(e -> e.toString());
+        saveMap.put("allElements", allElements);
+        saveMap.put("connected", player.isConnected());
+
+
+ */
         //gameState.addPlayer();
         
         //gameState.restoreData();

@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 
 import com.google.gson.Gson;
@@ -33,44 +34,10 @@ public class Server implements VirtualServer {
         this.registry = registry;
     }
 
-    public static void main(String[] argv) throws IOException, WrongStructureConfigurationSizeException {
+    public static void main(String[] argv) throws IOException {
         String host = argv[0];
         int socketport = Integer.parseInt(argv[1]);
         int rmiport = Integer.parseInt(argv[2]);
-
-        HashMap<String, Integer[]> hashInnerArray = new HashMap<>();
-        Integer[] a = new Integer[2];
-        a[0] = 2;
-        a[1] = 4;
-        hashInnerArray.put("array", a);
-
-        HashMap<String, ArrayList<Integer>> hashInnerArrayList = new HashMap<>();
-        ArrayList<Integer> l = new ArrayList<>();
-        l.add(13);
-        l.add(42);
-        hashInnerArrayList.put("arrayList", l);
-
-        HashMap<String, Object> hash1 = new HashMap<>();
-        hash1.put("mid1", hashInnerArray);
-        hash1.put("mid2", hashInnerArrayList);
-        hash1.put("color", true);
-
-        HashMap<String, Object> hashMapHashMap = new HashMap<>();
-        hashMapHashMap.put("outer",  hash1);
-
-
-
-        Gson gson = new Gson();
-        String filePath = new File("").getAbsolutePath();
-        try (Writer writer = new FileWriter(filePath + Config.GAME_STATE_PATH)) {
-            gson.toJson(hashMapHashMap, writer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-
-
-
 
         startServer(host, socketport, rmiport);
     }
@@ -86,16 +53,12 @@ public class Server implements VirtualServer {
 
         Server server = new Server(listenSocket, new Controller(), registry);
 
-
         //setup gamestate
         GameState gameState = new GameState(server);
         Populate.populate(gameState);
 
         //FA persistance
-        boolean store = Populate.existStore();
-        if (store) {
-            Populate.restoreState(gameState);
-        }
+        Populate.restoreState(gameState);
 
         server.controller.setGameState(gameState);
 

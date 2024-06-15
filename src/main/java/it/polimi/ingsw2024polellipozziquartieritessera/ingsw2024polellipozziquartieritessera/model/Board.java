@@ -26,11 +26,11 @@ public class Board {
     /**
      * List of gold card in deck
      */
-    private final ArrayList<GoldCard> goldDeck;
+    private ArrayList<GoldCard> goldDeck;
     /**
      * List of resource card in deck
      */
-    private final ArrayList<ResourceCard> resourceDeck;
+    private ArrayList<ResourceCard> resourceDeck;
 
     /**
      * Board Constructor
@@ -119,6 +119,15 @@ public class Board {
     public void setSharedObjectiveCard(int index, ObjectiveCard sharedObjectiveCard) {
         this.sharedObjectiveCards[index] = sharedObjectiveCard;
     }
+
+    public void setGoldDeck(ArrayList<GoldCard> goldDeck) {
+        this.goldDeck = goldDeck;
+    }
+
+    public void setResourceDeck(ArrayList<ResourceCard> resourceDeck) {
+        this.resourceDeck = resourceDeck;
+    }
+
 
     //EMPTINESS
 
