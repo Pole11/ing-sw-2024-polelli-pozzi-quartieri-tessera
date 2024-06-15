@@ -58,7 +58,8 @@ public class Server implements VirtualServer {
         Populate.populate(gameState);
 
         //FA persistance
-        Populate.restoreState(gameState);
+        //
+        // Populate.restoreState(gameState);
 
         server.controller.setGameState(gameState);
 
