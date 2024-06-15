@@ -7,6 +7,7 @@ module it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
     requires java.smartcardio;
     requires java.sql;
     requires javafx.media;
+    requires com.fasterxml.jackson.databind;
 
     opens it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera to javafx.fxml;
     exports it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera;

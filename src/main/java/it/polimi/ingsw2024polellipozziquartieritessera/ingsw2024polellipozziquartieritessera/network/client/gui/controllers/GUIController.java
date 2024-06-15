@@ -1,7 +1,5 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.Card;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -16,13 +14,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.WritableImage;
+import javafx.scene.image.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -51,6 +49,7 @@ abstract public class GUIController {
     private double pressedX;
     private double pressedY;
     private MediaPlayer mediaPlayer;
+    private int windowHeight = 920;
 
     @FXML
     private void initialize() {
@@ -58,6 +57,10 @@ abstract public class GUIController {
         System.out.println("[DEBUG] Scene is loaded with " + this.getClass());
         Platform.runLater(() -> {
             handleMuteButton.setText(getMediaPlayer().isMute() ? "Unmute" : "Mute");
+
+            handleMuteButton.getScene().setOnKeyPressed(event -> {
+                if (event.getCode().equals(KeyCode.M)) muteMusic();
+            });
         });
     }
 
@@ -65,6 +68,14 @@ abstract public class GUIController {
         this.commandQueue = new ArrayDeque();
         this.executeCommands = new Thread(this::executeCommandsRunnable);
         this.executeCommands.start();
+    }
+
+    public int getWindowHeight() {
+        return windowHeight;
+    }
+
+    public void setWindowHeight(int windowHeight) {
+        this.windowHeight = windowHeight;
     }
 
     public MediaPlayer getMediaPlayer() {
@@ -77,6 +88,12 @@ abstract public class GUIController {
 
     @FXML
     public void handleMuteMusic(ActionEvent event) {
+        Platform.runLater(() -> {
+            muteMusic();
+        });
+    }
+
+    public void muteMusic() {
         getMediaPlayer().setMute(!getMediaPlayer().isMute());
         handleMuteButton.setText(getMediaPlayer().isMute() ? "Unmute" : "Mute");
     }
@@ -108,6 +125,12 @@ abstract public class GUIController {
             commandQueue.addLast(command);
             commandQueue.notifyAll();
         }
+    }
+
+    public void setFontSize(Node root) {
+        Platform.runLater(() -> {
+            if (root != null) root.setStyle("-fx-font-size: " + getWindowHeight()*0.017 + "px");
+        });
     }
 
     public ArrayDeque<CommandRunnable> getCommandQueue() {
@@ -238,9 +261,9 @@ abstract public class GUIController {
         WritableImage imageWritable = new WritableImage(reader, 103, 101, 823, 547);
 
         ImageView imageView = new ImageView(imageWritable);
+        imageView.setFitHeight(height);
         imageView.getStyleClass().add("imageWithBorder");
 
-        imageView.setFitHeight(height);
         imageView.setPreserveRatio(true);
 
         return imageView;
@@ -268,6 +291,7 @@ abstract public class GUIController {
     }
 
     public ArrayList<ArrayList<Integer>> rotateBoard(ArrayList<ArrayList<Integer>> board) {
+        if (board == null) return null;
         ArrayList<ArrayList<Integer>> rotatedBoard = new ArrayList<>();
         ArrayList<String> cardList  = new ArrayList<>();
 
@@ -303,6 +327,7 @@ abstract public class GUIController {
     }
 
     public void resizeI(ArrayList<ArrayList<Integer>> matrix){
+        if (matrix == null) return;
         //remove empty rows
         for(int j = 0; j < matrix.size(); j++){
             Boolean isEmpty = true;
@@ -339,6 +364,21 @@ abstract public class GUIController {
         }
     }
 
+    public static WritableImage resizeWritableImage(WritableImage originalImage, double newWidth, double newHeight) {
+        // Create a Canvas to draw the resized image
+        Canvas canvas = new Canvas(newWidth, newHeight);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Draw the original image onto the canvas, scaling it to fit the new dimensions
+        gc.drawImage(originalImage, 0, 0, newWidth, newHeight);
+
+        // Create a new WritableImage and transfer the canvas content to it
+        WritableImage resizedImage = new WritableImage((int) newWidth, (int) newHeight);
+        PixelWriter pw = resizedImage.getPixelWriter();
+        canvas.snapshot(null, resizedImage);
+
+        return resizedImage;
+    }
 
     public void addPanning(Node node) {
         node.setOnMousePressed(new EventHandler<MouseEvent>() {

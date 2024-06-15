@@ -1,5 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
+import com.google.gson.Gson;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
@@ -10,6 +11,10 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -281,7 +286,7 @@ public class GameState {
      */
     public ArrayList<VirtualView> singleClient(VirtualView client) {
         ArrayList<VirtualView> clients = new ArrayList<>();
-        if (getPlayer(getPlayerIndex(client)).isConnected()){
+        if (client != null && getPlayer(getPlayerIndex(client)).isConnected()){
             clients.add(client);
         }
         return clients;
@@ -296,7 +301,9 @@ public class GameState {
         ArrayList<VirtualView> clients = new ArrayList<>();
         for (Player playerIterator : players) {
             if (playerIterator.isConnected() && !client.equals(playerIterator.getClient())) {
-                clients.add(playerIterator.getClient());
+                if (playerIterator.getClient() != null){
+                    clients.add(playerIterator.getClient());
+                }
             }
         }
         return clients;
@@ -307,11 +314,11 @@ public class GameState {
      * @return List of all clients
      */
     public ArrayList<VirtualView> allConnectedClients() {
-        return (ArrayList<VirtualView>) players.stream().filter(Player::isConnected).map(Player::getClient).collect(Collectors.toList());
+        return (ArrayList<VirtualView>) players.stream().filter(Player::isConnected).filter(e -> e.getClient() != null).map(Player::getClient).collect(Collectors.toList());
     }
 
     public ArrayList<VirtualView> allClients() {
-        return (ArrayList<VirtualView>) players.stream().map(Player::getClient).collect(Collectors.toList());
+        return (ArrayList<VirtualView>) players.stream().filter(e -> e.getClient() != null).map(Player::getClient).collect(Collectors.toList());
     }
 
 
@@ -591,7 +598,10 @@ public class GameState {
                 eventQueue.notifyAll();
             }
         }
+    }
 
+    public void addPlayer(Player player){
+        players.add(player);
     }
 
 
@@ -1089,7 +1099,14 @@ public class GameState {
             System.out.println(e.getState());
         });
 
-        //TODO: distruggi rescue
+        //erase state
+        Gson gson = new Gson();
+        String filePath = new File("").getAbsolutePath();
+        try (Writer writer = new FileWriter(filePath + Config.GAME_STATE_PATH)) {
+            gson.toJson(new HashMap(), writer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         Thread.currentThread().interrupt();
 
@@ -1104,8 +1121,7 @@ public class GameState {
             } catch (InterruptedException e) {
                 break;
             }
-            Populate.saveState(this);
-            //Populate.restoreState(this);
+            //Populate.saveState(this);
         }
     }
 

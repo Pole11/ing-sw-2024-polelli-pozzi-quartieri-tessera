@@ -1,5 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
@@ -19,15 +20,15 @@ public class Player {
     /**
      * Player board, structured like a variable matrix of card IDs
      */
-    private final ArrayList<ArrayList<Integer>> playerBoard;
+    private ArrayList<ArrayList<Integer>> playerBoard;
     /**
      * The map of all placed cards, that relate a card ID with his played side
      */
-    private final HashMap<Integer, Side> placedCardsMap;
+    private HashMap<Integer, Side> placedCardsMap;
     /**
      * The map of all cards in hand, that relate a card ID with his hand side
      */
-    private final HashMap<Integer, Side> handCardsMap;
+    private HashMap<Integer, Side> handCardsMap;
     /**
      * Color of the player
      */
@@ -51,15 +52,16 @@ public class Player {
     /**
      * List of the selectable objective cards
      */
+    //TODO: cambiare in arrayList magari, ricordarsi di cambiare poi setObj, populate e costruttore, e restoreVie
     private ObjectiveCard[] objectiveCardOptions;
     /**
      * Map of the centerResources of the player cards, relates a card ID with the center Resource
      */
-    private final HashMap<Integer, Element> centerResources;
+    private HashMap<Integer, Element> centerResources;
     /**
      * Map of all elements the player currently have, each Element is associated with the number of his occurrences
      */
-    private final HashMap<Element, Integer> allElements;
+    private HashMap<Element, Integer> allElements;
     /**
      * True if the player is connected (false if disconnected)
      */
@@ -94,6 +96,10 @@ public class Player {
         this.handCardsMap = new HashMap<Integer, Side>();
         this.objectivesWon = 0;
         this.centerResources = new HashMap<>();
+
+        //this.objectiveCardOptions = new ObjectiveCard[2];
+        //this.objectiveCardOptions[0] = null;
+        //this.objectiveCardOptions[1] = null;
 
         this.allElements = new HashMap<>();
         for (Element element : Element.values()) {
@@ -233,7 +239,6 @@ public class Player {
     public void setSecretObjectiveCardOptions(ObjectiveCard[] objectiveCards) {
         this.objectiveCardOptions = objectiveCards;
         synchronized (gameState.getEventQueue()){
-            //RIGUARDARE SE VA BENE PASSARE DA ARRAY A ARRAYLIST, NON E TANTO BELLO
             gameState.addToEventQueue(new UpdateSecretObjectiveEvent(gameState, gameState.singleClient(this.getClient()), new ArrayList<>(List.of(objectiveCards))));
             gameState.getEventQueue().notifyAll();
         }
@@ -253,6 +258,30 @@ public class Player {
             gameState.addToEventQueue(new ConnectionInfoEvent(gameState, gameState.allClients(), this, connected));
             gameState.getEventQueue().notifyAll();
         }
+    }
+
+    public void setPlayerBoard(ArrayList<ArrayList<Integer>> playerBoard) {
+        this.playerBoard = playerBoard;
+    }
+
+    public void setPlacedCardsMap(HashMap<Integer, Side> placedCardsMap) {
+        this.placedCardsMap = placedCardsMap;
+    }
+
+    public void setHandCardsMap(HashMap<Integer, Side> handCardsMap){
+        this.handCardsMap = handCardsMap;
+    }
+
+    public void setObjectivesWon(int objectivesWon){
+        this.objectivesWon = objectivesWon;
+    }
+
+    public void setCenterResources(HashMap<Integer, Element> centerResource){
+        this.centerResources = centerResource;
+    }
+
+    public void setAllElements(HashMap<Element, Integer> allElements){
+        this.allElements = allElements;
     }
 
     //ADDER/REMOVER

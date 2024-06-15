@@ -23,6 +23,7 @@ public class GUIControllerBoard extends GUIController {
 
     public GUIControllerBoard() {
         this.update();
+        setFontSize(mainContainerBoard);
     }
 
     public void printBoard() {
