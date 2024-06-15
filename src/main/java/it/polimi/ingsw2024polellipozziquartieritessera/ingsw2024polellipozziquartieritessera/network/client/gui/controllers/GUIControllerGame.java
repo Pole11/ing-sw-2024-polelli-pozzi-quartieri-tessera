@@ -354,7 +354,7 @@ public class GUIControllerGame extends GUIController {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
-                ImageView tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", (int) (getWindowHeight()*0.1));
+                ImageView tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", (int) (getWindowHeight()*0.09));
                 if (tempImageView == null) return;
                 //tempImageView.getStyleClass().add("imageWithBorder");
 

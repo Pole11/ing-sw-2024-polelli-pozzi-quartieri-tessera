@@ -129,7 +129,7 @@ abstract public class GUIController {
 
     public void setFontSize(Node root) {
         Platform.runLater(() -> {
-            root.setStyle("-fx-font-size: " + getWindowHeight()*0.017 + "px");
+            if (root != null) root.setStyle("-fx-font-size: " + getWindowHeight()*0.017 + "px");
         });
     }
 
@@ -291,6 +291,7 @@ abstract public class GUIController {
     }
 
     public ArrayList<ArrayList<Integer>> rotateBoard(ArrayList<ArrayList<Integer>> board) {
+        if (board == null) return null;
         ArrayList<ArrayList<Integer>> rotatedBoard = new ArrayList<>();
         ArrayList<String> cardList  = new ArrayList<>();
 
@@ -326,6 +327,7 @@ abstract public class GUIController {
     }
 
     public void resizeI(ArrayList<ArrayList<Integer>> matrix){
+        if (matrix == null) return;
         //remove empty rows
         for(int j = 0; j < matrix.size(); j++){
             Boolean isEmpty = true;
