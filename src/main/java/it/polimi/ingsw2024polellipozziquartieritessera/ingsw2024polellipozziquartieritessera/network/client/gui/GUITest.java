@@ -23,8 +23,10 @@ public class GUITest {
         ViewModel viewModel = new ViewModel();
         viewModel.setNickname(0, "Gino");
         viewModel.setNickname(1, "Pino");
+        viewModel.setNickname(2, "Tino");
         viewModel.setColor(0, Color.BLUE);
         viewModel.setColor(1, Color.GREEN);
+        viewModel.setColor(2, Color.YELLOW);
         viewModel.setGamePhase(GamePhase.MAINPHASE);
         viewModel.setSharedObjectives(96,97);
         viewModel.setCurrentPlayer(0);
@@ -38,6 +40,9 @@ public class GUITest {
         viewModel.addedCardToHand(1, 31);
         viewModel.addedCardToHand(1, 41);
         viewModel.addedCardToHand(1, 51);
+        viewModel.addedCardToHand(2, 32);
+        viewModel.addedCardToHand(2, 42);
+        viewModel.addedCardToHand(2, 52);
         viewModel.setMainBoard(42, 52, 2,12, 43, 3);
         viewModel.setStarterCard(98);
         viewModel.initializeBoard(0, 98);

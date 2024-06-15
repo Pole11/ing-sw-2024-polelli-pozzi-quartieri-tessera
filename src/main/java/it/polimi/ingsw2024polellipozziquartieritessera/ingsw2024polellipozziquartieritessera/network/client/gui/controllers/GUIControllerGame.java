@@ -1,23 +1,41 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.DrawType;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.DrawCardCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.FlipCardCommandRunnable;
-import javafx.application.*;
-import javafx.fxml.*;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.image.*;
-import javafx.scene.layout.*;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.*;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
-import java.lang.reflect.Array;
-import java.util.*;
-
-import static javafx.scene.layout.TilePane.setAlignment;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class GUIControllerGame extends GUIController {
     @FXML private BorderPane mainContainerGame;
@@ -26,46 +44,47 @@ public class GUIControllerGame extends GUIController {
     @FXML private VBox sharedResourceContainerGame;
     @FXML private Label currentPhase;
     private HashMap<Integer, ArrayList<Integer>> plateauCoordinatedMap;
-    private final int plateauHeight = 350;
 
     public GUIControllerGame() {
         //rotatePlayerContainer();
         populatePlateauCoordinateMap();
+        setFontSize(mainContainerGame);
         update();
     }
 
     private void populatePlateauCoordinateMap() {
         plateauCoordinatedMap = new HashMap<>();
-        plateauCoordinatedMap.put(0, new ArrayList<>(Arrays.asList(plateauHeight/4 - 40,plateauHeight - 24)));
-        plateauCoordinatedMap.put(1, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 24)));
-        plateauCoordinatedMap.put(2, new ArrayList<>(Arrays.asList(plateauHeight/4 + 40,plateauHeight - 24)));
-        plateauCoordinatedMap.put(3, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 61)));
-        plateauCoordinatedMap.put(4, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 61)));
-        plateauCoordinatedMap.put(5, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 61)));
-        plateauCoordinatedMap.put(6, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 61)));
-        plateauCoordinatedMap.put(7, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 98)));
-        plateauCoordinatedMap.put(8, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 98)));
-        plateauCoordinatedMap.put(9, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 98)));
-        plateauCoordinatedMap.put(10, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 98)));
-        plateauCoordinatedMap.put(11, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 135)));
-        plateauCoordinatedMap.put(12, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 135)));
-        plateauCoordinatedMap.put(13, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 135)));
-        plateauCoordinatedMap.put(14, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 135)));
-        plateauCoordinatedMap.put(15, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 172)));
-        plateauCoordinatedMap.put(16, new ArrayList<>(Arrays.asList(plateauHeight/4 - 20,plateauHeight - 172)));
-        plateauCoordinatedMap.put(17, new ArrayList<>(Arrays.asList(plateauHeight/4 + 20,plateauHeight - 172)));
-        plateauCoordinatedMap.put(18, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 172)));
-        plateauCoordinatedMap.put(19, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 209)));
-        plateauCoordinatedMap.put(20, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 229)));
-        plateauCoordinatedMap.put(21, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 209)));
-        plateauCoordinatedMap.put(22, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 248)));
-        plateauCoordinatedMap.put(23, new ArrayList<>(Arrays.asList(plateauHeight/4 - 61,plateauHeight - 287)));
-        plateauCoordinatedMap.put(24, new ArrayList<>(Arrays.asList(plateauHeight/4 - 36,plateauHeight - 320)));
-        plateauCoordinatedMap.put(25, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 325)));
-        plateauCoordinatedMap.put(26, new ArrayList<>(Arrays.asList(plateauHeight/4 + 36,plateauHeight - 320)));
-        plateauCoordinatedMap.put(27, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 287)));
-        plateauCoordinatedMap.put(28, new ArrayList<>(Arrays.asList(plateauHeight/4 + 61,plateauHeight - 248)));
-        plateauCoordinatedMap.put(29, new ArrayList<>(Arrays.asList(plateauHeight/4,plateauHeight - 278)));
+        int plateauHeight = (int) (getWindowHeight() * 0.38);
+        plateauCoordinatedMap.put(0,  new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.11), plateauHeight - (int) (plateauHeight * 0.068))));
+        plateauCoordinatedMap.put(1,  new ArrayList<>(Arrays.asList(plateauHeight/4                               , plateauHeight - (int) (plateauHeight * 0.068))));
+        plateauCoordinatedMap.put(2,  new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.11), plateauHeight - (int) (plateauHeight * 0.068))));
+        plateauCoordinatedMap.put(3,  new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.17))));
+        plateauCoordinatedMap.put(4,  new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.57), plateauHeight - (int) (plateauHeight * 0.17))));
+        plateauCoordinatedMap.put(5,  new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.57), plateauHeight - (int) (plateauHeight * 0.17))));
+        plateauCoordinatedMap.put(6,  new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.17))));
+        plateauCoordinatedMap.put(7,  new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.28))));
+        plateauCoordinatedMap.put(8,  new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.57), plateauHeight - (int) (plateauHeight * 0.28))));
+        plateauCoordinatedMap.put(9,  new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.57), plateauHeight - (int) (plateauHeight * 0.28))));
+        plateauCoordinatedMap.put(10, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.28))));
+        plateauCoordinatedMap.put(11, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.39))));
+        plateauCoordinatedMap.put(12, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.57), plateauHeight - (int) (plateauHeight * 0.39))));
+        plateauCoordinatedMap.put(13, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.57), plateauHeight - (int) (plateauHeight * 0.39))));
+        plateauCoordinatedMap.put(14, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.39))));
+        plateauCoordinatedMap.put(15, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.49))));
+        plateauCoordinatedMap.put(16, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.57), plateauHeight - (int) (plateauHeight * 0.49))));
+        plateauCoordinatedMap.put(17, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.57), plateauHeight - (int) (plateauHeight * 0.49))));
+        plateauCoordinatedMap.put(18, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.49))));
+        plateauCoordinatedMap.put(19, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.60))));
+        plateauCoordinatedMap.put(20, new ArrayList<>(Arrays.asList(plateauHeight/4                               , plateauHeight - (int) (plateauHeight * 0.65))));
+        plateauCoordinatedMap.put(21, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.60))));
+        plateauCoordinatedMap.put(22, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.71))));
+        plateauCoordinatedMap.put(23, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.82))));
+        plateauCoordinatedMap.put(24, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.10), plateauHeight - (int) (plateauHeight * 0.91))));
+        plateauCoordinatedMap.put(25, new ArrayList<>(Arrays.asList(plateauHeight/4                               , plateauHeight - (int) (plateauHeight * 0.93))));
+        plateauCoordinatedMap.put(26, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.10), plateauHeight - (int) (plateauHeight * 0.91))));
+        plateauCoordinatedMap.put(27, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.82))));
+        plateauCoordinatedMap.put(28, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.71))));
+        plateauCoordinatedMap.put(29, new ArrayList<>(Arrays.asList(plateauHeight/4                               , plateauHeight - (int) (plateauHeight * 0.79))));
     }
 
     private void clearAllchilds() {
@@ -94,6 +113,7 @@ public class GUIControllerGame extends GUIController {
 
         PixelReader reader = image.getPixelReader();
         WritableImage imageWritable = new WritableImage(reader, 48, 49, 460, 926);
+        //imageWritable = resizeWritableImage(imageWritable, (int) (getWindowHeight()*0.51), getWindowHeight());
 
         ImageView imageView = new ImageView(imageWritable);
 
@@ -128,11 +148,11 @@ public class GUIControllerGame extends GUIController {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
-                ImageView firstCommonObjectiveImageView = createCardImageView("/img/carte_fronte/" + firstCommonObjective + ".jpg", 75);
+                ImageView firstCommonObjectiveImageView = createCardImageView("/img/carte_fronte/" + firstCommonObjective + ".jpg", (int) (getWindowHeight()*0.081));
                 BorderPane firstCommonObjectivePane = new BorderPane(firstCommonObjectiveImageView);
                 sharedGoldContainerGame.getChildren().add(firstCommonObjectivePane);
 
-                ImageView secondCommonObjectiveImageView = createCardImageView("/img/carte_fronte/" + secondCommonObjective + ".jpg", 75);
+                ImageView secondCommonObjectiveImageView = createCardImageView("/img/carte_fronte/" + secondCommonObjective + ".jpg", (int) (getWindowHeight()*0.081));
                 BorderPane secondCommonObjectivePane = new BorderPane(secondCommonObjectiveImageView);
                 sharedResourceContainerGame.getChildren().add(secondCommonObjectivePane);
             }
@@ -144,7 +164,7 @@ public class GUIControllerGame extends GUIController {
             @Override
             public void run() {
                 sharedGoldContainerGame.getChildren().add(new Text("Gold Deck"));
-                ImageView goldDeckImageView = createCardImageView("/img/carte_retro/" + getViewModel().getSharedCards()[5] + ".jpg", 75);
+                ImageView goldDeckImageView = createCardImageView("/img/carte_retro/" + getViewModel().getSharedCards()[5] + ".jpg", (int) (getWindowHeight()*0.090));
                 goldDeckImageView.getStyleClass().add("clickable");
                 BorderPane goldDeckPane = new BorderPane(goldDeckImageView);
                 goldDeckPane.getStyleClass().add("cardDeck");
@@ -152,14 +172,15 @@ public class GUIControllerGame extends GUIController {
                 sharedGoldContainerGame.getChildren().add(goldDeckPane);
                 sharedGoldContainerGame.getChildren().add(new Text("Shared Gold"));
                 // add event
-                ImageView firstSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedGoldCards()[0] + ".jpg", 75);
+                ImageView firstSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedGoldCards()[0] + ".jpg", (int) (getWindowHeight()*0.090));
                 firstSharedGoldCardImageView.getStyleClass().add("clickable");
                 sharedGoldContainerGame.getChildren().add(firstSharedGoldCardImageView);
                 // add event
-                ImageView secondSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedGoldCards()[1] + ".jpg", 75);
+                ImageView secondSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedGoldCards()[1] + ".jpg", (int) (getWindowHeight()*0.090));
                 secondSharedGoldCardImageView.getStyleClass().add("clickable");
                 sharedGoldContainerGame.getChildren().add(secondSharedGoldCardImageView);
 
+                int plateauHeight = (int) (getWindowHeight() * 0.38);
                 Pane plateauImageViewPane = new Pane();
                 plateauImageViewPane.setPrefHeight(plateauHeight);
                 plateauImageViewPane.setId("plateauImageViewPane");
@@ -168,20 +189,21 @@ public class GUIControllerGame extends GUIController {
                 plateauContainerGame.getChildren().add(plateauImageViewPane);
 
                 sharedResourceContainerGame.getChildren().add(new Text("Resource Deck"));
-                ImageView resourceDeckImageView = createCardImageView("/img/carte_retro/" + getViewModel().getSharedCards()[4] + ".jpg", 75);
+                ImageView resourceDeckImageView = createCardImageView("/img/carte_retro/" + getViewModel().getSharedCards()[4] + ".jpg", (int) (getWindowHeight()*0.090));
                 resourceDeckImageView.getStyleClass().add("clickable");
                 BorderPane resourceDeckPane = new BorderPane(resourceDeckImageView);
+                resourceDeckPane.prefWidthProperty().bind(resourceDeckImageView.fitWidthProperty());
                 resourceDeckPane.getStyleClass().add("cardDeck");
                 // add event
                 sharedResourceContainerGame.getChildren().add(resourceDeckPane);
 
                 sharedResourceContainerGame.getChildren().add(new Text("Shared Resource"));
                 // add event
-                ImageView firstSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedResourceCards()[0] + ".jpg", 75);
+                ImageView firstSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedResourceCards()[0] + ".jpg", (int) (getWindowHeight()*0.090));
                 firstSharedResourceCardImageView.getStyleClass().add("clickable");
                 sharedResourceContainerGame.getChildren().add(firstSharedResourceCardImageView);
                 // add event
-                ImageView secondSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedResourceCards()[1] + ".jpg", 75);
+                ImageView secondSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedResourceCards()[1] + ".jpg", (int) (getWindowHeight()*0.090));
                 secondSharedResourceCardImageView.getStyleClass().add("clickable");
                 sharedResourceContainerGame.getChildren().add(secondSharedResourceCardImageView);
 
@@ -237,7 +259,7 @@ public class GUIControllerGame extends GUIController {
                     x = plateauCoordinatedMap.get(0).get(0); // comment for real use
                     y = plateauCoordinatedMap.get(0).get(1); // comment for real use
                 }
-                Circle circle = new Circle(x, y, 10);
+                Circle circle = new Circle(x, y, getWindowHeight()*0.01);
                 circle.setId("circlePoints" + i);
                 plateauImageViewPane.getChildren().add(circle);
 
@@ -290,9 +312,9 @@ public class GUIControllerGame extends GUIController {
                 for (Integer cardId : playerHandCards.keySet()) {
                     ImageView tempImageView;
                     if ((playerId == meId && playerHandCards.get(cardId) == Side.FRONT) || (playerId != meId && playerHandCards.get(cardId) == Side.BACK)) {
-                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+                        tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", (int) (getWindowHeight()*0.1));
                     } else {
-                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", 100);
+                        tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", (int) (getWindowHeight()*0.1));
                     }
                     tempImageView.setId("player" + playerId + "card" + cardId);
                     //tempImageView.getStyleClass().add("imageWithBorder");
@@ -332,7 +354,7 @@ public class GUIControllerGame extends GUIController {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
-                ImageView tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", 100);
+                ImageView tempImageView = createCardImageView("/img/carte_fronte/" + cardId + ".jpg", (int) (getWindowHeight()*0.09));
                 if (tempImageView == null) return;
                 //tempImageView.getStyleClass().add("imageWithBorder");
 
@@ -380,6 +402,36 @@ public class GUIControllerGame extends GUIController {
 
             // prova con setTop, setBottom ...
         });
+    }
+
+    @FXML
+    private void handleOpenGameRules(ActionEvent event) {
+        // Create a new stage for the image viewer
+        Stage imageStage = new Stage();
+        //imageStage.initModality(Modality.APPLICATION_MODAL);
+        imageStage.initStyle(StageStyle.DECORATED);
+        imageStage.setTitle("Game Rules");
+
+        // Create an ImageView to display the image
+        javafx.scene.image.Image image = new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResource("/img/rulebook.png")).toExternalForm());
+        javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView(image);
+        imageView.setPreserveRatio(true);
+        //imageView.setFitWidth((int) (getWindowHeight()*0.63));  // Adjust the width as needed
+        DoubleBinding adjustedWidth = Bindings.createDoubleBinding(
+                () -> imageStage.getWidth() - 20,
+                imageStage.widthProperty()
+        );
+        imageView.fitWidthProperty().bind(adjustedWidth);
+
+        // Create a ScrollPane to make the ImageView scrollable
+        javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(imageView);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        // Create a Scene for the new Stage
+        Scene scene = new Scene(scrollPane, (int) (getWindowHeight()*0.65), (int) (getWindowHeight()*0.43));
+        imageStage.setScene(scene);
+        imageStage.show();
     }
 
     @Override
