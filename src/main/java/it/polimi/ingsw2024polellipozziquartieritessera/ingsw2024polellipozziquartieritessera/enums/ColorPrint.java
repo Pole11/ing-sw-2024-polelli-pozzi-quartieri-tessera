@@ -51,4 +51,11 @@ public enum ColorPrint {
     public String toString() {
         return code;
     }
+
+    public static int getColorIndex(int cardIndex) {
+        int i = (int)Math.floor((double)(cardIndex-1) / 10 + 1);
+        if (i > 4)
+            i -= 4;
+        return Math.min(i,5);
+    }
 }
