@@ -1,13 +1,22 @@
+Separator {
+    -fx-opacity: 0;
+    -fx-padding: 0;
+}
+
+Text {
+    -fx-font-weight: bold;
+}
+
 .root {
-    -fx-background-color: rgb(220, 200, 60);
+    /* -fx-background-color: rgb(220, 200, 60); /*
     -fx-border-width: 10px;
     -fx-border-style: solid;
     -fx-border-color: rgb(180, 160, 30);
-    /*
-    -fx-font-size: 16px;
-    */
+    /* -fx-font-size: 16px; */
     -fx-font-family: 'Comic Neue';
-    image-bg-url: none;
+    -fx-background-image: url("../img/bricks_red.png");
+    -fx-background-repeat: repeat;
+    -fx-background-size: 900;
 }
 
 .cardDeck {
@@ -57,3 +66,6 @@
     -fx-background-color: none;
 }
 
+Text {
+    -fx-fill: white;
+}

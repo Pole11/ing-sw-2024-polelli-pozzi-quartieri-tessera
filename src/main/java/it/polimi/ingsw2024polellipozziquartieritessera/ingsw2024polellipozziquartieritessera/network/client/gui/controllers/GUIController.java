@@ -61,6 +61,8 @@ abstract public class GUIController {
             handleMuteButton.getScene().setOnKeyPressed(event -> {
                 if (event.getCode().equals(KeyCode.M)) muteMusic();
             });
+
+            windowHeight = GUIApplication.getSize();
         });
     }
 

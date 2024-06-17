@@ -20,7 +20,7 @@
         <TextField fx:id="nicknameTextField" />
         <Separator/>
         <Button onAction="#handleAddUser" text="Register" />
-        <Text>Remember that you can mute the music by pressing the m key</Text>
+        <Text>Remember that in all the scene apart from this one you can mute the music by pressing the m key</Text>
         <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
         <Separator/>
         <Label

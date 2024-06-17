@@ -92,9 +92,7 @@ public class GUIApplication extends Application {
 
         mainStage = stage;
 
-        double screenWidth = getScreenWidth();
-        double screenHeight = getScreenHeight();
-        int size = screenWidth > screenHeight ? (int) (screenHeight * 0.85) : (int) (screenWidth * 0.85);
+        int size = getSize();
 
         Scene scene = new Scene(root, size*1.2, size);
         stage.setTitle("Codex Naturalis");
@@ -114,6 +112,10 @@ public class GUIApplication extends Application {
         initGameController(guiController);
 
         System.out.println((int) mainStage.getHeight());
+    }
+
+    public static int getSize() {
+        return getScreenWidth() > getScreenHeight() ? (int) (getScreenHeight() * 0.85) : (int) (getScreenWidth() * 0.85);
     }
 
     public static double getScreenWidth() {

@@ -282,6 +282,8 @@ public class GUIControllerGame extends GUIController {
                 infoContainerVBox.setId("infoContainerPlayer" + playerId);
                 String currentPlayerNickname = nicknames.get(playerId);
                 Text nicknameText = new Text(currentPlayerNickname + " (" + getViewModel().getColorsMap(playerId) + " " + getViewModel().getPointsMap(playerId) + ")");
+                //nicknameText.setFill(javafx.scene.paint.Color.rgb(255,255,255));
+                //nicknameText.getStyleClass().add("nicknameText");
                 Button expandButton = new Button("Expand Board");
                 expandButton.setOnMousePressed(mouseEvent -> {
                     HashMap<String, Integer> paramsMap = new HashMap<>();
