@@ -14,6 +14,6 @@ public class HelpCommandRunnable extends CommandRunnable {
 
     @Override
     public void executeHelp() {
-
+        System.out.print("HELP\nmore information with HELP -h -h\n> ");
     }
 }

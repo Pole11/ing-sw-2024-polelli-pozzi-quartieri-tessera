@@ -704,6 +704,7 @@ public class GameState {
         StarterCard playerStarterCard = player.getStarterCard();
         //doesn't call updateBoard because the boardMatrix already has the card (without the side)
         player.addToPlacedCardsMap(playerStarterCard.getId(), side);
+        updateElements(player, playerStarterCard,side);
 
         synchronized (eventQueue) {
             eventQueue.add(new UpdateStarterCardEvent(this, allConnectedClients(), playerIndex, playerStarterCard.getId(), side));

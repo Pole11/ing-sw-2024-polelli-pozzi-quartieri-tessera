@@ -13,6 +13,7 @@ public class ShowPlayersCommandRunnable extends CommandRunnable {
 
     @Override
     public void executeHelp() {
+        System.out.print("SHOWPLAYERS\nthe command shows the nicknames and corresponding index of every player\n>");
 
     }
 }

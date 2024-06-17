@@ -23,6 +23,6 @@ public class ShowBoardCommandRunnable extends CommandRunnable {
 
     @Override
     public void executeHelp() {
-
+        System.out.print("SHOWBOARD [player_index]\nthe command shows the board of the player matching the player_index specified\nif no index is given, it shows the board of the player who invokes it\n>");
     }
 }

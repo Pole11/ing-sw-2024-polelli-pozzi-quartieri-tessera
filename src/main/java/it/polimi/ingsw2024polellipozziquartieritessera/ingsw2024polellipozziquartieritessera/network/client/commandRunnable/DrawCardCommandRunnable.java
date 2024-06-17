@@ -43,6 +43,6 @@ public class DrawCardCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("DRAWCARD [ SharedGold1 / SharedGold2 / DeckGold / SharedResource1 / SharedResource2 / DeckResource ]\nthe command allows the current player to draw a card from the main board\n> ");
     }
 }

@@ -109,7 +109,15 @@ public class CLIController {
     }
 
     public void showElements(){
-        System.out.println("this feature is not implemented yet, complain with the coders");
+        HashMap<Integer, HashMap> map = viewModel.getElementsMap();
+        int index = viewModel.getPlayerIndex();
+        System.out.println("this are the elements visible on your board");
+        for(Object e : map.get(index).keySet()){
+            if((int) map.get(index).get(e) != 0){
+                System.out.println(e + ": " + map.get(index).get(e));
+            }
+        }
+        System.out.print("> ");
     }
 
 

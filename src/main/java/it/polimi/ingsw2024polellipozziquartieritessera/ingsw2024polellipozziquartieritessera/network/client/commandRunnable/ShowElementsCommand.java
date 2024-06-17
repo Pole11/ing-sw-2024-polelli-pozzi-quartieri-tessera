@@ -13,6 +13,6 @@ public class ShowElementsCommand extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("SHOWELEMENTS\nthe command shows the resources and items currently visible on the player's board\n>");
     }
 }

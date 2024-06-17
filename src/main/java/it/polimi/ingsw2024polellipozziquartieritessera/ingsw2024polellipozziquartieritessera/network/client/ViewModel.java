@@ -167,7 +167,7 @@ public class ViewModel {
     }
 
     // GETTERS FOR CLI&GUI
-
+    public HashMap<Integer, HashMap> getElementsMap(){return elementsMap;}
     public int getPlayerIndex() {
         return playerIndex;
     }

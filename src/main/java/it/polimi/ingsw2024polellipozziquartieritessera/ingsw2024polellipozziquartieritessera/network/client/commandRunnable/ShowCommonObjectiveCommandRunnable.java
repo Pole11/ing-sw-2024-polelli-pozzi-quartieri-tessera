@@ -13,6 +13,6 @@ public class ShowCommonObjectiveCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("SHOWCOMMONOBJECTIVES\nthe command shows the objective card shared between all the players\n>");
     }
 }

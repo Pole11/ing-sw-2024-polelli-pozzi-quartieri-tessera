@@ -43,6 +43,6 @@ public class ChooseStarterCommandRunnable extends CommandRunnable {
 
     @Override
     public void executeHelp() {
-
+        System.out.print("CHOOSESTARTER [ Front / Back ]\nthe command allows the current player to choose the side of his starter card\n> ");
     }
 }

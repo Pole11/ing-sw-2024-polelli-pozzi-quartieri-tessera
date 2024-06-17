@@ -43,6 +43,6 @@ public class AdduserCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("ADDUSER [nickname]\nthe command allows the player to join a new game and set his new nickname or, if he previously disconnected, to reconnect to the game\n> ");
     }
 }

@@ -23,6 +23,6 @@ public class StartCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("START\nThe command allows a player to start a game if there are more than one player\n> ");
     }
 }

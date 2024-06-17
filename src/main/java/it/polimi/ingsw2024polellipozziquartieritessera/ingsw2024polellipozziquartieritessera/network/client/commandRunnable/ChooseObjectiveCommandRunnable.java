@@ -39,6 +39,6 @@ public class ChooseObjectiveCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("CHOOSEOBJECTIVE [ 0 / 1 ]\n\n> ");
     }
 }

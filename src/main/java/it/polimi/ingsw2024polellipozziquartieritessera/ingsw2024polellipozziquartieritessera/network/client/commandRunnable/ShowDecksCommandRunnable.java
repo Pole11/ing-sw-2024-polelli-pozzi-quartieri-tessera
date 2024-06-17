@@ -13,7 +13,6 @@ public class ShowDecksCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
-
+        System.out.print("SHOWDECKS\nthe command shows the main board of the game, including the 4 shared cards and the 2 decks\n>");
     }
 }

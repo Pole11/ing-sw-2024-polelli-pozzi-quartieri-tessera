@@ -13,6 +13,6 @@ public class ShowColorsCommand extends CommandRunnable {
 
     @Override
     public void executeHelp() {
-
+        System.out.print("SHOWCOLORS\nthe command shows the color chosen by every player\n>");
     }
 }
