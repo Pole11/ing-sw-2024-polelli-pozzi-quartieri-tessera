@@ -58,10 +58,13 @@ public class Server implements VirtualServer {
         Populate.populate(gameState);
 
         //FA persistance
-        //
-        // Populate.restoreState(gameState);
+        //TODO: this must not be commented
+        //Populate.restoreState(gameState);
+        Populate.saveState(gameState);
 
         server.controller.setGameState(gameState);
+
+        gameState.startThreads();
 
         //start RMI
         VirtualServer stub = (VirtualServer) UnicastRemoteObject.exportObject(server, 0);

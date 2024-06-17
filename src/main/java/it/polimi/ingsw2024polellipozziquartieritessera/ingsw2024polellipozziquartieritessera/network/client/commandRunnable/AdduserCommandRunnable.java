@@ -13,6 +13,16 @@ public class AdduserCommandRunnable extends CommandRunnable{
     public void executeCLI() {
         try {
             try {
+                /*if (clientContainer != null && clientContainer.getViewModel().getPlayerIndex() != -1){
+                    String nick = clientContainer.getViewModel().getNickname(clientContainer.getViewModel().getPlayerIndex());
+                    if (nick != null){
+                        if (!nick.equals(messageFromCli[1])){
+                            return;
+                        }
+                    }
+                }
+
+                 */
                 server.addConnectedPlayer(client, messageFromCli[1]);
             } catch (RemoteException e) {
                 serverDisconnectedCLI();

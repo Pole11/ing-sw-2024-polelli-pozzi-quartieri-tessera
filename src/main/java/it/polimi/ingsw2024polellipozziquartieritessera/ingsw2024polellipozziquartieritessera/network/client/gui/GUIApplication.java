@@ -141,6 +141,13 @@ public class GUIApplication extends Application {
         guiController.setWindowHeight((int) mainStage.getHeight());
     }
 
+    public void setClientServer(VirtualView client, VirtualServer server){
+        this.server = server;
+        this.client = client;
+        guiController.setServer(server);
+        guiController.setClient(client);
+    }
+
     public void runGui(VirtualView client, VirtualServer server, Client clientContainer, ViewModel viewModel) {
         GUIApplication.client = client;
         GUIApplication.server = server;

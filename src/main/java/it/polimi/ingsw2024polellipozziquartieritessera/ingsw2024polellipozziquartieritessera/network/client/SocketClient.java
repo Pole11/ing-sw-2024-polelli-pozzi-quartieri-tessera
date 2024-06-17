@@ -2,6 +2,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
+import javafx.application.Platform;
 
 import java.io.*;
 import java.net.*;
@@ -26,26 +27,36 @@ public class SocketClient implements VirtualView {
             try {
                 runVirtualServer();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                clientContainer.serverDisconnected();
             }
         }).start();
 
-        Scanner scan = new Scanner(System.in);
-        System.out.print("Do you GUI? [Y/n] ");
-        String input = scan.nextLine();
-        if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
-            clientContainer.runGui(server, this);
-        } else if (input.equalsIgnoreCase("n")) {
-            this.server.connectRmi(this);
-            clientContainer.runCli(server);
+        if (!clientContainer.isRunning()){
+            System.out.println("Welcome to CODEX!");
+            Scanner scan = new Scanner(System.in);
+            System.out.print("Do you GUI? [Y/n] ");
+            String input = scan.nextLine();
+            if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
+                clientContainer.runGui();
+            } else if (input.equalsIgnoreCase("n")) {
+                this.server.connectRmi(this);
+                clientContainer.runCli();
+            } else {
+                System.out.println("Please enter a valid input!");
+            }
         } else {
-            System.out.println("Please enter a valid input!");
+            if (clientContainer.isMeDoGui()){
+                clientContainer.getGuiApplication().setClientServer(this, server);
+                clientContainer.getGuiApplication().changeScene("/fxml/lobby.fxml");
+            } else {
+                //clientContainer.runCli();
+                System.out.println("the server is now available, try to re-connect with command ADDUSER");
+            }
         }
+
     }
 
     private void runVirtualServer() throws IOException {
-        System.out.println("Welcome to CODEX!");
-
         String line;
         // Read message type
         while ((line = input.readLine()) != null) {
@@ -72,9 +83,6 @@ public class SocketClient implements VirtualView {
                     break;
                 case Messages.SENDINDEX:
                     this.sendIndex(Integer.parseInt(messageString[1]));
-                    break;
-                case Messages.START:
-                    this.start();
                     break;
                 case Messages.ADDHAND:
                     this.updateAddHand(Integer.parseInt(messageString[1]), Integer.parseInt(messageString[2]));
@@ -122,11 +130,16 @@ public class SocketClient implements VirtualView {
                     }
                     this.updateWinner(winners);
                     break;
+                case Messages.UPDATEELEMENT:
+                    this.updateElement(Integer.parseInt(messageString[1]), Element.valueOf(messageString[2]), Integer.parseInt(messageString[3]));
+                    break;
                 default:
                     System.err.println("[5xx INVALID MESSAGE FROM SERVER]");
                     break;
             }
         }
+        clientContainer.serverDisconnected();
+        //TODO: controllare se funziona anche se il server perde la connesisone e non solo se crasha
     }
 
     @Override
@@ -158,11 +171,6 @@ public class SocketClient implements VirtualView {
     public void
     updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException {
         clientContainer.updateTurnPhase(nextTurnPhase);
-    }
-
-    @Override
-    public void start() throws RemoteException {
-        clientContainer.start();
     }
 
     @Override
@@ -228,5 +236,10 @@ public class SocketClient implements VirtualView {
     @Override
     public void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException {
         clientContainer.updateWinner(playerIndexes);
+    }
+
+    @Override
+    public void updateElement(int playerIndex, Element element, int numberOfElements) throws RemoteException {
+        clientContainer.updateElement(playerIndex, element, numberOfElements);
     }
 }

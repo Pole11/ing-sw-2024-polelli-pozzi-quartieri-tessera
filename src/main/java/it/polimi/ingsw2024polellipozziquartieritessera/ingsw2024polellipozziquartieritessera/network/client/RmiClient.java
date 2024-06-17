@@ -2,6 +2,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
+import javafx.application.Platform;
 
 import java.util.*;
 import java.rmi.server.*;
@@ -20,19 +21,27 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
 
     public void run() {
         try {
-            System.out.println("Welcome to CODEX!");
-
-            // CHIEDI SE VUOLE GUI O TUI
-            Scanner scan = new Scanner(System.in);
-            System.out.print("Do you GUI? [Y/n] ");
-            String input = scan.nextLine();
-            if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
-                clientContainer.runGui(server, this);
-            } else if (input.equalsIgnoreCase("n")) {
-                this.server.connectRmi(this);
-                clientContainer.runCli(server);
+            if (!clientContainer.isRunning()){
+                System.out.println("Welcome to CODEX!");
+                Scanner scan = new Scanner(System.in);
+                System.out.print("Do you GUI? [Y/n] ");
+                String input = scan.nextLine();
+                if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
+                    clientContainer.runGui();
+                } else if (input.equalsIgnoreCase("n")) {
+                    this.server.connectRmi(this);
+                    clientContainer.runCli();
+                } else {
+                    System.out.println("Please enter a valid input!");
+                }
             } else {
-                System.out.println("Please enter a valid input!");
+                if (clientContainer.isMeDoGui()){
+                    clientContainer.getGuiApplication().setClientServer(this, server);
+                    clientContainer.getGuiApplication().changeScene("/fxml/lobby.fxml");
+                } else {
+                    //clientContainer.runCli();
+                    System.out.println("the server is now available, try to re-connect with command ADDUSER");
+                }
             }
         } catch (RemoteException e) {
 
@@ -71,11 +80,6 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     @Override
     public void updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException {
         clientContainer.updateTurnPhase(nextTurnPhase);
-    }
-
-    @Override
-    public void start() throws RemoteException {
-        clientContainer.start();
     }
 
     @Override
@@ -141,6 +145,11 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     @Override
     public void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException {
         clientContainer.updateWinner(playerIndexes);
+    }
+
+    @Override
+    public void updateElement(int playerIndex, Element element, int numberOfElements) throws RemoteException {
+        clientContainer.updateElement(playerIndex, element, numberOfElements);
     }
 
 }

@@ -52,11 +52,6 @@ public class ClientProxy implements VirtualView {
         output.flush();
     }
 
-    @Override
-    public void start() throws RemoteException {
-        output.println(Messages.START);
-        output.flush();
-    }
 
     @Override
     public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
@@ -143,6 +138,12 @@ public class ClientProxy implements VirtualView {
             message += "; " + playerIndex;
         }
         output.println(message);
+        output.flush();
+    }
+
+    @Override
+    public void updateElement(int playerIndex, Element element, int numberOfElements) throws RemoteException {
+        output.println(Messages.UPDATEELEMENT + "; " + playerIndex + "; " + element + "; " + numberOfElements);
         output.flush();
     }
 }

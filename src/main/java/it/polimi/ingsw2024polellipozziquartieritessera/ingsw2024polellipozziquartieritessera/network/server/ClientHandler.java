@@ -73,11 +73,6 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
-    public void start() throws RemoteException {
-        view.start();
-    }
-
-    @Override
     public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
         view.connectionInfo(playerIndex, connected);
     }
@@ -140,5 +135,10 @@ public class ClientHandler implements VirtualView {
     @Override
     public void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException {
         view.updateWinner(playerIndexes);
+    }
+
+    @Override
+    public void updateElement(int playerIndex, Element element, int numberOfElements) throws RemoteException {
+        view.updateElement(playerIndex, element, numberOfElements);
     }
 }

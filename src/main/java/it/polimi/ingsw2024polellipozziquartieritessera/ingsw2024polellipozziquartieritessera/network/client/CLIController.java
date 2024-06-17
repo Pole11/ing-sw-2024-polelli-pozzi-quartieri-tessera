@@ -71,6 +71,11 @@ public class CLIController {
 
 
     public void manageInput(VirtualServer server, VirtualView client, Client clientContainer, String[] message) throws RemoteException {
+        //
+        if (message[0].equalsIgnoreCase("PING")){
+            System.err.print("INVALID COMMAND\n> ");
+            return;
+        }
         try {
             if (message[1].equals("-h")){
                 Command.valueOf(message[0].toUpperCase()).getCommandRunnable(message, server, clientContainer, client).executeHelp();
@@ -103,34 +108,26 @@ public class CLIController {
         }
     }
 
+    public void showElements(){
+        System.out.println("this feature is not implemented yet, complain with the coders");
+    }
+
 
     public void printAllCommands() {
         AtomicInteger i = new AtomicInteger();
         System.out.print("The possible commands are: \n[");
         Arrays.stream(Command.values()).forEach(e->{
-            System.out.print(e + " ");
-            if(i.incrementAndGet() % 5 == 0)
-                System.out.print("]\n[");
+            if (!e.equals(Command.PING)){
+                System.out.print(e + " ");
+                if(i.incrementAndGet() % 5 == 0)
+                    System.out.print("]\n[");
+            } else {
+                i.decrementAndGet();
+            }
         });
         System.out.print("]\n");
         System.out.print("To see in more detail: <COMMAND> -h\n> ");
     }
-
-/*    public void printCard(int CardId, Side side){
-        ArrayList<String> cardToPrint = new ArrayList<>();
-        cardToPrint = getPrintedCard(CardId, side);
-
-        for(int i = 0; i < cardToPrint.size(); i++){
-            System.out.println(cardToPrint.get(i));
-        }
-    }*/
-
-/*    public ArrayList<String> getPrintedCard(int cardId, Side side) {
-        ArrayList<String> cardToPrint = null;
-        Card card = viewModel.cardById(cardId);
-        return cardToPrint = printCard(card, side);
-
-    }*/
 
     public void printBoard(ArrayList<ArrayList<Integer>> board, ArrayList<Integer> cardsOrder){
         int i = 0, j = 0, u = 0 ,v = 0, colorIndex = 0;
@@ -259,6 +256,7 @@ public class CLIController {
             printNCards(cards, sides);
         }
     }
+
     public void ShowSecretObjective(){
         if(viewModel.getGamePhase().ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
             System.err.print("Secret objectives not initialized yet\n>   ");
@@ -321,7 +319,8 @@ public class CLIController {
             }
             System.out.print("> ");
         }
-;    }
+    }
+
     public void showPoints(){
         if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()) {
             System.err.print("you cant ask players points before the main phase has started\n> ");
@@ -355,6 +354,16 @@ public class CLIController {
             }
             System.out.println();
             printNCards(cards, sides);
+        }
+    }
+
+    public void showColors(){
+        System.out.println("your color is: " + viewModel.getColorsMap(viewModel.getPlayerIndex()));
+        for (int i = 0; i < viewModel.getPlayersSize(); i++){
+            if (i != viewModel.getPlayerIndex()){
+                System.out.println("the color of " + viewModel.getNickname(i) + " is: " + viewModel.getColorsMap(i));
+
+            }
         }
     }
 
