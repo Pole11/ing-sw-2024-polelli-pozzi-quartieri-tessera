@@ -83,6 +83,8 @@ public class ClientBot {
                 pos.flush();
 
                 index++;
+
+                System.out.flush();
             } catch (InterruptedException | IOException e) {
                 System.out.println(lastCommand);
                 throw new RuntimeException(e);

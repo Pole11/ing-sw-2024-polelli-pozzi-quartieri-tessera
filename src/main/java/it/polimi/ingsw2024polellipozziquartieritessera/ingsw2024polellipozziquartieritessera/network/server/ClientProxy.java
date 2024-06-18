@@ -149,7 +149,7 @@ public class ClientProxy implements VirtualView {
 
     @Override
     public void updateChat(int playerIndex, String content) throws RemoteException {
-        output.println(Messages.UPDATECHAT + "; " + playerIndex + "; " + content);
+        output.println(Messages.UPDATECHAT + "; " + playerIndex + "; " + content.replace(" ","~"));
         output.flush();
     }
 }

@@ -133,6 +133,9 @@ public class SocketClient implements VirtualView {
                 case Messages.UPDATEELEMENT:
                     this.updateElement(Integer.parseInt(messageString[1]), Element.valueOf(messageString[2]), Integer.parseInt(messageString[3]));
                     break;
+                case Messages.UPDATECHAT:
+                    this.updateChat(Integer.parseInt(messageString[1]), messageString[2].replace("~", " "));
+                    break;
                 default:
                     System.err.println("[5xx INVALID MESSAGE FROM SERVER]");
                     break;

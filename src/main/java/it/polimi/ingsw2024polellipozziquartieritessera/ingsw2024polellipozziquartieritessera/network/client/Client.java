@@ -407,7 +407,9 @@ public class Client implements VirtualView {
     public void updateChat(int playerIndex, String content){
         viewModel.setNewMessage(playerIndex, content);
         if (meDoGui) guiApplication.updateController();
-        else ; // notify the user in some way (it should be easy)
+        else if (viewModel.getPlayerIndex() != playerIndex) {
+            cliController.showMessageAlert();
+        }
     }
 
     @Override

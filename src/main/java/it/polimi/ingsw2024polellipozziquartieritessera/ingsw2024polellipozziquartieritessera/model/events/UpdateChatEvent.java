@@ -17,9 +17,10 @@ public class UpdateChatEvent extends Event {
 
     @Override
     public void execute() {
+        String decodedContent = content.replace("~"," ");
         for (VirtualView client : clients) {
             try {
-                client.updateChat(playerIndex, content);
+                client.updateChat(playerIndex, decodedContent);
             } catch (RemoteException e) {
                 playerDisconnected(client);
             }
