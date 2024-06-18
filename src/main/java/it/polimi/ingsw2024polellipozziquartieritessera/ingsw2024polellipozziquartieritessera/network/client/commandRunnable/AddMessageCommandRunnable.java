@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 public class AddMessageCommandRunnable extends CommandRunnable {
 private String content;
 
-    public void setContent() { this.content = content; }
+    public void setContent(String content) { this.content = content; }
 
     @Override
     public void executeCLI() {

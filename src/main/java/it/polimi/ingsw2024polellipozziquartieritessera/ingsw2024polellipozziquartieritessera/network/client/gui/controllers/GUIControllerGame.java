@@ -3,6 +3,8 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.DrawType;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.AddMessageCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.DrawCardCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.FlipCardCommandRunnable;
 import javafx.application.Platform;
@@ -14,18 +16,12 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -45,8 +41,11 @@ public class GUIControllerGame extends GUIController {
     @FXML private VBox sharedResourceContainerGame;
     @FXML private Label currentPhase;
     private HashMap<Integer, ArrayList<Integer>> plateauCoordinatedMap;
+    private ListView<Text> chatListView;
 
     public GUIControllerGame() {
+        chatListView = new ListView<>();
+
         rotatePlayerContainer();
         populatePlateauCoordinateMap();
         setFontSize(mainContainerGame);
@@ -93,13 +92,13 @@ public class GUIControllerGame extends GUIController {
             if (sharedResourceContainerGame != null) sharedResourceContainerGame.getChildren().clear();
             if (sharedGoldContainerGame != null) sharedGoldContainerGame.getChildren().clear();
             if (plateauContainerGame != null) {
-                while (plateauContainerGame.getChildren().size() > 4) {
+                while (plateauContainerGame.getChildren().size() > 5) {
                     plateauContainerGame.getChildren().removeLast(); // the first two are the messages from server
                 }
             }
             for (int i = 0; i < 4; i++) {
                 if (mainContainerGame.lookup("#player" + i + "ContainerGame") != null) {
-                    while (((Pane) mainContainerGame.lookup("#player" + i + "ContainerGame")).getChildren().size() > 1) {
+                    while (mainContainerGame.lookup("#player" + i + "ContainerGame") != null && ((Pane) mainContainerGame.lookup("#player" + i + "ContainerGame")).getChildren().size() > 1) {
                         ((Pane) mainContainerGame.lookup("#player" + i + "ContainerGame")).getChildren().removeLast();
                     }
                 }
@@ -233,11 +232,13 @@ public class GUIControllerGame extends GUIController {
                 // TODO: un-highlight
                 for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
                     Node tempNode = mainContainerGame.lookup("#player" + i + "ContainerGame");
+                    if (tempNode == null) continue;
                     tempNode.getStyleClass().remove(getViewModel().getColorsMap(i).toString().toLowerCase() + "Background");
                 }
 
                 // TODO: get current player id
                 Node currentPlayerHBox = mainContainerGame.lookup("#player" + idCurrentPlayer + "ContainerGame"); // ROTATE HERE
+                if (currentPlayerHBox == null) return;
 
                 // TODO: get current player color
                 Color currentPlayerColor = color;
@@ -250,7 +251,9 @@ public class GUIControllerGame extends GUIController {
         Platform.runLater(() -> {
             for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
                 Pane plateauImageViewPane = (Pane) mainContainerGame.lookup("#plateauImageViewPane");
+                if (plateauImageViewPane == null) return;
                 Circle oldCircle = (Circle) plateauImageViewPane.lookup("#circlePoints" + i);
+                if (oldCircle == null) return;
                 plateauImageViewPane.getChildren().remove(oldCircle);
                 int x, y;
                 try {
@@ -282,16 +285,29 @@ public class GUIControllerGame extends GUIController {
                 infoContainerVBox.setId("infoContainerPlayer" + playerId);
                 String currentPlayerNickname = nicknames.get(playerId);
                 Text nicknameText = new Text(currentPlayerNickname + " (" + getViewModel().getColorsMap(playerId) + " " + getViewModel().getPointsMap(playerId) + ")");
+                Text connectionText = new Text();
+                if (getViewModel().getConnession(playerId)) {
+                    connectionText.setText("Connected");
+                    connectionText.getStyleClass().remove("redText");
+                    connectionText.getStyleClass().add("greenText");
+                } else {
+                    connectionText.setText("Not Connected");
+                    connectionText.getStyleClass().remove("greenText");
+                    connectionText.getStyleClass().add("redText");
+                }
+
+                //nicknameText.getStyleClass().add("nicknameText");
                 Button expandButton = new Button("Expand Board");
                 expandButton.setOnMousePressed(mouseEvent -> {
                     HashMap<String, Integer> paramsMap = new HashMap<>();
                     paramsMap.put("playerId", playerId);
                     goToScene("/fxml/board.fxml", paramsMap);
                 });
-                infoContainerVBox.getChildren().addAll(nicknameText, expandButton);
+                infoContainerVBox.getChildren().addAll(nicknameText, expandButton, connectionText);
                 infoContainerVBox.setAlignment(Pos.CENTER);
 
                 Pane playerContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "ContainerGame"); // ROTATE HERE
+                if (playerContainer == null) return;
                 playerContainer.getChildren().add(infoContainerVBox);
 
                 updatePlayerHand(playerId, meId, playerHandCards);
@@ -317,6 +333,7 @@ public class GUIControllerGame extends GUIController {
                     } else {
                         tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", (int) (getWindowHeight()*0.1));
                     }
+                    if (tempImageView == null) continue;
                     tempImageView.setId("player" + playerId + "card" + cardId);
                     //tempImageView.getStyleClass().add("imageWithBorder");
                     if (handContainer != null) handContainer.getChildren().add(tempImageView);
@@ -359,6 +376,7 @@ public class GUIControllerGame extends GUIController {
                 //tempImageView.getStyleClass().add("imageWithBorder");
 
                 Pane playerContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "HandContainerGame"); // ROTATE HERE
+                if (playerContainer == null) return;
                 playerContainer.getChildren().add(tempImageView);
                 Separator verticalSeparator = new Separator();
                 verticalSeparator.setOrientation(Orientation.VERTICAL);
@@ -435,44 +453,111 @@ public class GUIControllerGame extends GUIController {
     }
 
     @FXML
+    private void handleOpenChat(ActionEvent event) {
+        Platform.runLater(() -> {
+            // Create a new stage for the image viewer
+            Stage chatStage = new Stage();
+            //chatStage.initModality(Modality.APPLICATION_MODAL);
+            chatStage.initStyle(StageStyle.DECORATED);
+            chatStage.setTitle("Chat");
+
+            VBox containerVBox = new VBox();
+
+            //ListView<Text> chatListView = new ListView<>();
+            chatListView.setId("chatListView");
+            VBox.setVgrow(chatListView, Priority.ALWAYS);
+            containerVBox.getChildren().add(chatListView);
+
+            populateChatListview();
+
+            HBox newMessageContainer = new HBox();
+            newMessageContainer.setMaxHeight(100);
+            VBox.setVgrow(newMessageContainer, Priority.ALWAYS);
+            newMessageContainer.setAlignment(Pos.CENTER);
+            containerVBox.getChildren().add(newMessageContainer);
+            TextArea textArea = new TextArea();
+            textArea.getStyleClass().add("chatTextArea");
+            newMessageContainer.getChildren().add(textArea);
+            textArea.prefHeightProperty().bind(newMessageContainer.heightProperty());
+            Button btnSend = new Button("Send");
+            newMessageContainer.getChildren().add(btnSend);
+            HBox.setHgrow(textArea, Priority.ALWAYS);
+            btnSend.prefHeightProperty().bind(newMessageContainer.heightProperty());
+            btnSend.setOnAction(mouseEvent -> {
+                AddMessageCommandRunnable command = new AddMessageCommandRunnable();
+                command.setContent(textArea.getText());
+                addCommand(command,this);
+                textArea.setText("");
+                populateChatListview();
+            });
+
+            // Create a Scene for the new Stage
+            Scene scene = new Scene(containerVBox, (int) (getWindowHeight()*0.65), (int) (getWindowHeight()*0.43));
+            String mainCss = getClass().getResource("/style/main.css").toExternalForm();
+            String chatCss = getClass().getResource("/style/chat.css").toExternalForm();
+            scene.getStylesheets().addAll(mainCss, chatCss);
+            chatStage.setScene(scene);
+            chatStage.show();
+        });
+    }
+
+    private void populateChatListview() {
+        chatListView.getItems().clear();
+
+        ArrayList<Message> messages = getViewModel().getChat().getMessages(); // implement with view model
+
+        if (messages != null) {
+            for (int i = messages.size() - 1; i >= 0; i--) {
+                Message m = messages.get(i);
+                if (m == null) continue;
+                Text tempText = new Text(getViewModel().getNickname(m.getAuthor()) + ": " + m.getContent());
+                chatListView.getItems().add(tempText);
+            }
+        }
+    }
+
+    @FXML
     private void handleOpenGameRules(ActionEvent event) {
-        // Create a new stage for the image viewer
-        Stage imageStage = new Stage();
-        //imageStage.initModality(Modality.APPLICATION_MODAL);
-        imageStage.initStyle(StageStyle.DECORATED);
-        imageStage.setTitle("Game Rules");
+        Platform.runLater(() -> {
+            // Create a new stage for the image viewer
+            Stage imageStage = new Stage();
+            //imageStage.initModality(Modality.APPLICATION_MODAL);
+            imageStage.initStyle(StageStyle.DECORATED);
+            imageStage.setTitle("Game Rules");
 
-        // Create an ImageView to display the image
-        javafx.scene.image.Image image = new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResource("/img/rulebook.png")).toExternalForm());
-        javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView(image);
-        imageView.setPreserveRatio(true);
-        //imageView.setFitWidth((int) (getWindowHeight()*0.63));  // Adjust the width as needed
-        DoubleBinding adjustedWidth = Bindings.createDoubleBinding(
-                () -> imageStage.getWidth() - 20,
-                imageStage.widthProperty()
-        );
-        imageView.fitWidthProperty().bind(adjustedWidth);
+            // Create an ImageView to display the image
+            javafx.scene.image.Image image = new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResource("/img/rulebook.png")).toExternalForm());
+            javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView(image);
+            imageView.setPreserveRatio(true);
+            //imageView.setFitWidth((int) (getWindowHeight()*0.63));  // Adjust the width as needed
+            DoubleBinding adjustedWidth = Bindings.createDoubleBinding(
+                    () -> imageStage.getWidth() - 20,
+                    imageStage.widthProperty()
+            );
+            imageView.fitWidthProperty().bind(adjustedWidth);
 
-        // Create a ScrollPane to make the ImageView scrollable
-        javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(imageView);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
+            // Create a ScrollPane to make the ImageView scrollable
+            javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(imageView);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setFitToHeight(true);
 
-        // Create a Scene for the new Stage
-        Scene scene = new Scene(scrollPane, (int) (getWindowHeight()*0.65), (int) (getWindowHeight()*0.43));
-        imageStage.setScene(scene);
-        imageStage.show();
+            // Create a Scene for the new Stage
+            Scene scene = new Scene(scrollPane, (int) (getWindowHeight()*0.65), (int) (getWindowHeight()*0.43));
+            imageStage.setScene(scene);
+            imageStage.show();
+        });
     }
 
     @Override
     public void update() {
-        populatePlateauCoordinateMap(); // only for TEST
+        //populatePlateauCoordinateMap(); // only for TEST
         Platform.runLater(() -> {
             clearAllchilds();
             initTable();
             highlightCurrentPlayerTable();
             updatePoints();
             setCurrentPhase();
+            populateChatListview();
         });
     }
 

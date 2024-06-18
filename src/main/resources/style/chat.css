@@ -1,0 +1,53 @@
+
+/* Default background color for ListView */
+.list-view {
+    -fx-background-color: rgb(220, 200, 60);
+}
+
+/* Default text color for ListView items */
+.list-cell {
+    -fx-text-fill: rgb(0,0,0);
+    -fx-background-color: rgb(220, 200, 60);
+}
+
+/* Background color for selected items */
+.list-cell:filled:selected, .list-cell:filled:selected:focused {
+    -fx-background-color: rgb(150, 130, 25); /* Green background for selected items */
+    -fx-text-fill: rgb(0,0,0);          /* White text for selected items */
+}
+
+/* Background color for hovered items */
+.list-cell:filled:hover {
+    -fx-background-color: rgb(180, 160, 30); /* Light grey background for hovered items */
+}
+
+/* Border color for ListView */
+.list-view {
+    -fx-border-color: rgb(180, 160, 30);
+    -fx-border-width: 3px;
+}
+
+/* Scroll bar customization */
+.scroll-bar:vertical .thumb {
+    -fx-background-color: rgb(180, 160, 30); /* Green scroll bar thumb */
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: rgb(220, 200, 60); /* Light grey scroll bar track */
+}
+
+Button {
+    -fx-border-radius: 0;
+}
+
+.text-area {
+    -fx-background-color: rgb(220, 200, 60); /* Background color */
+    -fx-text-fill: rgb(0,0,0);        /* Text color */
+    -fx-border-color: rgb(180, 160, 30);     /* Border color */
+}
+
+/* Style the TextArea when it is focused */
+.text-area:focused {
+    -fx-border-color: rgb(150, 130, 25);     /* Border color when focused */
+}
+
