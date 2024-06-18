@@ -42,6 +42,7 @@ public class GUIControllerGame extends GUIController {
     @FXML private Label currentPhase;
     private HashMap<Integer, ArrayList<Integer>> plateauCoordinatedMap;
     private ListView<Text> chatListView;
+    private boolean chatOpen;
 
     public GUIControllerGame() {
         chatListView = new ListView<>();
@@ -233,7 +234,9 @@ public class GUIControllerGame extends GUIController {
                 for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
                     Node tempNode = mainContainerGame.lookup("#player" + i + "ContainerGame");
                     if (tempNode == null) continue;
-                    tempNode.getStyleClass().remove(getViewModel().getColorsMap(i).toString().toLowerCase() + "Background");
+                    Color currentColor = getViewModel().getColorsMap(i);
+                    if (currentColor == null) continue;
+                    tempNode.getStyleClass().remove(currentColor.toString().toLowerCase() + "Background");
                 }
 
                 // TODO: get current player id
@@ -253,7 +256,7 @@ public class GUIControllerGame extends GUIController {
                 Pane plateauImageViewPane = (Pane) mainContainerGame.lookup("#plateauImageViewPane");
                 if (plateauImageViewPane == null) return;
                 Circle oldCircle = (Circle) plateauImageViewPane.lookup("#circlePoints" + i);
-                if (oldCircle == null) return;
+                //if (oldCircle == null) return;
                 plateauImageViewPane.getChildren().remove(oldCircle);
                 int x, y;
                 try {
@@ -455,8 +458,11 @@ public class GUIControllerGame extends GUIController {
     @FXML
     private void handleOpenChat(ActionEvent event) {
         Platform.runLater(() -> {
-            // Create a new stage for the image viewer
+            if (chatOpen) return;
+            chatOpen = true;
+
             Stage chatStage = new Stage();
+            chatStage.setOnCloseRequest(closeEvent -> { chatOpen = false; });
             //chatStage.initModality(Modality.APPLICATION_MODAL);
             chatStage.initStyle(StageStyle.DECORATED);
             chatStage.setTitle("Chat");
@@ -555,9 +561,9 @@ public class GUIControllerGame extends GUIController {
             clearAllchilds();
             initTable();
             highlightCurrentPlayerTable();
-            updatePoints();
             setCurrentPhase();
             populateChatListview();
+            updatePoints();
         });
     }
 
