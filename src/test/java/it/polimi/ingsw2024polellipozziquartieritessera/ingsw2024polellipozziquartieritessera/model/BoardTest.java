@@ -148,7 +148,7 @@ public class BoardTest {
             // test if launch exception
             assertThrows(IllegalArgumentException.class, () -> b.drawSharedGoldCard(4));
             assertThrows(IllegalArgumentException.class, () -> b.drawSharedResourceCard(4));
-        } catch (WrongStructureConfigurationSizeException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (EmptyDeckException e) {
             throw new RuntimeException(e);
@@ -201,7 +201,7 @@ public class BoardTest {
 
             // If deck is ended
             assertThrows(EmptyDeckException.class, ()->b.drawFromResourceDeck());
-        } catch (WrongStructureConfigurationSizeException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -233,7 +233,7 @@ public class BoardTest {
 
             // If deck is ended
             assertThrows(EmptyDeckException.class, b::drawFromGoldDeck);
-        } catch (WrongStructureConfigurationSizeException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

@@ -13,6 +13,7 @@ import java.rmi.registry.Registry;
 import java.util.*;
 
 public class ClientBot {
+    static String lastCommand = null;
     public static void main(String[] args) throws IOException {
         String input = args[0];
         String host = args[1];
@@ -26,6 +27,7 @@ public class ClientBot {
             try {
                 (new Client(input, host, port)).startClient();
             } catch (IOException e) {
+                System.out.println(lastCommand);
                 throw new RuntimeException(e);
             }
         });
@@ -36,7 +38,6 @@ public class ClientBot {
     }
 
     private static void insertInputs(PipedOutputStream pos) {
-
         String path = new File("").getAbsolutePath();
         String filePath=  path + "/src/test/java/it/polimi/ingsw2024polellipozziquartieritessera/ingsw2024polellipozziquartieritessera/bots/bot_commands.txt";
         List<String> commands = fileParsing(filePath);
@@ -46,6 +47,7 @@ public class ClientBot {
         try {
             Thread.sleep(2000); // Give the client some time to start
         } catch (InterruptedException e) {
+            System.out.println(lastCommand);
             throw new RuntimeException(e);
         }
 
@@ -53,12 +55,13 @@ public class ClientBot {
             pos.write(("n\n").getBytes());
             pos.flush();
         } catch (IOException e) {
+            System.out.println(lastCommand);
             throw new RuntimeException(e);
         }
 
         while (true) {
             try {
-                Thread.sleep(100); // Wait 1 second between inputs
+                Thread.sleep(10); // Wait 1 second between inputs
 
                 if (index == commands.size()) {
                     index = 0;
@@ -70,11 +73,18 @@ public class ClientBot {
                     chooseCommand = generateRandomPlaceCardCommand();
                 }
 
+                if (Objects.equals(chooseCommand, "PLACESTARTER")){
+                    chooseCommand = generateRandomPlaceStarterCommand();
+                }
+
+                lastCommand = chooseCommand;
+
                 pos.write((chooseCommand +"\n").getBytes());
                 pos.flush();
 
                 index++;
             } catch (InterruptedException | IOException e) {
+                System.out.println(lastCommand);
                 throw new RuntimeException(e);
             }
         }
@@ -88,6 +98,28 @@ public class ClientBot {
         int tableCardId;
         do {
             tableCardId = random.nextInt(86) + 1;
+        } while (tableCardId == placingCardId);
+
+        // Possible orientations and positions
+        String[] orientations = {"Upright", "Upleft", "Downright", "Downleft"};
+        String[] positions = {"Front", "Back"};
+
+        // Select random orientation and position
+        String orientation = orientations[random.nextInt(orientations.length)];
+        String position = positions[random.nextInt(positions.length)];
+
+        // Construct the command
+        return String.format("PLACECARD %d %d %s %s", placingCardId, tableCardId, orientation, position);
+    }
+
+    private static String generateRandomPlaceStarterCommand(){
+        Random random = new Random();
+
+        // Generate random placing card id and table card id, ensuring they are different
+        int placingCardId = random.nextInt(80) + 1;
+        int tableCardId;
+        do {
+            tableCardId = random.nextInt(6) + 81;
         } while (tableCardId == placingCardId);
 
         // Possible orientations and positions

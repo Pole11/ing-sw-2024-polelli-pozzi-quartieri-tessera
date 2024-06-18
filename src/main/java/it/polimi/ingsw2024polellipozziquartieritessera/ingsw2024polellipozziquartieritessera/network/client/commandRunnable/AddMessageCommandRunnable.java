@@ -1,19 +1,41 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable;
 
+import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class AddMessageCommandRunnable extends CommandRunnable {
+private String content;
+
+    public void setContent(String content) { this.content = content; }
 
     @Override
     public void executeCLI() {
-
+        try {
+            try{
+                server.addMessage(client, Arrays.stream(messageFromCli)
+                        .skip(1)
+                        .collect(Collectors.joining(" ")));
+                System.out.print("Message sent\n> ");
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+            System.err.print("INVALID COMMAND\n> ");
+        }
     }
 
     @Override
     public void executeGUI() {
-
+        try {
+            server.addMessage(client, content);
+        } catch (RemoteException e) {
+            this.serverDisconnectedGUI();
+        }
     }
 
     @Override
     public void executeHelp() {
-        System.out.print("ADDMESSAGE\none day we will have a chat, i presume.....\n> ");
+        System.out.print("ADDMESSAGE\n content\nThe command add a message to the global chat with all players\n> ");
     }
 }

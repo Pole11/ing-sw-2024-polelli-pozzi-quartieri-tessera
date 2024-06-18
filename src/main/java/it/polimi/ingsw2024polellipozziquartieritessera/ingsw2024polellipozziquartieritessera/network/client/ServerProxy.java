@@ -71,12 +71,6 @@ public class ServerProxy implements VirtualServer {
     }
 
     @Override
-    public void openChat() throws RemoteException {
-        output.println(Command.OPENCHAT);
-        output.flush();
-    }
-
-    @Override
     public void addMessage(VirtualView client, String content) throws RemoteException {
         output.println(Command.ADDMESSAGE + "; " + content);
         output.flush();

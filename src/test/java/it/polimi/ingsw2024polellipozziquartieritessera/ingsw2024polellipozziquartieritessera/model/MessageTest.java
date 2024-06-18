@@ -16,7 +16,7 @@ public class MessageTest {
         ArrayList<Message> messages = new ArrayList<Message>();
         for (int i = 0; i < k; i++) {
             String content = "contenuto " + i;
-            Message m = new Message(0, dt, content);
+            Message m = new Message(0, content);
             messages.add(m);
         }
 

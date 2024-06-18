@@ -39,6 +39,7 @@
                         styleClass="serverError"/>
                 <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
                 <Button onAction="#handleOpenGameRules" text="Game Rules" />
+                <Button onAction="#handleOpenChat" text="Open Chat" />
                 <Label
                         fx:id="currentPhase"/>
             </VBox>

@@ -1,28 +1,18 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable;
 
-import java.rmi.RemoteException;
-
-public class OpenChatCommandRunnable extends CommandRunnable{
+public class OpenChatCommandRunnable extends CommandRunnable {
     @Override
     public void executeCLI() {
-        try {
-            server.openChat();
-        } catch (RemoteException e) {
-            serverDisconnectedCLI();
-        }
+        clientContainer.getCliController().showChat();
     }
 
     @Override
     public void executeGUI() {
-        try {
-            server.openChat();
-        } catch (RemoteException e) {
-            this.serverDisconnectedGUI();
-        }
+
     }
 
     @Override
     public void executeHelp() {
-        System.out.print("SHOWCHAT\none day we will have a chat, i presume.....\n> ");
+        System.out.print("SHOWCHAT\nthe command shows the chat from the beginning of the game\n>");
     }
 }

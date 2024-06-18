@@ -62,6 +62,10 @@ public class GUITest {
         viewModel.updatePlayerBoard(1, 75, 65, CornerPos.UPLEFT, Side.FRONT);
         viewModel.updatePlayerBoard(1, 37, 75, CornerPos.UPLEFT, Side.FRONT);
 
+        viewModel.setConnection(0, true);
+        viewModel.setConnection(1, false);
+        viewModel.setConnection(2, true);
+
         GUIApplication guiApplication = new GUIApplication();
         guiApplication.runGui(null, null, null, viewModel);
     }

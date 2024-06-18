@@ -16,7 +16,6 @@ public enum Command {
      DRAWCARD(DrawCardCommandRunnable::new, "Network"),
      FLIPCARD(FlipCardCommandRunnable::new, "Network"),
      HELP(HelpCommandRunnable::new, "Local"),
-     OPENCHAT(OpenChatCommandRunnable::new, "Network"),
      PING(PingCommandRunnable::new, "Network"),
      PLACECARD(PlaceCardCommandRunnable::new, "Network"),
      SHOWBOARD(ShowBoardCommandRunnable::new, "Local"),
@@ -28,6 +27,7 @@ public enum Command {
      SHOWPLAYERS(ShowPlayersCommandRunnable::new, "Local"),
      SHOWPOINTS(ShowPointsCommandRunnable::new, "Local"),
      SHOWSECRETOBJECTIVES(ShowSecretObjectiveCommandRunnable::new, "Local"),
+     OPENCHAT(OpenChatCommandRunnable::new, "Local"),
      START(StartCommandRunnable::new, "Network");
 
      private final Supplier<? extends CommandRunnable> commandSupplier;

@@ -20,9 +20,9 @@ Text {
 }
 
 .cardDeck {
-    -fx-border-width: 0px 5px 5px 0px;
+    -fx-border-width: 0px 5px 7px 0px;
     -fx-border-style: solid;
-    -fx-border-color: rgb(140, 120, 0);
+    -fx-border-color: rgb(74, 74, 74);
 }
 
 .plateauContainerGame {
@@ -68,4 +68,12 @@ Text {
 
 Text {
     -fx-fill: white;
+}
+
+.greenText {
+    -fx-fill: green;
+}
+
+.redText {
+    -fx-fill: red;
 }

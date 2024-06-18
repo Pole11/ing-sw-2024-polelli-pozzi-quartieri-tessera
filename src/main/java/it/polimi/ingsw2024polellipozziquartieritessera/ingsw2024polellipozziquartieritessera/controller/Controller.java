@@ -255,9 +255,11 @@ public class Controller {
             player.changeHandSide(cardId, side);}
     }
 
-    public void openChat(){}
-
-    public void addMessage(int playerIndex, String content){}
+    public void addMessage(int playerIndex, String content){
+        synchronized (this.gameState){
+            gameState.addMessage(playerIndex, content);
+        }
+    }
 
     public synchronized void ping(VirtualView client){
         gameState.pingAnswer(client);
