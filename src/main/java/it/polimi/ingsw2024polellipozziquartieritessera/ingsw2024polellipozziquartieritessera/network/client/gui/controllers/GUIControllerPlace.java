@@ -140,6 +140,7 @@ public class GUIControllerPlace extends GUIController {
                 playerBoard = rotateBoard(playerBoard);
                 resizeI(playerBoard);
 
+                // TODO: prova ad aggiungere il scroll pane
                 GridPane gridPane = new GridPane();
                 //gridPane.setGridLinesVisible(true);
                 try {

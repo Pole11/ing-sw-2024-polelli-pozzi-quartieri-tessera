@@ -489,6 +489,7 @@ public class GUIControllerGame extends GUIController {
             newMessageContainer.getChildren().add(btnSend);
             HBox.setHgrow(textArea, Priority.ALWAYS);
             btnSend.prefHeightProperty().bind(newMessageContainer.heightProperty());
+            setFontSize(btnSend);
             btnSend.setOnAction(mouseEvent -> {
                 AddMessageCommandRunnable command = new AddMessageCommandRunnable();
                 command.setContent(textArea.getText());

@@ -84,6 +84,7 @@ public class Controller {
                 this.gameState.startGame(client);
             } catch (EmptyDeckException e) {
                 //if in this moment of the game the deck is empty, it's a programming error
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
@@ -157,6 +158,7 @@ public class Controller {
                 tableCard = (CornerCard) gameState.getCard(tableCardId);
             } catch (ClassCastException e){
                 //sent to client
+                e.printStackTrace();
                 throw new WrongInstanceTypeException("the card you selected is not a CornerCard");
             }
 
@@ -165,12 +167,18 @@ public class Controller {
 
             placeCardCheckings(player, placingCard, placingCardId, tableCorner, placingCorner, placingCardSide);
 
-            this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
+            try {
+                this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
+            } catch(CardNotOnBoardException e) {
+                e.printStackTrace();
+                return;
+            }
 
             try {
                 player.updatePlayerCardsMap(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);
             } catch (WrongInstanceTypeException e) {
                 //throw exception if placingCard is a starter card, it is already checked so if it happens here it's a programming mistake
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
 
@@ -201,7 +209,9 @@ public class Controller {
             Board board = this.gameState.getMainBoard();
             Player currentPlayer = this.gameState.getCurrentPlayer();
 
-            if (currentPlayer.getHandSize() >= Config.MAX_HAND_CARDS) throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
+            if (currentPlayer.getHandSize() >= Config.MAX_HAND_CARDS) {
+                throw new InvalidHandException("Player " + currentPlayer + " has too many cards in hand");
+            }
             GoldCard newGoldCard = null;
             ResourceCard newResourceCard = null;
 
@@ -234,10 +244,10 @@ public class Controller {
                     break;
                 default:
             }
+            this.gameState.changeCurrentPlayer();
+            gameState.checkGameEnded();
+            gameState.updateMainBoard();
         }
-        this.gameState.changeCurrentPlayer();
-        gameState.checkGameEnded();
-        gameState.updateMainBoard();
     }
 
     public void flipCard(int playerIndex, int cardId) throws CardIsNotInHandException {
@@ -252,7 +262,8 @@ public class Controller {
             } else {
                 side = Side.FRONT;
             }
-            player.changeHandSide(cardId, side);}
+            player.changeHandSide(cardId, side);
+        }
     }
 
     public void addMessage(int playerIndex, String content){
