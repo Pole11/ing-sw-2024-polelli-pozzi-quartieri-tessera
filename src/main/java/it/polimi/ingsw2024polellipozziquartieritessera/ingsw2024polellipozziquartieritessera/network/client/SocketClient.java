@@ -242,4 +242,9 @@ public class SocketClient implements VirtualView {
     public void updateElement(int playerIndex, Element element, int numberOfElements) throws RemoteException {
         clientContainer.updateElement(playerIndex, element, numberOfElements);
     }
+
+    @Override
+    public void updateChat(int playerIndex, String content) throws RemoteException {
+        clientContainer.updateChat(playerIndex, content);
+    }
 }

@@ -146,4 +146,10 @@ public class ClientProxy implements VirtualView {
         output.println(Messages.UPDATEELEMENT + "; " + playerIndex + "; " + element + "; " + numberOfElements);
         output.flush();
     }
+
+    @Override
+    public void updateChat(int playerIndex, String content) throws RemoteException {
+        output.println(Messages.UPDATECHAT + "; " + playerIndex + "; " + content);
+        output.flush();
+    }
 }

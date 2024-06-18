@@ -26,8 +26,6 @@ public interface VirtualServer extends Remote {
 
     public void flipCard(VirtualView client, int cardId) throws RemoteException;
 
-    public void openChat() throws RemoteException;
-
     public void addMessage(VirtualView client, String content) throws RemoteException;
 
     public void ping(VirtualView client) throws RemoteException;

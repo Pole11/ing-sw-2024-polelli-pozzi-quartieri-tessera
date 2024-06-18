@@ -1130,6 +1130,17 @@ public class GameState {
         }
     }
 
+//------------ chat ---------------
+
+    public void addMessage(int playerIndex, String content){
+        this.chat.addMessage(playerIndex, content);
+
+        synchronized (eventQueue) {
+            eventQueue.add(new UpdateChatEvent(this, allConnectedClients(), playerIndex, content));
+            eventQueue.notifyAll();
+        }
+    }
+
 
 //------------ others --------------------
 

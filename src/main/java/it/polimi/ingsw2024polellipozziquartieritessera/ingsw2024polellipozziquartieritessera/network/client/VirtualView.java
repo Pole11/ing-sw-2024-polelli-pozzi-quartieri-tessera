@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
 
 import java.rmi.*;
 import java.util.ArrayList;
@@ -28,4 +29,5 @@ public interface VirtualView extends Remote {
     void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException;
     void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException;
     void updateElement(int playerIndex, Element element, int numberOfElements) throws RemoteException;
+    void updateChat(int playerIndex, String content) throws RemoteException;
 }

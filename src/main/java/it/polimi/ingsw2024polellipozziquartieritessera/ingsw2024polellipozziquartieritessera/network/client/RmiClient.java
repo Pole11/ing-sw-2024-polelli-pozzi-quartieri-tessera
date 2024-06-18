@@ -152,4 +152,9 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
         clientContainer.updateElement(playerIndex, element, numberOfElements);
     }
 
+    @Override
+    public void updateChat(int playerIndex, String content) throws RemoteException {
+        clientContainer.updateChat(playerIndex, content);
+    }
+
 }

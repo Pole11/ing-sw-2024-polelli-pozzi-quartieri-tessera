@@ -220,11 +220,6 @@ public class Server implements VirtualServer {
     }
 
     @Override
-    public void openChat() {
-        this.controller.openChat();
-    }
-
-    @Override
     public void addMessage(VirtualView client, String content) {
         this.controller.addMessage(getPlayerIndex(client), content);
     }

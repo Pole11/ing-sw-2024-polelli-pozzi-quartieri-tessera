@@ -5,6 +5,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Global;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Chat;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
@@ -14,6 +15,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ public class ViewModel {
     private final HashMap<Integer, Color> colorsMap;
     private final HashMap<Integer, Integer> pointsMap;
     private final HashMap<Integer, HashMap> elementsMap;
+    private final Chat chat;
     private int starterCardId;
     private final int[] objectives; // 0,1 are common - 2,3 are secret (2 is the chosen one) // if the card is not set it is -1
     private GamePhase gamePhase;
@@ -37,7 +40,6 @@ public class ViewModel {
     private final HashMap<Integer,Side> handsSideMap; // side delle carte in mano (unico per id)
     private final HashMap<Integer,ArrayList<ArrayList<Integer>>> boardsMap; // mappa delle board dei players
     private int[] mainBoard; // se la carta non c'è viene inizializzata a -1
-    private Chat chat;
     private HashMap<Integer,ArrayList<Integer>> placingCardOrderMap;
 
     public ViewModel() {
@@ -59,6 +61,7 @@ public class ViewModel {
         colorsMap = new HashMap<>();
         pointsMap = new HashMap<>();
         populateCardsMap();
+        chat = new Chat();
 
         placingCardOrderMap = new HashMap<>();
     }
@@ -471,5 +474,13 @@ public class ViewModel {
             }
         }
         return corners;
+    }
+
+    public void setNewMessage(int playerIndex, String content) {
+        chat.addMessage(playerIndex, content);
+    }
+
+    public Chat getChat(){
+        return chat;
     }
 }

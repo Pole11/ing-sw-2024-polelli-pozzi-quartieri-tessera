@@ -141,4 +141,9 @@ public class ClientHandler implements VirtualView {
     public void updateElement(int playerIndex, Element element, int numberOfElements) throws RemoteException {
         view.updateElement(playerIndex, element, numberOfElements);
     }
+
+    @Override
+    public void updateChat(int playerIndex, String content) throws RemoteException {
+        view.updateChat(playerIndex, content);
+    }
 }

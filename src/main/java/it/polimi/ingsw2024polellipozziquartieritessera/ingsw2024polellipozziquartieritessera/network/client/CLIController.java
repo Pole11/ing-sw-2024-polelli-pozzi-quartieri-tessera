@@ -2,6 +2,8 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Chat;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
@@ -797,4 +799,15 @@ public class CLIController {
         }
     }
 
+    public void showChat() {
+        Chat chat = viewModel.getChat();
+
+        System.out.println("-------- GAME CHAT --------");
+        for (Message message : chat.getMessages()){
+            String playerName = viewModel.getNickname(message.getAuthor());
+            System.out.println("[" + playerName + "] " + message.getContent());
+        }
+
+        System.out.print("> ");
+    }
 }
