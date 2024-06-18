@@ -51,6 +51,11 @@ public class GUITest {
         viewModel.updatePlayerBoard(0, 25, 5, CornerPos.UPRIGHT, Side.FRONT);
         viewModel.updatePlayerBoard(0, 17, 5, CornerPos.UPLEFT, Side.FRONT);
 
+        int off = 9;
+        viewModel.setPoints(0,0 + off*3);
+        viewModel.setPoints(1,1 + off*3);
+        viewModel.setPoints(2,2 + off*3);
+
         viewModel.initializeBoard(1, 34);
         viewModel.updatePlayerBoard(1, 35, 34, CornerPos.UPLEFT, Side.FRONT);
         viewModel.updatePlayerBoard(1, 65, 34, CornerPos.UPLEFT, Side.FRONT);

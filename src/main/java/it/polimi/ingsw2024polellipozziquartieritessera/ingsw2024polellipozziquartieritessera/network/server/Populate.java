@@ -333,19 +333,26 @@ public class Populate {
             player.setHandCardsMap(handCardsMap);
 
             Color color = null;
-            if (playerJson.get("color") != ""){
+            if (!playerJson.get("color").equals("")){
                 color = Color.valueOf((String) playerJson.get("color"));
+                player.setColor(color);
             }
-            player.setColor(color);
+
 
             int objectivesWon = (int) playerJson.get("objectivesWon");
             player.setObjectivesWon(objectivesWon);
 
-            StarterCard starterCard = (StarterCard) createCard(false, (Map) cards.get(String.valueOf(playerJson.get("starterCard"))) , (Integer) playerJson.get("starterCard"));
-            player.setStarterCard(starterCard);
+            StarterCard starterCard = null;
+            if (!playerJson.get("starterCard").equals("")){
+                starterCard = (StarterCard) createCard(false, (Map) cards.get(String.valueOf(playerJson.get("starterCard"))) , (Integer) playerJson.get("starterCard"));
+                player.setStarterCard(starterCard);
+            }
 
-            ObjectiveCard objectiveCard = (ObjectiveCard) createCard(false, (Map) cards.get(String.valueOf(playerJson.get("objectiveCard"))) , (Integer) playerJson.get("objectiveCard"));
-            player.setObjectiveCard(objectiveCard);
+            ObjectiveCard objectiveCard = null;
+            if (!playerJson.get("objectiveCard").equals("")){
+                objectiveCard = (ObjectiveCard) createCard(false, (Map) cards.get(String.valueOf(playerJson.get("objectiveCard"))) , (Integer) playerJson.get("objectiveCard"));
+                player.setObjectiveCard(objectiveCard);
+            }
 
 
             if (playerJson.get("objectiveCardOptions") != ""){
@@ -371,11 +378,13 @@ public class Populate {
             }
             player.setAllElements(allElements);
 
+            gameState.addPlayerThread();
             gameState.addPlayer(player);
-            player.setConnected(true);
 
         }
-        //System.out.println("j");
+
+
+        System.out.println("j");
         /*
 
 

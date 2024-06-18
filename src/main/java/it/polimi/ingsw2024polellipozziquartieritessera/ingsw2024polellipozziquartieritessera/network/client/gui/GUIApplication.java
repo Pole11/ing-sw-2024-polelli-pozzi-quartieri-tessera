@@ -80,8 +80,8 @@ public class GUIApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml")); // uncomment for real use
-        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/game.fxml")); // uncomment for testing
+        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml")); // uncomment for real use
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml")); // uncomment for testing
         Parent root = fxmlLoader.load();
 
         String audioFilePath = "/sounds/soundtrack.mp3";
@@ -139,6 +139,13 @@ public class GUIApplication extends Application {
         guiController.setViewModel(viewModel);
         guiController.setMediaPlayer(mediaPlayer);
         guiController.setWindowHeight((int) mainStage.getHeight());
+    }
+
+    public void setClientServer(VirtualView client, VirtualServer server){
+        this.server = server;
+        this.client = client;
+        guiController.setServer(server);
+        guiController.setClient(client);
     }
 
     public void runGui(VirtualView client, VirtualServer server, Client clientContainer, ViewModel viewModel) {

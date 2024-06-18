@@ -13,8 +13,6 @@ public interface VirtualView extends Remote {
     void nicknameUpdate(int index, String nickname) throws RemoteException;
     void updateGamePhase(GamePhase nextGamePhase) throws RemoteException;
     void updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException;
-    //FORSE da togliere
-    void start() throws RemoteException;
     void connectionInfo(int playerIndex, boolean connected) throws RemoteException;
     void updateAddHand(int playerIndex, int cardIndex) throws RemoteException;
     void updateRemoveHand(int playerIndex, int cardIndex) throws RemoteException;
@@ -29,5 +27,5 @@ public interface VirtualView extends Remote {
     //side is null if is not decided
     void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException;
     void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException;
-
+    void updateElement(int playerIndex, Element element, int numberOfElements) throws RemoteException;
 }

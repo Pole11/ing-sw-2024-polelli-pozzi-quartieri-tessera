@@ -25,7 +25,7 @@ public class ClientBot {
 
         Thread starter = new Thread(() -> {
             try {
-                (new Client()).startClient(input, host, port);
+                (new Client(input, host, port)).startClient();
             } catch (IOException e) {
                 System.out.println(lastCommand);
                 throw new RuntimeException(e);

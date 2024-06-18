@@ -40,6 +40,6 @@ public class FlipCardCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("FLIPCARD [Card_ID]\nthe command allows the player to change visible side of one card in his hand\n> ");
     }
 }

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Global;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Chat;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
@@ -26,6 +25,7 @@ public class ViewModel {
     private final HashMap<Integer, Boolean> connessionMap;
     private final HashMap<Integer, Color> colorsMap;
     private final HashMap<Integer, Integer> pointsMap;
+    private final HashMap<Integer, HashMap> elementsMap;
     private int starterCardId;
     private final int[] objectives; // 0,1 are common - 2,3 are secret (2 is the chosen one) // if the card is not set it is -1
     private GamePhase gamePhase;
@@ -41,6 +41,8 @@ public class ViewModel {
     private HashMap<Integer,ArrayList<Integer>> placingCardOrderMap;
 
     public ViewModel() {
+        playerIndex = -1;
+        elementsMap = new HashMap<>();
         nicknamesMap = new HashMap<>();
         handsSideMap = new HashMap<>();
         placedSideMap = new HashMap<>();
@@ -91,6 +93,17 @@ public class ViewModel {
         objectives[3] = objectiveCardId2;
     }
 
+    public void initializeElementMap(int playerIndex){
+        HashMap <Element, Integer> map = new HashMap<>();
+        Arrays.stream(Element.values()).forEach(e-> {
+            map.put(e, 0);
+        });
+        elementsMap.put(playerIndex, map);
+    }
+
+    public void setElement(int playerIndex, Element element, int numberOfElements){
+        elementsMap.get(playerIndex).put(element, numberOfElements);
+    }
 
     public void setTurnPhase(TurnPhase turnPhase){
         this.turnPhase = turnPhase;
@@ -154,7 +167,7 @@ public class ViewModel {
     }
 
     // GETTERS FOR CLI&GUI
-
+    public HashMap<Integer, HashMap> getElementsMap(){return elementsMap;}
     public int getPlayerIndex() {
         return playerIndex;
     }
@@ -192,7 +205,6 @@ public class ViewModel {
     public GamePhase getGamePhase() {
         return gamePhase;
     }
-
 
     public TurnPhase getTurnPhase() {
         return turnPhase;

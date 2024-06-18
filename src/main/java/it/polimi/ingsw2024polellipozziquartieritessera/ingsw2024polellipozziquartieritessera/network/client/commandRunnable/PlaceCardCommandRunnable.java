@@ -69,7 +69,8 @@ public class PlaceCardCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("PLACECARD [placingCardId] [tableCardId] [tableCornerPos( Upright / Upleft / Downright / Downleft )] [placingCardSide( Front / Back )]\n");
+        System.out.print("the command allows the current player to place a card on his board\n> ");
     }
 
 }

@@ -13,6 +13,6 @@ public class ShowPointsCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("SHOWPOINTS\nthe command shows the scores of every player\n>");
     }
 }

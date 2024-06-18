@@ -116,36 +116,30 @@ public class GameState {
 
         this.executeEventRunning = true;
         this.executeEvents = new Thread(this::executeEventsRunnable);
-        this.executeEvents.start();
+
 
         this.playerThreads = new ArrayList<>();
 
         this.pingRunning = true;
         this.pingThread = new Thread(this::pingThreadRunnable);
-        pingThread.start();
+
 
         this.answered = new HashMap<>();
         resetAnswered();
 
         this.saveStateRunning = true;
         this.saveStateThread = new Thread(this::saveStateThreadRunnable);
-        saveStateThread.start();
+        //saveStateThread.start();
 
         this.turnToPlay = Integer.MAX_VALUE;
 
     }
 
-    //helper of constructor used also for FA persistance (restart all the threads)
-    public void restoreData(Chat chat, int currentPlayerIndex, ArrayList<Player> players, GamePhase currentGamePhase, TurnPhase currentGameTurn,HashMap<Integer, Boolean> answered, int turnToPlay, GamePhase prevGamePhase){
-        this.chat = chat;
-        this.currentPlayerIndex = currentPlayerIndex;
-        this.players = players;
-        this.currentGamePhase = currentGamePhase;
-        this.currentGameTurn = currentGameTurn;
-        this.answered = answered;
-        this.turnToPlay = turnToPlay;
-        this.prevGamePhase = prevGamePhase;
+    public void startThreads(){
+        this.executeEvents.start();
+        pingThread.start();
     }
+
 
     // GETTER
 
@@ -275,6 +269,7 @@ public class GameState {
 
 
             }
+            Populate.saveState(this);
             event.execute();
         }
     }
@@ -360,6 +355,10 @@ public class GameState {
         }
     }
 
+    public void addPlayerThread(){
+        playerThreads.add(new Thread());
+    }
+
     /**
      * Get the ping response from a player
      * @param client The client who has responded
@@ -390,7 +389,7 @@ public class GameState {
      * @param player Player to be reconnected
      */
     private void manageReconnection(Player player) {
-        restoreView(player.getClient());
+        //restoreView(player.getClient());
         synchronized (players) {
             player.setConnected(true);
         }
@@ -502,7 +501,7 @@ public class GameState {
     public Integer getPlayerIndex(VirtualView client) {
         int i = 0;
         for (Player playerIterator : this.players) {
-            if (playerIterator.getClient().equals(client)) {
+            if (playerIterator.getClient() != null && playerIterator.getClient().equals(client)) {
                 return i;
             }
             i++;
@@ -535,8 +534,7 @@ public class GameState {
         Player player = new Player(nickname, client, this);
         //if someone choose his nickname, he is inside the match, even if he is temporanely disconnected
 
-        //TOOD: isConnected can be removed
-        if (allClients().contains(client) && players.get(getPlayerIndex(client)).isConnected()) {
+        if (allConnectedClients().contains(client)) {
             synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "You already chose a nickname, you cannot change it"));
                 eventQueue.notifyAll();
@@ -559,7 +557,9 @@ public class GameState {
                 } else {
                     if (allConnectedClients().size()<Config.MAX_PLAYERS){
                         synchronized (eventQueue) {
-                            eventQueue.add(new ErrorEvent(this, singleClient(client), "The nickname is already used, please choose another one"));
+                            ArrayList<VirtualView> clients = new ArrayList<>();
+                            clients.add(client);
+                            eventQueue.add(new ErrorEvent(this, clients, "The nickname is already used, please choose another one"));
                             eventQueue.notifyAll();
                         }
                     }
@@ -568,9 +568,11 @@ public class GameState {
             }
         }
 
-        if (allConnectedClients().size() >= Config.MAX_PLAYERS) {
+        if (players.size() >= Config.MAX_PLAYERS) {
             synchronized (eventQueue) {
-                eventQueue.add(new ErrorEvent(this, singleClient(client), "The game is full"));
+                ArrayList<VirtualView> clients = new ArrayList<>();
+                clients.add(client);
+                eventQueue.add(new ErrorEvent(this, clients, "The game is full"));
                 eventQueue.notifyAll();
             }
             return;
@@ -579,6 +581,7 @@ public class GameState {
 
         if (currentGamePhase.equals(GamePhase.NICKNAMEPHASE)){
             players.add(player);
+            System.out.println(player.getClient());
             playerThreads.add(new Thread());
             synchronized (eventQueue) {
                 eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
@@ -701,6 +704,7 @@ public class GameState {
         StarterCard playerStarterCard = player.getStarterCard();
         //doesn't call updateBoard because the boardMatrix already has the card (without the side)
         player.addToPlacedCardsMap(playerStarterCard.getId(), side);
+        updateElements(player, playerStarterCard,side);
 
         synchronized (eventQueue) {
             eventQueue.add(new UpdateStarterCardEvent(this, allConnectedClients(), playerIndex, playerStarterCard.getId(), side));
@@ -966,6 +970,7 @@ public class GameState {
                 int newOccurencies = Collections.frequency(placingCard.getUncoveredElements(placingCardSide), ele);
                 player.addToAllElements(ele, currentOccurencies + newOccurencies);
             }
+            eventQueue.add(new UpdateElementsEvent(this, allClients(), getPlayerIndex(player), ele, player.getAllElements().get(ele)));
         }
     }
 
@@ -1121,7 +1126,7 @@ public class GameState {
             } catch (InterruptedException e) {
                 break;
             }
-            //Populate.saveState(this);
+            Populate.saveState(this);
         }
     }
 

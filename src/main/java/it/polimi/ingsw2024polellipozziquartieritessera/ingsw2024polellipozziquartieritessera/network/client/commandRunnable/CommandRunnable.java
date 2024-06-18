@@ -5,6 +5,8 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIController;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
+import java.io.IOException;
+
 public abstract class CommandRunnable {
     VirtualServer server;
     String[] messageFromCli;
@@ -39,10 +41,10 @@ public abstract class CommandRunnable {
     public abstract void executeHelp();
 
     public void serverDisconnectedCLI() {
-        System.out.print("error in server, server not available\n> ");
+        clientContainer.serverDisconnected();
     }
 
     public void serverDisconnectedGUI() {
-        this.guiController.setServerError("There was an error in server, the server is not available");
+        clientContainer.serverDisconnected();
     }
 }

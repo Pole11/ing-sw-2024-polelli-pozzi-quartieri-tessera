@@ -14,6 +14,6 @@ public class AddMessageCommandRunnable extends CommandRunnable {
 
     @Override
     public void executeHelp() {
-
+        System.out.print("ADDMESSAGE\none day we will have a chat, i presume.....\n> ");
     }
 }

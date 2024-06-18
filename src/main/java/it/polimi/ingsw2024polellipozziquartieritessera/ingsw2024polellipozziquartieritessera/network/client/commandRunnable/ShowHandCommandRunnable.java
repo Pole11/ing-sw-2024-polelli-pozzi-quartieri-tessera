@@ -17,6 +17,7 @@ ShowHandCommandRunnable extends  CommandRunnable{
 
     @Override
     public void executeHelp() {
+        System.out.print("SHOWHAND\nthe command shows the hand of the player who invokes it\n>");
 
     }
 }

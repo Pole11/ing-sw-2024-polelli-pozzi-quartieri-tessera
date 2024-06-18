@@ -45,6 +45,6 @@ public class ChooseColorCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-        System.out.print("CHOOSECOLOR [Blue / Green / Yellow / Red]\n> ");
+        System.out.print("CHOOSECOLOR [ Blue / Green / Yellow / Red ]\n> ");
     }
 }

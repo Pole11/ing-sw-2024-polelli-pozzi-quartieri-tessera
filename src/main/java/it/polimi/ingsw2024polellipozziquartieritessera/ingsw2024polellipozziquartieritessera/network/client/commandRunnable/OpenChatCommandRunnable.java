@@ -23,6 +23,6 @@ public class OpenChatCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("SHOWCHAT\none day we will have a chat, i presume.....\n> ");
     }
 }

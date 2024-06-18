@@ -13,6 +13,6 @@ public class ShowSecretObjectiveCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeHelp() {
-
+        System.out.print("SHOWSECRETOBJECTIVE\nthe command prints your secret objective, if you already chose it, or the objectives you have to choose from\n> ");
     }
 }
