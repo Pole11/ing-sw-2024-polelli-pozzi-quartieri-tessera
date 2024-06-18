@@ -97,9 +97,9 @@ public class Player {
         this.objectivesWon = 0;
         this.centerResources = new HashMap<>();
 
-        //this.objectiveCardOptions = new ObjectiveCard[2];
-        //this.objectiveCardOptions[0] = null;
-        //this.objectiveCardOptions[1] = null;
+        this.objectiveCardOptions = new ObjectiveCard[2];
+        this.objectiveCardOptions[0] = null;
+        this.objectiveCardOptions[1] = null;
 
         this.allElements = new HashMap<>();
         for (Element element : Element.values()) {
@@ -160,9 +160,6 @@ public class Player {
         return this.connected;
     }
 
-    public HashMap<Integer, Side> getHandCardsMap() {
-        return new HashMap<>(handCardsMap);
-    }
     //--------size------------
 
     public int getHandSize(){

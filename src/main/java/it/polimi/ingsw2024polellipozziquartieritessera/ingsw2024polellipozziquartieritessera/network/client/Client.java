@@ -348,6 +348,8 @@ public class Client implements VirtualView {
 
     @Override
     public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
+        System.out.print(playerIndex + cardId1);
+        if (side != null) System.out.println(side.toString());
         viewModel.fillPoints();
         if (side == null){
             viewModel.setStarterCard(cardId1);

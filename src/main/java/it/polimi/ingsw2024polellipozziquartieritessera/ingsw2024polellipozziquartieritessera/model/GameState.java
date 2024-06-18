@@ -272,6 +272,7 @@ public class GameState {
 
             }
             Populate.saveState(this);
+            //System.out.println(event);
             event.execute();
         }
     }
@@ -327,23 +328,24 @@ public class GameState {
         while (pingRunning) {
             for (int i = 0; i < playerThreads.size(); i++){
                 int finalI = i;
-                playerThreads.set(i, new Thread(() -> {
-                    int j = finalI;
-                    try {
-                        //wait for the answer of players
-                        Thread.sleep(1000*Config.WAIT_FOR_PING_TIME);
-                        if (players.get(j).isConnected()){
-                            System.out.println("client "  + j + " disconnected");
-                            synchronized (players) {
-                                players.get(j).setConnected(false);
+                if (!playerThreads.get(i).isAlive()){
+                    playerThreads.set(i, new Thread(() -> {
+                        int j = finalI;
+                        try {
+                            //wait for the answer of players
+                            Thread.sleep(1000*Config.WAIT_FOR_PING_TIME);
+                            if (players.get(j).isConnected()){
+                                System.out.println("client "  + j + " disconnected");
+                                synchronized (players) {
+                                    players.get(j).setConnected(false);
+                                }
+                                playerDisconnected();
                             }
-                            playerDisconnected();
-                        }
-                    } catch (InterruptedException e) {
+                        } catch (InterruptedException e) {}
+                    }));
+                    playerThreads.get(i).start();
+                }
 
-                    }
-                }));
-                playerThreads.get(i).start();
             }
 
             updatePlayersConnected();
@@ -391,15 +393,16 @@ public class GameState {
      * @param player Player to be reconnected
      */
     private void manageReconnection(Player player) {
-        //restoreView(player.getClient());
-        synchronized (players) {
-            player.setConnected(true);
-        }
         if (this.currentGamePhase.equals(GamePhase.TIMEOUT)) {
             this.timeoutThread.interrupt();
             currentGamePhase = prevGamePhase;
             prevGamePhase = null;
         }
+        restoreView(player.getClient());
+        synchronized (players) {
+            player.setConnected(true);
+        }
+
     }
 
     public void addPlacedEvent(Event event){
@@ -413,9 +416,14 @@ public class GameState {
      */
     public void restoreView(VirtualView client) {
         //send everything to client
-        ArrayList<VirtualView> clients = singleClient(client);
+        ArrayList<VirtualView> clients = new ArrayList<>();
+        clients.add(client);
         Player reconnectingPlayer = getPlayer(getPlayerIndex(client));
         synchronized (eventQueue) {
+            GamePhase gamePhase = currentGamePhase;
+            if (currentGamePhase.equals(GamePhase.TIMEOUT)){
+                gamePhase = prevGamePhase;
+            }
             //send player index
             if (reconnectingPlayer.getNickname() != null) {
                 eventQueue.add(new SendIndexEvent(this, clients, getPlayerIndex(client)));
@@ -430,7 +438,7 @@ public class GameState {
                 }
                 eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
                 //send hands
-                if (currentGamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
+                if (gamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
                     Set<Integer> handCardsSet = currentPlayer.getHandCardsMap().keySet();
                     for (Integer k : handCardsSet) {
                         eventQueue.add(new UpdateAddHandEvent(this, clients, currentPlayer, k));
@@ -442,7 +450,7 @@ public class GameState {
                 eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), reconnectingPlayer.getStarterCard().getId(), reconnectingPlayer.getPlacedCardSide(reconnectingPlayer.getStarterCard().getId())));
             }
             //send common objectives
-            if (currentGamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
+            if (gamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
                 ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();
                 sharedObjectives.add(mainBoard.getSharedObjectiveCard(0));
                 sharedObjectives.add(mainBoard.getSharedObjectiveCard(1));
@@ -454,28 +462,30 @@ public class GameState {
             if (reconnectingPlayer.getObjectiveCard() != null) {
                 secretObjectives.add(reconnectingPlayer.getObjectiveCard());
                 eventQueue.add(new UpdateSecretObjectiveEvent(this, clients, secretObjectives));
-            } else //if the secret objective options is not already given
-                if (currentGamePhase.ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
-                    ;
-                } else { //the player has to choose between two secrets
-                    secretObjectives.add(reconnectingPlayer.getObjectiveCardOption(0));
-                    secretObjectives.add(reconnectingPlayer.getObjectiveCardOption(1));
-                    //eventQueue.add(new UpdateSecretObjectiveEvent(this, clients, secretObjectives));
-                }
+            } else if (reconnectingPlayer.getObjectiveCardOptions()[0] == null && reconnectingPlayer.getObjectiveCardOptions()[1] == null) { }  //if the secret objective options is not already given
+            else { //the player has to choose between two secrets
+                secretObjectives.add(reconnectingPlayer.getObjectiveCardOption(0));
+                secretObjectives.add(reconnectingPlayer.getObjectiveCardOption(1));
+                eventQueue.add(new UpdateSecretObjectiveEvent(this, clients, secretObjectives));
+            }
             // send gamePhase and turnPhase if exists
-            eventQueue.add(new UpdateGamePhaseEvent(this, clients, currentGamePhase));
-            if (currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
+            //eventQueue.add(new UpdateGamePhaseEvent(this, clients, gamePhase));
+            if (gamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
                 eventQueue.add(new UpdateTurnPhaseEvent(this, clients, currentGameTurn));
             }
             // send current player
-            eventQueue.add(new UpdateCurrentPlayer(this, clients, currentPlayerIndex));
+            if (gamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
+                eventQueue.add(new UpdateCurrentPlayerEvent(this, clients, currentPlayerIndex));
+            }
 
             // for every placingCardEvent, place a card in the boardsMap and in placedOrderCardMap
             placedEventList.stream().forEach(e -> {
                 eventQueue.add(e);
             });
             // send mainBoard
-            eventQueue.add(new UpdateMainBoardEvent(this, clients, mainBoard));
+            if(gamePhase.ordinal() >= GamePhase.CHOOSESTARTERSIDEPHASE.ordinal()) {
+                eventQueue.add(new UpdateMainBoardEvent(this, clients, mainBoard));
+            }
             //todo send Chat
             eventQueue.notifyAll();
 
@@ -494,7 +504,7 @@ public class GameState {
         synchronized (players) {
             numberConnected = players.stream().filter(Player::isConnected).count();
         }
-        if (numberConnected <= 1) {
+        if (numberConnected <= 1 && !currentGamePhase.equals(GamePhase.TIMEOUT)) {
             this.prevGamePhase = currentGamePhase;
             this.currentGamePhase = GamePhase.TIMEOUT;
             System.out.println("Timeout for ending the game started");
@@ -514,7 +524,7 @@ public class GameState {
                     System.out.println("game ended after timeout expired");
                     restart();
                 } catch (InterruptedException e) {
-                    System.out.println("timout ended");
+                    System.out.println("timeout ended");
                 }
             });
             timeoutThread.start();

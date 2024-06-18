@@ -15,9 +15,9 @@ public class Config {
     public static final int OBJECTIVEQTY = 16;
     public static final int STARTERQTY = 6;
 
-    public static final int TIMEOUT_TIME = 60; // 60
-    public static final int NEXT_PING_TIME = 2; // 10
-    public static final int WAIT_FOR_PING_TIME = 1; // 5
+    public static final int TIMEOUT_TIME = 6000; // 60
+    public static final int NEXT_PING_TIME = 1; // 10
+    public static final int WAIT_FOR_PING_TIME = 6; // 5
     public static final int WAIT_FOR_SAVE_TIME = 1; // 10
 
     public static final String GAME_STATE_PATH = "/src/main/java/it/polimi/ingsw2024polellipozziquartieritessera/ingsw2024polellipozziquartieritessera/rescue.json";
