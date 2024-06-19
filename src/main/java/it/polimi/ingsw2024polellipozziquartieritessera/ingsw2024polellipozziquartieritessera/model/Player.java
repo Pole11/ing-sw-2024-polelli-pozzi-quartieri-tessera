@@ -303,6 +303,7 @@ public class Player {
     }
 
     public void removeFromHandCardsMap(Integer index){
+        System.out.println("Removing from hand card " + index);
         this.handCardsMap.remove(index);
         synchronized (gameState.getEventQueue()){
             gameState.addToEventQueue(new UpdateRemoveHandEvent(gameState, gameState.allConnectedClients(), this, index));
@@ -458,12 +459,14 @@ public class Player {
         //TODO: remove (only testing)
         // Check if rowIndex is within bounds
         if (rowIndex < 0 || rowIndex >= playerBoard.size()) {
+            System.out.println("ROW");
             printPlayerBoard();
             throw new IllegalArgumentException("Invalid row index: " + rowIndex);
         }
 
         // Check if colIndex is within bounds
         if (colIndex < 0 || colIndex >= playerBoard.get(rowIndex).size()) {
+            System.out.println("COL");
             printPlayerBoard();
             throw new IllegalArgumentException("Invalid column index: " + colIndex);
         }
@@ -488,7 +491,7 @@ public class Player {
      * @param rowIndex Final rows number
      * @param colIndex Final column number
      */
-    private void expandBoard(int rowIndex, int colIndex){
+    synchronized private void expandBoard(int rowIndex, int colIndex){
         // Expand the matrix to include the new position (remember that this supports only one execute: row++/-- or col++/--)
         // Expand rows if needed
         int rowDim = this.playerBoard.getFirst().size();

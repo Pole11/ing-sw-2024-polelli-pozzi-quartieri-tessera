@@ -254,6 +254,7 @@ public class GameState {
                     try {
                         eventQueue.wait();
                     } catch (InterruptedException e) {
+                        e.printStackTrace();
                         System.out.println("interrupted");
                         return;
                     }
@@ -338,7 +339,6 @@ public class GameState {
                             playerDisconnected();
                         }
                     } catch (InterruptedException e) {
-
                     }
                 }));
                 playerThreads.get(i).start();
@@ -350,6 +350,7 @@ public class GameState {
                 //wait to ping another time
                 Thread.sleep(1000*Config.NEXT_PING_TIME);
             } catch (InterruptedException e) {
+                e.printStackTrace();
                 break;
             }
         }
@@ -368,7 +369,9 @@ public class GameState {
             playerThreads.get(getPlayerIndex(client)).interrupt();
             try {
                 playerThreads.get(getPlayerIndex(client)).join();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -440,6 +443,7 @@ public class GameState {
                     System.out.println("game ended after timeout expired");
                     restart();
                 } catch (InterruptedException e) {
+                    e.printStackTrace();
                     System.out.println("timout ended");
                 }
             });
@@ -765,6 +769,7 @@ public class GameState {
                 //send also the cards to the view
                 this.setHands();
             } catch (EmptyDeckException e) {
+                e.printStackTrace();
                 // if in this moment of the game the deck is empty it's a programming mistake
                 throw new RuntimeException(e);
             }
@@ -884,12 +889,13 @@ public class GameState {
      * @param placingCardSide Side of the playing card
      * @throws PlacingOnHiddenCornerException The corner is hidden
      */
-    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingCardSide) throws PlacingOnHiddenCornerException {
+    public void placeCard(Player player, int placingCardId, int tableCardId, CornerPos tableCornerPos, CornerPos placingCornerPos, Side placingCardSide) throws PlacingOnHiddenCornerException, CardNotPlacedException, CardNotOnBoardException {
         // check if the indirect corners are hidden
         CornerCard placingCard = (CornerCard) cardsMap.get(placingCardId);
         ArrayList<ArrayList<Integer>> playerBoard = player.getPlayerBoard();
-        for (Integer row = 0; row < playerBoard.size(); row++) {
-            for (Integer col = 0; col < playerBoard.get(row).size(); col++) {
+        boolean tableCardExists = false;
+        for (Integer row = 0; row < playerBoard.size() && !tableCardExists; row++) {
+            for (Integer col = 0; col < playerBoard.get(row).size() && !tableCardExists; col++) {
                 if (playerBoard.get(row).get(col).equals(tableCardId)) { // if the card is the one on the table
                     int placingRow = row;
                     int placingCol = col;
@@ -924,12 +930,15 @@ public class GameState {
                         int matrixCardId = playerBoard.get(placingRow).get(placingCol - 1);
                         placeCardHelper(player, matrixCardId, placingCard, placingCardSide, CornerPos.UPRIGHT, CornerPos.DOWNLEFT);
                     }
-                    break;
+                    tableCardExists = true;
                 }
             }
         }
+
+        if (!tableCardExists) throw new CardNotOnBoardException("You are trying to place on a card that is not on table");
+
         updateElements(player, placingCard, placingCardSide);
-        System.out.println(player.getNickname() + "placed a card");
+        System.out.println(player.getNickname() + " placed card " + placingCardId);
     }
 
     private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {
@@ -954,7 +963,6 @@ public class GameState {
             if (currentOccurencies > 0)
                 player.removeFromAllElements(cornerEle);
         }
-
     }
 
     /**
@@ -1010,6 +1018,7 @@ public class GameState {
             try {
                 winners = getWinnerPlayerIndex();
             } catch (GameIsNotEndedException e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
             synchronized (eventQueue) {
@@ -1092,7 +1101,9 @@ public class GameState {
         executeEvents.interrupt();
         try {
             executeEvents.join();
-        } catch (InterruptedException ignored) {}
+        } catch (InterruptedException ignored) {
+            ignored.printStackTrace();
+        }
         playerThreads.forEach(Thread::interrupt);
         pingThread.interrupt();
         saveStateThread.interrupt();
@@ -1110,6 +1121,7 @@ public class GameState {
         try (Writer writer = new FileWriter(filePath + Config.GAME_STATE_PATH)) {
             gson.toJson(new HashMap(), writer);
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
 
@@ -1124,6 +1136,7 @@ public class GameState {
             try {
                 Thread.sleep(1000*Config.WAIT_FOR_SAVE_TIME);
             } catch (InterruptedException e) {
+                e.printStackTrace();
                 break;
             }
             Populate.saveState(this);

@@ -70,10 +70,10 @@ public class ControllerTest {
         Populate.populate(gs);
 
         Populate.populate(gs);
-        gs.addPlayer("paolo", new Client(null,null,null));
-        gs.addPlayer("piergiorgio", new Client(null,null,null));
-        gs.addPlayer("fungiforme", new Client(null,null,null));
-        gs.addPlayer("paola", new Client(null,null,null));
+        gs.addPlayer("paolo", new Client(null, null, null));
+        gs.addPlayer("piergiorgio", new Client(null, null, null));
+        gs.addPlayer("fungiforme", new Client(null, null, null));
+        gs.addPlayer("paola", new Client(null, null, null));
         Player player = gs.getPlayer(0);
         Controller c = new Controller();
         c.setGameState(gs);
@@ -324,10 +324,10 @@ public class ControllerTest {
         });
         GameState gs = new GameState(s);
         Populate.populate(gs);
-        gs.addPlayer("paolo", new Client(null,null,null));
-        gs.addPlayer("piergiorgio", new Client(null,null,null));
-        gs.addPlayer("fungiforme", new Client(null,null,null));
-        gs.addPlayer("paola", new Client(null,null,null));
+        gs.addPlayer("paolo", new Client(null, null, null));
+        gs.addPlayer("piergiorgio", new Client(null, null, null));
+        gs.addPlayer("fungiforme", new Client(null, null, null));
+        gs.addPlayer("paola", new Client(null, null, null));
 
         gs.setPlayersConnected(0, true);
         gs.setPlayersConnected(1, true);
@@ -456,10 +456,10 @@ public class ControllerTest {
         });
         GameState gs = new GameState(s);
         Populate.populate(gs);
-        gs.addPlayer("paolo", new Client(null,null,null));
-        gs.addPlayer("piergiorgio", new Client(null,null,null));
-        gs.addPlayer("fungiforme", new Client(null,null,null));
-        gs.addPlayer("paola", new Client(null,null,null));
+        gs.addPlayer("paolo", new Client(null, null, null));
+        gs.addPlayer("piergiorgio", new Client(null, null, null));
+        gs.addPlayer("fungiforme", new Client(null, null, null));
+        gs.addPlayer("paola", new Client(null, null, null));
         Controller c = new Controller();
         c.setGameState(gs);
 

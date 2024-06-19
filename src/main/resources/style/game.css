@@ -72,8 +72,10 @@ Text {
 
 .greenText {
     -fx-fill: green;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.8) , 2, 1, 0, 0);
 }
 
 .redText {
     -fx-fill: red;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.8) , 2, 1, 0, 0);
 }

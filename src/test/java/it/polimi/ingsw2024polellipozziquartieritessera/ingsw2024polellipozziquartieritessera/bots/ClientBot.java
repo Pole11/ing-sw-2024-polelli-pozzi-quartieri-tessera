@@ -61,7 +61,7 @@ public class ClientBot {
 
         while (true) {
             try {
-                Thread.sleep(10); // Wait 1 second between inputs
+                Thread.sleep(1); // Wait 1 second between inputs
 
                 if (index == commands.size()) {
                     index = 0;
