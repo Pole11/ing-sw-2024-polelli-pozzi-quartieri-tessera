@@ -232,7 +232,7 @@ public class Player {
 
     public void setStarterCard(StarterCard starterCard) {
         this.starterCard = starterCard;
-        this.placedCardsMap.put(this.getStarterCard().getId(), Side.FRONT); // also set the default side to FRONT
+        this.placedCardsMap.put(this.getStarterCard().getId(), null); // also set the default side to FRONT todo: changed side to null because of restore-view needs it, it will crash? we will see
         synchronized (gameState.getEventQueue()){
             gameState.addToEventQueue(new UpdateStarterCardEvent(gameState, gameState.singleClient(this.getClient()), gameState.getPlayerIndex(this), starterCard.getId(), null));
             gameState.getEventQueue().notifyAll();

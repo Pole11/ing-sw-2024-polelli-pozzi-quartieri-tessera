@@ -402,7 +402,6 @@ public class GameState {
         synchronized (players) {
             player.setConnected(true);
         }
-
     }
 
     public void addPlacedEvent(Event event){
@@ -449,7 +448,8 @@ public class GameState {
             }
             // send Starter card
             if (reconnectingPlayer.getStarterCard() != null) {
-                eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), reconnectingPlayer.getStarterCard().getId(), null));
+                Side starterSide = reconnectingPlayer.getPlacedCardSide(reconnectingPlayer.getStarterCard().getId());
+                eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), reconnectingPlayer.getStarterCard().getId(), starterSide));
             }
             //send common objectives
             if (gamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
