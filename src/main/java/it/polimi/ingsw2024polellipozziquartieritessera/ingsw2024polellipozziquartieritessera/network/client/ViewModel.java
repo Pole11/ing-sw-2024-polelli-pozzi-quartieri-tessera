@@ -54,6 +54,7 @@ public class ViewModel {
         mainBoard = new int[6];
         Arrays.fill(mainBoard, -1);
         gamePhase = GamePhase.NICKNAMEPHASE;
+        turnPhase = TurnPhase.PLACINGPHASE;
         cardsMap = new HashMap<>();
         handsMap = new HashMap<>();
         boardsMap = new HashMap<>();

@@ -336,7 +336,6 @@ public class Client implements VirtualView {
             System.out.print("you have chosen the objective card: " + objectiveCardId1 + "\n> ");
         } else{
             System.out.print("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1],\n to see your card use the command SHOWSECRETOBJECTIVES\n");
-
         }
         if (meDoGui) guiApplication.updateController();
     }

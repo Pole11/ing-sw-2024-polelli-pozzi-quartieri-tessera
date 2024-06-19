@@ -406,7 +406,7 @@ public class Player {
      * @param tableCardId ID of the card on the player board
      * @param tableCornerPos Corner position of the board card to which the new card is linked
      */
-    public void updateBoard(int placingCardId, int tableCardId, CornerPos tableCornerPos) {
+    public synchronized void updateBoard(int placingCardId, int tableCardId, CornerPos tableCornerPos) {
         int rowIndex = -1;
         int colIndex = -1;
 

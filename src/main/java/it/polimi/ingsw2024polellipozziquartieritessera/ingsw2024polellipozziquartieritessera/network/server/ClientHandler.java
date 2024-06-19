@@ -32,6 +32,7 @@ public class ClientHandler implements VirtualView {
                 command = Command.valueOf(message[0].toUpperCase());
             } catch(IllegalArgumentException e) {
                 System.out.println("Invalid command: " + message[0]);
+                continue;
             }
 
             if (Command.valueOf(message[0]).getType().equals("Local")){
