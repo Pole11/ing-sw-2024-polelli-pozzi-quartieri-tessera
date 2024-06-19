@@ -432,7 +432,9 @@ public class GameState {
             for (int i = 0; i < players.size(); i++) {
                 Player currentPlayer = players.get(i);
                 eventQueue.add(new NicknameEvent(this, clients, i, currentPlayer.getNickname()));
-                eventQueue.add(new ConnectionInfoEvent(this, clients, currentPlayer, currentPlayer.isConnected()));
+                if (i != getPlayerIndex(client)){
+                    eventQueue.add(new ConnectionInfoEvent(this, clients, currentPlayer, currentPlayer.isConnected()));
+                }
                 if (currentPlayer.getColor() != null) {
                     eventQueue.add((new UpdateColorEvent(this, clients, currentPlayer, currentPlayer.getColor())));
                 }
@@ -447,7 +449,7 @@ public class GameState {
             }
             // send Starter card
             if (reconnectingPlayer.getStarterCard() != null) {
-                eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), reconnectingPlayer.getStarterCard().getId(), reconnectingPlayer.getPlacedCardSide(reconnectingPlayer.getStarterCard().getId())));
+                eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), reconnectingPlayer.getStarterCard().getId(), null));
             }
             //send common objectives
             if (gamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
@@ -679,9 +681,10 @@ public class GameState {
             }
             System.out.println(nickname + " connected");
         } else {
-            //TODO: probabilmente il controllo in singleClient della connesione lancia un eccezione
+            ArrayList<VirtualView> clients = new ArrayList<>();
+            clients.add(client);
             synchronized (eventQueue) {
-                eventQueue.add(new ErrorEvent(this, singleClient(client), "the game is already started"));
+                eventQueue.add(new ErrorEvent(this, clients, "the game is already started"));
                 eventQueue.notifyAll();
             }
         }
