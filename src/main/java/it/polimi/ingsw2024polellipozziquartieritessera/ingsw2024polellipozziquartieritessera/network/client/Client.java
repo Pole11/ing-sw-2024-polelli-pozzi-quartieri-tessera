@@ -304,6 +304,7 @@ public class Client implements VirtualView {
         viewModel.setCurrentPlayer(currentPlayerIndex);
         if (viewModel.getPlayerIndex() == currentPlayerIndex) {
             System.out.print("it's your turn\n> ");
+            ShowMessageAlert();
             System.out.print("to place your card use the command PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)] to place your card\n> ");
         } else {
             System.out.print("it's the turn of " + viewModel.getNickname(currentPlayerIndex) + "\n> ");
@@ -406,9 +407,6 @@ public class Client implements VirtualView {
     public void updateChat(int playerIndex, String content){
         viewModel.setNewMessage(playerIndex, content);
         if (meDoGui) guiApplication.updateController();
-        else if (viewModel.getPlayerIndex() != playerIndex) {
-            cliController.showMessageAlert();
-        }
     }
 
     @Override
@@ -426,6 +424,14 @@ public class Client implements VirtualView {
             guiApplication.getGUIController().setServerError(error);
         }
         System.err.print("\nERROR FROM SERVER: " + error + "\n> ");
+    }
+
+    private void ShowMessageAlert(){
+        if (viewModel.getNewMessages() > 0){
+            System.out.println("Unread messages: " + viewModel.getNewMessages() + " (use OPENCHAT command to read)");
+            System.out.print("> ");
+            viewModel.resetNewMessages();
+        }
     }
 
 

@@ -41,6 +41,7 @@ public class ViewModel {
     private final HashMap<Integer,ArrayList<ArrayList<Integer>>> boardsMap; // mappa delle board dei players
     private int[] mainBoard; // se la carta non c'è viene inizializzata a -1
     private HashMap<Integer,ArrayList<Integer>> placingCardOrderMap;
+    private int newMessages; // only for cli
 
     public ViewModel() {
         playerIndex = -1;
@@ -479,6 +480,15 @@ public class ViewModel {
 
     public void setNewMessage(int playerIndex, String content) {
         chat.addMessage(playerIndex, content);
+        newMessages+=1;
+    }
+
+    public int getNewMessages() {
+        return newMessages;
+    }
+
+    public void resetNewMessages(){
+        newMessages = 0;
     }
 
     public Chat getChat(){

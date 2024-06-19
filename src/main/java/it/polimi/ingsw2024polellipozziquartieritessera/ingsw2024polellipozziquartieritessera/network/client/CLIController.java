@@ -810,9 +810,4 @@ public class CLIController {
 
         System.out.print("> ");
     }
-
-    public void showMessageAlert() {
-        System.out.println("new message in chat");
-        System.out.print("> ");
-    }
 }
