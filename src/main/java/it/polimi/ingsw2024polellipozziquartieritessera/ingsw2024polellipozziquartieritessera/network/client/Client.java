@@ -1,11 +1,13 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -138,12 +140,14 @@ public class Client implements VirtualView {
 
 
         try {
-            Thread.sleep(1000*10);
+            Thread.sleep(1000* Config.WAIT_DISCONNECTED_SERVER);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         try {
             startClient();
+        } catch (ConnectException e){
+            serverDisconnected();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -152,6 +156,7 @@ public class Client implements VirtualView {
 
     @Override
     public void updateGamePhase(GamePhase nextGamePhase) {
+        System.out.println("The Phase is " + nextGamePhase);
         viewModel.setGamePhase(nextGamePhase);
 
         if (meDoGui) {
@@ -245,8 +250,8 @@ public class Client implements VirtualView {
             if (connected){
                 System.out.print("you re-connected to the game\n> ");
             } else {
-                //SISTEMA
                 System.out.println("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>\n> ");
+                viewModel = new ViewModel();
             }
         } else {
             if (connected) {
@@ -279,6 +284,7 @@ public class Client implements VirtualView {
 
     @Override
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
+        System.out.println("index "  + playerIndex + " placingcard " + placingCardId + " tablecard" + tableCardId);
         viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
         if (viewModel.getPlayerIndex() == playerIndex) {
             System.out.print("you placed a card, now you have to draw your card with DRAWCARD [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");

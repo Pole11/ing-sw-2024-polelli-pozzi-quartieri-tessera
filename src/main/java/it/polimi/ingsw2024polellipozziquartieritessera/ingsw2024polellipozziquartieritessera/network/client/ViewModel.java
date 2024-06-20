@@ -190,6 +190,9 @@ public class ViewModel {
     }
 
     public Card cardById(int id){
+        if(id < 0){
+            return null;
+        }
         return cardsMap.get(id);
     }
 

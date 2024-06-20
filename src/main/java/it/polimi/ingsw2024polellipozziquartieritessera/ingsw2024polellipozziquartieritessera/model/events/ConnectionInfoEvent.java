@@ -26,7 +26,6 @@ public class ConnectionInfoEvent extends Event{
                     try {
                         //TODO: nuova fase
                         client.connectionInfo(gameState.getPlayerIndex(player), connected);
-                        client.updateGamePhase(GamePhase.NICKNAMEPHASE);
                     } catch (RemoteException e) {
                         playerDisconnected(client);
                     }

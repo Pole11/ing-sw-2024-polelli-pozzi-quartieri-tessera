@@ -355,9 +355,10 @@ public class Populate {
             }
 
 
-            if (playerJson.get("objectiveCardOptions") != ""){
+            ArrayList<Integer> ids = (ArrayList<Integer>) playerJson.get("objectiveCardOptions");
+
+            if (!ids.isEmpty()){
                 ObjectiveCard[] ObjectiveCardOptions = new ObjectiveCard[2];
-                ArrayList<Integer> ids = (ArrayList<Integer>) playerJson.get("objectiveCardOptions");
                 ObjectiveCardOptions[0] = (ObjectiveCard) createCard(false, (Map) cards.get(String.valueOf(ids.get(0))), ids.get(0));
                 ObjectiveCardOptions[1] = (ObjectiveCard) createCard(false, (Map) cards.get(String.valueOf(ids.get(1))), ids.get(1));
                 player.setSecretObjectiveCardOptions(ObjectiveCardOptions);
@@ -384,21 +385,19 @@ public class Populate {
         }
 
 
+        /*saveMap.put("currentPlayerIndex", gameState.getCurrentPlayerIndex());
+        saveMap.put("currentGamePhase", gameState.getCurrentGamePhase().toString());
+        saveMap.put("currentGameTurn", gameState.getCurrentGameTurn().toString());
+        saveMap.put("answered", gameState.getAnswered());
+        saveMap.put("turnToPlay", gameState.getTurnToPlay());
+        saveMap.put("prevGamePhase", gameState.getPrevGamePhase() != null ? gameState.getPrevGamePhase().toString() : "");
+
+
+
+         */
+
+
         System.out.println("j");
-        /*
-
-
-
-        HashMap <Element, Integer> allElements = player.getAllElements();
-        allElements.keySet().stream().map(e -> e.toString());
-        saveMap.put("allElements", allElements);
-        saveMap.put("connected", player.isConnected());
-
-
- */
-        //gameState.addPlayer();
-        
-        //gameState.restoreData();
 
 
     }

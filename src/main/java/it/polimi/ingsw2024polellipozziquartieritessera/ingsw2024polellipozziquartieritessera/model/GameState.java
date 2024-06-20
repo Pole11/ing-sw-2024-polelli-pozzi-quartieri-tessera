@@ -91,6 +91,7 @@ public class GameState {
      * Number of turns left to play
      */
     private int turnToPlay;
+    private ArrayList<UpdateBoardEvent> placedEventList;
 
 
     /**
@@ -131,8 +132,9 @@ public class GameState {
         this.saveStateThread = new Thread(this::saveStateThreadRunnable);
         //saveStateThread.start();
 
-        this.turnToPlay = Integer.MAX_VALUE;
 
+        this.turnToPlay = Integer.MAX_VALUE;
+        this.placedEventList = new ArrayList<>();
     }
 
     public void startThreads(){
@@ -271,6 +273,7 @@ public class GameState {
 
             }
             Populate.saveState(this);
+            //System.out.println(event);
             event.execute();
         }
     }
@@ -326,22 +329,24 @@ public class GameState {
         while (pingRunning) {
             for (int i = 0; i < playerThreads.size(); i++){
                 int finalI = i;
-                playerThreads.set(i, new Thread(() -> {
-                    int j = finalI;
-                    try {
-                        //wait for the answer of players
-                        Thread.sleep(1000*Config.WAIT_FOR_PING_TIME);
-                        if (players.get(j).isConnected()){
-                            System.out.println("client "  + j + " disconnected");
-                            synchronized (players) {
-                                players.get(j).setConnected(false);
+                if (!playerThreads.get(i).isAlive()){
+                    playerThreads.set(i, new Thread(() -> {
+                        int j = finalI;
+                        try {
+                            //wait for the answer of players
+                            Thread.sleep(1000*Config.WAIT_FOR_PING_TIME);
+                            if (players.get(j).isConnected()){
+                                System.out.println("client "  + j + " disconnected");
+                                synchronized (players) {
+                                    players.get(j).setConnected(false);
+                                }
+                                playerDisconnected();
                             }
-                            playerDisconnected();
-                        }
-                    } catch (InterruptedException e) {
-                    }
-                }));
-                playerThreads.get(i).start();
+                        } catch (InterruptedException e) {}
+                    }));
+                    playerThreads.get(i).start();
+                }
+
             }
 
             updatePlayersConnected();
@@ -392,23 +397,119 @@ public class GameState {
      * @param player Player to be reconnected
      */
     private void manageReconnection(Player player) {
-        //restoreView(player.getClient());
-        synchronized (players) {
-            player.setConnected(true);
-        }
         if (this.currentGamePhase.equals(GamePhase.TIMEOUT)) {
             this.timeoutThread.interrupt();
             currentGamePhase = prevGamePhase;
             prevGamePhase = null;
         }
+        restoreView(player.getClient());
+        synchronized (players) {
+            player.setConnected(true);
+        }
     }
 
+    public void addPlacedEvent(UpdateBoardEvent event){
+        placedEventList.add(event);
+    }
+    
+    
     /**
      * View restoration for reconnection
      * @param client Client to be reconnected
      */
     public void restoreView(VirtualView client) {
         //send everything to client
+        ArrayList<VirtualView> clients = new ArrayList<>();
+        clients.add(client);
+        Player reconnectingPlayer = getPlayer(getPlayerIndex(client));
+        synchronized (eventQueue) {
+            GamePhase gamePhase = currentGamePhase;
+            if (currentGamePhase.equals(GamePhase.TIMEOUT)){
+                gamePhase = prevGamePhase;
+            }
+            //send player index
+            if (reconnectingPlayer.getNickname() != null) {
+                eventQueue.add(new SendIndexEvent(this, clients, getPlayerIndex(client)));
+            }
+            //for every player, send nickname, isConnected, color, points, hands
+            for (int i = 0; i < players.size(); i++) {
+                Player currentPlayer = players.get(i);
+                eventQueue.add(new NicknameEvent(this, clients, i, currentPlayer.getNickname()));
+                if (i != getPlayerIndex(client)){
+                    eventQueue.add(new ConnectionInfoEvent(this, clients, currentPlayer, currentPlayer.isConnected()));
+                }
+                if (currentPlayer.getColor() != null) {
+                    eventQueue.add((new UpdateColorEvent(this, clients, currentPlayer, currentPlayer.getColor())));
+                }
+                eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
+                //send hands
+                if (gamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
+                    Set<Integer> handCardsSet = currentPlayer.getHandCardsMap().keySet();
+                    for (Integer k : handCardsSet) {
+                        eventQueue.add(new UpdateAddHandEvent(this, clients, currentPlayer, k));
+                    }
+                }
+                //send starter
+                if (currentPlayer.getStarterCard() != null) {
+                    Side starterSide = currentPlayer.getPlacedCardSide(currentPlayer.getStarterCard().getId());
+                    if (i == getPlayerIndex(client)){
+                        eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), currentPlayer.getStarterCard().getId(), null));
+                    }
+                    eventQueue.add(new UpdateStarterCardEvent(this, clients, i, currentPlayer.getStarterCard().getId(), starterSide));
+                }
+                HashMap<Element, Integer> elements = currentPlayer.getAllElements();
+                int finalI = i;
+                elements.keySet().stream().forEach(e->{
+                    eventQueue.add(new UpdateElementsEvent(this, clients, finalI, e, elements.get(e)));
+                });
+            }
+            // send Starter card
+/*            if (reconnectingPlayer.getStarterCard() != null) {
+                Side starterSide = reconnectingPlayer.getPlacedCardSide(reconnectingPlayer.getStarterCard().getId());
+                eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), reconnectingPlayer.getStarterCard().getId(), starterSide));
+            }*/
+            //send common objectives
+            if (gamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
+                ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();
+                sharedObjectives.add(mainBoard.getSharedObjectiveCard(0));
+                sharedObjectives.add(mainBoard.getSharedObjectiveCard(1));
+                eventQueue.add((new UpdateSharedObjectiveEvent(this, clients, sharedObjectives)));
+            }
+            //send correct secret objective
+            ArrayList<ObjectiveCard> secretObjectives = new ArrayList<>();
+            //if the secret objective is already choosen
+            if (reconnectingPlayer.getObjectiveCard() != null) {
+                secretObjectives.add(reconnectingPlayer.getObjectiveCard());
+                eventQueue.add(new UpdateSecretObjectiveEvent(this, clients, secretObjectives));
+            } else if (reconnectingPlayer.getObjectiveCardOptions()[0] == null && reconnectingPlayer.getObjectiveCardOptions()[1] == null) { }  //if the secret objective options is not already given
+            else { //the player has to choose between two secrets
+                secretObjectives.add(reconnectingPlayer.getObjectiveCardOption(0));
+                secretObjectives.add(reconnectingPlayer.getObjectiveCardOption(1));
+                eventQueue.add(new UpdateSecretObjectiveEvent(this, clients, secretObjectives));
+            }
+            // send gamePhase and turnPhase if exists
+            //eventQueue.add(new UpdateGamePhaseEvent(this, clients, gamePhase));
+            if (gamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
+                eventQueue.add(new UpdateTurnPhaseEvent(this, clients, currentGameTurn));
+            }
+            // send current player
+            if (gamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
+                eventQueue.add(new UpdateCurrentPlayerEvent(this, clients, currentPlayerIndex));
+            }
+
+            // for every placingCardEvent, place a card in the boardsMap and in placedOrderCardMap
+            placedEventList.stream().forEach(e -> {
+                e.setRestoreClients(clients); //events in placedEventList have the attribute 'clients' empty, it needs to be setted
+                eventQueue.add(e);
+            });
+            // send mainBoard
+            if(gamePhase.ordinal() >= GamePhase.CHOOSESTARTERSIDEPHASE.ordinal()) {
+                eventQueue.add(new UpdateMainBoardEvent(this, clients, mainBoard));
+            }
+            //todo send Chat
+            eventQueue.notifyAll();
+
+        }
     }
 
     /**
@@ -423,7 +524,7 @@ public class GameState {
         synchronized (players) {
             numberConnected = players.stream().filter(Player::isConnected).count();
         }
-        if (numberConnected <= 1) {
+        if (numberConnected <= 1 && !currentGamePhase.equals(GamePhase.TIMEOUT)) {
             this.prevGamePhase = currentGamePhase;
             this.currentGamePhase = GamePhase.TIMEOUT;
             System.out.println("Timeout for ending the game started");
@@ -443,7 +544,6 @@ public class GameState {
                     System.out.println("game ended after timeout expired");
                     restart();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
                     System.out.println("timout ended");
                 }
             });
@@ -552,6 +652,7 @@ public class GameState {
                 //takes for granted that player connection is updated
                 //if the player is not connected but the gameState doesn't know, the following code fails
                 if (!players.get(j).isConnected()) {
+                    playerThreads.get(j).interrupt();
                     players.get(j).setClient(client);
                     this.manageReconnection(players.get(j));
                     synchronized (eventQueue) {
@@ -599,9 +700,10 @@ public class GameState {
             }
             System.out.println(nickname + " connected");
         } else {
-            //TODO: probabilmente il controllo in singleClient della connesione lancia un eccezione
+            ArrayList<VirtualView> clients = new ArrayList<>();
+            clients.add(client);
             synchronized (eventQueue) {
-                eventQueue.add(new ErrorEvent(this, singleClient(client), "the game is already started"));
+                eventQueue.add(new ErrorEvent(this, clients, "the game is already started"));
                 eventQueue.notifyAll();
             }
         }
@@ -610,7 +712,6 @@ public class GameState {
     public void addPlayer(Player player){
         players.add(player);
     }
-
 
     //STARTING PHASE SETTERS
 

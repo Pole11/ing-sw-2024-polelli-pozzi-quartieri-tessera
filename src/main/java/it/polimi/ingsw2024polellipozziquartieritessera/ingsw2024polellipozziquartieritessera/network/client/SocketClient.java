@@ -6,6 +6,7 @@ import javafx.application.Platform;
 
 import java.io.*;
 import java.net.*;
+import java.net.ConnectException;
 import java.rmi.*;
 import java.util.*;
 
@@ -26,8 +27,10 @@ public class SocketClient implements VirtualView {
         new Thread(() -> {
             try {
                 runVirtualServer();
-            } catch (Exception e) {
+            } catch (ConnectException e) {
                 clientContainer.serverDisconnected();
+            } catch (IOException e){
+                e.printStackTrace();
             }
         }).start();
 
@@ -60,6 +63,7 @@ public class SocketClient implements VirtualView {
         String line;
         // Read message type
         while ((line = input.readLine()) != null) {
+            //System.out.println(line);
             String[] messageString = line.split("; ");
             Messages message = Messages.valueOf(messageString[0]);
             switch (message) {

@@ -280,6 +280,10 @@ public class Controller {
         gameState.updatePlayersConnected();
     }
 
+    public boolean isConnected(VirtualView client){
+        return gameState.getPlayer(gameState.getPlayerIndex(client)).isConnected();
+    }
+
 /*
     public void setConnected(int index, boolean connected){
         synchronized (this.gameState) {

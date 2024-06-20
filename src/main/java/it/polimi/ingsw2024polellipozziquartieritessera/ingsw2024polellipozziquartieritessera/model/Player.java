@@ -97,9 +97,9 @@ public class Player {
         this.objectivesWon = 0;
         this.centerResources = new HashMap<>();
 
-        //this.objectiveCardOptions = new ObjectiveCard[2];
-        //this.objectiveCardOptions[0] = null;
-        //this.objectiveCardOptions[1] = null;
+        this.objectiveCardOptions = new ObjectiveCard[2];
+        this.objectiveCardOptions[0] = null;
+        this.objectiveCardOptions[1] = null;
 
         this.allElements = new HashMap<>();
         for (Element element : Element.values()) {
@@ -225,11 +225,14 @@ public class Player {
             gameState.getEventQueue().notifyAll();
         }
 
+        // set options to null in order to manage reconnections
+        objectiveCardOptions[0] = null;
+        objectiveCardOptions[1] = null;
     }
 
     public void setStarterCard(StarterCard starterCard) {
         this.starterCard = starterCard;
-        this.placedCardsMap.put(this.getStarterCard().getId(), Side.FRONT); // also set the default side to FRONT
+        this.placedCardsMap.put(this.getStarterCard().getId(), null); // also set the default side to FRONT todo: changed side to null because of restore-view needs it, it will crash? we will see
         synchronized (gameState.getEventQueue()){
             gameState.addToEventQueue(new UpdateStarterCardEvent(gameState, gameState.singleClient(this.getClient()), gameState.getPlayerIndex(this), starterCard.getId(), null));
             gameState.getEventQueue().notifyAll();
@@ -367,8 +370,11 @@ public class Player {
         updateBoard(placingCardId, tableCardId, tableCornerPos);
         this.centerResources.put(placingCardId, placingCard.getResourceType());
         synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateBoardEvent(gameState, gameState.allConnectedClients(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide));
+            Event event = new UpdateBoardEvent(gameState, gameState.allConnectedClients(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide);
+            gameState.addToEventQueue(event);
             gameState.getEventQueue().notifyAll();
+            UpdateBoardEvent backupEvent = new UpdateBoardEvent(gameState, new ArrayList<>(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide);
+            gameState.addPlacedEvent(backupEvent);
         }
     }
 

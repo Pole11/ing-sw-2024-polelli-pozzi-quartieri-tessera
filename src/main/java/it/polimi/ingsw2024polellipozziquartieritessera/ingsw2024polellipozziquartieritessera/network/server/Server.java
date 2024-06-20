@@ -105,9 +105,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void connectRmi(VirtualView client) throws RemoteException {
-        System.out.println("New RMI " +
-                "" +
-                "client connected");
+        System.out.println("New RMI " + "client connected");
     }
 
     @Override
@@ -118,6 +116,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void startGame(VirtualView client) throws RemoteException{
+        if (!checkConnected(client)) return;
         if (controller.getGamePhase().equals(GamePhase.NICKNAMEPHASE)){
             this.controller.startGame(client);
         } else {
@@ -127,6 +126,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void chooseInitialStarterSide(VirtualView client, Side side) throws RemoteException {
+        if (!checkConnected(client)) return;
         if (controller.getGamePhase().equals(GamePhase.CHOOSESTARTERSIDEPHASE)) {
             int playerIndex = getPlayerIndex(client);
             this.controller.chooseInitialStarterSide(playerIndex, side);
@@ -138,6 +138,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void chooseInitialColor(VirtualView client, Color color) throws RemoteException {
+        if (!checkConnected(client)) return;
         if (controller.getGamePhase().equals(GamePhase.CHOOSECOLORPHASE)) {
             int playerIndex = getPlayerIndex(client);
             this.controller.chooseInitialColor(playerIndex, color);
@@ -149,6 +150,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void chooseInitialObjective(VirtualView client, int index) throws RemoteException {
+        if (!checkConnected(client)) return;
         if (controller.getGamePhase().equals(GamePhase.CHOOSEOBJECTIVEPHASE)) {
             int playerIndex = getPlayerIndex(client);
             this.controller.chooseInitialObjective(playerIndex, index);
@@ -160,6 +162,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void placeCard(VirtualView client, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws RemoteException {
+        if (!checkConnected(client)) return;
         int playerIndex = getPlayerIndex(client);
 
         //NON FUNZIONA IL CONTROLLO SUL PLAYER
@@ -185,6 +188,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void drawCard(VirtualView client, DrawType drawType) throws RemoteException {
+        if (!checkConnected(client)) return;
         int playerIndex = getPlayerIndex(client);
 
         if (
@@ -207,6 +211,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void flipCard(VirtualView client, int cardId) throws RemoteException {
+        if (!checkConnected(client)) return;
         if (controller.getGamePhase().equals(GamePhase.MAINPHASE)) {
             int playerIndex = getPlayerIndex(client);
             try {
@@ -220,13 +225,22 @@ public class Server implements VirtualServer {
     }
 
     @Override
-    public void addMessage(VirtualView client, String content) {
+    public void addMessage(VirtualView client, String content) throws RemoteException {
+        if (!checkConnected(client)) return;
         this.controller.addMessage(getPlayerIndex(client), content);
     }
 
     @Override
     public void ping(VirtualView client) throws RemoteException {
         this.controller.ping(client);
+    }
+
+    private boolean checkConnected(VirtualView client) throws RemoteException {
+        if (!controller.isConnected(client)){
+            client.sendError("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>");
+            return false;
+        }
+        return true;
     }
 
 
