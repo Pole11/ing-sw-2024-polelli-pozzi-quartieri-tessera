@@ -634,6 +634,7 @@ public class GameState {
                 //takes for granted that player connection is updated
                 //if the player is not connected but the gameState doesn't know, the following code fails
                 if (!players.get(j).isConnected()) {
+                    playerThreads.get(j).interrupt();
                     players.get(j).setClient(client);
                     this.manageReconnection(players.get(j));
                     synchronized (eventQueue) {

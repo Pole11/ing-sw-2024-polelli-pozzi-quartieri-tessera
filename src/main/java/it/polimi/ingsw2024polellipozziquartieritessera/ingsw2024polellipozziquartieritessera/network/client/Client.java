@@ -1,10 +1,12 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -136,12 +138,14 @@ public class Client implements VirtualView {
 
 
         try {
-            Thread.sleep(1000*10);
+            Thread.sleep(1000* Config.WAIT_DISCONNECTED_SERVER);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         try {
             startClient();
+        } catch (ConnectException e){
+            serverDisconnected();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -150,6 +154,7 @@ public class Client implements VirtualView {
 
     @Override
     public void updateGamePhase(GamePhase nextGamePhase) {
+        System.out.println("The Phase is " + nextGamePhase);
         viewModel.setGamePhase(nextGamePhase);
 
         if (meDoGui) {
@@ -243,8 +248,8 @@ public class Client implements VirtualView {
             if (connected){
                 System.out.print("you re-connected to the game\n> ");
             } else {
-                //SISTEMA
                 System.out.println("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>\n> ");
+                viewModel = new ViewModel();
             }
         } else {
             if (connected) {

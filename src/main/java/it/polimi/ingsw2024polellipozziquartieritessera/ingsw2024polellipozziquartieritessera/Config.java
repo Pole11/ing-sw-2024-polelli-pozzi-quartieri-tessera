@@ -19,6 +19,7 @@ public class Config {
     public static final int NEXT_PING_TIME = 2; // 10
     public static final int WAIT_FOR_PING_TIME = 2; // 5
     public static final int WAIT_FOR_SAVE_TIME = 1; // 10
+    public static final int WAIT_DISCONNECTED_SERVER = 3;
 
     public static final String GAME_STATE_PATH = "/src/main/java/it/polimi/ingsw2024polellipozziquartieritessera/ingsw2024polellipozziquartieritessera/rescue.json";
     public static final String CARD_JSON_PATH = "/src/main/java/it/polimi/ingsw2024polellipozziquartieritessera/ingsw2024polellipozziquartieritessera/cards.json";

@@ -105,9 +105,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void connectRmi(VirtualView client) throws RemoteException {
-        System.out.println("New RMI " +
-                "" +
-                "client connected");
+        System.out.println("New RMI " + "client connected");
     }
 
     @Override
