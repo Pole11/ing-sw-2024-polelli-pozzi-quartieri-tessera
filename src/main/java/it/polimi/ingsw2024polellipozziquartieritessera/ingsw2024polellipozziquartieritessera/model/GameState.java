@@ -715,11 +715,12 @@ public class GameState {
             eventQueue.notifyAll();
         }
 
-        // add the initial elements of the starter card
+        // TODO: this part of code is a duplicate of the part above (should be deleted)
+        /* add the initial elements of the starter card
         for (Element ele : player.getStarterCard().getUncoveredElements(side)) {
             int currentOccurrences = player.getAllElements().get(ele);
             player.addToAllElements(ele, currentOccurrences + 1);
-        }
+        }*/
 
 
         this.answered.put(playerIndex, true);
