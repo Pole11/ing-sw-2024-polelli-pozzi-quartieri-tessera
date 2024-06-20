@@ -372,7 +372,8 @@ public class Player {
             Event event = new UpdateBoardEvent(gameState, gameState.allConnectedClients(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide);
             gameState.addToEventQueue(event);
             gameState.getEventQueue().notifyAll();
-            gameState.addPlacedEvent(event);
+            UpdateBoardEvent backupEvent = new UpdateBoardEvent(gameState, new ArrayList<>(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide);
+            gameState.addPlacedEvent(backupEvent);
         }
     }
 

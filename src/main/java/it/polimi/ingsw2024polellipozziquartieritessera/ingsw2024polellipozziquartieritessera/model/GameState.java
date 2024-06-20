@@ -91,7 +91,7 @@ public class GameState {
      * Number of turns left to play
      */
     private int turnToPlay;
-    private ArrayList<Event> placedEventList;
+    private ArrayList<UpdateBoardEvent> placedEventList;
 
 
     /**
@@ -404,7 +404,7 @@ public class GameState {
         }
     }
 
-    public void addPlacedEvent(Event event){
+    public void addPlacedEvent(UpdateBoardEvent event){
         placedEventList.add(event);
     }
     
@@ -482,6 +482,7 @@ public class GameState {
 
             // for every placingCardEvent, place a card in the boardsMap and in placedOrderCardMap
             placedEventList.stream().forEach(e -> {
+                e.setRestoreClients(clients); //events in placedEventList have the attribute 'clients' empty, it needs to be setted
                 eventQueue.add(e);
             });
             // send mainBoard

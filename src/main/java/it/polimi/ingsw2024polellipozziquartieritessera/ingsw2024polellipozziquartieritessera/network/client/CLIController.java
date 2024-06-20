@@ -349,12 +349,17 @@ public class CLIController {
         } else {
             ArrayList<Integer> cards = new ArrayList<>();
             ArrayList<Side> sides = new ArrayList<>();
-            int decks[] = viewModel.getSharedCards();
-            String titles[] = {"SHARED RESOURCE 0","SHARED RESOURCE 1","SHARED GOLD 0","SHARED GOLD 1","RESOURCE DECK","GOLD DECK"};
+            int[] decks = viewModel.getSharedCards();
+            String[] titles = {"SHARED RESOURCE 0","SHARED RESOURCE 1","SHARED GOLD 0","SHARED GOLD 1","RESOURCE DECK","GOLD DECK"};
 
             for (int i = 0; i < decks.length; i++) {
                 cards.add(decks[i]);
-                sides.add(Side.FRONT);
+                if(i < decks.length - 2) {
+                    sides.add(Side.FRONT);
+                }
+                else {
+                    sides.add(Side.BACK);
+                }
             }
             System.out.println("this is the current main board");
             for(int i = 0; i < titles.length; i++){
@@ -376,7 +381,17 @@ public class CLIController {
     }
 
     private ArrayList<String> printCard(Card card, Side side){
-        if(card instanceof ObjectiveCard){
+        if(card == null){
+           ArrayList<String> emptyCard = new ArrayList<>();
+           emptyCard.add("+-----------------+");
+           emptyCard.add("|      \\   /      |");
+           emptyCard.add("|       \\ /       |");
+           emptyCard.add("|        X        |");
+           emptyCard.add("|       / \\       |");
+           emptyCard.add("|      /   \\      |");
+           emptyCard.add("+-----------------+");
+           return emptyCard;
+        } else if(card instanceof ObjectiveCard){
             return printCard((ObjectiveCard) card, side);
         } else if(card instanceof ResourceCard){
             return printCard((ResourceCard) card, side);
@@ -536,7 +551,7 @@ public class CLIController {
             output.add("");
         }
         for(int i = 0; i < cards.size(); i++) {
-            temp = printCard(viewModel.cardById(cards.get(i)),sides.get(i)) ;
+            temp = printCard(viewModel.cardById(cards.get(i)),sides.get(i));
             for (int j = 0; j < 7; j++) {
                 output.set(j, output.get(j) + " " + temp.get(j));
             }
@@ -549,6 +564,8 @@ public class CLIController {
     }
 
     private ArrayList<String> printCard(GoldCard card, Side side){
+        //todo remove id from backs
+
         // attributes
         int points;
         Element resource;
