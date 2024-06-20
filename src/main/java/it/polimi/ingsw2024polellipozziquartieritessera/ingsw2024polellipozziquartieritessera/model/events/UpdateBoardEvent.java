@@ -15,9 +15,7 @@ public class UpdateBoardEvent extends Event{
     private final int tableCardId;
     private final CornerPos existingCornerPos;
     private final Side side;
-
-
-
+    private ArrayList<VirtualView> restoreClients;
     public UpdateBoardEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) {
         super(gameState, clients);
         this.player = player;
@@ -26,15 +24,23 @@ public class UpdateBoardEvent extends Event{
         this.existingCornerPos = existingCornerPos;
         this.side = side;
     }
-
     @Override
     public void execute() {
-        for (VirtualView client : clients){
+        ArrayList<VirtualView> actualClients;
+        if(clients.isEmpty()){ //for PlacedEventList, updateBoard.clients needs to be set after construction
+            actualClients = restoreClients;
+        } else{
+            actualClients = clients;
+        }
+        for (VirtualView client : actualClients){
             try {
                 client.updatePlayerBoard(gameState.getPlayerIndex(player), placingCardId, tableCardId, existingCornerPos, side);
             } catch (RemoteException e) {
                 playerDisconnected(client);
             }
         }
+    }
+    public void setRestoreClients(ArrayList<VirtualView> restoreClients) {
+        this.restoreClients = restoreClients;
     }
 }
