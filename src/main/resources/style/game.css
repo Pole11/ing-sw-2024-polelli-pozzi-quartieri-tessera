@@ -16,7 +16,7 @@ Text {
     -fx-font-family: 'Comic Neue';
     -fx-background-image: url("../img/bricks_red.png");
     -fx-background-repeat: repeat;
-    -fx-background-size: 900;
+    -fx-background-size: 500;
 }
 
 .cardDeck {
@@ -78,4 +78,31 @@ Text {
 .redText {
     -fx-fill: red;
     -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.8) , 2, 1, 0, 0);
+}
+
+.anchorPaneHandContainer {
+    -fx-fit-to-width: 100%;
+}
+
+.stackPaneHandContainer {
+    -fx-padding: 10;
+}
+
+#scrollPaneContainerBoard {
+    -fx-background-color: transparent;
+    -fx-border-width: 4;
+    -fx-border-color: rgb(220, 200, 60);
+}
+
+#scrollPaneContainerBoard .viewport {
+    -fx-background-color: transparent;
+}
+
+#scrollPaneContainerBoard #scrollPaneContainerBoard:horizontal,
+#scrollPaneContainerBoard #scrollPaneContainerBoard:vertical {
+    -fx-opacity: 0;
+    -fx-max-height: 0;
+    -fx-max-width: 0;
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
 }

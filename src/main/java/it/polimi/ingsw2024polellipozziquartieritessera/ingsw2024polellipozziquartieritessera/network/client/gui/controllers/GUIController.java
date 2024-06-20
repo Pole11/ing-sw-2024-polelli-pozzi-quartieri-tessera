@@ -1,5 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.RingBuffer;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -50,6 +52,7 @@ abstract public class GUIController {
     private double pressedY;
     private MediaPlayer mediaPlayer;
     private int windowHeight = 920;
+    RingBuffer<Image> imageRingBuffer;
 
     @FXML
     private void initialize() {
@@ -62,7 +65,8 @@ abstract public class GUIController {
                 if (event.getCode().equals(KeyCode.M)) muteMusic();
             });
 
-            windowHeight = GUIApplication.getSize();
+            //windowHeight = GUIApplication.getSize();
+            windowHeight = (int) GUIApplication.getMainStage().getHeight();
         });
     }
 
@@ -260,7 +264,8 @@ abstract public class GUIController {
         Image image = new Image(imageUrl);
 
         PixelReader reader = image.getPixelReader();
-        WritableImage imageWritable = new WritableImage(reader, 103, 101, 823, 547);
+        //WritableImage imageWritable = new WritableImage(reader, 103, 101, 823, 547);
+        WritableImage imageWritable = new WritableImage(reader, 52, 51, 411, 273);
 
         ImageView imageView = new ImageView(imageWritable);
         imageView.setFitHeight(height);

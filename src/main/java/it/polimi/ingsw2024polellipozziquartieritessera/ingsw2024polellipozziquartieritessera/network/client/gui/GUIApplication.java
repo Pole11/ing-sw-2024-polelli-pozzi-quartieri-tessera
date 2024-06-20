@@ -39,7 +39,7 @@ public class GUIApplication extends Application {
         return guiController;
     }
 
-    public  Stage getMainStage() {
+    public static Stage getMainStage() {
         return mainStage;
     }
 
@@ -81,7 +81,7 @@ public class GUIApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/lobby.fxml")); // uncomment for real use
-        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/final.fxml")); // uncomment for testing
+        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/place.fxml")); // uncomment for testing
         Parent root = fxmlLoader.load();
 
         String audioFilePath = "/sounds/soundtrack.mp3";
@@ -92,7 +92,7 @@ public class GUIApplication extends Application {
 
         mainStage = stage;
 
-        int size = getSize();
+        int size = (int) (getScreenHeight() * 0.85);
 
         Scene scene = new Scene(root, size*1.2, size);
         stage.setTitle("Codex Naturalis");
@@ -116,6 +116,7 @@ public class GUIApplication extends Application {
 
     public static int getSize() {
         return getScreenWidth() > getScreenHeight() ? (int) (getScreenHeight() * 0.85) : (int) (getScreenWidth() * 0.85);
+        //return mainStage.getWidth() > mainStage.getHeight() ? (int) mainStage.getHeight() : (int) mainStage.getWidth();
     }
 
     public static double getScreenWidth() {

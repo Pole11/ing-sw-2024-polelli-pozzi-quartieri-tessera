@@ -45,7 +45,6 @@ public class GUITest {
         viewModel.addedCardToHand(2, 52);
         viewModel.setMainBoard(42, 52, 2,12, 43, 3);
         viewModel.setStarterCard(98);
-        viewModel.initializeBoard(0, 98);
         viewModel.updatePlayerBoard(0, 5, 98, CornerPos.UPLEFT, Side.FRONT);
         viewModel.updatePlayerBoard(0, 15, 5, CornerPos.DOWNLEFT, Side.FRONT);
         viewModel.updatePlayerBoard(0, 25, 5, CornerPos.UPRIGHT, Side.FRONT);
@@ -61,10 +60,21 @@ public class GUITest {
         viewModel.updatePlayerBoard(1, 65, 34, CornerPos.UPLEFT, Side.FRONT);
         viewModel.updatePlayerBoard(1, 75, 65, CornerPos.UPLEFT, Side.FRONT);
         viewModel.updatePlayerBoard(1, 37, 75, CornerPos.UPLEFT, Side.FRONT);
+        viewModel.updatePlayerBoard(1, 38, 37, CornerPos.UPLEFT, Side.FRONT);
+        viewModel.updatePlayerBoard(1, 39, 38, CornerPos.UPLEFT, Side.FRONT);
+        viewModel.updatePlayerBoard(1, 40, 39, CornerPos.UPLEFT, Side.FRONT);
+        viewModel.updatePlayerBoard(1, 41, 40, CornerPos.UPLEFT, Side.FRONT);
+        viewModel.updatePlayerBoard(1, 42, 41, CornerPos.UPLEFT, Side.FRONT);
+        viewModel.updatePlayerBoard(1, 43, 42, CornerPos.UPLEFT, Side.FRONT);
+        viewModel.updatePlayerBoard(1, 44, 43, CornerPos.UPLEFT, Side.FRONT);
+
+        viewModel.initializeBoard(2, 34);
 
         viewModel.setConnection(0, true);
         viewModel.setConnection(1, false);
         viewModel.setConnection(2, true);
+
+        viewModel.setPlayerIndex(1);
 
         GUIApplication guiApplication = new GUIApplication();
         guiApplication.runGui(null, null, null, viewModel);
