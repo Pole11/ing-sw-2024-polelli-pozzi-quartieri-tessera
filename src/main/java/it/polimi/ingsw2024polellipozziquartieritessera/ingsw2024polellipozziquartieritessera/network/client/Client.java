@@ -282,6 +282,7 @@ public class Client implements VirtualView {
 
     @Override
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
+        System.out.println("index "  + playerIndex + " placingcard " + placingCardId + " tablecard" + tableCardId);
         viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
         if (viewModel.getPlayerIndex() == playerIndex) {
             System.out.print("you placed a card, now you have to draw your card with DRAWCARD [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");
@@ -353,7 +354,6 @@ public class Client implements VirtualView {
 
     @Override
     public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
-        if (side != null) System.out.println(side.toString());
         viewModel.fillPoints();
         if (side == null){
             viewModel.setStarterCard(cardId1);

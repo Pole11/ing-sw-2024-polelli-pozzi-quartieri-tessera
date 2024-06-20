@@ -445,12 +445,25 @@ public class GameState {
                         eventQueue.add(new UpdateAddHandEvent(this, clients, currentPlayer, k));
                     }
                 }
+                //send starter
+                if (currentPlayer.getStarterCard() != null) {
+                    Side starterSide = currentPlayer.getPlacedCardSide(currentPlayer.getStarterCard().getId());
+                    if (i == getPlayerIndex(client)){
+                        eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), currentPlayer.getStarterCard().getId(), null));
+                    }
+                    eventQueue.add(new UpdateStarterCardEvent(this, clients, i, currentPlayer.getStarterCard().getId(), starterSide));
+                }
+                HashMap<Element, Integer> elements = currentPlayer.getAllElements();
+                int finalI = i;
+                elements.keySet().stream().forEach(e->{
+                    eventQueue.add(new UpdateElementsEvent(this, clients, finalI, e, elements.get(e)));
+                });
             }
             // send Starter card
-            if (reconnectingPlayer.getStarterCard() != null) {
+/*            if (reconnectingPlayer.getStarterCard() != null) {
                 Side starterSide = reconnectingPlayer.getPlacedCardSide(reconnectingPlayer.getStarterCard().getId());
                 eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), reconnectingPlayer.getStarterCard().getId(), starterSide));
-            }
+            }*/
             //send common objectives
             if (gamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
                 ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();

@@ -255,8 +255,6 @@ public class Controller {
             player.changeHandSide(cardId, side);}
     }
 
-    public void openChat(){}
-
     public void addMessage(int playerIndex, String content){}
 
     public synchronized void ping(VirtualView client){
@@ -265,6 +263,10 @@ public class Controller {
 
     public void manageDisconnection(){
         gameState.updatePlayersConnected();
+    }
+
+    public boolean isConnected(VirtualView client){
+        return gameState.getPlayer(gameState.getPlayerIndex(client)).isConnected();
     }
 
 /*
