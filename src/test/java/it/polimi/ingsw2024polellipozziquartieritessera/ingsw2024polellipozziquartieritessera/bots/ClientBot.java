@@ -8,8 +8,6 @@ import java.util.*;
 
 public class ClientBot {
     static Client client;
-    private static boolean nickChosen = false;
-    private static boolean colChosen = false;
     private static boolean sideChosen = false;
     private static boolean secretChosen = false;
     private static final int SPEED = 10; // millisecond for command
@@ -73,9 +71,8 @@ public class ClientBot {
         GamePhase gamePhase = client.getViewModel().getGamePhase();
         switch (gamePhase) {
             case NICKNAMEPHASE:
-                if (!nickChosen){
+                if (client.getViewModel().getPlayerIndex() == -1){
                     command = String.format("ADDUSER %s", generateName());
-                    nickChosen = true;
                 }
                 break;
             case CHOOSESTARTERSIDEPHASE:
@@ -85,9 +82,8 @@ public class ClientBot {
                 }
                 break;
             case CHOOSECOLORPHASE:
-                if (!colChosen){
+                if (client.getViewModel().getColorsMap(client.getViewModel().getPlayerIndex()) == null){
                     command = String.format("CHOOSECOLOR %s", generateColor());
-                    colChosen = true;
                 }
                 break;
             case CHOOSEOBJECTIVEPHASE:
