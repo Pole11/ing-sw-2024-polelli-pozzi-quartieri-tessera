@@ -36,9 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 
 abstract public class GUIController {
-    @FXML private Label serverMessageLabel;
-    @FXML private Label serverErrorLabel;
-    @FXML private Button handleMuteButton;
+    @FXML public Label serverMessageLabel;
+    @FXML public Label serverErrorLabel;
+    @FXML public Button handleMuteButton;
     // add virtual model
     private final ArrayDeque<CommandRunnable> commandQueue;
     private Thread executeCommands;

@@ -27,16 +27,40 @@ public class GUIControllerBoard extends GUIController {
     public void printBoard() {
         Platform.runLater(() -> {
             ViewModel vm = getViewModel();
-            ArrayList<ArrayList<Integer>> playerBoard = vm.getPlayerBoard(getViewModel().getPlayerIndex()); // the first arg is the index of the player to print the board of
+            int playerId = getParamsMap().get("playerId");
+            ArrayList<ArrayList<Integer>> playerBoard = vm.getPlayerBoard(playerId); // the first arg is the index of the player to print the board of
+
+            for (int i = 0; i < playerBoard.size(); i++) {
+                for (int j = 0; j < playerBoard.get(i).size(); j++) {
+                    System.out.print(playerBoard.get(i).get(j) + " ");
+                }
+                System.out.println();
+            }
+
             playerBoard = rotateBoard(playerBoard);
+
+            for (int i = 0; i < playerBoard.size(); i++) {
+                for (int j = 0; j < playerBoard.get(i).size(); j++) {
+                    System.out.print(playerBoard.get(i).get(j) + " ");
+                }
+                System.out.println();
+            }
+
             resizeI(playerBoard);
+
+            for (int i = 0; i < playerBoard.size(); i++) {
+                for (int j = 0; j < playerBoard.get(i).size(); j++) {
+                    System.out.print(playerBoard.get(i).get(j) + " ");
+                }
+                System.out.println();
+            }
 
             if (gridPaneContainerBoard != null) { gridPaneContainerBoard.getChildren().clear(); }
 
-            for (int k = 0; k < getViewModel().getPlacingCardOrderMap(getViewModel().getPlayerIndex()).size(); k++) {
+            for (int k = 0; k < getViewModel().getPlacingCardOrderMap(playerId).size(); k++) {
                 for (int i = 0; i < playerBoard.size(); i++) {
                     for (int j = 0; j < playerBoard.getFirst().size(); j++) {
-                        if (playerBoard.get(i).get(j) != -1 && getViewModel().getPlacingCardOrderMap(getViewModel().getPlayerIndex()).get(k).equals(playerBoard.get(i).get(j))) {
+                        if (playerBoard.get(i).get(j) != -1 && getViewModel().getPlacingCardOrderMap(playerId).get(k).equals(playerBoard.get(i).get(j))) {
                             int ele = playerBoard.get(i).get(j);
                             ImageView tempImageView;
                             String imageUrl = null;
@@ -79,9 +103,10 @@ public class GUIControllerBoard extends GUIController {
         Platform.runLater(() -> {
             int cornerWidth = (int) (getWindowHeight() * 0.0304);
             int cornerHeight = (int) (getWindowHeight() * 0.0310);
+            int playerId = getParamsMap().get("playerId");
 
             ViewModel vm = getViewModel();
-            ArrayList<ArrayList<Integer>> playerBoard = vm.getPlayerBoard(getViewModel().getPlayerIndex()); // the first arg is the index of the player to print the board of
+            ArrayList<ArrayList<Integer>> playerBoard = vm.getPlayerBoard(playerId); // the first arg is the index of the player to print the board of
             playerBoard = rotateBoard(playerBoard);
             resizeI(playerBoard);
 

@@ -3,6 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.DrawType;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.TurnPhase;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.AddMessageCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.DrawCardCommandRunnable;
@@ -27,10 +28,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 public class GUIControllerGame extends GUIController {
     @FXML private BorderPane mainContainerGame;
@@ -38,6 +36,9 @@ public class GUIControllerGame extends GUIController {
     @FXML private VBox plateauContainerGame;
     @FXML private VBox sharedResourceContainerGame;
     @FXML private Label currentPhase;
+    @FXML private StackPane plateauImageViewPane;
+    @FXML private Button handleOpenGameRulesButton;
+    @FXML private Button handleOpenChatButton;
     private HashMap<Integer, ArrayList<Integer>> plateauCoordinatedMap;
     private ListView<Text> chatListView;
     private boolean chatOpen;
@@ -46,55 +47,48 @@ public class GUIControllerGame extends GUIController {
         chatListView = new ListView<>();
 
         rotatePlayerContainer();
-        populatePlateauCoordinateMap();
         setFontSize(mainContainerGame);
-        update();
+        this.update();
     }
 
     private void populatePlateauCoordinateMap() {
         plateauCoordinatedMap = new HashMap<>();
         int plateauHeight = (int) (getWindowHeight() * 0.38);
-        plateauCoordinatedMap.put(0,  new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.11), plateauHeight - (int) (plateauHeight * 0.068))));
-        plateauCoordinatedMap.put(1,  new ArrayList<>(Arrays.asList(plateauHeight/4                               , plateauHeight - (int) (plateauHeight * 0.068))));
-        plateauCoordinatedMap.put(2,  new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.11), plateauHeight - (int) (plateauHeight * 0.068))));
-        plateauCoordinatedMap.put(3,  new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.17))));
-        plateauCoordinatedMap.put(4,  new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.057), plateauHeight - (int) (plateauHeight * 0.17))));
-        plateauCoordinatedMap.put(5,  new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.057), plateauHeight - (int) (plateauHeight * 0.17))));
-        plateauCoordinatedMap.put(6,  new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.17))));
-        plateauCoordinatedMap.put(7,  new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.28))));
-        plateauCoordinatedMap.put(8,  new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.057), plateauHeight - (int) (plateauHeight * 0.28))));
-        plateauCoordinatedMap.put(9,  new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.057), plateauHeight - (int) (plateauHeight * 0.28))));
-        plateauCoordinatedMap.put(10, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.28))));
-        plateauCoordinatedMap.put(11, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.39))));
-        plateauCoordinatedMap.put(12, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.057), plateauHeight - (int) (plateauHeight * 0.39))));
-        plateauCoordinatedMap.put(13, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.057), plateauHeight - (int) (plateauHeight * 0.39))));
-        plateauCoordinatedMap.put(14, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.39))));
-        plateauCoordinatedMap.put(15, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.49))));
-        plateauCoordinatedMap.put(16, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.057), plateauHeight - (int) (plateauHeight * 0.49))));
-        plateauCoordinatedMap.put(17, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.057), plateauHeight - (int) (plateauHeight * 0.49))));
-        plateauCoordinatedMap.put(18, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.49))));
-        plateauCoordinatedMap.put(19, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.60))));
-        plateauCoordinatedMap.put(20, new ArrayList<>(Arrays.asList(plateauHeight/4                               , plateauHeight - (int) (plateauHeight * 0.65))));
-        plateauCoordinatedMap.put(21, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.60))));
-        plateauCoordinatedMap.put(22, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.71))));
-        plateauCoordinatedMap.put(23, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.82))));
-        plateauCoordinatedMap.put(24, new ArrayList<>(Arrays.asList(plateauHeight/4 - (int) (plateauHeight * 0.10), plateauHeight - (int) (plateauHeight * 0.91))));
-        plateauCoordinatedMap.put(25, new ArrayList<>(Arrays.asList(plateauHeight/4                               , plateauHeight - (int) (plateauHeight * 0.93))));
-        plateauCoordinatedMap.put(26, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.10), plateauHeight - (int) (plateauHeight * 0.91))));
-        plateauCoordinatedMap.put(27, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.82))));
-        plateauCoordinatedMap.put(28, new ArrayList<>(Arrays.asList(plateauHeight/4 + (int) (plateauHeight * 0.17), plateauHeight - (int) (plateauHeight * 0.71))));
-        plateauCoordinatedMap.put(29, new ArrayList<>(Arrays.asList(plateauHeight/4                               , plateauHeight - (int) (plateauHeight * 0.79))));
+        double[] xOffsetFactors = { -0.11, 0, 0.11, 0.17, 0.057, -0.057, -0.17, -0.17,
+                -0.057, 0.057, 0.17, 0.17, 0.057, -0.057, -0.17, -0.17,
+                -0.057, 0.057, 0.17, 0.17, 0, -0.17, -0.17, -0.17,
+                -0.1, 0, 0.1, 0.17, 0.17, 0 };
+
+        double[] yOffsetFactors = { +0.43, +0.43, +0.43, +0.33, +0.33, +0.33, +0.33, +0.22,
+                +0.22, +0.22, +0.22, +0.12, +0.12, +0.12, +0.12, +0.02,
+                +0.02, +0.02, +0.02, -0.09, -0.15, -0.11, -0.20, -0.31,
+                -0.43, -0.45, -0.43, -0.31, -0.24, -0.33 };
+
+        // Populate the map with coordinates
+        for (int i = 0; i < xOffsetFactors.length; i++) {
+            int offsetX = (int) (plateauHeight * xOffsetFactors[i]);
+            int offsetY = (int) (plateauHeight * yOffsetFactors[i]);
+            plateauCoordinatedMap.put(i, new ArrayList<>(List.of(offsetX, offsetY)));
+        }
     }
 
     private void clearAllchilds() {
         Platform.runLater(() -> {
             if (sharedResourceContainerGame != null) sharedResourceContainerGame.getChildren().clear();
             if (sharedGoldContainerGame != null) sharedGoldContainerGame.getChildren().clear();
-            if (plateauContainerGame != null) {
-                while (plateauContainerGame.getChildren().size() > 5) {
-                    plateauContainerGame.getChildren().removeLast(); // the first two are the messages from server
+            /*if (plateauContainerGame != null) {
+                for (int i = 0; i < plateauContainerGame.getChildren().size(); i++) {
+                    // define the elements that must not be deleted
+                    ArrayList<Node> doNotDeleteElements = new ArrayList<>(Arrays.asList(serverMessageLabel,
+                            serverErrorLabel,
+                            handleMuteButton,
+                            handleOpenGameRulesButton,
+                            handleOpenChatButton,
+                            currentPhase,
+                            plateauImageViewPane));
+                    if (!doNotDeleteElements.contains(plateauContainerGame.getChildren().get(i))) plateauContainerGame.getChildren().remove(i); // the first two are the messages from server
                 }
-            }
+            }*/
             for (int i = 0; i < 4; i++) {
                 if (mainContainerGame.lookup("#player" + i + "ContainerGame") != null) {
                     while (mainContainerGame.lookup("#player" + i + "ContainerGame") != null && ((Pane) mainContainerGame.lookup("#player" + i + "ContainerGame")).getChildren().size() > 1) {
@@ -110,19 +104,20 @@ public class GUIControllerGame extends GUIController {
         String imageUrl = getClass().getResource("/img/plateau_score.jpg").toExternalForm();
         Image image = new Image(imageUrl);
 
+        // crop the image
         PixelReader reader = image.getPixelReader();
         WritableImage imageWritable = new WritableImage(reader, 48, 49, 460, 926);
-        //imageWritable = resizeWritableImage(imageWritable, (int) (getWindowHeight()*0.51), getWindowHeight());
 
         ImageView imageView = new ImageView(imageWritable);
 
-        imageView.setFitHeight(plateauHeight);
+        imageView.setFitHeight(plateauHeight); // just for info,the width is half thee height
         imageView.setPreserveRatio(true);
 
         return imageView;
     }
 
     public void initTable() {
+        // prepare the data structure for the hand
         ArrayList<HashMap<Integer, Side>> playerHandCards = new ArrayList<>();
         HashMap<Integer, String> nicknames = new HashMap<>();
         for (Integer playerId = 0; playerId < getViewModel().getPlayersSize(); playerId++) {
@@ -134,11 +129,16 @@ public class GUIControllerGame extends GUIController {
             nicknames.put(playerId, getViewModel().getNickname(playerId));
         }
 
+        // print shared objectives
         int firstCommonObjective = getViewModel().getObjectives()[0];
         int secondCommonObjective = getViewModel().getObjectives()[1];
-        int secretObjectiveCardId = getViewModel().getObjectives()[2];
         printCommonObjective(firstCommonObjective, secondCommonObjective);
+
+        // print decks
         printDecks();
+        int secretObjectiveCardId = getViewModel().getObjectives()[2];
+
+        // print the hands
         int meId = getViewModel().getPlayerIndex();
         for (int i = 0; i < playerHandCards.size(); i++) initPlayerHand(i, meId, nicknames, playerHandCards.get(i), secretObjectiveCardId);
     }
@@ -159,69 +159,105 @@ public class GUIControllerGame extends GUIController {
     }
 
     public void printDecks() {
-        Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
-            @Override
-            public void run() {
-                sharedGoldContainerGame.getChildren().add(new Text("Gold Deck"));
-                ImageView goldDeckImageView = createCardImageView("/img/carte_retro/" + getViewModel().getSharedCards()[5] + ".jpg", (int) (getWindowHeight()*0.090));
-                goldDeckImageView.getStyleClass().add("clickable");
-                BorderPane goldDeckPane = new BorderPane(goldDeckImageView);
-                goldDeckPane.getStyleClass().add("cardDeck");
-                // add event
-                sharedGoldContainerGame.getChildren().add(goldDeckPane);
-                sharedGoldContainerGame.getChildren().add(new Text("Shared Gold"));
-                // add event
-                ImageView firstSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedGoldCards()[0] + ".jpg", (int) (getWindowHeight()*0.090));
-                firstSharedGoldCardImageView.getStyleClass().add("clickable");
-                sharedGoldContainerGame.getChildren().add(firstSharedGoldCardImageView);
-                // add event
-                ImageView secondSharedGoldCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedGoldCards()[1] + ".jpg", (int) (getWindowHeight()*0.090));
-                secondSharedGoldCardImageView.getStyleClass().add("clickable");
-                sharedGoldContainerGame.getChildren().add(secondSharedGoldCardImageView);
+        Platform.runLater(() -> {
+            addTextToContainer(sharedGoldContainerGame, "Gold Deck");
+            try {
+                addCardToContainer(
+                        sharedGoldContainerGame,
+                        "/img/carte_retro/" + getViewModel().getSharedCards()[5] + ".jpg",
+                        DrawType.DECKGOLD,
+                        true
+                );
+                addTextToContainer(sharedGoldContainerGame, "Shared Gold");
+            } catch (Exception e) {
+                System.out.println("The gold deck is empty");
+            }
 
-                int plateauHeight = (int) (getWindowHeight() * 0.38);
-                Pane plateauImageViewPane = new Pane();
-                plateauImageViewPane.setPrefHeight(plateauHeight);
-                plateauImageViewPane.setId("plateauImageViewPane");
-                ImageView plateauImageView = createPlateauImageView(plateauHeight);
-                plateauImageViewPane.getChildren().add(plateauImageView);
-                plateauContainerGame.getChildren().add(plateauImageViewPane);
+            try {
+                addCardToContainer(
+                        sharedGoldContainerGame,
+                        "/img/carte_fronte/" + getViewModel().getSharedGoldCards()[0] + ".jpg",
+                        DrawType.SHAREDGOLD1,
+                        false
+                );
+            } catch (Exception e) {
+                System.out.println("The first gold shared is empty");
+            }
 
-                sharedResourceContainerGame.getChildren().add(new Text("Resource Deck"));
-                ImageView resourceDeckImageView = createCardImageView("/img/carte_retro/" + getViewModel().getSharedCards()[4] + ".jpg", (int) (getWindowHeight()*0.090));
-                resourceDeckImageView.getStyleClass().add("clickable");
-                BorderPane resourceDeckPane = new BorderPane(resourceDeckImageView);
-                resourceDeckPane.prefWidthProperty().bind(resourceDeckImageView.fitWidthProperty());
-                resourceDeckPane.getStyleClass().add("cardDeck");
-                // add event
-                sharedResourceContainerGame.getChildren().add(resourceDeckPane);
+            try {
+                addCardToContainer(
+                        sharedGoldContainerGame,
+                        "/img/carte_fronte/" + getViewModel().getSharedGoldCards()[1] + ".jpg",
+                        DrawType.SHAREDGOLD2,
+                        false
+                );
+            } catch (Exception e) {
+                System.out.println("The second gold shared is empty");
+            }
 
-                sharedResourceContainerGame.getChildren().add(new Text("Shared Resource"));
-                // add event
-                ImageView firstSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedResourceCards()[0] + ".jpg", (int) (getWindowHeight()*0.090));
-                firstSharedResourceCardImageView.getStyleClass().add("clickable");
-                sharedResourceContainerGame.getChildren().add(firstSharedResourceCardImageView);
-                // add event
-                ImageView secondSharedResourceCardImageView = createCardImageView("/img/carte_fronte/" + getViewModel().getSharedResourceCards()[1] + ".jpg", (int) (getWindowHeight()*0.090));
-                secondSharedResourceCardImageView.getStyleClass().add("clickable");
-                sharedResourceContainerGame.getChildren().add(secondSharedResourceCardImageView);
+            configurePlateau();
 
-                goldDeckPane.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.DECKGOLD); });
-                firstSharedGoldCardImageView.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.SHAREDGOLD1); });
-                secondSharedGoldCardImageView.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.SHAREDGOLD2); });
-                resourceDeckPane.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.DECKRESOURCE); });
-                firstSharedResourceCardImageView.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.SHAREDRESOURCE1); });
-                secondSharedResourceCardImageView.setOnMouseClicked(mouseEvent -> { handleDrawCard(DrawType.SHAREDRESOURCE2); });
+            addTextToContainer(sharedResourceContainerGame, "Resource Deck");
+            try {
+                addCardToContainer(
+                        sharedResourceContainerGame,
+                        "/img/carte_retro/" + getViewModel().getSharedCards()[4] + ".jpg",
+                        DrawType.DECKRESOURCE,
+                        true
+                );
+                addTextToContainer(sharedResourceContainerGame, "Shared Resource");
+            } catch (Exception e) {
+                System.out.println("The resource deck is empty");
+            }
 
-                addHoverRotate(goldDeckPane);
-                addHoverRotate(firstSharedGoldCardImageView);
-                addHoverRotate(secondSharedGoldCardImageView);
-                addHoverRotate(resourceDeckPane);
-                addHoverRotate(firstSharedResourceCardImageView);
-                addHoverRotate(secondSharedResourceCardImageView);
+            try {
+                addCardToContainer(
+                        sharedResourceContainerGame,
+                        "/img/carte_fronte/" + getViewModel().getSharedResourceCards()[0] + ".jpg",
+                        DrawType.SHAREDRESOURCE1,
+                        false
+                );
+            } catch (Exception e) {
+                System.out.println("The first resource shared is empty");
+            }
+
+            try {
+                addCardToContainer(
+                        sharedResourceContainerGame,
+                        "/img/carte_fronte/" + getViewModel().getSharedResourceCards()[1] + ".jpg",
+                        DrawType.SHAREDRESOURCE2,
+                        false
+                );
+            } catch (Exception e) {
+                System.out.println("The second resource shared is empty");
             }
         });
     }
+
+    private void addTextToContainer(Pane container, String text) {
+        container.getChildren().add(new Text(text));
+    }
+
+    private void addCardToContainer(Pane container, String imagePath, DrawType drawType, boolean addBorder) throws Exception {
+        ImageView imageView = createCardImageView(imagePath, (int) (getWindowHeight() * 0.090));
+        imageView.getStyleClass().add("clickable");
+        BorderPane cardPane = new BorderPane(imageView);
+        if (addBorder) cardPane.getStyleClass().add("cardDeck");
+        cardPane.setOnMouseClicked(mouseEvent -> handleDrawCard(drawType));
+        addHoverRotate(cardPane);
+        container.getChildren().add(cardPane);
+    }
+
+    private void configurePlateau() {
+        int plateauHeight = (int) (getWindowHeight() * 0.38);
+        plateauImageViewPane.setAlignment(Pos.CENTER);
+        plateauImageViewPane.setPrefHeight(plateauHeight);
+        plateauImageViewPane.setPrefWidth(plateauHeight / 2);
+        ImageView plateauImageView = createPlateauImageView(plateauHeight);
+        plateauImageViewPane.getChildren().add(plateauImageView);
+        //plateauContainerGame.getChildren().add(plateauImageViewPane);
+    }
+
 
     public void highlightCurrentPlayerTable() {
         int idCurrentPlayer = getViewModel().getCurrentPlayer();
@@ -251,7 +287,6 @@ public class GUIControllerGame extends GUIController {
     public void updatePoints() {
         Platform.runLater(() -> {
             for (int i = 0; i < getViewModel().getPlayersSize(); i++) {
-                Pane plateauImageViewPane = (Pane) mainContainerGame.lookup("#plateauImageViewPane");
                 if (plateauImageViewPane == null) return;
                 Circle oldCircle = (Circle) plateauImageViewPane.lookup("#circlePoints" + i);
                 //if (oldCircle == null) return;
@@ -264,15 +299,15 @@ public class GUIControllerGame extends GUIController {
                     x = plateauCoordinatedMap.get(0).get(0); // comment for real use
                     y = plateauCoordinatedMap.get(0).get(1); // comment for real use
                 }
-                Circle circle = new Circle(x, y, getWindowHeight()*0.01);
+                Circle circle = new Circle(0, 0, getWindowHeight()*0.01);
                 circle.setId("circlePoints" + i);
                 plateauImageViewPane.getChildren().add(circle);
 
                 int offset = 5;
-                if (getViewModel().getColorsMap(i) == Color.BLUE) { circle.setFill(javafx.scene.paint.Color.BLUE); circle.setTranslateX(-offset); circle.setTranslateY(-offset);}
-                else if (getViewModel().getColorsMap(i) == Color.GREEN) { circle.setFill(javafx.scene.paint.Color.GREEN); circle.setTranslateX(offset); circle.setTranslateY(-offset); }
-                else if (getViewModel().getColorsMap(i) == Color.RED) { circle.setFill(javafx.scene.paint.Color.RED); circle.setTranslateX(offset); circle.setTranslateY(offset); }
-                else if (getViewModel().getColorsMap(i) == Color.YELLOW) { circle.setFill(javafx.scene.paint.Color.YELLOW); circle.setTranslateX(-offset); circle.setTranslateY(offset);}
+                if (getViewModel().getColorsMap(i) == Color.BLUE) { circle.setFill(javafx.scene.paint.Color.BLUE); circle.setTranslateX(x - offset); circle.setTranslateY(y - offset);}
+                else if (getViewModel().getColorsMap(i) == Color.GREEN) { circle.setFill(javafx.scene.paint.Color.GREEN); circle.setTranslateX(x + offset); circle.setTranslateY(y - offset); }
+                else if (getViewModel().getColorsMap(i) == Color.RED) { circle.setFill(javafx.scene.paint.Color.RED); circle.setTranslateX(x + offset); circle.setTranslateY(y + offset); }
+                else if (getViewModel().getColorsMap(i) == Color.YELLOW) { circle.setFill(javafx.scene.paint.Color.YELLOW); circle.setTranslateX(x -offset); circle.setTranslateY(y + offset);}
             }
         });
     }
@@ -302,6 +337,7 @@ public class GUIControllerGame extends GUIController {
                 expandButton.setOnMousePressed(mouseEvent -> {
                     HashMap<String, Integer> paramsMap = new HashMap<>();
                     paramsMap.put("playerId", playerId);
+                    System.out.println(playerId);
                     goToScene("/fxml/board.fxml", paramsMap);
                 });
                 infoContainerVBox.getChildren().addAll(nicknameText, expandButton, connectionText);
@@ -430,24 +466,24 @@ public class GUIControllerGame extends GUIController {
             int meId = getViewModel().getPlayerIndex();
             switch(meId) {
                 case(0) -> { bottomContainer.setId("player0ContainerGame"); bottomContainerHand.setId("player0HandContainerGame");
-                    topContainer.setId("player1ContainerGame"); topContainerHand.setId("player1HandContainerGame");
-                    leftContainer.setId("player3ContainerGame"); leftContainerHand.setId("player3HandContainerGame");
-                    rightContainer.setId("player2ContainerGame"); rightContainerHand.setId("player2HandContainerGame");
-                }
-                case(1) -> { bottomContainer.setId("player1ContainerGame"); bottomContainerHand.setId("player1HandContainerGame");
-                    topContainer.setId("player0ContainerGame"); topContainerHand.setId("player0HandContainerGame");
-                    leftContainer.setId("player2ContainerGame"); leftContainerHand.setId("player2HandContainerGame");
+                    leftContainer.setId("player1ContainerGame"); leftContainerHand.setId("player1HandContainerGame");
+                    topContainer.setId("player2ContainerGame"); topContainerHand.setId("player2HandContainerGame");
                     rightContainer.setId("player3ContainerGame"); rightContainerHand.setId("player3HandContainerGame");
                 }
-                case(2) -> { bottomContainer.setId("player2ContainerGame"); bottomContainerHand.setId("player2HandContainerGame");
+                case(1) -> { bottomContainer.setId("player1ContainerGame"); bottomContainerHand.setId("player1HandContainerGame");
+                    leftContainer.setId("player2ContainerGame"); leftContainerHand.setId("player2HandContainerGame");
                     topContainer.setId("player3ContainerGame"); topContainerHand.setId("player3HandContainerGame");
-                    leftContainer.setId("player0ContainerGame"); leftContainerHand.setId("player0HandContainerGame");
+                    rightContainer.setId("player0ContainerGame"); rightContainerHand.setId("player0HandContainerGame");
+                }
+                case(2) -> { bottomContainer.setId("player2ContainerGame"); bottomContainerHand.setId("player2HandContainerGame");
+                    leftContainer.setId("player3ContainerGame"); leftContainerHand.setId("player3HandContainerGame");
+                    topContainer.setId("player0ContainerGame"); topContainerHand.setId("player0HandContainerGame");
                     rightContainer.setId("player1ContainerGame"); rightContainerHand.setId("player1HandContainerGame");
                 }
                 case(3) -> { bottomContainer.setId("player3ContainerGame"); bottomContainerHand.setId("player3HandContainerGame");
-                    topContainer.setId("player2ContainerGame"); topContainerHand.setId("player2HandContainerGame");
-                    leftContainer.setId("player1ContainerGame"); leftContainerHand.setId("player1HandContainerGame");
-                    rightContainer.setId("player0ContainerGame"); rightContainerHand.setId("player0HandContainerGame");
+                    leftContainer.setId("player0ContainerGame"); leftContainerHand.setId("player0HandContainerGame");
+                    topContainer.setId("player1ContainerGame"); topContainerHand.setId("player1HandContainerGame");
+                    rightContainer.setId("player2ContainerGame"); rightContainerHand.setId("player2HandContainerGame");
                 }
             }
         });
@@ -556,8 +592,8 @@ public class GUIControllerGame extends GUIController {
     @Override
     public void update() {
         System.gc();
-        //populatePlateauCoordinateMap(); // only for TEST
         Platform.runLater(() -> {
+            populatePlateauCoordinateMap();
             clearAllchilds();
             initTable();
             highlightCurrentPlayerTable();

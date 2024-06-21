@@ -24,6 +24,7 @@ public class GUIControllerPlace extends GUIController {
     @FXML private GridPane gridPaneContainerBoard;
     @FXML private ScrollPane scrollPaneContainerBoard;
     private int cardId;
+    private static int previousCardAmount = 1;
 
     public GUIControllerPlace() {
         setFontSize(mainContainerBoard);
@@ -99,7 +100,6 @@ public class GUIControllerPlace extends GUIController {
         });
     }
 
-
     public void printBoard() {
         GUIController thisController = this;
         Platform.runLater(() -> {
@@ -165,13 +165,7 @@ public class GUIControllerPlace extends GUIController {
                                                 command.setParams(cardId, ele, finalTableCornerPos, getViewModel().getHandCardsSide(cardId));
                                                 addCommand(command, thisController);
                                                 //showAlert(Alert.AlertType.INFORMATION, "Placed card", "Thank you for placing the card");
-
-                                                goToScene("/fxml/place.fxml");
-
-                                                /*System.out.println("Placing card id " + cardId);
-                                                System.out.println("Table card id " + ele);
-                                                System.out.println("Table corner pos " + finalTableCornerPos);
-                                                System.out.println("Placing card side " + getViewModel().getHandCardsSide(cardId));*/
+                                                //goToScene("/fxml/place.fxml");
                                             } else {
                                                 showAlert(Alert.AlertType.INFORMATION, "Placed card", "Incorrect card placing");
                                             }
@@ -204,7 +198,7 @@ public class GUIControllerPlace extends GUIController {
             gridPaneContainerBoard.setHgap(gridPaneHgap); // Spacing orizzontale
             gridPaneContainerBoard.setVgap(gridPaneVgap); // Spacing verticale
             gridPaneContainerBoard.setPadding(new Insets(gridPaneVPadding)); // Margine di 20 pixel su tutti i lati
-            gridPaneContainerBoard.setGridLinesVisible(true);
+            //gridPaneContainerBoard.setGridLinesVisible(true);
 
             addPanning(gridPaneContainerBoard);
 
@@ -264,6 +258,15 @@ public class GUIControllerPlace extends GUIController {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
+                try {
+                    if (previousCardAmount != getViewModel().getPlacingCardOrderMap(getViewModel().getCurrentPlayer()).size()) {
+                        previousCardAmount = getViewModel().getPlacingCardOrderMap(getViewModel().getCurrentPlayer()).size();
+                        goToScene("/fxml/game.fxml");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Proceeding to open place card scene");
+                }
+
                 if (getViewModel() != null) {
                     printBoard();
                     updatePlayerHand(-1);

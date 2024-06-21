@@ -66,8 +66,9 @@ Text {
     -fx-background-color: none;
 }
 
-Text {
+Text, Label {
     -fx-fill: white;
+    -fx-text-fill: white;
 }
 
 .greenText {

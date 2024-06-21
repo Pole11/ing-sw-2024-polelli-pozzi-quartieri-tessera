@@ -38,10 +38,10 @@
                         fx:id="serverErrorLabel"
                         styleClass="serverError"/>
                 <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
-                <Button onAction="#handleOpenGameRules" text="Game Rules" />
-                <Button onAction="#handleOpenChat" text="Open Chat" />
-                <Label
-                        fx:id="currentPhase"/>
+                <Button onAction="#handleOpenGameRules" fx:id="handleOpenGameRulesButton" text="Game Rules" />
+                <Button onAction="#handleOpenChat" fx:id="handleOpenChatButton" text="Open Chat" />
+                <Label fx:id="currentPhase"/>
+                <StackPane fx:id="plateauImageViewPane" />
             </VBox>
             <Separator orientation="VERTICAL"></Separator>
             <VBox alignment="CENTER" fx:id="sharedGoldContainerGame" styleClass="cardDeckContainer"></VBox>
