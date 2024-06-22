@@ -165,11 +165,10 @@ public class Server implements VirtualServer {
         //NON FUNZIONA IL CONTROLLO SUL PLAYER
         //NON FUNZIONA IL PARSING A INT SU SOCKEit
         if (
-            controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
-            (controller.getTurnPhase().equals(TurnPhase.PLACINGPHASE)) &&
-            (isRightTurn(playerIndex))
-        ){
-
+                (controller.getGamePhase().equals(GamePhase.MAINPHASE) || controller.getGamePhase().equals(GamePhase.ENDPHASE)) &&
+                        (controller.getTurnPhase().equals(TurnPhase.PLACINGPHASE)) &&
+                        (isRightTurn(playerIndex))
+        ) {
             //CardIsNotInHand e CardAlreadyPlaced FORSE da rimuovere e gestire sulla view
             try {
                 this.controller.placeCard(playerIndex, placingCardId, tableCardId, tableCornerPos, placingCardSide);
@@ -188,7 +187,7 @@ public class Server implements VirtualServer {
         int playerIndex = getPlayerIndex(client);
 
         if (
-            controller.getGamePhase().equals(GamePhase.MAINPHASE) &&
+            (controller.getGamePhase().equals(GamePhase.MAINPHASE) || controller.getGamePhase().equals(GamePhase.ENDPHASE)) &&
             (controller.getTurnPhase().equals(TurnPhase.DRAWPHASE)) &&
             (isRightTurn(playerIndex))
         ){
@@ -207,7 +206,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void flipCard(VirtualView client, int cardId) throws RemoteException {
-        if (controller.getGamePhase().equals(GamePhase.MAINPHASE)) {
+        if (controller.getGamePhase().equals(GamePhase.MAINPHASE) || controller.getGamePhase().equals(GamePhase.ENDPHASE)) {
             int playerIndex = getPlayerIndex(client);
             try {
                 this.controller.flipCard(playerIndex, cardId);

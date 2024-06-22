@@ -43,9 +43,10 @@ public class CommandGenerator {
                 break;
             case MAINPHASE:
             case ENDPHASE:
-            case FINALPHASE:
                 command = handleMainPhases(client);
                 break;
+            case FINALPHASE:
+                System.out.println("Siamo in final phase");
             default:
                 // No command to send for other phases
                 break;
@@ -111,7 +112,7 @@ public class CommandGenerator {
 
     private static int generateNumber(int max) {
         Random random = new Random();
-        return random.nextInt(max+1);
+        return random.nextInt(max + 1);
     }
 
     private static String placeCardCommand() {
@@ -122,10 +123,10 @@ public class CommandGenerator {
 
         Side side;
         int placingCard = chooseCardToPlace(handCards);
-        if (placingCard == -1){
+        if (placingCard == -1) {
             placingCard = handCards.getFirst();
             side = Side.BACK;
-        } else{
+        } else {
             side = Side.FRONT;
         }
 
@@ -142,22 +143,22 @@ public class CommandGenerator {
         ViewModel viewModel = client.getViewModel();
 
         ArrayList<Corner> corners;
-        if (tableCard <= 40){
+        if (tableCard <= 40) {
             ResourceCard card = (ResourceCard) viewModel.cardById(tableCard);
             corners = card.getCorners(viewModel.getPlacedCardSide(tableCard));
-        } else if (tableCard <= 80){
+        } else if (tableCard <= 80) {
             GoldCard card = (GoldCard) viewModel.cardById(tableCard);
             corners = card.getCorners(viewModel.getPlacedCardSide(tableCard));
-        } else{
+        } else {
             StarterCard card = (StarterCard) viewModel.cardById(tableCard);
             corners = card.getCorners(viewModel.getPlacedCardSide(tableCard));
         }
 
         ArrayList<CornerPos> suitablePositions = new ArrayList<>();
         int cornerIndex = 0;
-        for (Corner corner : corners){
-            if (!corner.getHidden() && !corner.getCovered() && corner.getElement() == Element.EMPTY){
-                switch (cornerIndex){
+        for (Corner corner : corners) {
+            if (!corner.getHidden() && !corner.getCovered() && corner.getElement() == Element.EMPTY) {
+                switch (cornerIndex) {
                     case 0:
                         suitablePositions.add(CornerPos.UPLEFT);
                     case 1:
@@ -172,7 +173,7 @@ public class CommandGenerator {
         }
 
 
-        if (suitablePositions.isEmpty()){
+        if (suitablePositions.isEmpty()) {
             suitablePositions.addAll(List.of(CornerPos.values()));
         }
 
@@ -186,25 +187,25 @@ public class CommandGenerator {
         Collections.shuffle(tableCards);
 
         // try finding a card with empty corner
-        for (int cardId : tableCards){
+        for (int cardId : tableCards) {
             Side side = viewModel.getPlacedCardSide(cardId);
-            if (side == Side.BACK){
+            if (side == Side.BACK) {
                 return cardId;
-            } else{
+            } else {
                 ArrayList<Corner> corners;
-                if (cardId <= 40){
+                if (cardId <= 40) {
                     ResourceCard card = (ResourceCard) viewModel.cardById(cardId);
                     corners = card.getCorners(Side.FRONT);
-                } else if (cardId <= 80){
+                } else if (cardId <= 80) {
                     GoldCard card = (GoldCard) viewModel.cardById(cardId);
                     corners = card.getCorners(Side.FRONT);
-                } else{
+                } else {
                     StarterCard card = (StarterCard) viewModel.cardById(cardId);
                     corners = card.getCorners(Side.FRONT);
                 }
 
-                for (Corner corner : corners){
-                    if (!corner.getHidden() && !corner.getCovered() && corner.getElement() == Element.EMPTY){
+                for (Corner corner : corners) {
+                    if (!corner.getHidden() && !corner.getCovered() && corner.getElement() == Element.EMPTY) {
                         return cardId;
                     }
                 }
@@ -224,10 +225,10 @@ public class CommandGenerator {
         ArrayList<Integer> resourceCards = new ArrayList<>();
 
         // try placing gold cards
-        for (int cardId : handCards){
+        for (int cardId : handCards) {
             if (cardId > 40) {
                 goldCards.add(cardId);
-            } else{
+            } else {
                 resourceCards.add(cardId);
             }
         }
@@ -248,7 +249,11 @@ public class CommandGenerator {
         }
     }
 
-    private static String drawCardCommand(){
+    private static String drawCardCommand() {
+        if (new Random().nextFloat(1f) < BotConfig.PASSIVITY) {
+            return (DrawType.values()[new Random().nextInt(DrawType.values().length)].toString());
+        }
+
         ViewModel viewModel = client.getViewModel();
 
         ArrayList<Integer> handCards = viewModel.getHand(viewModel.getPlayerIndex());
@@ -256,10 +261,10 @@ public class CommandGenerator {
         ArrayList<Integer> resourceCards = new ArrayList<>();
 
         // get cards types
-        for (int cardId : handCards){
+        for (int cardId : handCards) {
             if (cardId > 40) {
                 goldCards.add(cardId);
-            } else{
+            } else {
                 resourceCards.add(cardId);
             }
         }

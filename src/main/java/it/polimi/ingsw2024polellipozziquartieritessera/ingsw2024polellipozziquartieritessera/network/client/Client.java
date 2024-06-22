@@ -389,7 +389,7 @@ public class Client implements VirtualView {
             });
             System.out.println("won");
         }
-        restart();
+        //restart();
     }
 
     @Override

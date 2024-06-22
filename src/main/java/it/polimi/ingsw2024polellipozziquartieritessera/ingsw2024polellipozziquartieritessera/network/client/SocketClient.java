@@ -171,8 +171,7 @@ public class SocketClient implements VirtualView {
     }
 
     @Override
-    public void
-    updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException {
+    public void updateTurnPhase(TurnPhase nextTurnPhase) throws RemoteException {
         clientContainer.updateTurnPhase(nextTurnPhase);
     }
 

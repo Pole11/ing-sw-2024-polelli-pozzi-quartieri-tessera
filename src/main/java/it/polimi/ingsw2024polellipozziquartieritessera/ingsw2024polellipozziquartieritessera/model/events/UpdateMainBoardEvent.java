@@ -6,6 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 public class UpdateMainBoardEvent extends Event{
     private final Board mainBoard;
@@ -21,8 +22,18 @@ public class UpdateMainBoardEvent extends Event{
         int sharedGoldCard2 = mainBoard.getSharedGoldCard(1).getId();
         int sharedResourceCard1 = mainBoard.getSharedResourceCard(0).getId();
         int sharedResourceCard2 = mainBoard.getSharedResourceCard(1).getId();
-        int firtGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
-        int firstResourceDeckCard = mainBoard.getFirstResourceDeckCard().getId();
+        int firtGoldDeckCard;
+        try {
+            firtGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
+        } catch (NoSuchElementException e){
+            firtGoldDeckCard = -1;
+        }
+        int firstResourceDeckCard;
+        try {
+            firstResourceDeckCard = mainBoard.getFirstResourceDeckCard().getId();
+        } catch (NoSuchElementException e){
+            firstResourceDeckCard = -1;
+        }
         for (VirtualView client : clients) {
             try {
                 client.updateMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
