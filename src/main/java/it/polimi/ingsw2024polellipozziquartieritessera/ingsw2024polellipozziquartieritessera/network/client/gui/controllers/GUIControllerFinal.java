@@ -11,7 +11,18 @@ public class GUIControllerFinal extends GUIController {
     @Override
     public void update() {
         Platform.runLater(() -> {
-            winnerText.setText("The winner is/are ...");
+            String text;
+            if (getViewModel().getWinners().size() == 1){
+                text = "The winner is " + getViewModel().winners.getFirst();
+            } else {
+                text = "The winners are ";
+                for (int i = 0; i < getViewModel().getWinners().size(); i++) {
+                    text += getViewModel().getWinners().get(i) + " ";
+                }
+            }
+
+
+            winnerText.setText(text);
         });
     }
 }

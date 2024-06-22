@@ -5,6 +5,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
+import javafx.scene.control.Alert;
 
 import java.io.*;
 import java.net.ConnectException;
@@ -179,7 +180,8 @@ public class Client implements VirtualView {
                     guiApplication.changeScene("/fxml/game.fxml");
                 }
                 case GamePhase.ENDPHASE -> {
-                    System.out.print("NON SO CHI reached 20 points o NON SO\n> ");
+                    System.out.print("someone reached 20 points, the end phase has started\n> ");
+                    guiApplication.getGUIController().showAlert(Alert.AlertType.INFORMATION, "Message from server", "someone reached 20 points, the end phase has started");
                 }
                 case GamePhase.FINALPHASE -> {
                     guiApplication.changeScene("/fxml/final.fxml");
@@ -197,12 +199,11 @@ public class Client implements VirtualView {
                 case GamePhase.CHOOSEOBJECTIVEPHASE ->  {
                     cliController.ShowSecretObjective();
                 }
-
                 case GamePhase.MAINPHASE -> {
                     System.out.println("---Game started---");
                 }
                 case GamePhase.ENDPHASE -> {
-                    System.out.print("NON SO CHI reached 20 points o NON SO\n> ");
+                    System.out.print("someone reached 20 points, the end phase has started\n> ");
                 }
                 case GamePhase.FINALPHASE -> {
                     System.out.println("GAMEENDED???");
@@ -258,7 +259,6 @@ public class Client implements VirtualView {
                 System.out.print(viewModel.getNickname(playerIndex) + " connected\n> ");
             } else {
                 System.out.print(viewModel.getNickname(playerIndex) + " disconnected\n> ");
-                if (meDoGui) guiApplication.changeScene("/fxml/final.fxml");
             }
         }
         if (meDoGui) guiApplication.updateController();
@@ -284,7 +284,6 @@ public class Client implements VirtualView {
 
     @Override
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
-        System.out.println("index "  + playerIndex + " placingcard " + placingCardId + " tablecard" + tableCardId);
         viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
         if (viewModel.getPlayerIndex() == playerIndex) {
             System.out.print("you placed a card, now you have to draw your card with DRAWCARD [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");
@@ -374,6 +373,9 @@ public class Client implements VirtualView {
 
     @Override
     public void updateWinner(ArrayList<Integer> playerIndexes){
+        playerIndexes.stream().forEach(e-> {
+            viewModel.addWinner(e);
+        });
         System.out.println("---------GAME ENDED----------");
         if (playerIndexes.isEmpty()){
             System.out.println("No one won");

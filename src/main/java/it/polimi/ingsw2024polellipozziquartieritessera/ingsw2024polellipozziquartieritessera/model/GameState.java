@@ -84,8 +84,6 @@ public class GameState {
      */
     private GamePhase prevGamePhase;
 
-    private final Thread saveStateThread;
-    private boolean saveStateRunning;
 
     /**
      * Number of turns left to play
@@ -128,18 +126,13 @@ public class GameState {
         this.answered = new HashMap<>();
         resetAnswered();
 
-        this.saveStateRunning = true;
-        this.saveStateThread = new Thread(this::saveStateThreadRunnable);
-        //saveStateThread.start();
-
-
         this.turnToPlay = Integer.MAX_VALUE;
         this.placedEventList = new ArrayList<>();
     }
 
     public void startThreads(){
         this.executeEvents.start();
-        pingThread.start();
+        this.pingThread.start();
     }
 
 
@@ -204,6 +197,18 @@ public class GameState {
 
     public void setCurrentGameTurn(TurnPhase currentGameTurn) {
         this.currentGameTurn = currentGameTurn;
+    }
+
+    public void setAnswered(Integer index, boolean ans){
+        answered.put(index, ans);
+    }
+
+    public void setPrevGamePhase(GamePhase gamePhase){
+        this.prevGamePhase = gamePhase;
+    }
+
+    public void setTurnToPlay(int turnToPlay) {
+        this.turnToPlay = turnToPlay;
     }
 
     //ADDER/REMOVER
@@ -340,7 +345,7 @@ public class GameState {
                                 synchronized (players) {
                                     players.get(j).setConnected(false);
                                 }
-                                playerDisconnected();
+                                playerDisconnected(j);
                             }
                         } catch (InterruptedException e) {}
                     }));
@@ -355,7 +360,6 @@ public class GameState {
                 //wait to ping another time
                 Thread.sleep(1000*Config.NEXT_PING_TIME);
             } catch (InterruptedException e) {
-                e.printStackTrace();
                 break;
             }
         }
@@ -515,11 +519,11 @@ public class GameState {
     /**
      * Set and verify the disconnection of a player, and manage the thread call
      */
-    public void playerDisconnected() {
+    public void playerDisconnected(int index) {
         if (currentGamePhase.equals(GamePhase.NICKNAMEPHASE)) {
-            //DA SCEGLIERE DA QUANDO IN POI FARLO, SE COSI VA BENE O DA MAIN
             return;
         }
+
         long numberConnected;
         synchronized (players) {
             numberConnected = players.stream().filter(Player::isConnected).count();
@@ -548,7 +552,25 @@ public class GameState {
                 }
             });
             timeoutThread.start();
+        } else {
+            if (currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
+                if (currentPlayerIndex == index){
+                    if (currentGameTurn.equals(TurnPhase.DRAWPHASE)){
+                        ResourceCard newResourceCard = null;
+                        try {
+                            newResourceCard = getMainBoard().drawFromResourceDeck();
+                        } catch (EmptyDeckException e) {
+                            checkGameEnded();
+                        }
+                        Player currentPlayer = getPlayer(index);
+                        currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
+                    }
+                    changeCurrentPlayer();
+                    currentGameTurn = TurnPhase.PLACINGPHASE;
+                }
+            }
         }
+        System.out.println(currentGameTurn);
     }
 
     /**
@@ -574,7 +596,7 @@ public class GameState {
         if (currentGamePhase.equals(GamePhase.ENDPHASE)) {
             turnToPlay--;
         }
-        playerDisconnected();
+        //playerDisconnected();
     }
     /**
      * Send the ping to verify connection
@@ -1199,7 +1221,6 @@ public class GameState {
     private void restart(){
         pingRunning = false;
         executeEventRunning = false;
-        saveStateRunning = false;
         executeEvents.interrupt();
         try {
             executeEvents.join();
@@ -1208,7 +1229,6 @@ public class GameState {
         }
         playerThreads.forEach(Thread::interrupt);
         pingThread.interrupt();
-        saveStateThread.interrupt();
         server.restart();
 
         System.out.println(executeEvents.getState());
@@ -1231,18 +1251,6 @@ public class GameState {
 
 
         System.out.println("---------GAME RESTARTED------");
-    }
-
-    private void saveStateThreadRunnable(){
-        while (saveStateRunning){
-            try {
-                Thread.sleep(1000*Config.WAIT_FOR_SAVE_TIME);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                break;
-            }
-            Populate.saveState(this);
-        }
     }
 
 //------------ chat ---------------

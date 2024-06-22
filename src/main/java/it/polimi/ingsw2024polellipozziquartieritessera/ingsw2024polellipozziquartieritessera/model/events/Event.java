@@ -21,7 +21,7 @@ public abstract class Event {
         if (gameState.getPlayer(gameState.getPlayerIndex(client)).isConnected()){
             System.out.println("client " + gameState.getPlayerIndex(client) + " disconnected");
             gameState.setPlayersConnected(gameState.getPlayerIndex(client), false);
-            gameState.playerDisconnected();
+            gameState.playerDisconnected(gameState.getPlayerIndex(client));
         }
     }
 }

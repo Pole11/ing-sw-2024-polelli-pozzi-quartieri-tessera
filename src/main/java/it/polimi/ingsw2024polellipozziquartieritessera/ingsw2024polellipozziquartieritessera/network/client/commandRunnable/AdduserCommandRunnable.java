@@ -45,19 +45,14 @@ public class AdduserCommandRunnable extends CommandRunnable{
     }
 
     private boolean checkNickname(String nicknameToCheck){
-        System.out.println("1");
         //this is runned only if I am in the client
         if (clientContainer != null){
-            System.out.println("2");
             //if the user already connected
             int index = clientContainer.getViewModel().getPlayerIndex();
             if (index!= -1){
-                System.out.println("3");
                 String nick = clientContainer.getViewModel().getNickname(index);
                 if (nick != null){
-                    System.out.println("4");
                     if (!nick.equals(nicknameToCheck)){
-                        System.out.println("5");
                         return false;
                     }
                 }

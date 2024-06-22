@@ -22,7 +22,6 @@ public class ServerProxy implements VirtualServer {
 
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException {
-        System.out.println(output);
         output.println(Command.ADDUSER +"; " + nickname);
         output.flush();
     }

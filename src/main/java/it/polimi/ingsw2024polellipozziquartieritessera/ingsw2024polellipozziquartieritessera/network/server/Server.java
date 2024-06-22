@@ -58,8 +58,7 @@ public class Server implements VirtualServer {
         Populate.populate(gameState);
 
         //FA persistance
-        //TODO: this must not be commented
-        //Populate.restoreState(gameState);
+        Populate.restoreState(gameState);
         Populate.saveState(gameState);
 
         server.controller.setGameState(gameState);
@@ -82,6 +81,7 @@ public class Server implements VirtualServer {
             throw new RuntimeException(e);
         }
         controller.setGameState(gameState);
+        gameState.startThreads();
     }
 
     private void runServer() throws IOException {

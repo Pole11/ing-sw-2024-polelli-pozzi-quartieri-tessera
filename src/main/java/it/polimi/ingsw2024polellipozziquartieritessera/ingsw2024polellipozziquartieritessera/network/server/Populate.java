@@ -256,7 +256,6 @@ public class Populate {
         try {
             jsonState = mapper.readValue(Paths.get(filePath + Config.GAME_STATE_PATH).toFile(), Map.class);
         } catch (IOException e) {
-            System.out.println(e.getClass());
             System.out.println("there is no state");
             return;
         }
@@ -277,15 +276,15 @@ public class Populate {
         List<Integer> sharedObjectives = (List<Integer>) jsonBoard.get("sharedObjectiveCards");
 
         for (int i = 0; i<sharedGold.size(); i++){
-            int goldId = (int) sharedGold.get(i);
+            int goldId = sharedGold.get(i);
             gameState.getMainBoard().setSharedGoldCard(i, (GoldCard) createCard(false, (Map) cards.get(String.valueOf(goldId)), goldId));
         }
         for (int i = 0; i<sharedResource.size(); i++){
-            int resourceId = (int) sharedResource.get(i);
+            int resourceId = sharedResource.get(i);
             gameState.getMainBoard().setSharedResourceCard(i,(ResourceCard) createCard(false, (Map) cards.get(String.valueOf(resourceId)), resourceId));
         }
         for (int i = 0; i<sharedObjectives.size(); i++){
-            int objectiveId = (int) sharedObjectives.get(i);
+            int objectiveId = sharedObjectives.get(i);
             gameState.getMainBoard().setSharedObjectiveCard(i,(ObjectiveCard) createCard(false, (Map) cards.get(String.valueOf(objectiveId)), objectiveId));
         }
 
@@ -305,7 +304,6 @@ public class Populate {
         });
         gameState.getMainBoard().setResourceDeck(resourceDeck);
 
-        //NON HO ANCORA ASSEGNATO I DECKS
 
         //restore players
         ArrayList<?> players = (ArrayList<?>) jsonState.get("players");
@@ -384,22 +382,19 @@ public class Populate {
 
         }
 
-
-        /*saveMap.put("currentPlayerIndex", gameState.getCurrentPlayerIndex());
-        saveMap.put("currentGamePhase", gameState.getCurrentGamePhase().toString());
-        saveMap.put("currentGameTurn", gameState.getCurrentGameTurn().toString());
-        saveMap.put("answered", gameState.getAnswered());
-        saveMap.put("turnToPlay", gameState.getTurnToPlay());
-        saveMap.put("prevGamePhase", gameState.getPrevGamePhase() != null ? gameState.getPrevGamePhase().toString() : "");
-
+        gameState.setCurrentPlayerIndex((int)jsonState.get("currentPlayerIndex"));
+        gameState.setCurrentGamePhase(GamePhase.valueOf((String) jsonState.get("currentGamePhase")));
+        gameState.setCurrentGameTurn(TurnPhase.valueOf((String) jsonState.get("currentGameTurn")));
+        String prevGamePhase = (String) jsonState.get("prevGamePhase");
+        gameState.setPrevGamePhase(prevGamePhase != "" ? GamePhase.valueOf(prevGamePhase) : null);
+        gameState.setTurnToPlay((int)jsonState.get("turnToPlay"));
 
 
-         */
+        Map<?, ?> answeredJson = (Map<?, ?>) jsonState.get("answered");
+        for (Object key : answeredJson.keySet()){
+            gameState.setAnswered((Integer.parseInt((String) key)), (Boolean) answeredJson.get((String) key));
+        }
 
-
-        System.out.println("j");
-
-
+        System.out.println("I restored the state");
     }
-
 }
