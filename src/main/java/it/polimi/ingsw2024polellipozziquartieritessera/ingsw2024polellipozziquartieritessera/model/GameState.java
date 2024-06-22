@@ -1112,20 +1112,22 @@ public class GameState {
      * Check if game is ended by one of the possible conditions
      */
     public void checkGameEnded() {
-        // 20 points?
+        // switch to end phase
         if (!currentGamePhase.equals(GamePhase.ENDPHASE)) {
+            // first endphase entering: player reach 20 points
             for (Player player : this.players) {
                 if (player.getPoints() >= Config.POINTSTOENDPHASE) {
                     currentGamePhase = GamePhase.ENDPHASE;
                     break;
                 }
             }
+            // second endphase entering: all decks are empty
+            if (this.getMainBoard().isResourceDeckEmpty() && this.getMainBoard().isGoldDeckEmpty()){
+                currentGamePhase = GamePhase.ENDPHASE;
+            }
+
             if (currentGamePhase.equals(GamePhase.ENDPHASE)) {
-                //currentPlayer is already updated here, it's the one that plays next, right after the previous drew
-                //currentPlayer = 0 => playerSize
-                //currentPlayer = 1 => playerSize + playerSize - 1
-                //currentPlayer = 2 => playerSize + playerSize - 2
-                //currentPlayer = 3 => playerSize + playerSize - 3
+
                 if (currentPlayerIndex == 0) {
                     this.turnToPlay = players.size();
                 } else {
@@ -1134,9 +1136,14 @@ public class GameState {
             }
         }
 
-        // cards ended?
-        if ((this.getMainBoard().isResourceDeckEmpty() && this.getMainBoard().isGoldDeckEmpty()) || turnToPlay == 0) {
+        // switch to final phase
+        if (turnToPlay == 0) {
             currentGamePhase = GamePhase.FINALPHASE;
+
+            synchronized (eventQueue){
+                this.getEventQueue().notifyAll();
+            }
+
             calculateFinalPoints();
             ArrayList<Integer> winners;
             try {
@@ -1145,11 +1152,12 @@ public class GameState {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
+
             synchronized (eventQueue) {
                 eventQueue.add(new GameEndedEvent(this, allConnectedClients(), winners));
                 eventQueue.notifyAll();
             }
-            restart();
+            // restart();
         }
     }
 

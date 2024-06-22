@@ -5,6 +5,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 import java.util.Random;
 
 /**
@@ -31,7 +32,6 @@ public class Board {
      * List of resource card in deck
      */
     private ArrayList<ResourceCard> resourceDeck;
-
     /**
      * Board Constructor
      */
@@ -88,11 +88,11 @@ public class Board {
         return sharedObjectiveCards[index];
     }
 
-    public GoldCard getFirstGoldDeckCard(){
+    public GoldCard getFirstGoldDeckCard() throws NoSuchElementException {
         return goldDeck.getFirst();
     }
 
-    public ResourceCard getFirstResourceDeckCard(){
+    public ResourceCard getFirstResourceDeckCard() throws NoSuchElementException {
         return resourceDeck.getFirst();
     }
 
