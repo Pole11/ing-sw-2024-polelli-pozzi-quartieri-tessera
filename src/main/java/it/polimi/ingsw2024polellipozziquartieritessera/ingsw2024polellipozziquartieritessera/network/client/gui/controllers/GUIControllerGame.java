@@ -3,7 +3,6 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.DrawType;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.TurnPhase;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.AddMessageCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.DrawCardCommandRunnable;
@@ -39,9 +38,12 @@ public class GUIControllerGame extends GUIController {
     @FXML private StackPane plateauImageViewPane;
     @FXML private Button handleOpenGameRulesButton;
     @FXML private Button handleOpenChatButton;
+
     private HashMap<Integer, ArrayList<Integer>> plateauCoordinatedMap;
     private ListView<Text> chatListView;
     private boolean chatOpen;
+    private static ImageView plateauImageView;
+    private static Image plateauImage;
 
     public GUIControllerGame() {
         chatListView = new ListView<>();
@@ -102,18 +104,18 @@ public class GUIControllerGame extends GUIController {
 
     private ImageView createPlateauImageView(int plateauHeight) {
         String imageUrl = getClass().getResource("/img/plateau_score.jpg").toExternalForm();
-        Image image = new Image(imageUrl);
+        plateauImage = new Image(imageUrl);
 
         // crop the image
-        PixelReader reader = image.getPixelReader();
+        PixelReader reader = plateauImage.getPixelReader();
         WritableImage imageWritable = new WritableImage(reader, 48, 49, 460, 926);
 
-        ImageView imageView = new ImageView(imageWritable);
+        plateauImageView = new ImageView(imageWritable);
 
-        imageView.setFitHeight(plateauHeight); // just for info,the width is half thee height
-        imageView.setPreserveRatio(true);
+        plateauImageView.setFitHeight(plateauHeight); // just for info,the width is half thee height
+        plateauImageView.setPreserveRatio(true);
 
-        return imageView;
+        return plateauImageView;
     }
 
     public void initTable() {
@@ -362,7 +364,6 @@ public class GUIControllerGame extends GUIController {
                 handContainer = (Pane) mainContainerGame.lookup("#player" + playerId + "HandContainerGame"); // ROTATE HERE
                 if (handContainer != null) { handContainer.getChildren().clear(); }
 
-                // TODO: get my player id
                 for (Integer cardId : playerHandCards.keySet()) {
                     ImageView tempImageView;
                     if ((playerId == meId && playerHandCards.get(cardId) == Side.FRONT) || (playerId != meId && playerHandCards.get(cardId) == Side.BACK)) {

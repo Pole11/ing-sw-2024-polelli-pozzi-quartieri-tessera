@@ -110,8 +110,6 @@ public class GUIApplication extends Application {
 
         guiController = fxmlLoader.getController();
         initGameController(guiController);
-
-        System.out.println((int) mainStage.getHeight());
     }
 
     public static int getSize() {

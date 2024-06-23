@@ -1,7 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.RingBuffer;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.PacmanBuffer;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -14,6 +14,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -29,11 +30,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
+import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 abstract public class GUIController {
     @FXML public Label serverMessageLabel;
@@ -52,11 +51,12 @@ abstract public class GUIController {
     private double pressedY;
     private MediaPlayer mediaPlayer;
     private int windowHeight = 920;
-    RingBuffer<Image> imageRingBuffer;
+    //private static PacmanBuffer<ImageView> imageViewRingBuffer;
 
     @FXML
     private void initialize() {
         isSceneLoaded = true;
+
         System.out.println("[DEBUG] Scene is loaded with " + this.getClass());
         Platform.runLater(() -> {
             handleMuteButton.setText(getMediaPlayer().isMute() ? "Unmute" : "Mute");
@@ -67,6 +67,15 @@ abstract public class GUIController {
 
             //windowHeight = GUIApplication.getSize();
             windowHeight = (int) GUIApplication.getMainStage().getHeight();
+
+            /*if (imageViewRingBuffer == null) {
+                imageViewRingBuffer = new PacmanBuffer<>(Config.BUFFER_IMAGE_SIZE);
+                for (int i = 0; i < Config.BUFFER_IMAGE_SIZE; i++) {
+                    imageViewRingBuffer.add(new ImageView());
+                }
+            }*/
+
+            //imageViewRingBuffer.printStatus();
         });
     }
 
@@ -263,17 +272,55 @@ abstract public class GUIController {
         String imageUrl = resource.toExternalForm();
         Image image = new Image(imageUrl);
 
-        PixelReader reader = image.getPixelReader();
-        //WritableImage imageWritable = new WritableImage(reader, 103, 101, 823, 547);
-        WritableImage imageWritable = new WritableImage(reader, 52, 51, 411, 273);
+        /*ImageView imageView = imageViewRingBuffer.getNext();
+        imageView.imageProperty().set(null);
 
-        ImageView imageView = new ImageView(imageWritable);
+        try {
+            // TODO: togli tutti gli event handler
+            imageView.setId("");
+            imageView.setImage(image);
+        } catch(Exception e) {
+            System.out.println("Naggia");
+            e.printStackTrace();
+        }*/
+        ImageView imageView = new ImageView(image);
         imageView.setFitHeight(height);
         imageView.getStyleClass().add("imageWithBorder");
 
         imageView.setPreserveRatio(true);
 
         return imageView;
+    }
+
+    private void removeAllEventHandlers(javafx.scene.Node node) throws NoSuchFieldException, IllegalAccessException {
+        // Access the private field 'eventHandlerManager' using reflection
+        Field field = null;
+        try {
+            field = Node.class.getDeclaredField("eventHandlerManager");
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+        field.setAccessible(true);
+
+        Object eventHandlerManager = field.get(node);
+
+        if (eventHandlerManager != null) {
+            // Access the private field 'eventHandlers' inside 'EventHandlerManager'
+            Field mapField = eventHandlerManager.getClass().getDeclaredField("eventHandlers");
+            mapField.setAccessible(true);
+
+            Map eventHandlers = null;
+            try {
+                eventHandlers = (Map) mapField.get(eventHandlerManager);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Clear the event handlers map
+            if (eventHandlers != null) {
+                eventHandlers.clear();
+            }
+        }
     }
 
     public void addHoverRotate(Node node) {
@@ -348,6 +395,7 @@ abstract public class GUIController {
                 j--;
             }
         }
+
         //remove empty columns
         ArrayList<Boolean> areEmpty = new ArrayList<>();
         for(int i = 0; i < matrix.get(0).size(); i++){
