@@ -266,12 +266,16 @@ public class Populate {
     public static void restoreState(GameState gameState) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
-        // Load rescue.json
-        InputStream rescueInputStream = Populate.class.getResourceAsStream("/rescue.json");
-        if (rescueInputStream == null) {
-            throw new FileNotFoundException("Resource not found: /rescue.json");
+        String filePath = new File("").getAbsolutePath();
+
+        Map<String, ?> jsonState = null;
+        try {
+            jsonState = mapper.readValue(Paths.get(filePath + Config.GAME_STATE_PATH).toFile(), Map.class);
+        } catch (IOException e) {
+            System.out.println("there is no state");
+            return;
         }
-        Map<String, ?> jsonState = mapper.readValue(rescueInputStream, Map.class);
+        System.out.println("Found a state file in location: " + filePath + Config.GAME_STATE_PATH);
 
         // Load cards.json
         InputStream cardsInputStream = Populate.class.getResourceAsStream("/cards.json");

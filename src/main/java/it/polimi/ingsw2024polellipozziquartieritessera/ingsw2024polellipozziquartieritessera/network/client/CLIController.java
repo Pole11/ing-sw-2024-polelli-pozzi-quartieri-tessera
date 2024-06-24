@@ -868,6 +868,7 @@ public class CLIController {
             String playerName = viewModel.getNickname(message.getAuthor());
             System.out.println("[" + playerName + "] " + message.getContent());
         }
+        viewModel.resetNewMessages();
 
         System.out.print("> ");
     }
