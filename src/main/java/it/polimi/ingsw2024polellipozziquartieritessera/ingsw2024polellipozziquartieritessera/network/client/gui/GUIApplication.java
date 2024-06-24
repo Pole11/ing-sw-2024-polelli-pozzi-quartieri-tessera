@@ -31,6 +31,10 @@ public class GUIApplication extends Application {
     private static Client clientContainer;
     private static MediaPlayer mediaPlayer;
 
+    public static void setViewModel(ViewModel viewModel) {
+        GUIApplication.viewModel = viewModel;
+    }
+
     public static MediaPlayer getMediaPlayer() {
         return mediaPlayer;
     }
@@ -64,7 +68,7 @@ public class GUIApplication extends Application {
          });
     }
 
-    public static void changeScene(String fxml, HashMap<String, Integer> paramsMap) { // this was used when viewModel was not static
+    public static void changeScene(String fxml, HashMap<String, Object> paramsMap) { // this was used when viewModel was not static
         Platform.runLater(() -> {
             FXMLLoader fxmlLoader = new FXMLLoader(GUIApplication.class.getResource(fxml));
             try {
@@ -148,6 +152,7 @@ public class GUIApplication extends Application {
         guiController.setServer(server);
         guiController.setClient(client);
     }
+
 
     public void runGui(VirtualView client, VirtualServer server, Client clientContainer, ViewModel viewModel) {
         GUIApplication.client = client;

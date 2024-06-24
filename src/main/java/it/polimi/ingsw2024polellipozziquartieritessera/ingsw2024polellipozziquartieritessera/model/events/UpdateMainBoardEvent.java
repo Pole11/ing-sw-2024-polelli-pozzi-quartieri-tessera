@@ -6,6 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 public class UpdateMainBoardEvent extends Event {
     private final Board mainBoard;
@@ -17,12 +18,42 @@ public class UpdateMainBoardEvent extends Event {
 
     @Override
     public void execute() {
-        int sharedGoldCard1 = mainBoard.getSharedGoldCard(0).getId();
-        int sharedGoldCard2 = mainBoard.getSharedGoldCard(1).getId();
-        int sharedResourceCard1 = mainBoard.getSharedResourceCard(0).getId();
-        int sharedResourceCard2 = mainBoard.getSharedResourceCard(1).getId();
-        int firstGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
-        int firstResourceDeckCard = mainBoard.getFirstResourceDeckCard().getId();
+        int sharedGoldCard1;
+        try {
+            sharedGoldCard1 = mainBoard.getSharedGoldCard(0).getId();
+        } catch (NullPointerException e) {
+            sharedGoldCard1 = -1;
+        }
+        int sharedGoldCard2;
+        try{
+            sharedGoldCard2 = mainBoard.getSharedGoldCard(1).getId();
+        } catch (NullPointerException e) {
+            sharedGoldCard2 = -1;
+        }
+        int sharedResourceCard1;
+        try {
+            sharedResourceCard1 = mainBoard.getSharedResourceCard(0).getId();
+        } catch (NullPointerException e) {
+            sharedResourceCard1 = -1;
+        }
+        int sharedResourceCard2;
+        try{
+            sharedResourceCard2 = mainBoard.getSharedResourceCard(1).getId();
+        } catch (NullPointerException e) {
+            sharedResourceCard2 = -1;
+        }
+        int firtGoldDeckCard;
+        try {
+            firtGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
+        } catch (NoSuchElementException e){
+            firtGoldDeckCard = -1;
+        }
+        int firstResourceDeckCard;
+        try {
+            firstResourceDeckCard = mainBoard.getFirstResourceDeckCard().getId();
+        } catch (NoSuchElementException e){
+            firstResourceDeckCard = -1;
+        }
         for (VirtualView client : clients) {
             try {
                 client.updateMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firstGoldDeckCard, firstResourceDeckCard);

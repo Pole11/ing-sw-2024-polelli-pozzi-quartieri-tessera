@@ -44,7 +44,7 @@ public class ViewModel {
     private int[] mainBoard; // se la carta non c'è viene inizializzata a -1
     private HashMap<Integer,ArrayList<Integer>> placingCardOrderMap;
     private int newMessages; // only for cli
-    public ArrayList<Integer> winners;
+    private ArrayList<Integer> winners;
 
     public ViewModel() {
         playerIndex = -1;
@@ -97,9 +97,6 @@ public class ViewModel {
         winners.add(winner);
     }
 
-    public ArrayList<Integer> getWinners(){
-        return new ArrayList<>(winners);
-    }
 
     public void setSharedObjectives(int objectiveCardId1, int objectiveCardId2) {
         objectives[0] = objectiveCardId1;
@@ -184,6 +181,10 @@ public class ViewModel {
     }
 
     // GETTERS FOR CLI&GUI
+    public ArrayList<Integer> getWinners(){
+        return new ArrayList<>(winners);
+    }
+
     public HashMap<Integer, HashMap> getElementsMap(){return elementsMap;}
     public int getPlayerIndex() {
         return playerIndex;

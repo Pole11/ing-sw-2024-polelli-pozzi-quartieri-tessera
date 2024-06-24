@@ -204,7 +204,7 @@ public class Controller {
     }
 
 
-    public void drawCard(DrawType drawType) throws InvalidHandException, EmptyDeckException {
+    public void drawCard(DrawType drawType) throws InvalidHandException, EmptyDeckException, EmptyMainBoardException {
         synchronized (this.gameState) {
             Board board = this.gameState.getMainBoard();
             Player currentPlayer = this.gameState.getCurrentPlayer();
@@ -248,6 +248,7 @@ public class Controller {
             gameState.checkGameEnded();
             gameState.updateMainBoard();
         }
+        System.out.println(getPlayerNickname(getCurrentPlayerIndex())+ " drew a card");
     }
 
     public void flipCard(int playerIndex, int cardId) throws CardIsNotInHandException {
@@ -274,6 +275,10 @@ public class Controller {
 
     public synchronized void ping(VirtualView client){
         gameState.pingAnswer(client);
+    }
+
+    public synchronized void gameEnded(VirtualView client){
+        gameState.clientEnded(client);
     }
 
     public void manageDisconnection(){

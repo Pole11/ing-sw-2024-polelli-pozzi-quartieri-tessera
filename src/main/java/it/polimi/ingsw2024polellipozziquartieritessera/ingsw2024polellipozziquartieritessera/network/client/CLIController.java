@@ -10,6 +10,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.GameEndedCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
@@ -32,7 +33,8 @@ public class CLIController {
         restartExecuteCommand();
     }
 
-    public void restartExecuteCommand(){
+    //old
+    /*public void restartExecuteCommand(){
         if (executeCommands != null && executeCommands.isAlive()){
             executeCommandRunning = false;
             executeCommands.interrupt();
@@ -50,6 +52,39 @@ public class CLIController {
         this.executeCommands.start();
     }
 
+     */
+
+
+
+//new
+    public void restartExecuteCommand(){
+        if (executeCommands != null && executeCommands.isAlive()){
+            //executeCommandRunning = false;
+            executeCommands.interrupt();
+            try {
+                executeCommands.join();
+            } catch (InterruptedException ignored) {}
+
+        }
+        commandQueue.clear();
+        executeCommandRunning = true;
+        this.executeCommands = new Thread(this::executeCommandsRunnable);
+        this.executeCommands.start();
+    }
+
+
+    public void restart(VirtualView client, VirtualServer server) {
+        synchronized (commandQueue) {
+            commandQueue.clear();
+            GameEndedCommandRunnable commandRunnable = new GameEndedCommandRunnable();
+            commandRunnable.setClient(client);
+            commandRunnable.setServer(server);
+            commandQueue.add(commandRunnable);
+            commandQueue.notifyAll();
+        }
+        restartExecuteCommand();
+    }
+
     private void executeCommandsRunnable() {
         while (executeCommandRunning) {
             CommandRunnable command = null;
@@ -58,14 +93,13 @@ public class CLIController {
                     try {
                         commandQueue.wait();
                     } catch (InterruptedException e) {
-                        break;
+                        System.out.println("interrupted");
+                        return;
                     }
                 }
-                if (!executeCommandRunning){
-                    break;
-                }
+
                 command = commandQueue.remove();
-                commandQueue.notifyAll();
+                //commandQueue.notifyAll();
             }
             command.executeCLI();
         }

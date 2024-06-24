@@ -3,6 +3,7 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.scene.control.Alert;
@@ -16,6 +17,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Client implements VirtualView {
@@ -188,11 +190,11 @@ public class Client implements VirtualView {
                     guiApplication.changeScene("/fxml/game.fxml");
                 }
                 case GamePhase.ENDPHASE -> {
+                    guiApplication.changeScene("/fxml/game.fxml");
                     System.out.print("someone reached 20 points, the end phase has started\n> ");
-                    guiApplication.getGUIController().showAlert(Alert.AlertType.INFORMATION, "Message from server", "someone reached 20 points, the end phase has started");
+                    //guiApplication.getGUIController().showAlert(Alert.AlertType.INFORMATION, "Message from server", "someone reached 20 points, the end phase has started");
                 }
                 case GamePhase.FINALPHASE -> {
-                    guiApplication.changeScene("/fxml/final.fxml");
                 }
             }
             guiApplication.updateController();
@@ -214,7 +216,7 @@ public class Client implements VirtualView {
                     System.out.print("someone reached 20 points, the end phase has started\n> ");
                 }
                 case GamePhase.FINALPHASE -> {
-                    System.out.println("GAMEENDED???");
+
                 }
             }
         }
@@ -261,6 +263,7 @@ public class Client implements VirtualView {
             } else {
                 System.out.println("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>\n> ");
                 viewModel = new ViewModel();
+                guiApplication.changeScene("/fxml/lobby.fxml");
             }
         } else {
             if (connected) {
@@ -381,9 +384,17 @@ public class Client implements VirtualView {
 
     @Override
     public void updateWinner(ArrayList<Integer> playerIndexes){
+        viewModel.setGamePhase(GamePhase.FINALPHASE);
         playerIndexes.stream().forEach(e-> {
             viewModel.addWinner(e);
         });
+        if (meDoGui){
+            HashMap<String, Object> params = new HashMap<>();
+            ArrayList<String> playerNicknames = new ArrayList<>();
+            playerIndexes.stream().map(e-> viewModel.getNickname(e)).forEach(playerNicknames::add);
+            params.put("playerIndexes", playerNicknames);
+            guiApplication.changeScene("/fxml/final.fxml", params);
+        }
         System.out.println("---------GAME ENDED----------");
         if (playerIndexes.isEmpty()){
             System.out.println("No one won");
@@ -460,8 +471,11 @@ public class Client implements VirtualView {
         }
     }
     private void restart(){
-        cliController.restartExecuteCommand();
+        System.out.println("Restarting...");
+        if (!meDoGui) cliController.restart(client, server);
+        if (meDoGui) guiApplication.getGUIController().restart(client, server);
         viewModel = new ViewModel();
+        GUIApplication.setViewModel(viewModel);
         System.out.print("the game finished, to enter a new match, use the command ADDUSER <nickname>\n> ");
     }
 }

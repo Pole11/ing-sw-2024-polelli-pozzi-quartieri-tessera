@@ -291,7 +291,7 @@ public class ControllerTest {
 
 
     @Test
-    void drawCard() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, InvalidHandException, EmptyDeckException {
+    void drawCard() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, InvalidHandException, EmptyDeckException, EmptyMainBoardException {
 
         int starterCardId = 81;
 

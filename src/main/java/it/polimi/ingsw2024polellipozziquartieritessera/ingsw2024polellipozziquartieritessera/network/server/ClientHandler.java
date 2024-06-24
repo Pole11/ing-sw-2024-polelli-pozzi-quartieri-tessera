@@ -28,18 +28,24 @@ public class ClientHandler implements VirtualView {
         while ((line = input.readLine()) != null) {
             String[] message = line.split("; ");
             Command command = null;
-            try {
-                command = Command.valueOf(message[0].toUpperCase());
-            } catch(IllegalArgumentException e) {
-                System.out.println("Invalid command: " + message[0]);
-                continue;
+            //is thw ack for the ending of the game, it is a unsual way to send data because some of structures are not in the usual behaviour
+            if (message[0].equals(Command.GAMEENDED.toString())) {
+                server.gameEnded(this);
+            } else {
+                try {
+                    command = Command.valueOf(message[0].toUpperCase());
+                } catch(IllegalArgumentException e) {
+                    System.out.println("Invalid command: " + message[0]);
+                    continue;
+                }
+
+                if (Command.valueOf(message[0]).getType().equals("Local")){
+                    System.err.println("message arrived to server that should have been managed in client");
+                } else {
+                    Command.valueOf(message[0]).getCommandRunnable(message, server, null, this).executeCLI();
+                }
             }
 
-            if (Command.valueOf(message[0]).getType().equals("Local")){
-                System.err.println("message arrived to server that should have been managed in client");
-            } else {
-                Command.valueOf(message[0]).getCommandRunnable(message, server, null, this).executeCLI();
-            }
         }
     }
 
