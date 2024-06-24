@@ -18,7 +18,7 @@ private String content;
                         .collect(Collectors.joining(" ")));
                 System.out.print("Message sent\n> ");
             } catch (RemoteException e) {
-                throw new RuntimeException(e);
+                serverDisconnectedCLI();
             }
         } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
             System.err.print("INVALID COMMAND\n> ");

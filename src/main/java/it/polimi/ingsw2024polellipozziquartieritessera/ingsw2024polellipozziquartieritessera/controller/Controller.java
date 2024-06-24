@@ -139,7 +139,7 @@ public class Controller {
     }
 
 
-    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException, WrongInstanceTypeException {
+    public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException, WrongInstanceTypeException, CardNotOnBoardException {
         synchronized (this.gameState) {
             Player player = gameState.getPlayer(playerIndex);
             // check that the card is in the hand of the player
@@ -166,13 +166,7 @@ public class Controller {
             Corner tableCorner = tableCard.getCorners(player.getPlacedCardSide(tableCardId)).get(tableCornerPos.ordinal());
 
             placeCardCheckings(player, placingCard, placingCardId, tableCorner, placingCorner, placingCardSide);
-
-            try {
-                this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
-            } catch(CardNotOnBoardException e) {
-                e.printStackTrace();
-                return;
-            }
+            this.gameState.placeCard(player, placingCardId, tableCardId, tableCornerPos, placingCornerPos, placingCardSide);
 
             try {
                 player.updatePlayerCardsMap(placingCardId, placingCard, tableCard, tableCardId, tableCornerPos, placingCardSide);

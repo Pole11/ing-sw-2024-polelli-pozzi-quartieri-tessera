@@ -22,7 +22,7 @@
         <Label>First option:</Label>
         <StackPane styleClass="objectiveCardImageContainer" fx:id="firstObjectiveImageContainer" >
         </StackPane>
-        <Label>Secondo opziono:</Label>
+        <Label>Second option:</Label>
         <StackPane styleClass="objectiveCardImageContainer" fx:id="secondObjectiveImageContainer">
         </StackPane>
         <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />

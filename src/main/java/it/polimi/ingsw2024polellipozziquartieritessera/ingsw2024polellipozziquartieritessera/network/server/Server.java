@@ -177,7 +177,7 @@ public class Server implements VirtualServer {
             //CardIsNotInHand e CardAlreadyPlaced FORSE da rimuovere e gestire sulla view
             try {
                 this.controller.placeCard(playerIndex, placingCardId, tableCardId, tableCornerPos, placingCardSide);
-            } catch (WrongInstanceTypeException | CardIsNotInHandException | CardAlreadPlacedException | CardAlreadyPresentOnTheCornerException | PlacingOnHiddenCornerException | GoldCardCannotBePlacedException e){
+            } catch (CardNotOnBoardException | WrongInstanceTypeException | CardIsNotInHandException | CardAlreadPlacedException | CardAlreadyPresentOnTheCornerException | PlacingOnHiddenCornerException | GoldCardCannotBePlacedException e){
                 client.sendError(e.getMessage());
             } catch (WrongPlacingPositionException | CardNotPlacedException e) {
                 throw new RuntimeException();
@@ -247,6 +247,7 @@ public class Server implements VirtualServer {
     private boolean checkConnected(VirtualView client) throws RemoteException {
         if (!controller.isConnected(client)){
             client.sendError("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>");
+            client.connectionInfo(getPlayerIndex(client), false);
             return false;
         }
         return true;
