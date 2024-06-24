@@ -60,7 +60,7 @@ abstract public class GUIController {
     private void initialize() {
         isSceneLoaded = true;
 
-        System.out.println("[DEBUG] Scene is loaded with " + this.getClass());
+        //System.out.println("[DEBUG] Scene is loaded with " + this.getClass());
         Platform.runLater(() -> {
             handleMuteButton.setText(getMediaPlayer().isMute() ? "Unmute" : "Mute");
 
@@ -266,7 +266,7 @@ abstract public class GUIController {
             @Override
             public void run() {
                 clearServerError();
-                System.out.println("[DEBUG] Rendering server message: " + serverMessage);
+                //System.out.println("[DEBUG] Rendering server message: " + serverMessage);
                 serverMessageLabel.setText(serverMessage);
             }
         });
@@ -391,7 +391,7 @@ abstract public class GUIController {
 
     public void addHoverBgImage(Node node, String imageUrl) { // non funziona
         Platform.runLater(() -> {
-            node.setOnMouseEntered(mouseEvent -> { node.setStyle("-fx-background-image: url('" + imageUrl + "')"); node.setStyle("-fx-background-image: none"); System.out.println("-fx-background-image: url('" + imageUrl + "')"); });
+            node.setOnMouseEntered(mouseEvent -> { node.setStyle("-fx-background-image: url('" + imageUrl + "')"); node.setStyle("-fx-background-image: none"); });
             node.setOnMouseExited(mouseEvent -> { node.setStyle("-fx-background-image: none"); node.setStyle("-fx-background-image: url('" + imageUrl + "')"); });
         });
     }

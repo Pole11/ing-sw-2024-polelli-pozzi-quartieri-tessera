@@ -306,10 +306,10 @@ public class GUIControllerGame extends GUIController {
                 plateauImageViewPane.getChildren().add(circle);
 
                 int offset = 5;
-                if (getViewModel().getColorsMap(i) == Color.BLUE) { circle.setFill(javafx.scene.paint.Color.BLUE); circle.setTranslateX(x - offset); circle.setTranslateY(y - offset);}
-                else if (getViewModel().getColorsMap(i) == Color.GREEN) { circle.setFill(javafx.scene.paint.Color.GREEN); circle.setTranslateX(x + offset); circle.setTranslateY(y - offset); }
-                else if (getViewModel().getColorsMap(i) == Color.RED) { circle.setFill(javafx.scene.paint.Color.RED); circle.setTranslateX(x + offset); circle.setTranslateY(y + offset); }
-                else if (getViewModel().getColorsMap(i) == Color.YELLOW) { circle.setFill(javafx.scene.paint.Color.YELLOW); circle.setTranslateX(x -offset); circle.setTranslateY(y + offset);}
+                if (getViewModel().getColorsMap(i).equals(Color.BLUE)) { circle.setFill(javafx.scene.paint.Color.BLUE); circle.setTranslateX(x - offset); circle.setTranslateY(y - offset);}
+                else if (getViewModel().getColorsMap(i).equals(Color.GREEN)) { circle.setFill(javafx.scene.paint.Color.GREEN); circle.setTranslateX(x + offset); circle.setTranslateY(y - offset); }
+                else if (getViewModel().getColorsMap(i).equals(Color.RED)) { circle.setFill(javafx.scene.paint.Color.RED); circle.setTranslateX(x + offset); circle.setTranslateY(y + offset); }
+                else if (getViewModel().getColorsMap(i).equals(Color.YELLOW)) { circle.setFill(javafx.scene.paint.Color.YELLOW); circle.setTranslateX(x -offset); circle.setTranslateY(y + offset);}
             }
         });
     }
@@ -322,7 +322,8 @@ public class GUIControllerGame extends GUIController {
                 VBox infoContainerVBox = new VBox();
                 infoContainerVBox.setId("infoContainerPlayer" + playerId);
                 String currentPlayerNickname = nicknames.get(playerId);
-                Text nicknameText = new Text(currentPlayerNickname + " (" + getViewModel().getColorsMap(playerId) + " " + getViewModel().getPointsMap(playerId) + ")");
+                String currentPlayerDisplayName = (playerId == 0 ? "⚫ " : "") + currentPlayerNickname + " (" + getViewModel().getColorsMap(playerId) + " " + getViewModel().getPointsMap(playerId) + ")";
+                Text nicknameText = new Text(currentPlayerDisplayName);
                 Text connectionText = new Text();
                 if (getViewModel().getConnession(playerId)) {
                     connectionText.setText("Connected");
@@ -497,7 +498,12 @@ public class GUIControllerGame extends GUIController {
             chatOpen = true;
 
             Stage chatStage = new Stage();
-            chatStage.setOnCloseRequest(closeEvent -> { chatOpen = false; });
+            chatStage.setOnCloseRequest(closeEvent -> {
+                chatOpen = false;
+                handleOpenChatButton.getStyleClass().remove("pendingChatButton");
+                handleOpenChatButton.setText("Open Chat");
+                getViewModel().resetNewMessages();
+            });
             //chatStage.initModality(Modality.APPLICATION_MODAL);
             chatStage.initStyle(StageStyle.DECORATED);
             chatStage.setTitle("Chat");
@@ -558,6 +564,13 @@ public class GUIControllerGame extends GUIController {
         }
     }
 
+    public void setNewMessageChat() {
+        if (getViewModel().getNewMessages() > 0) {
+            handleOpenChatButton.getStyleClass().add("pendingChatButton");
+            handleOpenChatButton.setText("Open Chat (" + getViewModel().getNewMessages() + ")");
+        }
+    }
+
     @FXML
     private void handleOpenGameRules(ActionEvent event) {
         Platform.runLater(() -> {
@@ -598,7 +611,8 @@ public class GUIControllerGame extends GUIController {
             clearAllchilds();
             initTable();
             highlightCurrentPlayerTable();
-            setCurrentPhase();
+            //setCurrentPhase();
+            setNewMessageChat();
             populateChatListview();
             updatePoints();
         });

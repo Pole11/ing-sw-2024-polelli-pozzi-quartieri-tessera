@@ -31,7 +31,7 @@ public class GUIControllerStartGame extends GUIController {
     @Override
     public void update() {
         Platform.runLater(() -> {
-            System.out.println("[DEBUG] Updating start game controller");
+            //System.out.println("[DEBUG] Updating start game controller");
             String message = "You successfully entered the game with the nickname " + getViewModel().getNickname(getViewModel().getPlayerIndex()) + ". ";
             showNicknamesConnected();
             setServerMessage(message);

@@ -40,7 +40,7 @@
                 <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
                 <Button onAction="#handleOpenGameRules" fx:id="handleOpenGameRulesButton" text="Game Rules" />
                 <Button onAction="#handleOpenChat" fx:id="handleOpenChatButton" text="Open Chat" />
-                <Label fx:id="currentPhase"/>
+                <!-- <Label fx:id="currentPhase"/> -->
                 <StackPane fx:id="plateauImageViewPane" />
             </VBox>
             <Separator orientation="VERTICAL"></Separator>

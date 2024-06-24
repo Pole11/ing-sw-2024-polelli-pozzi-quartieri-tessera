@@ -24,12 +24,22 @@ public class GUIControllerPlace extends GUIController {
     @FXML private GridPane gridPaneContainerBoard;
     @FXML private ScrollPane scrollPaneContainerBoard;
     private int cardId;
-    private static int previousCardAmount = 1;
+    private static int previousHandCardAmount = 3;
 
     public GUIControllerPlace() {
         setFontSize(mainContainerBoard);
+        initPreviousHandCardAmount();
         initGridPaneContainerBoard();
         this.update();
+    }
+
+    public void initPreviousHandCardAmount() {
+        Platform.runLater(() -> {
+            if (getViewModel() != null) {
+                System.out.println("Init");
+                previousHandCardAmount = getViewModel().getHand(getViewModel().getPlayerIndex()).size();
+            }
+        });
     }
 
     public void updatePlayerHand(int handCardId) {
@@ -123,7 +133,6 @@ public class GUIControllerPlace extends GUIController {
                                 imageUrl = "/img/carte_retro/" + ele + ".jpg";
                             }
                             tempImageView = createCardImageView(imageUrl, (int) (getWindowHeight() * 0.108));
-                            System.out.println(getWindowHeight());
                             GridPane imageGridPane = new GridPane();
 
                             for (int w = 0; w < 2; w++) {
@@ -216,7 +225,7 @@ public class GUIControllerPlace extends GUIController {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
-                System.out.println("[DEBUG] Rendering server message: " + serverMessage);
+                //System.out.println("[DEBUG] Rendering server message: " + serverMessage);
                 showAlert(Alert.AlertType.INFORMATION, "Message from server", serverMessage);
             }
         });
@@ -227,7 +236,7 @@ public class GUIControllerPlace extends GUIController {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
-                System.err.println("[DEBUG] Rendering server error: " + serverMessage);
+                //System.err.println("[DEBUG] Rendering server error: " + serverMessage);
                 showAlert(Alert.AlertType.WARNING, "Error from server", serverMessage);
             }
         });
@@ -259,12 +268,12 @@ public class GUIControllerPlace extends GUIController {
             @Override
             public void run() {
                 try {
-                    if (previousCardAmount != getViewModel().getPlacingCardOrderMap(getViewModel().getCurrentPlayer()).size()) {
-                        previousCardAmount = getViewModel().getPlacingCardOrderMap(getViewModel().getCurrentPlayer()).size();
+                    if (previousHandCardAmount == getViewModel().getHand(getViewModel().getPlayerIndex()).size() + 1) {
+                        previousHandCardAmount = getViewModel().getHand(getViewModel().getPlayerIndex()).size();
                         goToScene("/fxml/game.fxml");
                     }
                 } catch (Exception e) {
-                    System.out.println("Proceeding to open place card scene");
+                    //System.out.println("Proceeding to open place card scene");
                 }
 
                 if (getViewModel() != null) {

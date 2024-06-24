@@ -14,9 +14,9 @@ Text {
     -fx-border-color: rgb(180, 160, 30);
     /* -fx-font-size: 16px; */
     -fx-font-family: 'Comic Neue';
-    -fx-background-image: url("../img/bricks_red.png");
+    -fx-background-image: url("../img/legno.jpg");
     -fx-background-repeat: repeat;
-    -fx-background-size: 500;
+    -fx-background-size: 800;
 }
 
 .cardDeck {
@@ -79,6 +79,10 @@ Text, Label {
 .redText {
     -fx-fill: red;
     -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.8) , 2, 1, 0, 0);
+}
+
+.pendingChatButton {
+    -fx-background-color: rgb(248, 134, 63);
 }
 
 .anchorPaneHandContainer {

@@ -1,5 +1,6 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import javafx.application.Platform;
@@ -10,8 +11,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class GUIControllerBoard extends GUIController {
     @FXML
@@ -30,38 +33,18 @@ public class GUIControllerBoard extends GUIController {
             int playerId = (Integer) getParamsMap().get("playerId");
             ArrayList<ArrayList<Integer>> playerBoard = vm.getPlayerBoard(playerId); // the first arg is the index of the player to print the board of
 
-            for (int i = 0; i < playerBoard.size(); i++) {
-                for (int j = 0; j < playerBoard.get(i).size(); j++) {
-                    System.out.print(playerBoard.get(i).get(j) + " ");
-                }
-                System.out.println();
-            }
-
             playerBoard = rotateBoard(playerBoard);
-
-            for (int i = 0; i < playerBoard.size(); i++) {
-                for (int j = 0; j < playerBoard.get(i).size(); j++) {
-                    System.out.print(playerBoard.get(i).get(j) + " ");
-                }
-                System.out.println();
-            }
-
             resizeI(playerBoard);
-
-            for (int i = 0; i < playerBoard.size(); i++) {
-                for (int j = 0; j < playerBoard.get(i).size(); j++) {
-                    System.out.print(playerBoard.get(i).get(j) + " ");
-                }
-                System.out.println();
-            }
 
             if (gridPaneContainerBoard != null) { gridPaneContainerBoard.getChildren().clear(); }
 
+            //boolean first = true;
             for (int k = 0; k < getViewModel().getPlacingCardOrderMap(playerId).size(); k++) {
                 for (int i = 0; i < playerBoard.size(); i++) {
                     for (int j = 0; j < playerBoard.getFirst().size(); j++) {
                         if (playerBoard.get(i).get(j) != -1 && getViewModel().getPlacingCardOrderMap(playerId).get(k).equals(playerBoard.get(i).get(j))) {
                             int ele = playerBoard.get(i).get(j);
+
                             ImageView tempImageView;
                             String imageUrl = null;
                             if (getViewModel().getPlacedCardSide(ele) == Side.FRONT) {
@@ -71,9 +54,33 @@ public class GUIControllerBoard extends GUIController {
                             }
                             tempImageView = createCardImageView(imageUrl, (int) (getWindowHeight() * 0.108));
 
+                            /*if (first) {
+                                Circle coloredCircle = new Circle(0,0, getWindowHeight()*0.015);
+                                if (getViewModel().getColorsMap(playerId).equals(Color.BLUE)) { coloredCircle.setFill(javafx.scene.paint.Color.BLUE); }
+                                else if (getViewModel().getColorsMap(playerId).equals(Color.GREEN)) { coloredCircle.setFill(javafx.scene.paint.Color.GREEN); }
+                                else if (getViewModel().getColorsMap(playerId).equals(Color.RED)) { coloredCircle.setFill(javafx.scene.paint.Color.RED); }
+                                else if (getViewModel().getColorsMap(playerId).equals(Color.YELLOW)) { coloredCircle.setFill(javafx.scene.paint.Color.YELLOW); }
+
+                                coloredCircle.setTranslateX(getWindowHeight() * 0.025);
+                                coloredCircle.setTranslateY(getWindowHeight() * 0.020);
+
+                                StackPane tempStackPane = new StackPane(tempImageView, coloredCircle);
+                                if (playerId == 0) {
+                                    Circle blackCircle = new Circle(0,0, getWindowHeight()*0.01);
+                                    tempStackPane.getChildren().add(blackCircle);
+                                } else {
+
+                                }
+
+                                gridPaneContainerBoard.add(tempStackPane, j, i);
+                                first = false;
+                            } else {
+                                gridPaneContainerBoard.add(tempImageView, j, i);
+                            }*/
+
+                            gridPaneContainerBoard.add(tempImageView, j, i);
                             gridPaneContainerBoard.setHalignment(tempImageView, HPos.CENTER);
                             gridPaneContainerBoard.setValignment(tempImageView, VPos.CENTER);
-                            gridPaneContainerBoard.add(tempImageView, j, i);
                         }
                     }
                 }
