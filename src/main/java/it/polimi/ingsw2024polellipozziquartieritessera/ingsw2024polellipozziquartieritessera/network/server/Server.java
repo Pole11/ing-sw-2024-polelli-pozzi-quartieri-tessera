@@ -35,6 +35,8 @@ public class Server implements VirtualServer {
     }
 
     public static void main(String[] argv) throws IOException {
+        System.out.println("Executing server");
+
         String host = argv[0];
         int socketport = Integer.parseInt(argv[1]);
         int rmiport = Integer.parseInt(argv[2]);

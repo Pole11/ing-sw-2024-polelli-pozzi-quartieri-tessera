@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate.readJSON;
+
 public class ViewModel {
     private int playerIndex;
     private final HashMap<Integer,String> nicknamesMap;
@@ -392,15 +394,16 @@ public class ViewModel {
 
     //TODO: guardare se servono le modifiche di Global
     private void populateCardsMap() {
-        String filePath = new File("").getAbsolutePath();
         String jsonString = null;
         try {
-            jsonString = Populate.readJSON(filePath + Config.CARD_JSON_PATH);
+            jsonString = readJSON(Config.CARD_JSON_PATH);
         } catch (IOException e) {
-            System.out.print("Error while loading image, pls try again");
+            System.out.println("Error while loading JSON, please try again");
+            return;
         }
         Gson gson = new Gson();
-        Map cards = gson.fromJson(jsonString, Map.class);
+        Map<String, ?> cards = gson.fromJson(jsonString, Map.class);
+        // Your code to use the loaded cards map
 
 
         for (Object key : cards.keySet()){

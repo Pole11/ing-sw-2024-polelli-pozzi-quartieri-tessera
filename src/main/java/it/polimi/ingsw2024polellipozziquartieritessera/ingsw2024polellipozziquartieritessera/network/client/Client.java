@@ -40,6 +40,8 @@ public class Client implements VirtualView {
     }
 
     public static void main(String[] args) throws IOException {
+        System.out.println("Executing client");
+
         String rmiOrSocket = args[0];
         String host = args[1];
         String port = args[2];

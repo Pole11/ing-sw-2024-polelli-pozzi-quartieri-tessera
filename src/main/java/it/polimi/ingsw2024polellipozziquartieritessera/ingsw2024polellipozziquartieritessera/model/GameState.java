@@ -1239,9 +1239,9 @@ public class GameState {
 
         //erase state
         Gson gson = new Gson();
-        String filePath = new File("").getAbsolutePath();
-        try (Writer writer = new FileWriter(filePath + Config.GAME_STATE_PATH)) {
-            gson.toJson(new HashMap(), writer);
+        String filePath = new File("").getAbsolutePath() + Config.GAME_STATE_PATH;
+        try (Writer writer = new FileWriter(filePath)) {
+            gson.toJson(new HashMap<>(), writer);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

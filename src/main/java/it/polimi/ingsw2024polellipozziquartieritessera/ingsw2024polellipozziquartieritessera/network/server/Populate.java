@@ -24,35 +24,41 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 
 public class Populate {
 
     public static String readJSON(String fileName) throws IOException {
-        BufferedReader reader= null;
-        try {reader = new BufferedReader(new FileReader(fileName));}
-        catch (IOException e) {
-            e.printStackTrace();// da sistemare
+        InputStream inputStream = Populate.class.getResourceAsStream(fileName);
+        if (inputStream == null) {
+            throw new FileNotFoundException("Resource not found: " + fileName);
         }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         StringBuilder stringBuilder = new StringBuilder();
-        String line = null;
+        String line;
         String ls = System.getProperty("line.separator");
         while ((line = reader.readLine()) != null) {
-            stringBuilder.append(line);
-            stringBuilder.append(ls);
+            stringBuilder.append(line).append(ls);
         }
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        // Remove the last line separator
+        if (stringBuilder.length() > 0) {
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
         reader.close();
-        String content = stringBuilder.toString();
-        return content;
+        return stringBuilder.toString();
     }
 
-    public static void populate(GameState gameState) throws IOException {
-        String filePath = new File("").getAbsolutePath();
-        ObjectMapper mapper = new ObjectMapper();
 
-        Map<String, ?> cards = mapper.readValue(Paths.get(filePath + Config.CARD_JSON_PATH).toFile(), Map.class);;
+    public static void populate(GameState gameState) throws IOException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        InputStream inputStream = Populate.class.getResourceAsStream("/cards.json");
+        if (inputStream == null) {
+            throw new FileNotFoundException("Resource not found: /cards.json");
+        }
+        Map<String, ?> cards = mapper.readValue(inputStream, Map.class);
 
 
         for (Object key : cards.keySet()) {
@@ -249,19 +255,21 @@ public class Populate {
     }
 
     public static void restoreState(GameState gameState) throws IOException {
-        String filePath = new File("").getAbsolutePath();
         ObjectMapper mapper = new ObjectMapper();
 
-        Map<String, ?> jsonState = null;
-        try {
-            jsonState = mapper.readValue(Paths.get(filePath + Config.GAME_STATE_PATH).toFile(), Map.class);
-        } catch (IOException e) {
-            System.out.println("there is no state");
-            return;
+        // Load rescue.json
+        InputStream rescueInputStream = Populate.class.getResourceAsStream("/rescue.json");
+        if (rescueInputStream == null) {
+            throw new FileNotFoundException("Resource not found: /rescue.json");
         }
+        Map<String, ?> jsonState = mapper.readValue(rescueInputStream, Map.class);
 
-        final Map<String, ?> cards = mapper.readValue(Paths.get(filePath + Config.CARD_JSON_PATH).toFile(), Map.class);;
-
+        // Load cards.json
+        InputStream cardsInputStream = Populate.class.getResourceAsStream("/cards.json");
+        if (cardsInputStream == null) {
+            throw new FileNotFoundException("Resource not found: /cards.json");
+        }
+        Map<String, ?> cards = mapper.readValue(cardsInputStream, Map.class);
 
         //if the json is an empty object
         if (jsonState.isEmpty()){
