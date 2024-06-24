@@ -147,4 +147,7 @@ public class ClientHandler implements VirtualView {
     public void updateChat(int playerIndex, String content) throws RemoteException {
         view.updateChat(playerIndex, content);
     }
+    public void redirectOut(boolean bool) throws RemoteException {
+        view.redirectOut(bool);
+    }
 }

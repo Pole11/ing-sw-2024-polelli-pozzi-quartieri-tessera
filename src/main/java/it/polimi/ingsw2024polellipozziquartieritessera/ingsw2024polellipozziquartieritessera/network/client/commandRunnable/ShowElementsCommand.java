@@ -3,7 +3,17 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 public class ShowElementsCommand extends CommandRunnable{
     @Override
     public void executeCLI() {
-        clientContainer.getCliController().showElements();
+        try {
+            if (messageFromCli.length < 2) {
+                clientContainer.getCliController().showElements();
+            } else {
+                Integer playerIndex = Integer.parseInt(messageFromCli[1]);
+                clientContainer.getCliController().showElements(playerIndex);
+            }
+        } catch (Exception r){
+            System.err.print(r + "\nplease insert a valid player index\n >");
+        }
+
     }
 
     @Override

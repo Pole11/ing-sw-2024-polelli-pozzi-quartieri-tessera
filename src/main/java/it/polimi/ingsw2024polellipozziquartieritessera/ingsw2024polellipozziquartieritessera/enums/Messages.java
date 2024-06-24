@@ -25,5 +25,6 @@ public enum Messages {
     UPDATESTARTER,
     UPDATEWINNER,
     UPDATEELEMENT,
-    UPDATECHAT
+    UPDATECHAT,
+    REDIRECTOUT;
 }

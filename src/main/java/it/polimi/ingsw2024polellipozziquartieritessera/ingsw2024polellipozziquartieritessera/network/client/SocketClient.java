@@ -140,6 +140,9 @@ public class SocketClient implements VirtualView {
                 case Messages.UPDATECHAT:
                     this.updateChat(Integer.parseInt(messageString[1]), messageString[2].replace("~", " "));
                     break;
+                case Messages.REDIRECTOUT:
+                    this.redirectOut(Boolean.parseBoolean(messageString[1]));
+                    break;
                 default:
                     System.err.println("[5xx INVALID MESSAGE FROM SERVER]");
                     break;
@@ -254,4 +257,10 @@ public class SocketClient implements VirtualView {
     public void updateChat(int playerIndex, String content) throws RemoteException {
         clientContainer.updateChat(playerIndex, content);
     }
+
+    @Override
+    public void redirectOut(boolean bool) throws RemoteException {
+        clientContainer.redirectOut(bool);
+    }
+
 }

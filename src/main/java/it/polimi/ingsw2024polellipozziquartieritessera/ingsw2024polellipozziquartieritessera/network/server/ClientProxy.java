@@ -152,4 +152,10 @@ public class ClientProxy implements VirtualView {
         output.println(Messages.UPDATECHAT + "; " + playerIndex + "; " + content.replace(" ","~"));
         output.flush();
     }
+
+    @Override
+    public void redirectOut(boolean bool) throws RemoteException {
+        output.println(Messages.REDIRECTOUT + "; " + bool);
+        output.flush();
+    }
 }

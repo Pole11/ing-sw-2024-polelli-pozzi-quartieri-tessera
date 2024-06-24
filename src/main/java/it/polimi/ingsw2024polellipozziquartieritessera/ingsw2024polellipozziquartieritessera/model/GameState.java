@@ -427,6 +427,7 @@ public class GameState {
         clients.add(client);
         Player reconnectingPlayer = getPlayer(getPlayerIndex(client));
         synchronized (eventQueue) {
+            eventQueue.add(new redirectOutEvent(this, clients, true));
             GamePhase gamePhase = currentGamePhase;
             if (currentGamePhase.equals(GamePhase.TIMEOUT)){
                 gamePhase = prevGamePhase;
@@ -445,8 +446,7 @@ public class GameState {
                 if (currentPlayer.getColor() != null) {
                     eventQueue.add((new UpdateColorEvent(this, clients, currentPlayer, currentPlayer.getColor())));
                 }
-                eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
-                //send hands
+                                //send hands
                 if (gamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
                     Set<Integer> handCardsSet = currentPlayer.getHandCardsMap().keySet();
                     for (Integer k : handCardsSet) {
@@ -466,6 +466,7 @@ public class GameState {
                 elements.keySet().stream().forEach(e->{
                     eventQueue.add(new UpdateElementsEvent(this, clients, finalI, e, elements.get(e)));
                 });
+                //eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
             }
             // send Starter card
 /*            if (reconnectingPlayer.getStarterCard() != null) {
@@ -511,6 +512,13 @@ public class GameState {
                 eventQueue.add(new UpdateMainBoardEvent(this, clients, mainBoard));
             }
             //todo send Chat
+
+            //send points
+            for(int i = 0; i < players.size(); i++){
+                Player currentPlayer = players.get(i);
+                eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
+            }
+            eventQueue.add(new redirectOutEvent(this, clients, false));
             eventQueue.notifyAll();
 
         }

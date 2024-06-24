@@ -30,6 +30,9 @@ public class Client implements VirtualView {
     private final String host;
     private final int port;
     private boolean running;
+    ByteArrayOutputStream baos;
+    PrintStream restoreStream;
+    PrintStream oldPrintStream;
 
     public Client(String rmiOrSocket, String host, String port){
         this.viewModel = new ViewModel();
@@ -37,6 +40,9 @@ public class Client implements VirtualView {
         this.host = host;
         this.port = Integer.parseInt(port);
         this.running = false;
+        this.baos = new ByteArrayOutputStream();
+        this.restoreStream = new PrintStream(baos);
+        this.oldPrintStream = null;
     }
 
     public static void main(String[] args) throws IOException {
@@ -420,6 +426,16 @@ public class Client implements VirtualView {
     }
 
     @Override
+    public void redirectOut(boolean bool) throws RemoteException {
+        if(bool){
+            oldPrintStream = System.out;
+            System.setOut(restoreStream);
+        } else {
+            System.setOut(oldPrintStream);
+        }
+    }
+
+    @Override
     public void ping(String ping) throws RemoteException {
         if (meDoGui){
             guiApplication.getGUIController().ping(client, server);
@@ -443,8 +459,6 @@ public class Client implements VirtualView {
             viewModel.resetNewMessages();
         }
     }
-
-
     private void restart(){
         cliController.restartExecuteCommand();
         viewModel = new ViewModel();

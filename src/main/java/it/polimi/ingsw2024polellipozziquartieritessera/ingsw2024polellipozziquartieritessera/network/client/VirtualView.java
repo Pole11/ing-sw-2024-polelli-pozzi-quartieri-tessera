@@ -30,4 +30,5 @@ public interface VirtualView extends Remote {
     void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException;
     void updateElement(int playerIndex, Element element, int numberOfElements) throws RemoteException;
     void updateChat(int playerIndex, String content) throws RemoteException;
+    void redirectOut(boolean bool) throws RemoteException;
 }

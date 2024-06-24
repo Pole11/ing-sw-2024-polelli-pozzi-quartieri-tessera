@@ -111,17 +111,27 @@ public class CLIController {
     }
 
     public void showElements(){
-        HashMap<Integer, HashMap> map = viewModel.getElementsMap();
         int index = viewModel.getPlayerIndex();
-        System.out.println("this are the elements visible on your board");
-        for(Object e : map.get(index).keySet()){
-            if((int) map.get(index).get(e) != 0){
-                System.out.println(e + ": " + map.get(index).get(e));
+        showElements(index);
+    }
+    public void showElements(int index){
+        if(index >= viewModel.getPlayersSize() || index < 0){
+            System.err.print("the index doesn't match an existing player");
+        } else {
+            HashMap<Integer, HashMap> map = viewModel.getElementsMap();
+            if(index == viewModel.getPlayerIndex()) {
+                System.out.println("this are the elements visible on your board");
+            } else{
+                System.out.println("this are the elements visible on " + viewModel.getNickname(index) +"'s board");
+            }
+            for (Object e : map.get(index).keySet()) {
+                if ((int) map.get(index).get(e) != 0) {
+                    System.out.println(e + ": " + map.get(index).get(e));
+                }
             }
         }
         System.out.print("> ");
     }
-
 
     public void printAllCommands() {
         AtomicInteger i = new AtomicInteger();
@@ -321,11 +331,11 @@ public class CLIController {
             System.out.print("there are no players registered\n> ");
         } else {
             System.out.println("this are the players nicknames ");
-            System.out.println("You are the player with index: " + viewModel.getPlayerIndex() + ", your nickname is " + viewModel.getNickname(viewModel.getPlayerIndex()));
+            //System.out.println("You are the player with index: " + viewModel.getPlayerIndex() + ", your nickname is " +viewModel.getNickname(viewModel.getPlayerIndex()));
             for(int i = 0; i < n_players; i++){
-                if (i != viewModel.getPlayerIndex()){
-                    System.out.println("index: " + i + " nickname: " + viewModel.getNickname(i));
-                }
+                String colorPlayer = ColorPrint.getColorPrint(viewModel.getColorsMap(i)).toString();
+                System.out.println("index: " + i + " nickname: " + colorPlayer + viewModel.getNickname(i) + ColorPrint.RESET);
+
             }
             System.out.print("> ");
         }
@@ -630,7 +640,7 @@ public class CLIController {
         }
         String costString = "";
         for (Element key : cost.keySet()){
-            costString = cost.get(key) + key.toString().substring(0,3).toUpperCase();
+            costString = costString + " " +  cost.get(key) + key.toString().substring(0,3).toUpperCase();
         }
 
         String challengeString = "";

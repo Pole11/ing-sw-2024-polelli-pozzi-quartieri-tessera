@@ -157,4 +157,8 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
         clientContainer.updateChat(playerIndex, content);
     }
 
+    @Override
+    public void redirectOut(boolean bool) throws RemoteException {
+        clientContainer.redirectOut(bool);
+    }
 }
