@@ -7,7 +7,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateSecretObjectiveEvent extends Event{
+public class UpdateSecretObjectiveEvent extends Event {
     private final ArrayList<ObjectiveCard> objectiveCards;
 
 
@@ -18,11 +18,11 @@ public class UpdateSecretObjectiveEvent extends Event{
 
     @Override
     public void execute() {
-        for (VirtualView client: clients) {
-            int id1=-1, id2=-1;
-            switch (objectiveCards.size()){
+        for (VirtualView client : clients) {
+            int id1 = -1, id2 = -1;
+            switch (objectiveCards.size()) {
                 case 1:
-                    id1 = objectiveCards.get(0).getId();
+                    id1 = objectiveCards.getFirst().getId();
                     break;
                 case 2:
                     id1 = objectiveCards.get(0).getId();

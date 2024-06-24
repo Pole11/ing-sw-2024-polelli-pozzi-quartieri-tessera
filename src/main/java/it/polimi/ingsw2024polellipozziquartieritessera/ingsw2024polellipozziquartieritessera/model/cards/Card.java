@@ -1,12 +1,11 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
 
-import com.google.gson.annotations.SerializedName;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.CardNotPlacedException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 
 /**
  * Abstract Card class
- * */
+ */
 public abstract class Card {
     /**
      * Card identifier (from 1 to 102)
@@ -15,9 +14,10 @@ public abstract class Card {
 
     /**
      * Card Constructor
+     *
      * @param id Card identifier
      */
-    public Card(int id){
+    public Card(int id) {
         this.id = id;
     }
 
@@ -28,6 +28,7 @@ public abstract class Card {
 
     /**
      * Abstract method for calculating the points gained from the card challenge
+     *
      * @param player Owner of the card
      * @return Points gained from the card challenge
      * @throws CardNotPlacedException Card has not been placed yet

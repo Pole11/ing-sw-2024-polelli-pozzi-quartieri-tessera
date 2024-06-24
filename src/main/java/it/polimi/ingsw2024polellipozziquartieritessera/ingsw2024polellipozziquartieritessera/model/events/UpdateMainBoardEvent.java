@@ -7,7 +7,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateMainBoardEvent extends Event{
+public class UpdateMainBoardEvent extends Event {
     private final Board mainBoard;
 
     public UpdateMainBoardEvent(GameState gameState, ArrayList<VirtualView> clients, Board mainBoard) {
@@ -21,11 +21,11 @@ public class UpdateMainBoardEvent extends Event{
         int sharedGoldCard2 = mainBoard.getSharedGoldCard(1).getId();
         int sharedResourceCard1 = mainBoard.getSharedResourceCard(0).getId();
         int sharedResourceCard2 = mainBoard.getSharedResourceCard(1).getId();
-        int firtGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
+        int firstGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
         int firstResourceDeckCard = mainBoard.getFirstResourceDeckCard().getId();
         for (VirtualView client : clients) {
             try {
-                client.updateMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firtGoldDeckCard, firstResourceDeckCard);
+                client.updateMainBoard(sharedGoldCard1, sharedGoldCard2, sharedResourceCard1, sharedResourceCard2, firstGoldDeckCard, firstResourceDeckCard);
             } catch (RemoteException e) {
                 playerDisconnected(client);
             }

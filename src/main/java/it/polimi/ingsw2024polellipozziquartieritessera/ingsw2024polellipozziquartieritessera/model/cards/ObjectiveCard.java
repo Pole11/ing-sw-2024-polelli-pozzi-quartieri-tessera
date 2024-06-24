@@ -18,9 +18,10 @@ public class ObjectiveCard extends Card {
 
     /**
      * Object Card Constructor
-     * @param id Card identifier
+     *
+     * @param id        Card identifier
      * @param challenge Challenge of the card
-     * @param points Number of points for the card challenge
+     * @param points    Number of points for the card challenge
      */
     public ObjectiveCard(int id, Challenge challenge, int points) {
         super(id);
@@ -38,10 +39,14 @@ public class ObjectiveCard extends Card {
     }
 
     public int calculatePoints(Player player) {
+        // Calculate how many times the player has won this challenge
         int timesWon = this.challenge.getTimesWon(player, this);
+
+        // Increment player's count of objectives won if timesWon is greater than 0
         if (timesWon > 0) {
             player.incrementObjectivesWon();
         }
+
         return timesWon * this.points;
     }
 }

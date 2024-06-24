@@ -7,12 +7,12 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateElementsEvent extends Event{
+public class UpdateElementsEvent extends Event {
     private final int playerIndex;
     private final Element element;
     private final int numberOfElements;
 
-    public UpdateElementsEvent(GameState gameState, ArrayList<VirtualView> clients, int playerIndex ,Element element, int numberOfElements) {
+    public UpdateElementsEvent(GameState gameState, ArrayList<VirtualView> clients, int playerIndex, Element element, int numberOfElements) {
         super(gameState, clients);
         this.playerIndex = playerIndex;
         this.element = element;
@@ -21,7 +21,7 @@ public class UpdateElementsEvent extends Event{
 
     @Override
     public void execute() {
-        for (VirtualView client: clients) {
+        for (VirtualView client : clients) {
             try {
                 client.updateElement(playerIndex, element, numberOfElements);
             } catch (RemoteException e) {

@@ -8,7 +8,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateColorEvent extends Event{
+public class UpdateColorEvent extends Event {
     private final Player player;
     private final Color color;
 

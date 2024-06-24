@@ -1,7 +1,8 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
-
+/**
+ * Enumeration of the client to server messages
+ */
 public enum Messages {
     GAMEPHASE,
     TURNPHASE,

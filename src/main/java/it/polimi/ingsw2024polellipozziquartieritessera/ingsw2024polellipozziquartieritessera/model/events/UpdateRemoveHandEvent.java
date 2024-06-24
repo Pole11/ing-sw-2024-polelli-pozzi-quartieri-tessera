@@ -7,7 +7,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateRemoveHandEvent extends Event{
+public class UpdateRemoveHandEvent extends Event {
     private final Player player;
     private final int index;
 
@@ -19,7 +19,7 @@ public class UpdateRemoveHandEvent extends Event{
 
     @Override
     public void execute() {
-        for (VirtualView client : clients){
+        for (VirtualView client : clients) {
             try {
                 client.updateRemoveHand(gameState.getPlayerIndex(player), index);
             } catch (RemoteException e) {

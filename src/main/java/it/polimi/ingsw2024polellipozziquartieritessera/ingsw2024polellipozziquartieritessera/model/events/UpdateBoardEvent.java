@@ -9,13 +9,14 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateBoardEvent extends Event{
+public class UpdateBoardEvent extends Event {
     private final Player player;
     private final int placingCardId;
     private final int tableCardId;
     private final CornerPos existingCornerPos;
     private final Side side;
     private ArrayList<VirtualView> restoreClients;
+
     public UpdateBoardEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) {
         super(gameState, clients);
         this.player = player;
@@ -24,15 +25,16 @@ public class UpdateBoardEvent extends Event{
         this.existingCornerPos = existingCornerPos;
         this.side = side;
     }
+
     @Override
     public void execute() {
         ArrayList<VirtualView> actualClients;
-        if(clients.isEmpty()){ //for PlacedEventList, updateBoard.clients needs to be set after construction
+        if (clients.isEmpty()) { //for PlacedEventList, updateBoard.clients needs to be set after construction
             actualClients = restoreClients;
-        } else{
+        } else {
             actualClients = clients;
         }
-        for (VirtualView client : actualClients){
+        for (VirtualView client : actualClients) {
             try {
                 client.updatePlayerBoard(gameState.getPlayerIndex(player), placingCardId, tableCardId, existingCornerPos, side);
             } catch (RemoteException e) {
@@ -40,6 +42,7 @@ public class UpdateBoardEvent extends Event{
             }
         }
     }
+
     public void setRestoreClients(ArrayList<VirtualView> restoreClients) {
         this.restoreClients = restoreClients;
     }

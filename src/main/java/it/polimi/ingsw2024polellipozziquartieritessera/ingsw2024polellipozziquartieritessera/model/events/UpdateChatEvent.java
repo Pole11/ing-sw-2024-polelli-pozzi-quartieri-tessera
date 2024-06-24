@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class UpdateChatEvent extends Event {
     int playerIndex;
     String content;
+
     public UpdateChatEvent(GameState gameState, ArrayList<VirtualView> clients, int playerIndex, String content) {
         super(gameState, clients);
         this.playerIndex = playerIndex;
@@ -17,7 +18,7 @@ public class UpdateChatEvent extends Event {
 
     @Override
     public void execute() {
-        String decodedContent = content.replace("~"," ");
+        String decodedContent = content.replace("~", " ");
         for (VirtualView client : clients) {
             try {
                 client.updateChat(playerIndex, decodedContent);

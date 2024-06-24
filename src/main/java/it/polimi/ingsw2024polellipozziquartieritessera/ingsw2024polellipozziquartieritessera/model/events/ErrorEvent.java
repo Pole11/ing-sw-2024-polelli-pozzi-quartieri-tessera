@@ -6,7 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class ErrorEvent extends Event{
+public class ErrorEvent extends Event {
     private final String error;
 
     public ErrorEvent(GameState gameState, ArrayList<VirtualView> clients, String error) {

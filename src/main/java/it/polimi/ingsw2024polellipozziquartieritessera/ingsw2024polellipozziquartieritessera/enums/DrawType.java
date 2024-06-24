@@ -1,5 +1,8 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums;
 
+/**
+ * Enumeration of the possible draw choices
+ */
 public enum DrawType {
     SHAREDGOLD1,
     SHAREDGOLD2,
@@ -7,5 +10,4 @@ public enum DrawType {
     SHAREDRESOURCE1,
     SHAREDRESOURCE2,
     DECKRESOURCE
-
 }

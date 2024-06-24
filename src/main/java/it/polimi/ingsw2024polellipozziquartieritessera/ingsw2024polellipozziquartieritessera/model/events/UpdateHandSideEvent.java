@@ -7,7 +7,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateHandSideEvent extends Event{
+public class UpdateHandSideEvent extends Event {
     private final int index;
     private final Side side;
 
@@ -19,7 +19,7 @@ public class UpdateHandSideEvent extends Event{
 
     @Override
     public void execute() {
-        for (VirtualView client : clients){
+        for (VirtualView client : clients) {
             try {
                 client.updateHandSide(index, side);
             } catch (RemoteException e) {

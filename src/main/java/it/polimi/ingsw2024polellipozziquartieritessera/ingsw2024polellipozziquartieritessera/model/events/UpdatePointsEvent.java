@@ -7,7 +7,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdatePointsEvent extends Event{
+public class UpdatePointsEvent extends Event {
     private final Player player;
     private final int points;
 
@@ -19,7 +19,7 @@ public class UpdatePointsEvent extends Event{
 
     @Override
     public void execute() {
-        for (VirtualView client : clients){
+        for (VirtualView client : clients) {
             try {
                 client.updatePoints(gameState.getPlayerIndex(player), points);
             } catch (RemoteException e) {

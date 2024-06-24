@@ -6,7 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class SendIndexEvent extends Event{
+public class SendIndexEvent extends Event {
     private final int id;
 
     public SendIndexEvent(GameState gameState, ArrayList<VirtualView> clients, int id) {
@@ -16,7 +16,7 @@ public class SendIndexEvent extends Event{
 
     @Override
     public void execute() {
-        for (VirtualView client: clients) {
+        for (VirtualView client : clients) {
             try {
                 client.sendIndex(id);
             } catch (RemoteException e) {

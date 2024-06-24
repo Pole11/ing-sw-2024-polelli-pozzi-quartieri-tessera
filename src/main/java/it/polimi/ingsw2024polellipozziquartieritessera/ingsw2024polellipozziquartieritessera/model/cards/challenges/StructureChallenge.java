@@ -2,33 +2,34 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.GoldCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ObjectiveCard;
 
-public class StructureChallenge extends Challenge{
+public class StructureChallenge extends Challenge {
     private final Element[][] configuration;
 
     public StructureChallenge(Element[][] configuration) {
         this.configuration = configuration;
 
+        // Validate the number of rows in the configuration matrix
         if (configuration.length != Config.N_STRUCTURE_CHALLENGE_CONFIGURATION) {
-            System.err.println("error in json, configuration of structure challenge is not properly formatted, number of rows in the matrix is too big");
+            System.err.println("Error in JSON: Structure challenge configuration has incorrect number of rows.");
             throw new RuntimeException();
-            //throw new WrongStructureConfigurationSizeException("The number of rows in the matrix is too big");
         }
 
-        if (configuration[0].length != Config.N_STRUCTURE_CHALLENGE_CONFIGURATION ||
-                    configuration[1].length != Config.N_STRUCTURE_CHALLENGE_CONFIGURATION ||
-                    configuration[2].length != Config.N_STRUCTURE_CHALLENGE_CONFIGURATION) {
-            System.err.println("error in json, configuration of structure challenge is not properly formatted, number of cols in the matrix is too big");
-            throw new RuntimeException();
-            //throw new WrongStructureConfigurationSizeException("The number of cols in the matrix is too big");
+        // Validate the number of columns in each row of the configuration matrix
+        for (int i = 0; i < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; i++) {
+            if (configuration[i].length != Config.N_STRUCTURE_CHALLENGE_CONFIGURATION) {
+                System.err.println("Error in JSON: Structure challenge configuration has incorrect number of columns.");
+                throw new RuntimeException();
+            }
         }
     }
 
-    public Element[][] getConfiguration() { return configuration; }
+    public Element[][] getConfiguration() {
+        return configuration;
+    }
 
     @Override
     public int getTimesWon(Player player, GoldCard card) {
@@ -40,52 +41,51 @@ public class StructureChallenge extends Challenge{
         int rows = player.getPlayerBoard().size();
         int cols = player.getPlayerBoard().getFirst().size();
 
-        // instantiate the element board and fill it with the cards elements on playerBoard
+        // Create a board to store elements from the player's board
         Element[][] elementBoard = new Element[rows][cols];
-        for (int i=0; i<rows; i++){
-            for (int j=0; j<cols; j++){
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 int cardId = player.getPlayerBoard().get(i).get(j);
-                if (cardId != -1){
+                if (cardId != -1) {
                     elementBoard[i][j] = player.getCenterResource(cardId);
-                } else{
+                } else {
                     elementBoard[i][j] = Element.EMPTY;
                 }
             }
         }
 
-        // instantiate the checkBoard
+        // Create a board to track used positions on the player's board
         int[][] checkBoard = new int[rows][cols];
 
-        // verify the recurrences of the configuration (from up-left to down-right)
+        // Calculate the number of valid occurrences of the challenge configuration
         int recurrences = 0;
-
-        for (int i=0; i<rows; i++){
-            for (int j=0; j<cols; j++){
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 boolean isValidOccurrence = true;
-                for (int k = 0; k < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION && isValidOccurrence; k++){
-                    for(int w = 0; w < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION && isValidOccurrence; w++){
-                        if (this.getConfiguration()[k][w] != Element.EMPTY){
-                            // if we are outside bounds
-                            if (i+k >= rows || j+w >= cols) {
+                for (int k = 0; k < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION && isValidOccurrence; k++) {
+                    for (int w = 0; w < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION && isValidOccurrence; w++) {
+                        if (this.getConfiguration()[k][w] != Element.EMPTY) {
+                            // Check if the current position is within bounds
+                            if (i + k >= rows || j + w >= cols) {
                                 isValidOccurrence = false;
                             }
-                            // if the configuration is not matched
-                            else if(elementBoard[i+k][j+w] != this.getConfiguration()[k][w]){
+                            // Check if the elements match the configuration
+                            else if (elementBoard[i + k][j + w] != this.getConfiguration()[k][w]) {
                                 isValidOccurrence = false;
                             }
-                            // if the elements are used more than one time
-                            else if(checkBoard[i+k][j+w] == 1){
+                            // Check if the element position has already been used
+                            else if (checkBoard[i + k][j + w] == 1) {
                                 isValidOccurrence = false;
                             }
                         }
                     }
                 }
-                if (isValidOccurrence){
-                    // set in check board the used cards from 0 to 1
-                    for (int k = 0; k < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; k++){
-                        for(int w = 0; w < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; w++){
-                            if (i+k<rows && j+w<cols){
-                                if (elementBoard[i+k][j+w] != Element.EMPTY) {
+                if (isValidOccurrence) {
+                    // Mark positions on the check board as used
+                    for (int k = 0; k < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; k++) {
+                        for (int w = 0; w < Config.N_STRUCTURE_CHALLENGE_CONFIGURATION; w++) {
+                            if (i + k < rows && j + w < cols) {
+                                if (elementBoard[i + k][j + w] != Element.EMPTY) {
                                     checkBoard[i + k][j + w] = 1;
                                 }
                             }

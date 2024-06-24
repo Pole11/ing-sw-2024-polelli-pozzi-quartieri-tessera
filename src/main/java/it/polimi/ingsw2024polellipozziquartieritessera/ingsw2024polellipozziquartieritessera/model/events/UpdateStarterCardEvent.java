@@ -7,11 +7,10 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateStarterCardEvent extends Event{
+public class UpdateStarterCardEvent extends Event {
     private final int playerIndex;
     private final int cardId;
     private final Side side;
-
 
 
     public UpdateStarterCardEvent(GameState gameState, ArrayList<VirtualView> clients, int playerIndex, int cardId, Side side) {
@@ -24,7 +23,7 @@ public class UpdateStarterCardEvent extends Event{
 
     @Override
     public void execute() {
-        for (VirtualView client: clients) {
+        for (VirtualView client : clients) {
             try {
                 client.updateStarterCard(playerIndex, cardId, side);
             } catch (RemoteException e) {

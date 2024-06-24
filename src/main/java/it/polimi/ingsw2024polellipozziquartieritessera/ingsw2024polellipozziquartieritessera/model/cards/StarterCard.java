@@ -1,12 +1,12 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongInstanceTypeException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.Challenge;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Starter Card class
@@ -19,9 +19,10 @@ public class StarterCard extends CornerCard {
 
     /**
      * Starter Card Constructor
-     * @param id Card identifier
-     * @param frontCorners Front corners array
-     * @param backCorners Back corners array
+     *
+     * @param id             Card identifier
+     * @param frontCorners   Front corners array
+     * @param backCorners    Back corners array
      * @param centerResource Center resources of the front side array
      */
     public StarterCard(int id, Corner[] frontCorners, Corner[] backCorners, ArrayList<Element> centerResource) {
@@ -49,19 +50,19 @@ public class StarterCard extends CornerCard {
         throw new WrongInstanceTypeException("called a method on starter card that is implemented only on Resource or Gold card");
     }
 
-    public ArrayList<Element> getUncoveredElements(Side side){
-        // resource array initialization
+    public ArrayList<Element> getUncoveredElements(Side side) {
+        // Initialize ArrayList to store uncovered resources
         ArrayList<Element> uncoveredResources = new ArrayList<>();
 
-        // set corners resources
-        for (Corner corner : this.getUncoveredCorners(side)){
-            if(corner.getElement() != Element.EMPTY){
+        // Add resources of uncovered corners
+        for (Corner corner : this.getUncoveredCorners(side)) {
+            if (corner.getElement() != Element.EMPTY) {
                 uncoveredResources.add(corner.getElement());
             }
         }
 
-        // add center resources if on front side
-        if (side == Side.FRONT){
+        // If the card is on the front side, add center resources to uncoveredResources
+        if (side == Side.FRONT) {
             uncoveredResources.addAll(centerResources);
         }
 

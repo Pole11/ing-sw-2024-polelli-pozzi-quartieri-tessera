@@ -3,10 +3,10 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateGamePhaseEvent;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
-import java.util.ArrayList;
-
+/**
+ * Enumeration of the phases of the game
+ */
 public enum GamePhase {
     NICKNAMEPHASE,
     CHOOSESTARTERSIDEPHASE,
@@ -17,13 +17,23 @@ public enum GamePhase {
     FINALPHASE, // calculate points and declare winner
     TIMEOUT; //there is one or zero player connected
 
-    public void changePhase(GameState gameState){
+    /**
+     * Changes the current game phase to the next phase.
+     *
+     * @param gameState The current game state.
+     */
+    public void changePhase(GameState gameState) {
+        // Determine the next game phase
         GamePhase nextPhase = GamePhase.values()[this.ordinal() + 1];
-        synchronized (gameState.getEventQueue()){
+
+        synchronized (gameState.getEventQueue()) {
+            // Add event to the event queue and notify all waiting threads
             gameState.addToEventQueue(new UpdateGamePhaseEvent(gameState, gameState.allConnectedClients(), nextPhase));
             gameState.getEventQueue().notifyAll();
         }
+
+        // Update the current game phase
         gameState.setCurrentGamePhase(nextPhase);
-        System.out.println("the gamePhase has changed: " + nextPhase);
+        System.out.println("The game phase has changed: " + nextPhase);
     }
 }

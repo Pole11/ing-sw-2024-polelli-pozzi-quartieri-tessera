@@ -1,27 +1,38 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateGamePhaseEvent;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateTurnPhaseEvent;
 
+/**
+ * Enumeration of the turn actions
+ */
 public enum TurnPhase {
     PLACINGPHASE,
     DRAWPHASE;
 
-
-    public void changePhase(GameState gameState){
-        //TOOD: non cambia bene, mantiene lo stesso
+    /**
+     * Changes the phase of the game.
+     *
+     * @param gameState The current game state.
+     */
+    public void changePhase(GameState gameState) {
         TurnPhase nextPhase;
-        if (this.equals(PLACINGPHASE)){
+
+        // Determine the next phase based on the current phase
+        if (this.equals(PLACINGPHASE)) {
             nextPhase = DRAWPHASE;
         } else {
             nextPhase = PLACINGPHASE;
         }
-        synchronized (gameState.getEventQueue()){
+
+        // Add an event to the event queue to update the turn phase
+        synchronized (gameState.getEventQueue()) {
             gameState.addToEventQueue(new UpdateTurnPhaseEvent(gameState, gameState.allConnectedClients(), nextPhase));
             gameState.getEventQueue().notifyAll();
         }
+
+        // Set the current game turn to the next phase
         gameState.setCurrentGameTurn(nextPhase);
-        System.out.println("the turnPhase has changed: " + nextPhase);
+        System.out.println("The turn phase has changed: " + nextPhase);
     }
 }

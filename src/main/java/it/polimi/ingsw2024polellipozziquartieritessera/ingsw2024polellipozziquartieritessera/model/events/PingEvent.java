@@ -6,7 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class PingEvent extends Event{
+public class PingEvent extends Event {
 
     public PingEvent(GameState gameState, ArrayList<VirtualView> clients) {
         super(gameState, clients);
@@ -15,7 +15,7 @@ public class PingEvent extends Event{
 
     @Override
     public void execute() {
-        for (VirtualView clientIterator : this.clients){
+        for (VirtualView clientIterator : this.clients) {
             try {
                 clientIterator.ping("ping");
             } catch (RemoteException e) {

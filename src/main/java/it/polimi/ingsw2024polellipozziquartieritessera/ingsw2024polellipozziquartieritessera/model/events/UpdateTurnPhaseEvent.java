@@ -7,7 +7,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateTurnPhaseEvent extends Event{
+public class UpdateTurnPhaseEvent extends Event {
     private final TurnPhase turnPhase;
 
     public UpdateTurnPhaseEvent(GameState gameState, ArrayList<VirtualView> clients, TurnPhase turnPhase) {
@@ -17,7 +17,7 @@ public class UpdateTurnPhaseEvent extends Event{
 
     @Override
     public void execute() {
-        for (VirtualView client: clients) {
+        for (VirtualView client : clients) {
             try {
                 client.updateTurnPhase(turnPhase);
             } catch (RemoteException e) {

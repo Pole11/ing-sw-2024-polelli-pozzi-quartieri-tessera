@@ -1,13 +1,13 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
 
 /**
  * Corner class
  */
 public class Corner {
     /**
-     * Contains the resource/item on the corner (empty if has no element)
+     * Contains the resource/item on the corner (empty if it has no element)
      */
     private final Element element;
     /**
@@ -31,9 +31,10 @@ public class Corner {
 
     /**
      * Corner Constructor
+     *
      * @param element Element given by the corner
-     * @param cardId Parent card identifier
-     * @param hidden Hidden corner specifier
+     * @param cardId  Parent card identifier
+     * @param hidden  Hidden corner specifier
      */
     public Corner(Element element, int cardId, Boolean hidden) {
         covered = false;
