@@ -108,7 +108,7 @@ public class CLIController {
 
     public void manageInput(VirtualServer server, VirtualView client, Client clientContainer, String[] message) throws RemoteException {
         //
-        if (message[0].equalsIgnoreCase("PING")){
+        if (message[0].equalsIgnoreCase("PING") || message[0].equalsIgnoreCase("GAMEENDED")){
             System.err.print("INVALID COMMAND\n> ");
             return;
         }
@@ -171,7 +171,7 @@ public class CLIController {
         AtomicInteger i = new AtomicInteger();
         System.out.print("The possible commands are: \n[");
         Arrays.stream(Command.values()).forEach(e->{
-            if (!e.equals(Command.PING)){
+            if (!e.equals(Command.PING) && !e.equals(Command.GAMEENDED)){
                 System.out.print(e + " ");
                 if(i.incrementAndGet() % 5 == 0)
                     System.out.print("]\n[");
