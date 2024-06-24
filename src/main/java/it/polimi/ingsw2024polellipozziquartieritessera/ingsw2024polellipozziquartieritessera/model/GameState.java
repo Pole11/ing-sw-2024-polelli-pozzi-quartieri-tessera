@@ -261,24 +261,15 @@ public class GameState {
                     try {
                         eventQueue.wait();
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        System.out.println("interrupted");
+                        System.out.println("execute events interrupted");
                         return;
                     }
                 }
 
-                //System.out.println("exited from while");
-
-                if (!executeEventRunning){
-                    break;
-                }
-
                 event = eventQueue.remove();
-
 
             }
             Populate.saveState(this);
-            //System.out.println(event);
             event.execute();
         }
     }
@@ -347,7 +338,8 @@ public class GameState {
                                 }
                                 playerDisconnected(j);
                             }
-                        } catch (InterruptedException e) {}
+                        } catch (InterruptedException e) {
+                        }
                     }));
                     playerThreads.get(i).start();
                 }
@@ -360,6 +352,7 @@ public class GameState {
                 //wait to ping another time
                 Thread.sleep(1000*Config.NEXT_PING_TIME);
             } catch (InterruptedException e) {
+                pingRunning = false;
                 break;
             }
         }
@@ -379,7 +372,7 @@ public class GameState {
             try {
                 playerThreads.get(getPlayerIndex(client)).join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("playerThread interrupted from outside");
             }
         }
     }
@@ -467,11 +460,7 @@ public class GameState {
                     eventQueue.add(new UpdateElementsEvent(this, clients, finalI, e, elements.get(e)));
                 });
             }
-            // send Starter card
-/*            if (reconnectingPlayer.getStarterCard() != null) {
-                Side starterSide = reconnectingPlayer.getPlacedCardSide(reconnectingPlayer.getStarterCard().getId());
-                eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), reconnectingPlayer.getStarterCard().getId(), starterSide));
-            }*/
+
             //send common objectives
             if (gamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
                 ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();
@@ -491,8 +480,7 @@ public class GameState {
                 secretObjectives.add(reconnectingPlayer.getObjectiveCardOption(1));
                 eventQueue.add(new UpdateSecretObjectiveEvent(this, clients, secretObjectives));
             }
-            // send gamePhase and turnPhase if exists
-            //eventQueue.add(new UpdateGamePhaseEvent(this, clients, gamePhase));
+            // send turnPhase if exists
             if (gamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
                 eventQueue.add(new UpdateTurnPhaseEvent(this, clients, currentGameTurn));
             }
@@ -541,20 +529,24 @@ public class GameState {
                     synchronized (players) {
                         winners = (ArrayList<Integer>) players.stream().filter(Player::isConnected).map(this::getPlayerIndex).collect(Collectors.toList());
                     }
-                    synchronized (eventQueue) {
-                        eventQueue.add(new GameEndedEvent(this, allConnectedClients(), winners));
-                        eventQueue.notifyAll();
-                    }
+                    System.out.println("I am timeout ended");
+                    gameEnded(winners);
                     System.out.println("game ended after timeout expired");
-                    restart();
                 } catch (InterruptedException e) {
                     System.out.println("timout ended");
                 }
             });
             timeoutThread.start();
         } else {
-            if (currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
-                if (currentPlayerIndex == index){
+            switch (currentGamePhase){
+                case CHOOSESTARTERSIDEPHASE -> setStarterSide(index, Side.BACK);
+                //choose between the availables
+                case CHOOSECOLORPHASE -> setColor(index, Arrays.stream(Color.values()).filter(e-> !players.stream().map(Player::getColor).toList().contains(e)).findFirst().get());
+                case CHOOSEOBJECTIVEPHASE -> setSecretObjective(index, 0);
+            }
+
+            if (currentPlayerIndex == index){
+                if (currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
                     if (currentGameTurn.equals(TurnPhase.DRAWPHASE)){
                         ResourceCard newResourceCard = null;
                         try {
@@ -565,8 +557,8 @@ public class GameState {
                         Player currentPlayer = getPlayer(index);
                         currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
                     }
+                    currentGameTurn = TurnPhase.DRAWPHASE;
                     changeCurrentPlayer();
-                    currentGameTurn = TurnPhase.PLACINGPHASE;
                 }
             }
         }
@@ -708,7 +700,6 @@ public class GameState {
 
         if (currentGamePhase.equals(GamePhase.NICKNAMEPHASE)){
             players.add(player);
-            System.out.println(player.getClient());
             playerThreads.add(new Thread());
             synchronized (eventQueue) {
                 eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
@@ -862,6 +853,14 @@ public class GameState {
      * @param color Color chosen
      */
     public void setColor(int playerIndex, Color color) {//method called by view when the player chooses the side
+        //this is runned when a player select the color, all the other player not connected select it automatically
+        players.stream().filter(e -> !e.isConnected() && e.getColor() == null).forEach(e->{
+            e.setColor(Arrays.stream(Color.values()).filter(p-> !players.stream().map(Player::getColor).toList().contains(p)).findFirst().get());
+            this.answered.put(getPlayerIndex(e), true);
+            System.out.println(e.getNickname() + " chose his color, the number of answered is: " + numberAnswered());
+        });
+
+
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
             synchronized (eventQueue) {
@@ -883,7 +882,7 @@ public class GameState {
         }
         player.setColor(color);
         this.answered.put(playerIndex, true);
-        System.out.println(playerIndex + " chose his color, the number of answered is: " + numberAnswered());
+        System.out.println(getPlayer(playerIndex).getNickname() + " chose his color, the number of answered is: " + numberAnswered());
 
 
         if (numberAnswered() == players.size()) {
@@ -964,6 +963,13 @@ public class GameState {
      */
     //called from controller
     public void setSecretObjective(int playerIndex, int cardIndex) {
+        //this is runned when a player select the objective, all the other player not connected select it automatically
+        players.stream().filter(e -> !e.isConnected() && e.getObjectiveCard() == null).forEach(e->{
+            e.setObjectiveCard(e.getObjectiveCardOption(0));
+            this.answered.put(getPlayerIndex(e), true);
+            System.out.println(e.getNickname() + " chose his objective, the number of ansewred is: " + numberAnswered());
+        });
+
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
             synchronized (eventQueue) {
@@ -983,7 +989,7 @@ public class GameState {
 
         player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
         this.answered.put(playerIndex, true);
-        System.out.println(playerIndex + " chose his objective, the number of ansewred is: " + numberAnswered());
+        System.out.println(getPlayer(playerIndex).getNickname() + " chose his objective, the number of ansewred is: " + numberAnswered());
 
 
         if (numberAnswered() == players.size()) {
@@ -1117,15 +1123,16 @@ public class GameState {
             // first endphase entering: player reach 20 points
             for (Player player : this.players) {
                 if (player.getPoints() >= Config.POINTSTOENDPHASE) {
-                    currentGamePhase = GamePhase.ENDPHASE;
+                    currentGamePhase.changePhase(this);
                     break;
                 }
             }
             // second endphase entering: all decks are empty
             if (this.getMainBoard().isResourceDeckEmpty() && this.getMainBoard().isGoldDeckEmpty()){
-                currentGamePhase = GamePhase.ENDPHASE;
+                currentGamePhase.changePhase(this);
             }
 
+            //inizialize turnToPlay
             if (currentGamePhase.equals(GamePhase.ENDPHASE)) {
 
                 if (currentPlayerIndex == 0) {
@@ -1138,11 +1145,11 @@ public class GameState {
 
         // switch to final phase
         if (turnToPlay == 0) {
-            currentGamePhase = GamePhase.FINALPHASE;
+            currentGamePhase.changePhase(this);
 
-            synchronized (eventQueue){
-                this.getEventQueue().notifyAll();
-            }
+//            synchronized (eventQueue){
+//                this.getEventQueue().notifyAll();
+//            }
 
             calculateFinalPoints();
             ArrayList<Integer> winners;
@@ -1152,12 +1159,7 @@ public class GameState {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
-
-            synchronized (eventQueue) {
-                eventQueue.add(new GameEndedEvent(this, allConnectedClients(), winners));
-                eventQueue.notifyAll();
-            }
-            // restart();
+            gameEnded(winners);
         }
     }
 
@@ -1226,18 +1228,30 @@ public class GameState {
         return (winnerPlayerIndeces);
     }
 
-    private void restart(){
-        pingRunning = false;
-        executeEventRunning = false;
-        executeEvents.interrupt();
-        try {
-            executeEvents.join();
-        } catch (InterruptedException ignored) {
-            ignored.printStackTrace();
-        }
+    private void gameEnded(ArrayList<Integer> winners){
         playerThreads.forEach(Thread::interrupt);
+        pingRunning = false;
         pingThread.interrupt();
-        server.restart();
+        synchronized (eventQueue){
+            eventQueue.clear();
+            //eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), GamePhase.FINALPHASE));
+            eventQueue.add(new GameEndedEvent(this, allConnectedClients(), winners));
+            eventQueue.notifyAll();
+        }
+        //executeEventRunning = false;
+        executeEvents.interrupt();
+
+
+        /*synchronized (eventQueue){
+            if (eventQueue.isEmpty()){
+                executeEvents.interrupt();
+            } else {
+                synchronized (eventQueue) {
+                    executeEventRunning = false;
+                    eventQueue.notifyAll();
+                }
+            }
+        }*/
 
         System.out.println(executeEvents.getState());
         System.out.println(pingThread.getState());
@@ -1254,11 +1268,16 @@ public class GameState {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
 
-        Thread.currentThread().interrupt();
-
-
-        System.out.println("---------GAME RESTARTED------");
+    public void clientEnded(VirtualView client){
+        System.out.println("client " + getPlayer(getPlayerIndex(client)).getNickname() + " ended");
+        answered.put(getPlayerIndex(client), true);
+        if (numberAnswered() >= allConnectedClients().size()){
+            server.restart();
+            Thread.currentThread().interrupt();
+            System.out.println("---------GAME RESTARTED------");
+        }
     }
 
 //------------ chat ---------------

@@ -190,6 +190,7 @@ public class Server implements VirtualServer {
         if (!checkConnected(client)) return;
         int playerIndex = getPlayerIndex(client);
 
+
         if (
             (controller.getGamePhase().equals(GamePhase.MAINPHASE) || controller.getGamePhase().equals(GamePhase.ENDPHASE)) &&
             (controller.getTurnPhase().equals(TurnPhase.DRAWPHASE)) &&
@@ -201,6 +202,8 @@ public class Server implements VirtualServer {
                 client.sendError("Too many cards in hand");
             } catch (EmptyDeckException e) {
                 client.sendError("The deck is empty");
+            } catch (EmptyMainBoardException e){
+                client.sendError("The main board is empty");
             }
         }
         else{
@@ -232,6 +235,11 @@ public class Server implements VirtualServer {
     @Override
     public void ping(VirtualView client) throws RemoteException {
         this.controller.ping(client);
+    }
+
+    @Override
+    public void gameEnded(VirtualView client) throws RemoteException {
+        this.controller.gameEnded(client);
     }
 
     private boolean checkConnected(VirtualView client) throws RemoteException {

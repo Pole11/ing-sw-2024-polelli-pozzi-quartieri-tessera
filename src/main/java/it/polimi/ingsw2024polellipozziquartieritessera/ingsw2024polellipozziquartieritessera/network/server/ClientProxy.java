@@ -133,6 +133,7 @@ public class ClientProxy implements VirtualView {
 
     @Override
     public void updateWinner(ArrayList<Integer> playerIndexes) throws RemoteException {
+        System.out.println("updatewinner in client Proxy");
         String message = Messages.UPDATEWINNER.toString();
         for (int playerIndex : playerIndexes) {
             message += "; " + playerIndex;

@@ -335,7 +335,7 @@ public class GUIControllerGame extends GUIController {
                 //nicknameText.getStyleClass().add("nicknameText");
                 Button expandButton = new Button("Expand Board");
                 expandButton.setOnMousePressed(mouseEvent -> {
-                    HashMap<String, Integer> paramsMap = new HashMap<>();
+                    HashMap<String, Object> paramsMap = new HashMap<>();
                     paramsMap.put("playerId", playerId);
                     System.out.println(playerId);
                     goToScene("/fxml/board.fxml", paramsMap);

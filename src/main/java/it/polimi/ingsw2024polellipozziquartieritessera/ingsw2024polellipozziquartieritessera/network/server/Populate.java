@@ -195,8 +195,17 @@ public class Populate {
             players.add(createPlayerSave(gameState.getPlayer(i)));
         }
 
+        ArrayList<HashMap<String , Object>> messages = new ArrayList<>();
+        gameState.getChat().getMessages().stream().forEach(e->{
+            HashMap<String, Object> message = new HashMap<>();
+            message.put("author", e.getAuthor());
+            message.put("content", e.getContent());
+            messages.add(message);
+        });
+
+
         saveMap.put("mainBoard", mainBoard);
-        saveMap.put("chat", "bohNonC'èLaChat");
+        saveMap.put("chat", messages);
         saveMap.put("players", players);
         saveMap.put("currentPlayerIndex", gameState.getCurrentPlayerIndex());
         saveMap.put("currentGamePhase", gameState.getCurrentGamePhase().toString());
@@ -305,8 +314,17 @@ public class Populate {
         gameState.getMainBoard().setResourceDeck(resourceDeck);
 
 
+        //restore chat
+        ArrayList chat = (ArrayList) jsonState.get("chat");
+        chat.stream().forEach(e->{
+            gameState.getChat().addMessage( (int) ((HashMap) e).get("author"), (String) ((HashMap) e).get("content"));
+        });
+
         //restore players
         ArrayList<?> players = (ArrayList<?>) jsonState.get("players");
+        if (players.isEmpty()){
+            System.out.println("the players are empty");
+        }
         for (int i = 0; i < players.size(); i++){
             Map playerJson = (Map) players.get(i);
             Player player = new Player((String) playerJson.get("nickname"), null, gameState);

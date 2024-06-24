@@ -27,7 +27,7 @@ public class GUIControllerBoard extends GUIController {
     public void printBoard() {
         Platform.runLater(() -> {
             ViewModel vm = getViewModel();
-            int playerId = getParamsMap().get("playerId");
+            int playerId = (Integer) getParamsMap().get("playerId");
             ArrayList<ArrayList<Integer>> playerBoard = vm.getPlayerBoard(playerId); // the first arg is the index of the player to print the board of
 
             for (int i = 0; i < playerBoard.size(); i++) {
@@ -103,7 +103,7 @@ public class GUIControllerBoard extends GUIController {
         Platform.runLater(() -> {
             int cornerWidth = (int) (getWindowHeight() * 0.0304);
             int cornerHeight = (int) (getWindowHeight() * 0.0310);
-            int playerId = getParamsMap().get("playerId");
+            int playerId = (Integer) getParamsMap().get("playerId");
 
             ViewModel vm = getViewModel();
             ArrayList<ArrayList<Integer>> playerBoard = vm.getPlayerBoard(playerId); // the first arg is the index of the player to print the board of

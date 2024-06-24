@@ -28,7 +28,9 @@ public enum Command {
      SHOWPOINTS(ShowPointsCommandRunnable::new, "Local"),
      SHOWSECRETOBJECTIVES(ShowSecretObjectiveCommandRunnable::new, "Local"),
      OPENCHAT(OpenChatCommandRunnable::new, "Local"),
-     START(StartCommandRunnable::new, "Network");
+     START(StartCommandRunnable::new, "Network"),
+     GAMEENDED(GameEndedCommandRunnable::new, "Network");
+
 
      private final Supplier<? extends CommandRunnable> commandSupplier;
 

@@ -63,7 +63,6 @@ public class SocketClient implements VirtualView {
         String line;
         // Read message type
         while ((line = input.readLine()) != null) {
-            //System.out.println(line);
             String[] messageString = line.split("; ");
             Messages message = Messages.valueOf(messageString[0]);
             switch (message) {

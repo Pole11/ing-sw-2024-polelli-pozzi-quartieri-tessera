@@ -213,17 +213,24 @@ public class Board {
      * Get a card from the shared golds, removing it from the shared golds
      * @param pos Position of the shared gold card (1-2)
      * @return Gold card drawn
-     * @throws EmptyDeckException Deck is empty
+     * @throws EmptyMainBoardException A Card in the main board is not present
      */
-    public GoldCard drawSharedGoldCard(int pos) throws EmptyDeckException {
+    public GoldCard drawSharedGoldCard(int pos) throws EmptyMainBoardException {
         // verify position is valid
         if (pos < 1 || pos > this.sharedGoldCards.length) {
             throw new IllegalArgumentException("invalid position: " + pos);
         }
+        if (this.sharedGoldCards[pos-1] == null){
+            throw new EmptyMainBoardException("This shared gold card is not present");
+        }
         // get the card
         GoldCard drawnCard = this.sharedGoldCards[pos - 1];
         // replace card in shared
-        this.sharedGoldCards[pos - 1] = drawFromGoldDeck();
+        try {
+            this.sharedGoldCards[pos - 1] = drawFromGoldDeck();
+        } catch (EmptyDeckException e) {
+            this.sharedGoldCards[pos - 1] = null;
+        }
         // return the specified card
         return drawnCard;
     }
@@ -232,17 +239,24 @@ public class Board {
      * Get a card from the shared resources, removing it from the shared resources
      * @param pos Position of the shared resource card (1-2)
      * @return Resource card drawn
-     * @throws EmptyDeckException Deck is empty
+     * @throws EmptyMainBoardException A Card in the main board is not present
      */
-    public ResourceCard drawSharedResourceCard(int pos) throws EmptyDeckException {
+    public ResourceCard drawSharedResourceCard(int pos) throws EmptyMainBoardException {
         // verify position is valid
         if (pos < 1 || pos > this.sharedResourceCards.length) {
             throw new IllegalArgumentException("Invalid position: " + pos);
         }
+        if (this.sharedResourceCards[pos-1] == null){
+            throw new EmptyMainBoardException("This shared gold card is not present");
+        }
         // get the specified card
         ResourceCard drawnCard = this.sharedResourceCards[pos - 1];
         // replace card in shared
-        this.sharedResourceCards[pos - 1] = drawFromResourceDeck();
+        try {
+            this.sharedResourceCards[pos - 1] = drawFromResourceDeck();
+        } catch (EmptyDeckException e) {
+            this.sharedGoldCards[pos - 1] = null;
+        }
         // return the card
         return drawnCard;
     }

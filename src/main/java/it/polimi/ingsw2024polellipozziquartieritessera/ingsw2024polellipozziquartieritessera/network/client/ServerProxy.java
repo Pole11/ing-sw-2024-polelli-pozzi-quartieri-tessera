@@ -80,4 +80,10 @@ public class ServerProxy implements VirtualServer {
         output.println(Command.PING);
         output.flush();
     }
+
+    @Override
+    public void gameEnded(VirtualView client) throws RemoteException {
+        output.println(Command.GAMEENDED);
+        output.flush();
+    }
 }

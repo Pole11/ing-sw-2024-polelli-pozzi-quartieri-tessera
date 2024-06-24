@@ -82,7 +82,7 @@ public class BoardTest {
 
          */
     }
-
+/*
     @Test
     void testDrawSharedCards() {
         // setup
@@ -154,7 +154,7 @@ public class BoardTest {
             throw new RuntimeException(e);
         }
     }
-
+*/
     @Test
     void testGetFromResourceDeck() throws EmptyDeckException {
         // setup

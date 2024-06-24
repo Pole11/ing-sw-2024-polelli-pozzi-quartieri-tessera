@@ -26,5 +26,6 @@
         <Label
                 fx:id="serverErrorLabel"
                 styleClass="serverError"/>
+        <Button onAction="#handleBackToLogin" text="Back to Login"/>
     </VBox>
 </GridPane>

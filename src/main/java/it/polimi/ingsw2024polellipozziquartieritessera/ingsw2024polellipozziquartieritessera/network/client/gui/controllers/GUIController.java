@@ -6,6 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.GameEndedCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
@@ -47,12 +48,14 @@ abstract public class GUIController {
     private Client clientContainer;
     private ViewModel viewModel;
     private boolean isSceneLoaded = false;
-    private HashMap<String, Integer> paramsMap;
+    private HashMap<String, Object> paramsMap;
     private double pressedX;
     private double pressedY;
     private MediaPlayer mediaPlayer;
     private int windowHeight = 920;
     RingBuffer<Image> imageRingBuffer;
+
+    private boolean executeCommandRunning;
 
     @FXML
     private void initialize() {
@@ -72,8 +75,51 @@ abstract public class GUIController {
 
     public GUIController() {
         this.commandQueue = new ArrayDeque();
+        executeCommandRunning = true;
+        restartExecuteCommand();
+    }
+
+    public void restartExecuteCommand(){
+        System.out.println("restartExecuteCommand in guii");
+        if (executeCommands != null && executeCommands.isAlive()){
+            //executeCommandRunning = false;
+            executeCommands.interrupt();
+
+            /*if (commandQueue.isEmpty()){
+                executeCommands.interrupt();
+            } else {
+                synchronized (commandQueue) {
+                    executeCommandRunning = false;
+                    commandQueue.notifyAll();
+                }
+            }
+
+             */
+
+            try {
+                executeCommands.join();
+            } catch (InterruptedException ignored) {}
+
+
+
+        }
+        commandQueue.clear();
+        executeCommandRunning = true;
         this.executeCommands = new Thread(this::executeCommandsRunnable);
         this.executeCommands.start();
+    }
+
+    public void restart(VirtualView client, VirtualServer server){
+        System.out.println("restarting gui");
+        synchronized (commandQueue){
+            commandQueue.clear();
+            GameEndedCommandRunnable commandRunnable = new GameEndedCommandRunnable();
+            commandRunnable.setClient(client);
+            commandRunnable.setServer(server);
+            commandQueue.add(commandRunnable);
+            commandQueue.notifyAll();
+        }
+        restartExecuteCommand();
     }
 
     public int getWindowHeight() {
@@ -104,22 +150,28 @@ abstract public class GUIController {
         handleMuteButton.setText(getMediaPlayer().isMute() ? "Unmute" : "Mute");
     }
 
+
     private void executeCommandsRunnable() {
-        while (true) {
-            CommandRunnable command;
+        while (executeCommandRunning) {
+            CommandRunnable command = null;
             synchronized (commandQueue) {
                 while (commandQueue.isEmpty()) {
                     try {
                         commandQueue.wait();
                     } catch (InterruptedException e) {
+                        System.out.println("interrupted");
+                        return;
                     }
                 }
+
                 command = commandQueue.remove();
-                commandQueue.notifyAll();
+                //commandQueue.notifyAll();
             }
             command.executeGUI();
         }
     }
+
+
 
     public void addCommand(CommandRunnable command, GUIController guiController) {
         command.setClient(getClient());
@@ -245,15 +297,15 @@ abstract public class GUIController {
         GUIApplication.changeScene(fxml);
     }
 
-    public void goToScene(String fxml, HashMap<String, Integer> paramsMap) {
+    public void goToScene(String fxml, HashMap<String, Object> paramsMap) {
         GUIApplication.changeScene(fxml, paramsMap);
     }
 
-    public HashMap<String, Integer> getParamsMap() {
+    public HashMap<String, Object> getParamsMap() {
         return paramsMap;
     }
 
-    public void setParamsMap(HashMap<String, Integer> paramsMap) {
+    public void setParamsMap(HashMap<String, Object> paramsMap) {
         this.paramsMap = paramsMap;
     }
 
@@ -446,7 +498,8 @@ abstract public class GUIController {
 
     // Method to show a simple alert
     public void showAlert(Alert.AlertType alertType, String title, String content) {
-        Alert alert = new Alert(alertType);
+        Alert alert = null;
+        alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);

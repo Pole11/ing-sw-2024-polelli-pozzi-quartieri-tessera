@@ -18,10 +18,30 @@ public class UpdateMainBoardEvent extends Event{
 
     @Override
     public void execute() {
-        int sharedGoldCard1 = mainBoard.getSharedGoldCard(0).getId();
-        int sharedGoldCard2 = mainBoard.getSharedGoldCard(1).getId();
-        int sharedResourceCard1 = mainBoard.getSharedResourceCard(0).getId();
-        int sharedResourceCard2 = mainBoard.getSharedResourceCard(1).getId();
+        int sharedGoldCard1;
+        try {
+            sharedGoldCard1 = mainBoard.getSharedGoldCard(0).getId();
+        } catch (NullPointerException e) {
+            sharedGoldCard1 = -1;
+        }
+        int sharedGoldCard2;
+        try{
+            sharedGoldCard2 = mainBoard.getSharedGoldCard(1).getId();
+        } catch (NullPointerException e) {
+            sharedGoldCard2 = -1;
+        }
+        int sharedResourceCard1;
+        try {
+            sharedResourceCard1 = mainBoard.getSharedResourceCard(0).getId();
+        } catch (NullPointerException e) {
+            sharedResourceCard1 = -1;
+        }
+        int sharedResourceCard2;
+        try{
+            sharedResourceCard2 = mainBoard.getSharedResourceCard(1).getId();
+        } catch (NullPointerException e) {
+            sharedResourceCard2 = -1;
+        }
         int firtGoldDeckCard;
         try {
             firtGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
