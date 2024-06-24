@@ -24,7 +24,7 @@ public class Config {
 
     public static final String GAME_STATE_PATH = "/rescue.json";
     public static final String CARD_JSON_PATH = "/cards.json";
-    public static final String TITLE_CLI_PATH = "/src/main/resources/img/TitleCLI.txt";
+    public static final String TITLE_CLI_PATH = "/img/TitleCLI.txt";
 
 }
 
