@@ -42,11 +42,11 @@ public class UpdateMainBoardEvent extends Event {
         } catch (NullPointerException e) {
             sharedResourceCard2 = -1;
         }
-        int firtGoldDeckCard;
+        int firstGoldDeckCard;
         try {
-            firtGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
+            firstGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
         } catch (NoSuchElementException e){
-            firtGoldDeckCard = -1;
+            firstGoldDeckCard = -1;
         }
         int firstResourceDeckCard;
         try {
