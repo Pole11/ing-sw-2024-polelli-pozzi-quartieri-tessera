@@ -15,6 +15,7 @@ public class AdduserCommandRunnable extends CommandRunnable{
         try {
             try {
                 String username = String.join(" ", Arrays.copyOfRange(messageFromCli, 1, messageFromCli.length));
+                System.out.println(username);
                 if (checkNickname(username)){
                     if (clientContainer != null){
                         clientContainer.resetViewModel();
@@ -36,10 +37,10 @@ public class AdduserCommandRunnable extends CommandRunnable{
     public void executeGUI() {
         try {
             if (checkNickname(nickname)){
-                server.addConnectedPlayer(client, this.nickname);
                 if (clientContainer != null){
                     clientContainer.resetViewModel();
                 }
+                server.addConnectedPlayer(client, this.nickname);
             } else {
                 guiController.setServerError("To reconnect use your previous nickname");
             }
