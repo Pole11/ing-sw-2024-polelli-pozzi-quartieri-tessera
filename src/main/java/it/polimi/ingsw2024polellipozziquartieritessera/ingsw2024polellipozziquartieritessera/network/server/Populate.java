@@ -342,8 +342,12 @@ public class Populate {
             Player player = new Player((String) playerJson.get("nickname"), null, gameState);
 
             player.setConnected(false);
-            player.addPoints( (int) playerJson.get("points"));
-            player.setPlayerBoard((ArrayList<ArrayList<Integer>>) playerJson.get("playerBoard"));
+            player.addPoints((int) playerJson.get("points"));
+            Object playerBoardObj = playerJson.get("playerBoard");
+            System.out.println(playerBoardObj);
+            ArrayList<ArrayList<Integer>> playerBoardArrayList = (ArrayList<ArrayList<Integer>>) playerBoardObj;
+            System.out.println(playerBoardArrayList);
+            player.setPlayerBoard(playerBoardArrayList);
 
 
             Map<?, ?> handJson = (Map<?, ?>) playerJson.get("handCardsMap");

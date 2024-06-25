@@ -264,7 +264,7 @@ public class Player {
     }
 
     public void setPlayerBoard(ArrayList<ArrayList<Integer>> playerBoard) {
-        this.playerBoard = playerBoard;
+        this.playerBoard = new ArrayList<>(playerBoard);
     }
 
     public void setPlacedCardsMap(HashMap<Integer, Side> placedCardsMap) {

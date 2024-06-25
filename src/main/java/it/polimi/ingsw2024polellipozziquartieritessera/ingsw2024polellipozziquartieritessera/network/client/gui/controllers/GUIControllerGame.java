@@ -369,6 +369,8 @@ public class GUIControllerGame extends GUIController {
                         tempImageView = createCardImageView("/img/carte_retro/" + cardId + ".jpg", (int) (getWindowHeight()*0.1));
                     }
                     if (tempImageView == null) continue;
+
+                    // get the temp image from the fxml
                     tempImageView.setId("player" + playerId + "card" + cardId);
                     //tempImageView.getStyleClass().add("imageWithBorder");
                     if (handContainer != null) handContainer.getChildren().add(tempImageView);

@@ -418,7 +418,7 @@ public class Client implements VirtualView {
             HashMap<String, Object> params = new HashMap<>();
             ArrayList<String> playerNicknames = new ArrayList<>();
             playerIndexes.stream().map(e-> viewModel.getNickname(e)).forEach(playerNicknames::add);
-            params.put("playerIndexes", playerNicknames);
+            params.put("playerNicknames", playerNicknames);
             guiApplication.changeScene("/fxml/final.fxml", params);
         }
         System.out.println("---------GAME ENDED----------");

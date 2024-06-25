@@ -13,7 +13,7 @@ public class GUIControllerFinal extends GUIController {
     Text winnerText;
 
     public GUIControllerFinal() {
-        //this.update();
+        this.update();
     }
 
     @FXML
@@ -25,16 +25,15 @@ public class GUIControllerFinal extends GUIController {
     public void update() {
         Platform.runLater(() -> {
             HashMap<String, Object> params = getParamsMap();
-            ArrayList<String> playerIndexes = (ArrayList<String>) params.get("playerIndexes");
+            ArrayList<String> playerNicknames = (ArrayList<String>) params.get("playerNicknames");
 
             String text;
-            System.out.println(playerIndexes);
-            if (playerIndexes.size() == 1){
-                text = "The winner is " + playerIndexes.getFirst();
+            if (playerNicknames.size() == 1){
+                text = "The winner is " + playerNicknames.getFirst();
             } else {
                 text = "The winners are ";
-                for (int i = 0; i < playerIndexes.size(); i++) {
-                    text += playerIndexes.get(i) + " ";
+                for (int i = 0; i < playerNicknames.size(); i++) {
+                    text += playerNicknames.get(i) + " ";
                 }
             }
 
