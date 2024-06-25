@@ -261,6 +261,12 @@ public class Client implements VirtualView {
 
     @Override
     public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
+        if (playerIndex == -1) { // me stesso
+            System.out.println("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>\n> ");
+            viewModel = new ViewModel();
+            guiApplication.changeScene("/fxml/lobby.fxml");
+            return;
+        }
         viewModel.setConnection(playerIndex, connected);
         if (playerIndex == viewModel.getPlayerIndex()){
             if (connected){

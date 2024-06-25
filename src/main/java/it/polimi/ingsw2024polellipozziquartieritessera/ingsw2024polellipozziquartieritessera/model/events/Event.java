@@ -43,7 +43,7 @@ public abstract class Event {
      */
     public void playerDisconnected(VirtualView client){
         if (gameState.getPlayer(gameState.getPlayerIndex(client)).isConnected()){
-            System.out.println("Client " + gameState.getPlayerIndex(client) + " disconnected");
+            System.out.println("Client " + gameState.getPlayer(gameState.getPlayerIndex(client)).getNickname() + " disconnected");
             gameState.setPlayersConnected(gameState.getPlayerIndex(client), false);
             gameState.playerDisconnected(gameState.getPlayerIndex(client));
         }

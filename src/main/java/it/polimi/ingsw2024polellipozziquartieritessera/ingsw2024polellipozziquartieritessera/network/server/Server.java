@@ -245,6 +245,13 @@ public class Server implements VirtualServer {
     }
 
     private boolean checkConnected(VirtualView client) throws RemoteException {
+        boolean connected;
+        try{
+            connected = controller.isConnected(client);
+        } catch (IndexOutOfBoundsException e){
+            client.sendError("you don't exist, to reconnect login with ADDUSER <your previous nickname>");
+            client.connectionInfo(getPlayerIndex(client), false);
+        }
         if (!controller.isConnected(client)){
             client.sendError("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>");
             client.connectionInfo(getPlayerIndex(client), false);

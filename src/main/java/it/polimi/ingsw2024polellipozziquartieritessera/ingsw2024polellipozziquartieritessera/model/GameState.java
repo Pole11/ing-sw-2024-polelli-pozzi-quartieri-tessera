@@ -332,7 +332,7 @@ public class GameState {
                             //wait for the answer of players
                             Thread.sleep(1000*Config.WAIT_FOR_PING_TIME);
                             if (players.get(j).isConnected()){
-                                System.out.println("client "  + j + " disconnected");
+                                System.out.println("client "  + getPlayer(j).getNickname() + " disconnected");
                                 synchronized (players) {
                                     players.get(j).setConnected(false);
                                 }
