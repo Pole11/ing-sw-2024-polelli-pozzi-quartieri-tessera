@@ -112,6 +112,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException {
+        System.out.println(client + "   " + nickname);
         this.controller.addPlayer(client, nickname);
     }
 

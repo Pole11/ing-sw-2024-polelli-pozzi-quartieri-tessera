@@ -250,6 +250,7 @@ public class Client implements VirtualView {
 
     @Override
     public void nicknameUpdate(int playerIndex, String nickname) {
+        System.out.print(viewModel);
         viewModel.setNickname(playerIndex, nickname);
         viewModel.setConnection(playerIndex, true);
         viewModel.initializeElementMap(playerIndex);

@@ -665,7 +665,7 @@ public class GameState {
     public void addPlayer(String nickname, VirtualView client) {
         Player player = new Player(nickname, client, this);
         //if someone choose his nickname, he is inside the match, even if he is temporanely disconnected
-
+        System.out.println("i am in gamestate" + client + nickname);
         if (allConnectedClients().contains(client)) {
             synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "You already chose a nickname, you cannot change it"));
