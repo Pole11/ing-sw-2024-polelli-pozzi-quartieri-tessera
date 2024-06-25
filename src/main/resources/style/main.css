@@ -44,3 +44,7 @@ Button {
     -fx-padding: 10;
     -fx-background-color: white;
 }
+
+.pendingChatButton {
+    -fx-background-color: rgb(248, 134, 63);
+}

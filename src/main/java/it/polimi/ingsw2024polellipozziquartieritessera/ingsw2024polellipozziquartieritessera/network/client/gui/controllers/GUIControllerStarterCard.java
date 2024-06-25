@@ -71,6 +71,7 @@ public class GUIControllerStarterCard extends GUIController {
     public void update() {
         Platform.runLater(() -> {
             setStarterCardImage(getViewModel().getStarterCard());
+            populateChatListview();
         });
     }
 }

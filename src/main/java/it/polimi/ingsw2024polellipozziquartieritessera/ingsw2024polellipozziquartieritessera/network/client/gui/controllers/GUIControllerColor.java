@@ -39,9 +39,6 @@ public class GUIControllerColor extends GUIController {
     }
 
     private void handleChooseColor(Color color) {
-        Platform.runLater(() -> {
-            changeMainContainerBorder(color); // TODO: move from here, put it in the client so that the color is changed only one single time
-        });
         /*try {
             getServer().chooseInitialColor(getClient(), color);
         } catch (RemoteException e) {
@@ -54,10 +51,11 @@ public class GUIControllerColor extends GUIController {
         addCommand(command, this);
     }
 
-    private void changeMainContainerBorder(Color color) {
+    private void changeMainContainerBorder() {
         Platform.runLater(() -> {
             for (Color colorIterator : Color.values()) { mainContainerPrep.getStyleClass().remove(colorIterator.toString().toLowerCase() + "Border"); }
-            mainContainerPrep.getStyleClass().add(color.toString().toLowerCase() + "Border");
+            Color color = getViewModel().getColorsMap(getViewModel().getPlayerIndex());
+            if (color != null) mainContainerPrep.getStyleClass().add(color.toString().toLowerCase() + "Border");
         });
     }
 
@@ -72,6 +70,9 @@ public class GUIControllerColor extends GUIController {
 
     @Override
     public void update() {
-
+        Platform.runLater(() -> {
+            populateChatListview();
+            changeMainContainerBorder();
+        });
     }
 }

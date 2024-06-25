@@ -25,6 +25,7 @@
         <Label>Second option:</Label>
         <StackPane styleClass="objectiveCardImageContainer" fx:id="secondObjectiveImageContainer">
         </StackPane>
+        <Button onAction="#handleOpenChat" fx:id="handleOpenChatButton" text="Open Chat" />
         <Button onAction="#handleMuteMusic" fx:id="handleMuteButton" text="Mute" />
         <Label
                 fx:id="serverMessageLabel"

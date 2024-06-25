@@ -37,16 +37,12 @@ public class GUIControllerGame extends GUIController {
     @FXML private Label currentPhase;
     @FXML private StackPane plateauImageViewPane;
     @FXML private Button handleOpenGameRulesButton;
-    @FXML private Button handleOpenChatButton;
 
     private HashMap<Integer, ArrayList<Integer>> plateauCoordinatedMap;
-    private ListView<Text> chatListView;
-    private boolean chatOpen;
     private static ImageView plateauImageView;
     private static Image plateauImage;
 
     public GUIControllerGame() {
-        chatListView = new ListView<>();
 
         rotatePlayerContainer();
         setFontSize(mainContainerGame);
@@ -489,86 +485,6 @@ public class GUIControllerGame extends GUIController {
                 }
             }
         });
-    }
-
-    @FXML
-    private void handleOpenChat(ActionEvent event) {
-        Platform.runLater(() -> {
-            if (chatOpen) return;
-            chatOpen = true;
-
-            Stage chatStage = new Stage();
-            chatStage.setOnCloseRequest(closeEvent -> {
-                chatOpen = false;
-                handleOpenChatButton.getStyleClass().remove("pendingChatButton");
-                handleOpenChatButton.setText("Open Chat");
-                getViewModel().resetNewMessages();
-            });
-            //chatStage.initModality(Modality.APPLICATION_MODAL);
-            chatStage.initStyle(StageStyle.DECORATED);
-            chatStage.setTitle("Chat");
-
-            VBox containerVBox = new VBox();
-
-            //ListView<Text> chatListView = new ListView<>();
-            chatListView.setId("chatListView");
-            VBox.setVgrow(chatListView, Priority.ALWAYS);
-            containerVBox.getChildren().add(chatListView);
-
-            populateChatListview();
-
-            HBox newMessageContainer = new HBox();
-            newMessageContainer.setMaxHeight(100);
-            VBox.setVgrow(newMessageContainer, Priority.ALWAYS);
-            newMessageContainer.setAlignment(Pos.CENTER);
-            containerVBox.getChildren().add(newMessageContainer);
-            TextArea textArea = new TextArea();
-            textArea.getStyleClass().add("chatTextArea");
-            newMessageContainer.getChildren().add(textArea);
-            textArea.prefHeightProperty().bind(newMessageContainer.heightProperty());
-            Button btnSend = new Button("Send");
-            newMessageContainer.getChildren().add(btnSend);
-            HBox.setHgrow(textArea, Priority.ALWAYS);
-            btnSend.prefHeightProperty().bind(newMessageContainer.heightProperty());
-            setFontSize(btnSend);
-            btnSend.setOnAction(mouseEvent -> {
-                AddMessageCommandRunnable command = new AddMessageCommandRunnable();
-                command.setContent(textArea.getText());
-                addCommand(command,this);
-                textArea.setText("");
-                populateChatListview();
-            });
-
-            // Create a Scene for the new Stage
-            Scene scene = new Scene(containerVBox, (int) (getWindowHeight()*0.65), (int) (getWindowHeight()*0.43));
-            String mainCss = getClass().getResource("/style/main.css").toExternalForm();
-            String chatCss = getClass().getResource("/style/chat.css").toExternalForm();
-            scene.getStylesheets().addAll(mainCss, chatCss);
-            chatStage.setScene(scene);
-            chatStage.show();
-        });
-    }
-
-    private void populateChatListview() {
-        chatListView.getItems().clear();
-
-        ArrayList<Message> messages = getViewModel().getChat().getMessages(); // implement with view model
-
-        if (messages != null) {
-            for (int i = messages.size() - 1; i >= 0; i--) {
-                Message m = messages.get(i);
-                if (m == null) continue;
-                Text tempText = new Text(getViewModel().getNickname(m.getAuthor()) + ": " + m.getContent());
-                chatListView.getItems().add(tempText);
-            }
-        }
-    }
-
-    public void setNewMessageChat() {
-        if (getViewModel().getNewMessages() > 0) {
-            handleOpenChatButton.getStyleClass().add("pendingChatButton");
-            handleOpenChatButton.setText("Open Chat (" + getViewModel().getNewMessages() + ")");
-        }
     }
 
     @FXML

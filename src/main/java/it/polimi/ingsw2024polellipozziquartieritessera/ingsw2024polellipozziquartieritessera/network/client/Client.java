@@ -192,9 +192,12 @@ public class Client implements VirtualView {
                 case GamePhase.ENDPHASE -> {
                     guiApplication.changeScene("/fxml/game.fxml");
                     System.out.print("someone reached 20 points, the end phase has started\n> ");
-                    //guiApplication.getGUIController().showAlert(Alert.AlertType.INFORMATION, "Message from server", "someone reached 20 points, the end phase has started");
+                    guiApplication.getGUIController().showAlert(Alert.AlertType.INFORMATION, "Message from server", "someone reached 20 points, the end phase has started");
                 }
                 case GamePhase.FINALPHASE -> {
+                }
+                case GamePhase.TIMEOUT -> {
+                    guiApplication.getGUIController().showAlert(Alert.AlertType.INFORMATION, "Timeout", "No one is connected, we are waiting " + Config.TIMEOUT_TIME + " seconds for the other players to re-join");
                 }
             }
             guiApplication.updateController();
@@ -322,7 +325,7 @@ public class Client implements VirtualView {
             System.out.print("it's your turn\n> ");
             cliController.showBoard();
             cliController.showHand();
-            ShowMessageAlert();
+            showMessageAlert();
             System.out.print("to place your card use the command PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)] to place your card\n> ");
         } else {
             System.out.print("it's the turn of " + viewModel.getNickname(currentPlayerIndex) + "\n> ");
@@ -465,7 +468,7 @@ public class Client implements VirtualView {
         System.err.print("\nERROR FROM SERVER: " + error + "\n> ");
     }
 
-    private void ShowMessageAlert(){
+    private void showMessageAlert(){
         if (viewModel.getNewMessages() > 0){
             System.out.println("Unread messages: " + viewModel.getNewMessages() + " (use OPENCHAT command to read)");
             System.out.print("> ");
