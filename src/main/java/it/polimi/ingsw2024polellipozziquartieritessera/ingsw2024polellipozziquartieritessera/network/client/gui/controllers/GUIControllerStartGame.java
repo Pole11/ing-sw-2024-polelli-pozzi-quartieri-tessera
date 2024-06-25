@@ -35,6 +35,7 @@ public class GUIControllerStartGame extends GUIController {
             String message = "You successfully entered the game with the nickname " + getViewModel().getNickname(getViewModel().getPlayerIndex()) + ". ";
             showNicknamesConnected();
             setServerMessage(message);
+            setNewMessageChat();
             populateChatListview();
         });
     }

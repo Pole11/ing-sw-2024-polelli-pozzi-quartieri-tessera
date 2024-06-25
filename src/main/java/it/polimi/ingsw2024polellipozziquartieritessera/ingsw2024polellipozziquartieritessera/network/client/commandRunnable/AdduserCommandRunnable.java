@@ -33,6 +33,9 @@ public class AdduserCommandRunnable extends CommandRunnable{
         try {
             if (checkNickname(nickname)){
                 server.addConnectedPlayer(client, this.nickname);
+                if (clientContainer != null){
+                    clientContainer.resetViewModel();
+                }
             } else {
                 guiController.setServerError("To reconnect use your previous nickname");
             }
@@ -48,6 +51,8 @@ public class AdduserCommandRunnable extends CommandRunnable{
 
     private boolean checkNickname(String nicknameToCheck){
         //this is runned only if I am in the client
+        System.out.println(nicknameToCheck);
+        System.out.println(clientContainer.getViewModel().getNickname(clientContainer.getViewModel().getPlayerIndex()));
         if (clientContainer != null){
             //if the user already connected
             int index = clientContainer.getViewModel().getPlayerIndex();

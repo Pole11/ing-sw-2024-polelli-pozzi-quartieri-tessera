@@ -71,6 +71,7 @@ public class GUIControllerColor extends GUIController {
     @Override
     public void update() {
         Platform.runLater(() -> {
+            setNewMessageChat();
             populateChatListview();
             changeMainContainerBorder();
         });

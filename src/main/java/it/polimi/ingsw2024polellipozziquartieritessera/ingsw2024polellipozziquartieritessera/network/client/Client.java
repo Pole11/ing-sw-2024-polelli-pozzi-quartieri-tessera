@@ -58,6 +58,12 @@ public class Client implements VirtualView {
 
     }
 
+    public void resetViewModel(){
+        viewModel = new ViewModel();
+        guiApplication.setViewModel(viewModel);
+        cliController = new CLIController(viewModel);
+    }
+
     //GETTER
     public VirtualView getClient(){
         return client;

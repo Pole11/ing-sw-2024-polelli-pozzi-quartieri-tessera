@@ -236,12 +236,22 @@ public class Server implements VirtualServer {
 
     @Override
     public void ping(VirtualView client) throws RemoteException {
-        this.controller.ping(client);
+        try {
+            this.controller.ping(client);
+        } catch (IndexOutOfBoundsException e){
+            client.sendError("you don't exist, to reconnect login with ADDUSER <your previous nickname>");
+            client.connectionInfo(getPlayerIndex(client), false);
+        }
     }
 
     @Override
     public void gameEnded(VirtualView client) throws RemoteException {
-        this.controller.gameEnded(client);
+        try {
+            this.controller.gameEnded(client);
+        } catch (IndexOutOfBoundsException e){
+            client.sendError("you don't exist, to reconnect login with ADDUSER <your previous nickname>");
+            client.connectionInfo(getPlayerIndex(client), false);
+        }
     }
 
     private boolean checkConnected(VirtualView client) throws RemoteException {
