@@ -30,6 +30,7 @@ public enum Command {
      SHOWPLAYERS(ShowPlayersCommandRunnable::new, "Local"),
      SHOWPOINTS(ShowPointsCommandRunnable::new, "Local"),
      SHOWSECRETOBJECTIVES(ShowSecretObjectiveCommandRunnable::new, "Local"),
+     STATUS(StatusCommandRunnable::new,"Local"),
      OPENCHAT(OpenChatCommandRunnable::new, "Local"),
      START(StartCommandRunnable::new, "Network"),
      GAMEENDED(GameEndedCommandRunnable::new, "Network");

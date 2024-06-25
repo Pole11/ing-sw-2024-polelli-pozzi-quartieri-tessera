@@ -361,14 +361,19 @@ public class CLIController {
     }
     public void showPlayers(){
         int n_players = viewModel.getPlayersSize();
+        String colorPlayer = "";
+
         if(n_players < 1){
-            System.out.print("there are no players registered\n> ");
+            System.out.print("you are not registered\n> ");
         } else {
             System.out.println("this are the players nicknames ");
             //System.out.println("You are the player with index: " + viewModel.getPlayerIndex() + ", your nickname is " +viewModel.getNickname(viewModel.getPlayerIndex()));
             for(int i = 0; i < n_players; i++){
-                String colorPlayer = ColorPrint.getColorPrint(viewModel.getColorsMap(i)).toString();
-                System.out.println("index: " + i + " nickname: " + colorPlayer + viewModel.getNickname(i) + ColorPrint.RESET);
+                colorPlayer = "";
+                if(viewModel.getColorsMap(i) != null) {
+                    colorPlayer = ColorPrint.getColorPrint(viewModel.getColorsMap(i)).toString();
+                }
+                System.out.println("index: " + i + " nickname: " + colorPlayer + viewModel.getNickname(i) + ColorPrint.RESET + " is connected: " + viewModel.getConnession(i));
 
             }
             System.out.print("> ");
@@ -871,5 +876,20 @@ public class CLIController {
         viewModel.resetNewMessages();
 
         System.out.print("> ");
+    }
+    public void status(){
+        System.out.println("-----GAME-STATUS-----");
+        GamePhase currentGamePhase = viewModel.getGamePhase();
+        System.out.println("current game phase: " + currentGamePhase.toString());
+        if(currentGamePhase.equals(GamePhase.MAINPHASE) || currentGamePhase.equals(GamePhase.ENDPHASE)){
+            System.out.println("current turn phase: " + viewModel.getTurnPhase().toString());
+        }
+        if(viewModel.getNickname(viewModel.getCurrentPlayer()) != null) {
+            if (viewModel.getPlayerIndex() == viewModel.getCurrentPlayer()) {
+                System.out.print("it's your turn to play" + "\n >");
+            } else {
+                System.out.print("the current player is: " + viewModel.getNickname(viewModel.getCurrentPlayer()) + "\n >");
+            }
+        }
     }
 }

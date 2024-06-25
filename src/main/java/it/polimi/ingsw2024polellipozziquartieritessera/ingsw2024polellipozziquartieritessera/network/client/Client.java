@@ -101,9 +101,11 @@ public class Client implements VirtualView {
                 this.server = (VirtualServer) registry.lookup("VirtualServer");
                 this.client = new RmiClient(server, this);
                 ((RmiClient) client).run();
-            } catch (RemoteException | NotBoundException e) {
-                e.printStackTrace();
+            } catch (RemoteException e) {
+                serverDisconnected();
                 System.out.println("An error occurred while executing RmiClient!");
+            } catch (NotBoundException e){
+                e.printStackTrace();
             }
         }
     }
