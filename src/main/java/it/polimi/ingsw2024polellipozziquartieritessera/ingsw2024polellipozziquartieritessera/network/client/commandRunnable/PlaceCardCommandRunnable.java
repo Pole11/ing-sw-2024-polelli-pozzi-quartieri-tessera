@@ -13,6 +13,10 @@ public class PlaceCardCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeCLI() {
+        if (messageFromCli.length > 5){
+            tooManyArguments();
+            return;
+        }
         try {
             int placingCardId;
             int tableCardId;

@@ -3,6 +3,10 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 public class ShowBoardCommandRunnable extends CommandRunnable {
     @Override
     public void executeCLI() {
+        if (messageFromCli.length > 2){
+            tooManyArguments();
+            return;
+        }
         try {
             if(messageFromCli.length < 2){
                 clientContainer.getCliController().showBoard();

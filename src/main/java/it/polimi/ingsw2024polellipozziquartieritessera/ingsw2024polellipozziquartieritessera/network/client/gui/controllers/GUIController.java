@@ -2,9 +2,11 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.PacmanBuffer;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.AddMessageCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.GameEndedCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
@@ -17,18 +19,20 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.lang.reflect.Field;
@@ -39,7 +43,7 @@ abstract public class GUIController {
     @FXML public Label serverMessageLabel;
     @FXML public Label serverErrorLabel;
     @FXML public Button handleMuteButton;
-    // add virtual model
+    @FXML private Button handleOpenChatButton;
     private final ArrayDeque<CommandRunnable> commandQueue;
     private Thread executeCommands;
     private VirtualView client; // temp
@@ -52,6 +56,9 @@ abstract public class GUIController {
     private double pressedY;
     private MediaPlayer mediaPlayer;
     private int windowHeight = 920;
+    private ListView<Text> chatListView;
+    private boolean chatOpen;
+    private Alert alert;
     //private static PacmanBuffer<ImageView> imageViewRingBuffer;
 
     private boolean executeCommandRunning;
@@ -59,6 +66,7 @@ abstract public class GUIController {
     @FXML
     private void initialize() {
         isSceneLoaded = true;
+        chatListView = new ListView<>();
 
         //System.out.println("[DEBUG] Scene is loaded with " + this.getClass());
         Platform.runLater(() -> {
@@ -375,6 +383,86 @@ abstract public class GUIController {
         }
     }
 
+    @FXML
+    private void handleOpenChat(ActionEvent event) {
+        Platform.runLater(() -> {
+            if (chatOpen) return;
+            chatOpen = true;
+
+            Stage chatStage = new Stage();
+            chatStage.setOnCloseRequest(closeEvent -> {
+                chatOpen = false;
+                handleOpenChatButton.getStyleClass().remove("pendingChatButton");
+                handleOpenChatButton.setText("Open Chat");
+                getViewModel().resetNewMessages();
+            });
+            //chatStage.initModality(Modality.APPLICATION_MODAL);
+            chatStage.initStyle(StageStyle.DECORATED);
+            chatStage.setTitle("Chat");
+
+            VBox containerVBox = new VBox();
+
+            //ListView<Text> chatListView = new ListView<>();
+            chatListView.setId("chatListView");
+            VBox.setVgrow(chatListView, Priority.ALWAYS);
+            containerVBox.getChildren().add(chatListView);
+
+            populateChatListview();
+
+            HBox newMessageContainer = new HBox();
+            newMessageContainer.setMaxHeight(100);
+            VBox.setVgrow(newMessageContainer, Priority.ALWAYS);
+            newMessageContainer.setAlignment(Pos.CENTER);
+            containerVBox.getChildren().add(newMessageContainer);
+            TextArea textArea = new TextArea();
+            textArea.getStyleClass().add("chatTextArea");
+            newMessageContainer.getChildren().add(textArea);
+            textArea.prefHeightProperty().bind(newMessageContainer.heightProperty());
+            Button btnSend = new Button("Send");
+            newMessageContainer.getChildren().add(btnSend);
+            HBox.setHgrow(textArea, Priority.ALWAYS);
+            btnSend.prefHeightProperty().bind(newMessageContainer.heightProperty());
+            setFontSize(btnSend);
+            btnSend.setOnAction(mouseEvent -> {
+                AddMessageCommandRunnable command = new AddMessageCommandRunnable();
+                command.setContent(textArea.getText());
+                addCommand(command,this);
+                textArea.setText("");
+                populateChatListview();
+            });
+
+            // Create a Scene for the new Stage
+            Scene scene = new Scene(containerVBox, (int) (getWindowHeight()*0.65), (int) (getWindowHeight()*0.43));
+            String mainCss = getClass().getResource("/style/main.css").toExternalForm();
+            String chatCss = getClass().getResource("/style/chat.css").toExternalForm();
+            scene.getStylesheets().addAll(mainCss, chatCss);
+            chatStage.setScene(scene);
+            chatStage.show();
+        });
+    }
+
+    public void populateChatListview() {
+        chatListView.getItems().clear();
+
+        ArrayList<Message> messages = getViewModel().getChat().getMessages(); // implement with view model
+
+        if (messages != null) {
+            for (int i = messages.size() - 1; i >= 0; i--) {
+                Message m = messages.get(i);
+                if (m == null) continue;
+                Text tempText = new Text(getViewModel().getNickname(m.getAuthor()) + ": " + m.getContent());
+                chatListView.getItems().add(tempText);
+            }
+        }
+    }
+
+    public void setNewMessageChat() {
+        if (getViewModel().getNewMessages() > 0) {
+            handleOpenChatButton.getStyleClass().add("pendingChatButton");
+            handleOpenChatButton.setText("Open Chat (" + getViewModel().getNewMessages() + ")");
+        }
+    }
+
     public void addHoverRotate(Node node) {
         Platform.runLater(() -> {
             node.setOnMouseEntered(mouseEvent -> { node.getStyleClass().add("rotateYes"); node.getStyleClass().remove("rotateNo"); });
@@ -546,7 +634,7 @@ abstract public class GUIController {
 
     // Method to show a simple alert
     public void showAlert(Alert.AlertType alertType, String title, String content) {
-        Alert alert = null;
+        if (alert != null) alert.close();
         alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);

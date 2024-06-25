@@ -83,6 +83,7 @@ public class GUIControllerObjective extends GUIController{
     public void update() {
         Platform.runLater(() -> {
             setObjectiveCardImages(getViewModel().getSecretObjectiveCards()[0], getViewModel().getSecretObjectiveCards()[1]);
+            populateChatListview();
         });
     }
 }
