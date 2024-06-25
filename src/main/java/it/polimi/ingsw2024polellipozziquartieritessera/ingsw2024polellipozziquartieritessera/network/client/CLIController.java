@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CLIController {
-    private final ViewModel viewModel;
+    private ViewModel viewModel;
     private final ArrayDeque<CommandRunnable> commandQueue;
     private Thread executeCommands;
     private boolean executeCommandRunning;
@@ -53,8 +53,9 @@ public class CLIController {
     }
 
      */
-
-
+    public void setViewModel(ViewModel viewModel){
+        this.viewModel = viewModel;
+    }
 
 //new
     public void restartExecuteCommand(){
