@@ -270,6 +270,7 @@ public class GameState {
 
             }
             Populate.saveState(this);
+            System.out.println(event);
             event.execute();
         }
     }
@@ -328,11 +329,12 @@ public class GameState {
                 if (!playerThreads.get(i).isAlive()){
                     playerThreads.set(i, new Thread(() -> {
                         int j = finalI;
+                        System.out.println("player to be pinged" + j);
                         try {
                             //wait for the answer of players
                             Thread.sleep(1000*Config.WAIT_FOR_PING_TIME);
                             if (players.get(j).isConnected()){
-                                System.out.println("client "  + getPlayer(j).getNickname() + " disconnected");
+                                System.out.println("client "  + getPlayer(j).getNickname() + " disconnected because ping didn't arrive in time");
                                 synchronized (players) {
                                     players.get(j).setConnected(false);
                                 }
@@ -367,6 +369,8 @@ public class GameState {
      * @param client The client who has responded
      */
     public void pingAnswer(VirtualView client) {
+        System.out.println(getPlayerIndex(client));
+        System.out.println(getPlayer(getPlayerIndex(client)).getNickname());
         synchronized (players) {
             playerThreads.get(getPlayerIndex(client)).interrupt();
             try {

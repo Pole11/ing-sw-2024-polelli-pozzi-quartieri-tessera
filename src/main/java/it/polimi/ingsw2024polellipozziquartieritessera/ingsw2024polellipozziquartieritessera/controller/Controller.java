@@ -268,6 +268,7 @@ public class Controller {
     }
 
     public synchronized void ping(VirtualView client){
+        System.out.println(getPlayerIndex(client));
         gameState.pingAnswer(client);
     }
 

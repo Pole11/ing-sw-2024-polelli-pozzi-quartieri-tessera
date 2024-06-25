@@ -24,9 +24,9 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 public class Server implements VirtualServer {
-    final Controller controller;
-    final ServerSocket listenSocket;
-    final Registry registry;
+    private final Controller controller;
+    private final ServerSocket listenSocket;
+    private final Registry registry;
 
     public Server(ServerSocket listenSocket, Controller controller, Registry registry) {
         this.listenSocket = listenSocket;
@@ -50,6 +50,12 @@ public class Server implements VirtualServer {
 
         // listen to rmi
         System.setProperty("java.rmi.server.hostname", host);
+        //set timeout for rmi after which it throws a remoteException
+        System.setProperty("sun.rmi.transport.tcp.responseTimeout", Config.RMI_RESPONSE_TIMEOUT);
+        System.setProperty("Sun.rmi.transport.tcp.readTimeout", "2000");
+        System.setProperty("Sun.rmi.transport.connectionTimeout", "2000");
+        System.setProperty("Sun.rmi.transport.proxy.connectTimeout", "2000");
+        System.setProperty("Sun.rmi.transport.tcp.handshakeTimeout", "2000");
         String name = "VirtualServer";
         Registry registry = LocateRegistry.createRegistry(rmiport);
 
@@ -237,6 +243,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void ping(VirtualView client) throws RemoteException {
+        System.out.println(getPlayerIndex(client));
         try {
             this.controller.ping(client);
         } catch (IndexOutOfBoundsException e){

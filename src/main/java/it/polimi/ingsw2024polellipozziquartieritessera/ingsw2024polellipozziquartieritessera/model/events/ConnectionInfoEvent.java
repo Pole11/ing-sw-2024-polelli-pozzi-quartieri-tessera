@@ -21,18 +21,10 @@ public class ConnectionInfoEvent extends Event {
     public void execute() {
         for (VirtualView client : clients) {
             if (client != null) {
-                if (client.equals(player.getClient())) {
-                    try {
-                        client.connectionInfo(gameState.getPlayerIndex(player), connected);
-                    } catch (RemoteException e) {
-                        playerDisconnected(client);
-                    }
-                } else {
-                    try {
-                        client.connectionInfo(gameState.getPlayerIndex(player), connected);
-                    } catch (RemoteException e) {
-                        playerDisconnected(client);
-                    }
+                try {
+                    client.connectionInfo(gameState.getPlayerIndex(player), connected);
+                } catch (RemoteException e) {
+                    playerDisconnected(client);
                 }
             }
         }
