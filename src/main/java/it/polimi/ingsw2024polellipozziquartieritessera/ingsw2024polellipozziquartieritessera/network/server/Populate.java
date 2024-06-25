@@ -345,20 +345,16 @@ public class Populate {
             player.addPoints( (int) playerJson.get("points"));
             player.setPlayerBoard((ArrayList<ArrayList<Integer>>) playerJson.get("playerBoard"));
 
-            Map<?, ?> placedJson = (Map<?, ?>) playerJson.get("placedCardsMap");
-            HashMap<Integer, Side> placedCardsMap = new HashMap<>();
-            for (Object key : placedJson.keySet()){
-                placedCardsMap.put(Integer.parseInt((String) key), Side.valueOf((String) placedJson.get(key)));
-            }
-            player.setPlacedCardsMap(placedCardsMap);
-
 
             Map<?, ?> handJson = (Map<?, ?>) playerJson.get("handCardsMap");
             HashMap<Integer, Side> handCardsMap = new HashMap<>();
             for (Object key : handJson.keySet()){
                 handCardsMap.put(Integer.parseInt((String) key), Side.valueOf((String) handJson.get(key)));
             }
+            System.out.println(playerJson.get("handCardsMap"));
+            System.out.println(handCardsMap);
             player.setHandCardsMap(handCardsMap);
+            System.out.println(player.getHandCardsMap());
 
             Color color = null;
             if (!playerJson.get("color").equals("")){
@@ -375,6 +371,14 @@ public class Populate {
                 starterCard = (StarterCard) createCard(false, (Map) cards.get(String.valueOf(playerJson.get("starterCard"))) , (Integer) playerJson.get("starterCard"));
                 player.setStarterCard(starterCard);
             }
+
+
+            Map<?, ?> placedJson = (Map<?, ?>) playerJson.get("placedCardsMap");
+            HashMap<Integer, Side> placedCardsMap = new HashMap<>();
+            for (Object key : placedJson.keySet()){
+                placedCardsMap.put(Integer.parseInt((String) key), Side.valueOf((String) placedJson.get(key)));
+            }
+            player.setPlacedCardsMap(placedCardsMap);
 
             ObjectiveCard objectiveCard = null;
             if (!playerJson.get("objectiveCard").equals("")){

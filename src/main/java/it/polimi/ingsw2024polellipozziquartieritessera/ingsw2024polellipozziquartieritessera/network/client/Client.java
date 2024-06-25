@@ -316,6 +316,7 @@ public class Client implements VirtualView {
 
     @Override
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
+        System.err.println("updating board");
         viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
         if (viewModel.getPlayerIndex() == playerIndex) {
             System.out.print("you placed a card, now you have to draw your card with DRAWCARD [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");
@@ -463,12 +464,12 @@ public class Client implements VirtualView {
 
     @Override
     public void redirectOut(boolean bool) throws RemoteException {
-        if(bool){
+        /*if(bool){
             oldPrintStream = System.out;
             System.setOut(restoreStream);
         } else {
             System.setOut(oldPrintStream);
-        }
+        }*/
     }
 
     @Override

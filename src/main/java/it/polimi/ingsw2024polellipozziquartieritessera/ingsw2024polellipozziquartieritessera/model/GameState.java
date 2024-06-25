@@ -415,6 +415,7 @@ public class GameState {
      * @param client Client to be reconnected
      */
     public void restoreView(VirtualView client) {
+        System.out.println("RESTORE VIEWWWWWWWWWW");
         //send everything to client
         ArrayList<VirtualView> clients = new ArrayList<>();
         clients.add(client);
@@ -447,8 +448,10 @@ public class GameState {
                     }
                 }
                 //send starter
+                System.out.println(currentPlayer.getStarterCard());
                 if (currentPlayer.getStarterCard() != null) {
                     Side starterSide = currentPlayer.getPlacedCardSide(currentPlayer.getStarterCard().getId());
+                    System.out.println(starterSide);
                     if (i == getPlayerIndex(client)){
                         eventQueue.add(new UpdateStarterCardEvent(this, clients, getPlayerIndex(client), currentPlayer.getStarterCard().getId(), null));
                     }
@@ -667,6 +670,7 @@ public class GameState {
         //if someone choose his nickname, he is inside the match, even if he is temporanely disconnected
         System.out.println("i am in gamestate" + client + nickname);
         if (allConnectedClients().contains(client)) {
+            System.out.println("1");
             synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "You already chose a nickname, you cannot change it"));
                 eventQueue.notifyAll();
@@ -676,10 +680,16 @@ public class GameState {
 
         //checks for reconnections or same nickname exception
         for (int j = 0; j < players.size(); j++) {
+            System.out.println("2");
+
             if (player.getNickname().equals(players.get(j).getNickname())) {
+                System.out.println("3");
+
                 //takes for granted that player connection is updated
                 //if the player is not connected but the gameState doesn't know, the following code fails
                 if (!players.get(j).isConnected()) {
+                    System.out.println("4");
+
                     playerThreads.get(j).interrupt();
                     players.get(j).setClient(client);
                     this.manageReconnection(players.get(j));
@@ -688,7 +698,11 @@ public class GameState {
                         eventQueue.notifyAll();
                     }
                 } else {
+                    System.out.println("5");
+
                     if (allConnectedClients().size()<Config.MAX_PLAYERS){
+                        System.out.println("6");
+
                         synchronized (eventQueue) {
                             ArrayList<VirtualView> clients = new ArrayList<>();
                             clients.add(client);
@@ -702,6 +716,8 @@ public class GameState {
         }
 
         if (players.size() >= Config.MAX_PLAYERS) {
+            System.out.println("7");
+
             synchronized (eventQueue) {
                 ArrayList<VirtualView> clients = new ArrayList<>();
                 clients.add(client);
@@ -713,6 +729,9 @@ public class GameState {
 
 
         if (currentGamePhase.equals(GamePhase.NICKNAMEPHASE)){
+            System.out.println("8");
+
+
             players.add(player);
             playerThreads.add(new Thread());
             synchronized (eventQueue) {
@@ -727,6 +746,8 @@ public class GameState {
             }
             System.out.println(nickname + " connected");
         } else {
+            System.out.println("9");
+
             ArrayList<VirtualView> clients = new ArrayList<>();
             clients.add(client);
             synchronized (eventQueue) {
@@ -825,6 +846,19 @@ public class GameState {
      */
     public void setStarterSide(int playerIndex, Side side) {
         //TODO: try catch id player not registerred
+        System.out.println(allConnectedClients());
+        players.stream().filter(e -> !e.isConnected() && !answered.get(getPlayerIndex(e))).forEach(e->{
+            System.out.println(e.getNickname());
+            e.addToPlacedCardsMap(e.getStarterCard().getId(), Side.BACK);
+            updateElements(e, e.getStarterCard(), Side.BACK);
+            synchronized (eventQueue) {
+                eventQueue.add(new UpdateStarterCardEvent(this, allConnectedClients(), getPlayerIndex(e), e.getStarterCard().getId(), Side.BACK));
+                eventQueue.notifyAll();
+            }
+            this.answered.put(getPlayerIndex(e), true);
+            System.out.println(e.getNickname() + " chose his color, the number of answered is: " + numberAnswered());
+        });
+
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
             synchronized (eventQueue) {
@@ -1010,10 +1044,9 @@ public class GameState {
             System.out.println("everyone answered");
             resetAnswered();
             this.currentGamePhase.changePhase(this);
-            synchronized (eventQueue) {
-                eventQueue.add(new UpdateCurrentPlayerEvent(this, allConnectedClients(), currentPlayerIndex));
-                eventQueue.notifyAll();
-            }
+            currentPlayerIndex = players.size() -1;
+            currentGameTurn = TurnPhase.DRAWPHASE;
+            changeCurrentPlayer();
         }
     }
 

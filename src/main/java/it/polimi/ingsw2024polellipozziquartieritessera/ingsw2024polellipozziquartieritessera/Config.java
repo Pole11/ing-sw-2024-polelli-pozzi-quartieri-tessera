@@ -15,9 +15,9 @@ public class Config {
     public static final int OBJECTIVEQTY = 16;
     public static final int STARTERQTY = 6;
 
-    public static final int TIMEOUT_TIME = 1; // 60
-    public static final int NEXT_PING_TIME = 2; // 10
-    public static final int WAIT_FOR_PING_TIME = 2; // 5
+    public static final int TIMEOUT_TIME = 5; // 60
+    public static final int NEXT_PING_TIME = 4; // 10
+    public static final int WAIT_FOR_PING_TIME = 4; // 5
     public static final int WAIT_DISCONNECTED_SERVER = 3;
 
     public static final int BUFFER_IMAGE_SIZE = 100;
