@@ -325,8 +325,10 @@ public class Client implements VirtualView {
         viewModel.setCurrentPlayer(currentPlayerIndex);
         if (viewModel.getPlayerIndex() == currentPlayerIndex) {
             System.out.print("it's your turn\n> ");
-            cliController.showBoard();
-            cliController.showHand();
+            if (!meDoGui) {
+                cliController.showBoard();
+                cliController.showHand();
+            }
             showMessageAlert();
             System.out.print("to place your card use the command PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)] to place your card\n> ");
         } else {
