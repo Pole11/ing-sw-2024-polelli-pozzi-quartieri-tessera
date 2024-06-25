@@ -16,7 +16,11 @@ public class AdduserCommandRunnable extends CommandRunnable{
             try {
                 String username = String.join(" ", Arrays.copyOfRange(messageFromCli, 1, messageFromCli.length));
                 if (checkNickname(username)){
+                    if (clientContainer != null){
+                        clientContainer.resetViewModel();
+                    }
                     server.addConnectedPlayer(client, username);
+
                 } else {
                     System.err.print("To reconnect use your previous nickname\n> ");
                 }

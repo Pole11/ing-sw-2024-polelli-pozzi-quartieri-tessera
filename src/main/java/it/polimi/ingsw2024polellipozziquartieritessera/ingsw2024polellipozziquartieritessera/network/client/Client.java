@@ -60,8 +60,11 @@ public class Client implements VirtualView {
 
     public void resetViewModel(){
         viewModel = new ViewModel();
-        guiApplication.setViewModel(viewModel);
-        cliController.setViewModel(viewModel);
+        if (meDoGui) {
+            guiApplication.setViewModel(viewModel);
+        } else {
+            cliController.setViewModel(viewModel);
+        }
     }
 
     //GETTER
