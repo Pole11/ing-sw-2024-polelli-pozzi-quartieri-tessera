@@ -1,6 +1,7 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable;
 
 import java.rmi.RemoteException;
+import java.util.Arrays;
 
 public class AdduserCommandRunnable extends CommandRunnable{
     private String nickname;
@@ -13,8 +14,9 @@ public class AdduserCommandRunnable extends CommandRunnable{
     public void executeCLI() {
         try {
             try {
-                if (checkNickname(messageFromCli[1])){
-                    server.addConnectedPlayer(client, messageFromCli[1]);
+                String username = String.join(" ", Arrays.copyOfRange(messageFromCli, 1, messageFromCli.length));
+                if (checkNickname(username)){
+                    server.addConnectedPlayer(client, username);
                 } else {
                     System.err.print("To reconnect use your previous nickname\n> ");
                 }
