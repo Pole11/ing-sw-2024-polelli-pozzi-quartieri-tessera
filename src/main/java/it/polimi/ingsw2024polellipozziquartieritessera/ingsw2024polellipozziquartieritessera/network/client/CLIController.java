@@ -108,7 +108,7 @@ public class CLIController {
 
     public void manageInput(VirtualServer server, VirtualView client, Client clientContainer, String[] message) throws RemoteException {
         //
-        if (message[0].equalsIgnoreCase("PING") || message[0].equalsIgnoreCase("GAMEENDED")){
+        if (message[0].equalsIgnoreCase(Command.PING.toString()) || message[0].equalsIgnoreCase(Command.GAMEENDED.toString())){
             System.err.print("INVALID COMMAND\n> ");
             return;
         }
@@ -275,7 +275,7 @@ public class CLIController {
             }
             System.out.println();
         }
-        System.out.println("this are the card placed in the board");
+        System.out.println("these are the cards placed in the board");
         printNCards(cardsOrder, sides);
 
     }
@@ -306,7 +306,7 @@ public class CLIController {
             sides.add(Side.FRONT);
             sides.add(Side.FRONT);
 
-            System.out.println("this are the common objectives for this game");
+            System.out.println("these are the common objectives for this game");
             printNCards(cards, sides);
         }
     }
@@ -325,7 +325,7 @@ public class CLIController {
                 cards.add(objectives[3]);
                 sides.add(viewModel.getPlacedCardSide(objectives[3]));
             }
-            System.out.println("this are your secret objectives");
+            System.out.println("these are your secret objectives");
             printNCards(cards, sides);
         }
     }
@@ -364,7 +364,7 @@ public class CLIController {
         if(n_players < 1){
             System.out.print("there are no players registered\n> ");
         } else {
-            System.out.println("this are the players nicknames ");
+            System.out.println("these are the players nicknames ");
             //System.out.println("You are the player with index: " + viewModel.getPlayerIndex() + ", your nickname is " +viewModel.getNickname(viewModel.getPlayerIndex()));
             for(int i = 0; i < n_players; i++){
                 String colorPlayer = ColorPrint.getColorPrint(viewModel.getColorsMap(i)).toString();
@@ -380,7 +380,7 @@ public class CLIController {
             System.err.print("you cant ask players points before the main phase has started\n> ");
         }else {
             int n_players = viewModel.getPlayersSize();
-            System.out.println("this are the players points ");
+            System.out.println("these are the players points ");
             for (int i = 0; i < n_players; i++) {
                 System.out.println(" nickname: " + viewModel.getNickname(i) + "\tpoints: " + viewModel.getPointsMap(i));
             }

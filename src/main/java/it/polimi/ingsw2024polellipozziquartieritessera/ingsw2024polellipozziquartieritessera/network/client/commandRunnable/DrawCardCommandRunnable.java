@@ -13,6 +13,10 @@ public class DrawCardCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeCLI() {
+        if (messageFromCli.length > 2){
+            tooManyArguments();
+            return;
+        }
         try {
             DrawType drawType;
             try {

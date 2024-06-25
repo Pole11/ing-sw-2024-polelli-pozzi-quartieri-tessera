@@ -11,6 +11,10 @@ public class FlipCardCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeCLI() {
+        if (messageFromCli.length > 2){
+            tooManyArguments();
+            return;
+        }
         try {
             int cardId;
             try {

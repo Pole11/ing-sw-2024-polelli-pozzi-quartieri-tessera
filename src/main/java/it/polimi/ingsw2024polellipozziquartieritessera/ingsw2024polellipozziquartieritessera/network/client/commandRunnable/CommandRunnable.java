@@ -47,4 +47,8 @@ public abstract class CommandRunnable {
     public void serverDisconnectedGUI() {
         clientContainer.serverDisconnected();
     }
+
+    public void tooManyArguments(){
+        System.err.print("Invalid number of arguments: you put to many arguments\n> ");
+    }
 }
