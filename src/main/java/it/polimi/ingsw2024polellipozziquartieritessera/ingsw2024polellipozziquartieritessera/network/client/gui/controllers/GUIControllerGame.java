@@ -547,7 +547,7 @@ public class GUIControllerGame extends GUIController {
             @Override
             public void run() {
                 System.out.println("[DEBUG] Rendering server message: " + serverMessage);
-                showAlert(Alert.AlertType.INFORMATION, "Message from server", serverMessage);
+                showSingleAlert(Alert.AlertType.INFORMATION, "Message from server", serverMessage);
             }
         });
     }

@@ -539,6 +539,7 @@ public class GameState {
                     }
                     System.out.println("I am timeout ended");
                     gameEnded(winners);
+                    System.out.println(allConnectedClients());
                     if (allConnectedClients().size() == 0) {
                         server.restart();
                         Thread.currentThread().interrupt();
