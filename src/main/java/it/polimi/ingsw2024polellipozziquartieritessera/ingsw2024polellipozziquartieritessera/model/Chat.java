@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * The Chat class represents a chat that contains a list of messages.
  */
 public class Chat {
-    private ArrayList<Message> messages; // may be final (the reference only)
+    private final ArrayList<Message> messages;
 
     /**
      * Constructs an empty Chat.

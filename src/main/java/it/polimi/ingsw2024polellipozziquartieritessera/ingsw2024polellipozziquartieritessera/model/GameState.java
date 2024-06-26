@@ -881,7 +881,7 @@ public class GameState {
                 eventQueue.notifyAll();
             }
             this.answered.put(getPlayerIndex(e), true);
-            System.out.println(e.getNickname() + " automatically chose his starter card, the number of answered is: " + numberAnswered());
+            System.out.println(e.getNickname() + " chose his color, the number of answered is: " + numberAnswered());
         });
 
         Player player = this.players.get(playerIndex);
@@ -911,7 +911,7 @@ public class GameState {
 
 
         this.answered.put(playerIndex, true);
-        System.out.println(getPlayer(playerIndex).getNickname() + " chose his startercard, the number of answered is: " + numberAnswered());
+        System.out.println(playerIndex + " chose his startercard, the number of answered is: " + numberAnswered());
         //notify him and all the others about the change
         if (numberAnswered() == players.size()) {
             System.out.println("everyone answered");
@@ -930,7 +930,7 @@ public class GameState {
         players.stream().filter(e -> !e.isConnected() && e.getColor() == null).forEach(e->{
             e.setColor(Arrays.stream(Color.values()).filter(p-> !players.stream().map(Player::getColor).toList().contains(p)).findFirst().get());
             this.answered.put(getPlayerIndex(e), true);
-            System.out.println(e.getNickname() + " automatically chose his color, the number of answered is: " + numberAnswered());
+            System.out.println(e.getNickname() + " chose his color, the number of answered is: " + numberAnswered());
         });
 
 
@@ -1041,7 +1041,7 @@ public class GameState {
         players.stream().filter(e -> !e.isConnected() && e.getObjectiveCard() == null).forEach(e->{
             e.setObjectiveCard(e.getObjectiveCardOption(0));
             this.answered.put(getPlayerIndex(e), true);
-            System.out.println(e.getNickname() + " automatically chose his objective, the number of ansewred is: " + numberAnswered());
+            System.out.println(e.getNickname() + " chose his objective, the number of ansewred is: " + numberAnswered());
         });
 
         Player player = this.players.get(playerIndex);

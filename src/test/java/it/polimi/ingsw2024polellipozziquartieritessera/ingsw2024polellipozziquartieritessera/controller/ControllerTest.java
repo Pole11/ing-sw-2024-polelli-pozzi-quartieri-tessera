@@ -2,24 +2,25 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.Corner;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.CornerCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.StarterCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.SocketClient;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
-import java.net.ServerSocket;
-import java.rmi.*;
-import java.rmi.registry.Registry;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ControllerTest {
     @Test
-    void placeCardTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException, EmptyDeckException, CardNotOnBoardException {
+    void placeCardTest() throws IOException, WrongPlacingPositionException, WrongInstanceTypeException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException, EmptyDeckException, CardNotOnBoardException {
 
         int starterCardId = 85;
         Side starterCardSide = Side.BACK;
@@ -75,19 +76,17 @@ public class ControllerTest {
                 assertEquals(false, resourceCard1Corners.get((cpos.ordinal() + 2) % 4).getCovered());
                 assertEquals(starterCardCorners.get(cpos.ordinal()).getLinkedCorner(),
                         resourceCard1Corners.get((cpos.ordinal() + 2) % 4));
-                assertTrue(starterCardCorners.get(cpos.ordinal()).getLinkedCorner() == resourceCard1Corners.get((cpos.ordinal() + 2) % 4));
+                assertSame(starterCardCorners.get(cpos.ordinal()).getLinkedCorner(), resourceCard1Corners.get((cpos.ordinal() + 2) % 4));
                 assertEquals(resourceCard1Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner(),
                         starterCardCorners.get(cpos.ordinal()));
-                assertTrue(resourceCard1Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner() == starterCardCorners.get(cpos.ordinal()));
+                assertSame(resourceCard1Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner(), starterCardCorners.get(cpos.ordinal()));
             } else {
                 assertEquals(false, starterCardCorners.get(cpos.ordinal()).getCovered());
                 assertEquals(false, resourceCard1Corners.get((cpos.ordinal() + 2) % 4).getCovered());
-                assertEquals(null,
-                        resourceCard1Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner());
-                assertTrue(null == resourceCard1Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner());
-                assertEquals(null,
-                        starterCardCorners.get(cpos.ordinal()).getLinkedCorner());
-                assertTrue(null == starterCardCorners.get(cpos.ordinal()).getLinkedCorner());
+                assertNull(resourceCard1Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner());
+                assertNull(resourceCard1Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner());
+                assertNull(starterCardCorners.get(cpos.ordinal()).getLinkedCorner());
+                assertNull(starterCardCorners.get(cpos.ordinal()).getLinkedCorner());
             }
         }
 
@@ -107,16 +106,15 @@ public class ControllerTest {
                 assertEquals(false, resourceCard2Corners.get((cpos.ordinal() + 2) % 4).getCovered());
                 assertEquals(resourceCard1Corners.get(cpos.ordinal()).getLinkedCorner(),
                         resourceCard2Corners.get((cpos.ordinal() + 2) % 4));
-                assertTrue(resourceCard1Corners.get(cpos.ordinal()).getLinkedCorner() == resourceCard2Corners.get((cpos.ordinal() + 2) % 4));
+                assertSame(resourceCard1Corners.get(cpos.ordinal()).getLinkedCorner(), resourceCard2Corners.get((cpos.ordinal() + 2) % 4));
                 assertEquals(resourceCard2Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner(),
                         resourceCard1Corners.get(cpos.ordinal()));
-                assertTrue(resourceCard2Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner() == resourceCard1Corners.get(cpos.ordinal()));
+                assertSame(resourceCard2Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner(), resourceCard1Corners.get(cpos.ordinal()));
             } else {
                 assertEquals(false, resourceCard1Corners.get(cpos.ordinal()).getCovered());
                 assertEquals(false, resourceCard2Corners.get((cpos.ordinal() + 2) % 4).getCovered());
-                assertEquals(null,
-                        resourceCard2Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner());
-                assertTrue(null == resourceCard2Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner());
+                assertNull(resourceCard2Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner());
+                assertNull(resourceCard2Corners.get((cpos.ordinal() + 2) % 4).getLinkedCorner());
             }
 
         }
@@ -187,81 +185,76 @@ public class ControllerTest {
 
         player.addToHandCardsMap(goldCardId, Side.FRONT);
         c.placeCard(0, goldCardId, resourceCardId2, goldCardToTableCornerPos, goldCardSide);
-        resourceCard2Corners = ((CornerCard)  gs.getCard(resourceCardId2)).getCorners(resourceCard2Side);
-        ArrayList<Corner> goldCardCorners = ((CornerCard)  gs.getCard(goldCardId)).getCorners(goldCardSide);
+        resourceCard2Corners = ((CornerCard) gs.getCard(resourceCardId2)).getCorners(resourceCard2Side);
+        ArrayList<Corner> goldCardCorners = ((CornerCard) gs.getCard(goldCardId)).getCorners(goldCardSide);
 
         assertEquals(false, goldCardCorners.get(CornerPos.UPLEFT.ordinal()).getCovered());
-        assertEquals(null,
-                goldCardCorners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner());
-        assertTrue(null == goldCardCorners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner());
+        assertNull(goldCardCorners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner());
+        assertNull(goldCardCorners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner());
         assertEquals(false, goldCardCorners.get(CornerPos.UPRIGHT.ordinal()).getCovered());
         assertEquals(resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()),
                 goldCardCorners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
-        assertTrue(resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()) == goldCardCorners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
-        assertTrue(resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()) == goldCardCorners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
+        assertSame(resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()), goldCardCorners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
+        assertSame(resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()), goldCardCorners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
         assertEquals(resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner(),
                 goldCardCorners.get(CornerPos.UPRIGHT.ordinal()));
-        assertTrue(resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner() == goldCardCorners.get(CornerPos.UPRIGHT.ordinal()));
+        assertSame(resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner(), goldCardCorners.get(CornerPos.UPRIGHT.ordinal()));
         assertEquals(false, goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()).getCovered());
         assertEquals(resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()),
                 goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner());
-        assertTrue(resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()) == goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner());
+        assertSame(resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()), goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner());
         assertEquals(resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner(),
                 goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()));
-        assertTrue(resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner() == goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()));
+        assertSame(resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner(), goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()));
         assertEquals(false, goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()).getCovered());
-        assertEquals(null,
-                goldCardCorners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
-        assertTrue(null == goldCardCorners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
+        assertNull(goldCardCorners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
+        assertNull(goldCardCorners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
 
         assertEquals(true, resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()).getCovered());
         assertEquals(goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()),
                 resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner());
-        assertTrue(goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()) == resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner());
+        assertSame(goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()), resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner());
         assertEquals(goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner(),
                 resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()));
-        assertTrue(goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner() == resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()));
+        assertSame(goldCardCorners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner(), resourceCard2Corners.get(CornerPos.UPLEFT.ordinal()));
         assertEquals(false, resourceCard2Corners.get(CornerPos.UPRIGHT.ordinal()).getCovered());
         assertEquals(resourceCard1Corners.get(CornerPos.DOWNLEFT.ordinal()),
                 resourceCard2Corners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
-        assertTrue(resourceCard1Corners.get(CornerPos.DOWNLEFT.ordinal()) == resourceCard2Corners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
+        assertSame(resourceCard1Corners.get(CornerPos.DOWNLEFT.ordinal()), resourceCard2Corners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
         assertEquals(resourceCard1Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner(),
                 resourceCard2Corners.get(CornerPos.UPRIGHT.ordinal()));
-        assertTrue(resourceCard1Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner() == resourceCard2Corners.get(CornerPos.UPRIGHT.ordinal()));
+        assertSame(resourceCard1Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner(), resourceCard2Corners.get(CornerPos.UPRIGHT.ordinal()));
         assertEquals(false, resourceCard2Corners.get(CornerPos.DOWNRIGHT.ordinal()).getCovered());
-        assertEquals(null,
-                resourceCard2Corners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner());
-        assertTrue(null == resourceCard2Corners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner());
+        assertNull(resourceCard2Corners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner());
+        assertNull(resourceCard2Corners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner());
         assertEquals(false, resourceCard2Corners.get(CornerPos.DOWNLEFT.ordinal()).getCovered());
-        assertEquals(null,
-                resourceCard2Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
-        assertTrue(null == resourceCard2Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
+        assertNull(resourceCard2Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
+        assertNull(resourceCard2Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
 
         assertEquals(true, resourceCard3Corners.get(CornerPos.UPLEFT.ordinal()).getCovered());
         assertEquals(resourceCard4Corners.get(CornerPos.DOWNRIGHT.ordinal()),
                 resourceCard3Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner());
-        assertTrue(resourceCard4Corners.get(CornerPos.DOWNRIGHT.ordinal()) == resourceCard3Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner());
+        assertSame(resourceCard4Corners.get(CornerPos.DOWNRIGHT.ordinal()), resourceCard3Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner());
         assertEquals(resourceCard4Corners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner(),
                 resourceCard3Corners.get(CornerPos.UPLEFT.ordinal()));
-        assertTrue(resourceCard4Corners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner() == resourceCard3Corners.get(CornerPos.UPLEFT.ordinal()));
+        assertSame(resourceCard4Corners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner(), resourceCard3Corners.get(CornerPos.UPLEFT.ordinal()));
         assertEquals(false, resourceCard3Corners.get(CornerPos.UPRIGHT.ordinal()).getCovered());
-        assertEquals(null,
-                resourceCard3Corners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
-        assertTrue(null == resourceCard3Corners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
+        assertNull(resourceCard3Corners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
+        assertNull(resourceCard3Corners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner());
         assertEquals(false, resourceCard3Corners.get(CornerPos.DOWNRIGHT.ordinal()).getCovered());
         assertEquals(resourceCard1Corners.get(CornerPos.UPLEFT.ordinal()),
                 resourceCard3Corners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner());
-        assertTrue(resourceCard1Corners.get(CornerPos.UPLEFT.ordinal()) == resourceCard3Corners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner());
+        assertSame(resourceCard1Corners.get(CornerPos.UPLEFT.ordinal()), resourceCard3Corners.get(CornerPos.DOWNRIGHT.ordinal()).getLinkedCorner());
         assertEquals(resourceCard1Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner(),
                 resourceCard3Corners.get(CornerPos.DOWNRIGHT.ordinal()));
-        assertTrue(resourceCard1Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner() == resourceCard3Corners.get(CornerPos.DOWNRIGHT.ordinal()));
+        assertSame(resourceCard1Corners.get(CornerPos.UPLEFT.ordinal()).getLinkedCorner(), resourceCard3Corners.get(CornerPos.DOWNRIGHT.ordinal()));
         assertEquals(true, resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()).getCovered());
         assertEquals(goldCardCorners.get(CornerPos.UPRIGHT.ordinal()),
                 resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
-        assertTrue(goldCardCorners.get(CornerPos.UPRIGHT.ordinal()) == resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
+        assertSame(goldCardCorners.get(CornerPos.UPRIGHT.ordinal()), resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()).getLinkedCorner());
         assertEquals(goldCardCorners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner(),
                 resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()));
-        assertTrue(goldCardCorners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner() == resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()));
+        assertSame(goldCardCorners.get(CornerPos.UPRIGHT.ordinal()).getLinkedCorner(), resourceCard3Corners.get(CornerPos.DOWNLEFT.ordinal()));
     }
 
 
@@ -302,7 +295,7 @@ public class ControllerTest {
         /*Map.Entry<Integer,Side> entry = player.getHandCardsMap().entrySet().iterator().next();
         player.getHandCardsMap().remove(entry.getKey());*/
         c.drawCard(DrawType.SHAREDGOLD1);
-        assertEquals(1,gs.getCurrentPlayerIndex());
+        assertEquals(1, gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
         assertNotEquals(gs.getMainBoard().getSharedGoldCard(0), card1);
         assertEquals(gs.getMainBoard().getSharedGoldCard(1), card2);
@@ -313,7 +306,7 @@ public class ControllerTest {
         //entry = player.getHandCardsMap().entrySet().iterator().next();
         //player.getHandCardsMap().remove(entry.getKey());
         c.drawCard(DrawType.SHAREDGOLD2);
-        assertEquals(1,gs.getCurrentPlayerIndex());
+        assertEquals(1, gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
         assertEquals(gs.getMainBoard().getSharedGoldCard(0), card1);
         assertNotEquals(gs.getMainBoard().getSharedGoldCard(1), card2);
@@ -324,7 +317,7 @@ public class ControllerTest {
         /*entry = player.getHandCardsMap().entrySet().iterator().next();
         player.getHandCardsMap().remove(entry.getKey());*/
         c.drawCard(DrawType.SHAREDRESOURCE1);
-        assertEquals(1,gs.getCurrentPlayerIndex());
+        assertEquals(1, gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
         assertNotEquals(gs.getMainBoard().getSharedResourceCard(0), card1);
         assertEquals(gs.getMainBoard().getSharedResourceCard(1), card2);
@@ -337,7 +330,7 @@ public class ControllerTest {
         /*entry = player.getHandCardsMap().entrySet().iterator().next();
         player.getHandCardsMap().remove(entry.getKey());*/
         c.drawCard(DrawType.SHAREDRESOURCE2);
-        assertEquals(1,gs.getCurrentPlayerIndex());
+        assertEquals(1, gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
         assertEquals(gs.getMainBoard().getSharedResourceCard(0), card1);
         assertNotEquals(gs.getMainBoard().getSharedResourceCard(1), card2);
@@ -350,10 +343,10 @@ public class ControllerTest {
         player.getHandCardsMap().remove(entry.getKey());*/
         c.drawCard(DrawType.DECKRESOURCE);
         //card1 = gs.getMainBoard().drawFromResourceDeck();
-        assertEquals(1,gs.getCurrentPlayerIndex());
+        assertEquals(1, gs.getCurrentPlayerIndex());
         gs.setCurrentPlayerIndex(0);
         //assertTrue(player.handCardContains(card1.getId()));
-        assertEquals(gs.getMainBoard().getResourceDeckSize(), size -1);
+        assertEquals(gs.getMainBoard().getResourceDeckSize(), size - 1);
         //assertNotEquals(gs.getMainBoard().getResourceDeck().getLast(), card1);
     }
 
@@ -377,4 +370,28 @@ public class ControllerTest {
         assertEquals(Side.FRONT, gs.getPlayer(0).getHandCardSide(1));
     }
 
+    @Test
+    public void testControllerSetter() throws IOException {
+        Server s = new Server(null, null, null);
+        GameState gs = new GameState(s);
+        Controller c = new Controller();
+        c.setGameState(gs);
+        VirtualView client1 = new SocketClient(null, null, null);
+        VirtualView client2 = new SocketClient(null, null, null);
+
+        gs.addPlayer("paolo", client1);
+        gs.addPlayer("piergiorgio", client2);
+
+        assertThrows(RuntimeException.class, () -> c.startGame(client1));
+
+        Populate.populate(gs);
+        c.setGamePhase(GamePhase.MAINPHASE);
+        assertEquals(gs.getCurrentGamePhase(), GamePhase.MAINPHASE);
+
+        c.addMessage(0, "messaggio");
+        assertEquals(gs.getChat().getMessages().getFirst().getContent(), "messaggio");
+
+        c.gameEnded(client1);
+        c.isConnected(client1);
+    }
 }

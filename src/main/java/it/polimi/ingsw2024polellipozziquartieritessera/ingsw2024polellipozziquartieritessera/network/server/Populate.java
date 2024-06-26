@@ -29,8 +29,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * Populate class that parse the cards from the json file and save the state of the game
+ */
 public class Populate {
 
+    /**
+     * Reads a JSON file from the classpath and returns its content as a string.
+     *
+     * @param fileName name of the JSON file to read
+     * @return the content of the JSON file as a string
+     * @throws IOException if an I/O error occurs while reading the file
+     */
     public static String readJSON(String fileName) throws IOException {
         InputStream inputStream = Populate.class.getResourceAsStream(fileName);
         if (inputStream == null) {
@@ -51,7 +61,12 @@ public class Populate {
         return stringBuilder.toString();
     }
 
-
+    /**
+     * Populates the given GameState object with data from a predefined JSON file.
+     *
+     * @param gameState the gamestate to populate
+     * @throws IOException if an I/O error occurs while reading the JSON file
+     */
     public static void populate(GameState gameState) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -80,7 +95,14 @@ public class Populate {
         }
     }
 
-
+    /**
+     * Creates a Card object based on the provided card data and id.
+     *
+     * @param setup boolean indicating if this method is called during setup
+     * @param card map containing the card data
+     * @param id card identifier
+     * @return created card
+     */
     public static Card createCard(boolean setup, Map<String, ?> card, Integer id) {
         Card returnCard = null;
 
@@ -132,6 +154,12 @@ public class Populate {
         return returnCard;
     }
 
+    /**
+     * Creates the Challenge object from the cards map
+     *
+     * @param card map containing the cards data
+     * @return created challenge
+     */
     private static Challenge createChallenge(Map<String, ?> card) {
         Challenge challenge = null;
         if (card.get("Type").equals("Objective") || card.get("Type").equals("Gold")){
@@ -162,6 +190,14 @@ public class Populate {
         return challenge;
     }
 
+    /**
+     * Creates the Corner object from the cards map
+     *
+     * @param side Side of the card where the corner is located
+     * @param card map containg the cards data
+     * @param id card identifier
+     * @return created corner
+     */
     private static Corner[] createCorners(String side, Map<String, ?> card, Integer id){
         Corner[] corners = new Corner[Config.N_CORNERS];
         //for in frontCorners
@@ -180,6 +216,11 @@ public class Populate {
         return corners;
     }
 
+    /**
+     * Saves the current state of the game to a file.
+     *
+     * @param gameState the gamestate that has to be saved
+     */
     public static void saveState(GameState gameState) {
         Gson gson = new Gson();
 
@@ -193,6 +234,12 @@ public class Populate {
         }
     }
 
+    /**
+     * Creates a save map for the given GameState object.
+     *
+     * @param gameState the gamestate to create a save map for
+     * @return HashMap representing the saved state of the game
+     */
     public static HashMap<String, Object> createSaveMap(GameState gameState){
         HashMap<String, Object> saveMap = new HashMap<>();
 
@@ -237,6 +284,12 @@ public class Populate {
 
     }
 
+    /**
+     * Creates a save map for the given Board object.
+     *
+     * @param mainBoard the Board object to create a save map for
+     * @return a HashMap representing the saved state of the board
+     */
     public static HashMap<String, Object> createMainBoardSave(Board mainBoard){
         HashMap<String, Object> saveMap = new HashMap<>();
 
@@ -249,7 +302,12 @@ public class Populate {
         return saveMap;
     }
 
-
+    /**
+     * Creates a save map for the given Player object.
+     *
+     * @param player the Player object to create a save map for
+     * @return a HashMap representing the saved state of the player
+     */
     public static HashMap<String, Object> createPlayerSave(Player player){
         //all attributes but gameState and client
         HashMap<String, Object> saveMap = new HashMap<>();
@@ -276,6 +334,12 @@ public class Populate {
         return saveMap;
     }
 
+    /**
+     * Restores the game state from a previously saved file.
+     *
+     * @param gameState the GameState object to restore the state into
+     * @throws IOException if an I/O error occurs while reading the saved state file
+     */
     public static void restoreState(GameState gameState) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 

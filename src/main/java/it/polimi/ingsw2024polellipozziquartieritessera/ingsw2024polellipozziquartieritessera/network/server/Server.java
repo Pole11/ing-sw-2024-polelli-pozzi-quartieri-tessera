@@ -23,11 +23,20 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
+/**
+ * Server class
+ */
 public class Server implements VirtualServer {
     private final Controller controller;
     private final ServerSocket listenSocket;
     private final Registry registry;
 
+    /**
+     * Constructs a Server object with the specified listen socket, controller, and registry.
+     * @param listenSocket the ServerSocket object that the server will use to listen for incoming connections
+     * @param controller the Controller object that will handle the business logic for the server
+     * @param registry the Registry object used for service registration
+     */
     public Server(ServerSocket listenSocket, Controller controller, Registry registry) {
         this.listenSocket = listenSocket;
         this.controller = controller;
@@ -49,6 +58,14 @@ public class Server implements VirtualServer {
         }
     }
 
+    /**
+     * Starts the server with the specified host, socket port, and RMI port.
+     *
+     * @param host the hostname or IP address of the server
+     * @param socketport the port number for the server socket
+     * @param rmiport the port number for the RMI registry
+     * @throws IOException if an I/O error occurs when opening the socket or registry
+     */
     public static void startServer(String host, int socketport, int rmiport) throws IOException{
         // listen to socket
         ServerSocket listenSocket = new ServerSocket(socketport);
@@ -83,6 +100,9 @@ public class Server implements VirtualServer {
         server.runServer();
     }
 
+    /**
+     * Restarts the gamestate
+     */
     public void restart() {
         GameState gameState = new GameState(this);
         try {

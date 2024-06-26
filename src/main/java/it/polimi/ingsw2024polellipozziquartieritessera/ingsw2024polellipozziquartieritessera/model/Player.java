@@ -318,6 +318,11 @@ public class Player {
         this.placedCardsMap.put(index, side);
     }
 
+    /**
+     * Add a Card to the player's hand
+     * @param index CardID
+     * @param side Side
+     */
     public void addToHandCardsMap(Integer index, Side side) {
         this.handCardsMap.put(index, side);
         synchronized (gameState.getEventQueue()) {

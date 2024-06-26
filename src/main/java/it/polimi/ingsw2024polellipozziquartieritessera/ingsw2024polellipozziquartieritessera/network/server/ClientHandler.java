@@ -10,18 +10,32 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-
+/**
+ * Class that resides in the server and handles the clients messages for the server
+ */
 public class ClientHandler implements VirtualView {
     final Server server;
     final BufferedReader input;
     final VirtualView view;
 
+    /**
+     * Constructor for the ClientHandler class.
+     *
+     * @param server The server instance this handler is associated with.
+     * @param input The BufferedReader to read input from the client.
+     * @param output The BufferedWriter to send output to the client.
+     */
     public ClientHandler(Server server, BufferedReader input, BufferedWriter output) {
         this.server = server;
         this.input = input;
         this.view = new ClientProxy(output);
     }
 
+    /**
+     * Runs the virtual client, continuously reading input from the client and handling commands.
+     *
+     * @throws IOException If an I/O error occurs while reading input.
+     */
     public void runVirtualView() throws IOException {
         String line;
         System.out.println("New Socket client connected");

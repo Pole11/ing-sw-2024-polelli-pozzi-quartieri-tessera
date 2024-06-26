@@ -8,9 +8,16 @@ import java.util.ArrayList;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
+/**
+ * Class that resides in the server and handles message from the server to the clients
+ */
 public class ClientProxy implements VirtualView {
     final PrintWriter output;
 
+    /**
+     * Constructor for the ClientProxy class.
+     * @param output The BufferedWriter to send output to the client.
+     */
     public ClientProxy(BufferedWriter output) {
         this.output = new PrintWriter(output);
     }
