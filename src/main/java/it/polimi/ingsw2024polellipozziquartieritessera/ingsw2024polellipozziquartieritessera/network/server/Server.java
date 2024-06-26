@@ -44,6 +44,7 @@ public class Server implements VirtualServer {
 
             startServer(host, socketport, rmiport);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("This is the server, please remember to use the right parameters: [server ip] [server port socket] [server port rmi]");
         }
     }
