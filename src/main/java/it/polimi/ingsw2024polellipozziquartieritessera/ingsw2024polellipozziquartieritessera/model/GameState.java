@@ -425,7 +425,7 @@ public class GameState {
         clients.add(client);
         Player reconnectingPlayer = getPlayer(getPlayerIndex(client));
         synchronized (eventQueue) {
-            eventQueue.add(new redirectOutEvent(this, clients, true));
+            eventQueue.add(new RedirectOutEvent(this, clients, true));
             GamePhase gamePhase = currentGamePhase;
             if (currentGamePhase.equals(GamePhase.TIMEOUT)){
                 gamePhase = prevGamePhase;
@@ -513,7 +513,7 @@ public class GameState {
                 Player currentPlayer = players.get(i);
                 eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
             }
-            eventQueue.add(new redirectOutEvent(this, clients, false));
+            eventQueue.add(new RedirectOutEvent(this, clients, false));
             eventQueue.notifyAll();
 
         }

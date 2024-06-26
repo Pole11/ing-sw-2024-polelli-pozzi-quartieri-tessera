@@ -5,6 +5,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.controllers.GUIControllerLobby;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.scene.control.Alert;
 
@@ -30,16 +31,18 @@ public class Client implements VirtualView {
 
     private final String rmiOrSocket;
     private final String host;
+    private final String myIp;
     private final int port;
     private boolean running;
     ByteArrayOutputStream baos;
     PrintStream restoreStream;
     PrintStream oldPrintStream;
 
-    public Client(String rmiOrSocket, String host, String port){
+    public Client(String rmiOrSocket, String host, String port, String myIp){
         this.viewModel = new ViewModel();
         this.rmiOrSocket = rmiOrSocket;
         this.host = host;
+        this.myIp = myIp;
         this.port = Integer.parseInt(port);
         this.running = false;
         this.baos = new ByteArrayOutputStream();
@@ -50,11 +53,21 @@ public class Client implements VirtualView {
     public static void main(String[] args) throws IOException {
         System.out.println("Executing client");
 
-        String rmiOrSocket = args[0];
-        String host = args[1];
-        String port = args[2];
 
-        (new Client(rmiOrSocket, host, port)).startClient();
+        try {
+            String rmiOrSocket = args[0];
+            String host = args[1];
+            String port = args[2];
+            String myIp = "";
+            try {
+                myIp = args[3];
+            } catch (IndexOutOfBoundsException e) {
+                if (rmiOrSocket.equals("rmi")) System.out.println("If you are encountering an error with rmi, please provide the ip address of the current machine");
+            }
+            (new Client(rmiOrSocket, host, port, myIp)).startClient();
+        } catch(Exception e) {
+            System.out.println("This is the client, please remember to use the right parameters: [rmi/socket] [server ip] [server port (depends on rmi and socket)] [optional with rmi: ip address of the current machine]");
+        }
 
     }
 
@@ -106,6 +119,7 @@ public class Client implements VirtualView {
             ((SocketClient) client).run();
         } else { //default rmi
             try {
+                if (myIp != null && !myIp.isEmpty()) System.setProperty("java.rmi.server.hostname", myIp);
                 Registry registry = LocateRegistry.getRegistry(host, port);
                 this.server = (VirtualServer) registry.lookup("VirtualServer");
                 this.client = new RmiClient(server, this);

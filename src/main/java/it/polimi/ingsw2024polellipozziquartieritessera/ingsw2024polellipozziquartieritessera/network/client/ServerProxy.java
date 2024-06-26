@@ -81,6 +81,11 @@ public class ServerProxy implements VirtualServer {
         output.flush();
     }
 
+    public void pong(VirtualView client) throws RemoteException {
+        output.println(Command.PONG);
+        output.flush();
+    }
+
     @Override
     public void gameEnded(VirtualView client) throws RemoteException {
         output.println(Command.GAMEENDED);

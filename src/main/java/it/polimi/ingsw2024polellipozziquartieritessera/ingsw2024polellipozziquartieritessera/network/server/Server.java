@@ -37,11 +37,15 @@ public class Server implements VirtualServer {
     public static void main(String[] argv) throws IOException {
         System.out.println("Executing server");
 
-        String host = argv[0];
-        int socketport = Integer.parseInt(argv[1]);
-        int rmiport = Integer.parseInt(argv[2]);
+        try {
+            String host = argv[0];
+            int socketport = Integer.parseInt(argv[1]);
+            int rmiport = Integer.parseInt(argv[2]);
 
-        startServer(host, socketport, rmiport);
+            startServer(host, socketport, rmiport);
+        } catch (Exception e) {
+            System.out.println("This is the server, please remember to use the right parameters: [server ip] [server port socket] [server port rmi]");
+        }
     }
 
     public static void startServer(String host, int socketport, int rmiport) throws IOException{
@@ -250,6 +254,10 @@ public class Server implements VirtualServer {
             client.sendError("you don't exist, to reconnect login with ADDUSER <your previous nickname>");
             client.connectionInfo(getPlayerIndex(client), false);
         }
+    }
+
+    @Override
+    public void pong(VirtualView client) throws RemoteException {
     }
 
     @Override
