@@ -55,6 +55,11 @@ public class ClientHandler implements VirtualView {
     }
 
     @Override
+    public void pong() throws RemoteException {
+        view.pong();
+    }
+
+    @Override
     public void sendError(String error) throws RemoteException {
         view.sendError(error);
     }

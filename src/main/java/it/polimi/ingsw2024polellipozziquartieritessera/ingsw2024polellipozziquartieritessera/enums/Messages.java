@@ -11,6 +11,7 @@ public enum Messages {
     MESSAGE,
     NICKNAME,
     PING,
+    PONG,
     SENDINDEX,
     ADDHAND,
     REMOVEHAND,

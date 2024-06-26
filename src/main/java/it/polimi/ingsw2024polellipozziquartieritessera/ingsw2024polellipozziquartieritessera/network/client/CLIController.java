@@ -30,6 +30,8 @@ public class CLIController {
     private boolean executeCommandRunning;
     private boolean pongRunning;
 
+    private Thread serverThread;
+
     public CLIController(ViewModel viewModel){
         this.commandQueue = new ArrayDeque();
         this.viewModel = viewModel;
@@ -40,6 +42,9 @@ public class CLIController {
         pongRunning = true;
     }
 
+    public void pongAnswer(){
+        serverThread.interrupt();
+    }
 
     public void restartPong(VirtualServer server, VirtualView client, Client clientContainer){
         if (pongThread != null && pongThread.isAlive()){
@@ -56,6 +61,17 @@ public class CLIController {
         pongThread = new Thread(()->{
             while (pongRunning) {
                 if (server == null) continue;
+                if (serverThread == null || !serverThread.isAlive()){
+                    serverThread = new Thread(()->{
+                        try {
+                            Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
+                            clientContainer.serverDisconnected();
+                        } catch (InterruptedException e) {
+                            System.out.println("serverThread interrupted");
+                        }
+                    });
+                    serverThread.start();
+                }
                 synchronized (commandQueue){
                     PongCommandRunnable commandRunnable = new PongCommandRunnable();
                     commandRunnable.setClient(client);
@@ -65,7 +81,8 @@ public class CLIController {
                     commandQueue.notifyAll();
                 }
                 try {
-                    sleep(5000);
+                    sleep(1000*Config.NEXT_PONG);
+                    //sleep(5000);
                 } catch (InterruptedException e) {
                     System.out.println("pong thread interrupted");
                 }
@@ -143,7 +160,9 @@ public class CLIController {
                 command = commandQueue.remove();
                 //commandQueue.notifyAll();
             }
+            System.out.println(command);
             command.executeCLI();
+
         }
     }
 

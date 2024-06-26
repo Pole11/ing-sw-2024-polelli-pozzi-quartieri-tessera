@@ -500,6 +500,15 @@ public class Client implements VirtualView {
     }
 
     @Override
+    public void pong() throws RemoteException {
+        if (meDoGui) {
+            getGuiApplication().getGUIController().pongAnswer();
+        } else {
+            getCliController().pongAnswer();
+        }
+    }
+
+    @Override
     public void sendError(String error) throws RemoteException {
         if (meDoGui) {
             guiApplication.getGUIController().setServerError(error);

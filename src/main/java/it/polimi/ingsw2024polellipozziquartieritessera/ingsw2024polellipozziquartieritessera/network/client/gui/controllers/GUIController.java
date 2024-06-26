@@ -65,6 +65,8 @@ abstract public class GUIController {
     private boolean executeCommandRunning;
     private boolean pongRunning;
 
+    private Thread serverThread;
+
     @FXML
     private void initialize() {
         isSceneLoaded = true;
@@ -99,6 +101,10 @@ abstract public class GUIController {
         restartExecuteCommand();
 
     }
+
+    public void pongAnswer(){
+        serverThread.interrupt();
+    }
     
     public void restartPong(VirtualServer server, VirtualView client, Client clientContainer){
         if (pongThread != null && pongThread.isAlive()){
@@ -111,10 +117,22 @@ abstract public class GUIController {
             }
         }
 
+
+
         pongRunning = true;
         pongThread = new Thread(()->{
             while (pongRunning) {
-                //if (server == null) continue;
+                if (serverThread == null || !serverThread.isAlive()){
+                    serverThread = new Thread(()->{
+                        try {
+                            Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
+                            clientContainer.serverDisconnected();
+                        } catch (InterruptedException e) {
+
+                        }
+                    });
+                    serverThread.start();
+                }
                 synchronized (commandQueue){
                     PongCommandRunnable commandRunnable = new PongCommandRunnable();
                     commandRunnable.setClient(client);
@@ -124,7 +142,8 @@ abstract public class GUIController {
                     commandQueue.notifyAll();
                 }
                 try {
-                    sleep(5000);
+                    sleep(1000*Config.NEXT_PONG);
+                    //sleep(5000);
                 } catch (InterruptedException e) {
                     System.out.println("pong thread interrupted");
                 }

@@ -66,6 +66,11 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
     }
 
     @Override
+    public void pong() throws RemoteException {
+        clientContainer.pong();
+    }
+
+    @Override
     public void nicknameUpdate(int index, String nickname) throws RemoteException {
         clientContainer.nicknameUpdate(index, nickname);
     }

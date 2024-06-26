@@ -145,6 +145,9 @@ public class SocketClient implements VirtualView {
                 case Messages.REDIRECTOUT:
                     this.redirectOut(Boolean.parseBoolean(messageString[1]));
                     break;
+                case Messages.PONG:
+                    this.pong();
+                    break;
                 default:
                     System.err.println("[5xx INVALID MESSAGE FROM SERVER]");
                     break;
@@ -162,6 +165,11 @@ public class SocketClient implements VirtualView {
     @Override
     public void ping(String ping) throws RemoteException {
         clientContainer.ping(ping);
+    }
+
+    @Override
+    public void pong() throws RemoteException {
+        clientContainer.pong();
     }
 
     @Override

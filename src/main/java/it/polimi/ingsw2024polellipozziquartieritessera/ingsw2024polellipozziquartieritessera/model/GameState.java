@@ -269,7 +269,11 @@ public class GameState {
                 event = eventQueue.remove();
 
             }
-            new Thread(event::execute).start();
+            if (event instanceof PingEvent){
+                new Thread(event::execute).start();
+            } else {
+                event.execute();
+            }
             Populate.saveState(this);
             System.out.println(event);
             System.out.println("THIS IS THE CLIENTS" + players.stream().map(Player::getClient).toList());

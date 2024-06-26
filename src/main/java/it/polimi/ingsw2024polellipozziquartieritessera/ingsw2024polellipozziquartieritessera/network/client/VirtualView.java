@@ -9,6 +9,7 @@ import java.util.ArrayList;
 //clint che vede il server
 public interface VirtualView extends Remote {
     void ping(String ping) throws RemoteException;
+    void pong() throws RemoteException;
     void sendError(String error) throws RemoteException;
     void sendIndex(int index) throws RemoteException;
     void nicknameUpdate(int index, String nickname) throws RemoteException;

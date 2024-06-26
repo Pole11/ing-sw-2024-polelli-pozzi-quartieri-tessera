@@ -17,6 +17,8 @@ public class Config {
 
     //al timeout in seconds
     public static final int TIMEOUT_TIME = 30000; // 60
+    public static final int WAIT_FOR_PONG_TIME = 2;
+    public static final int NEXT_PONG = 5;
     public static final int NEXT_PING_TIME = 4; // 10
     public static final int WAIT_FOR_PING_TIME = 4; // 5
     public static final int WAIT_DISCONNECTED_SERVER = 3;
