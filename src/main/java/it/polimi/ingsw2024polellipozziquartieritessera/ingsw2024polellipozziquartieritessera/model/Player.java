@@ -172,6 +172,11 @@ public class Player {
         return this.objectiveCard;
     }
 
+    /**
+     * Set the secret objective card chosen by the player
+     * Set secretOptions to null in order to manage reconnections
+     * @param objectiveCard The chosen objective
+     */
     public void setObjectiveCard(ObjectiveCard objectiveCard) {
         this.objectiveCard = objectiveCard;
         synchronized (gameState.getEventQueue()) {
@@ -179,8 +184,6 @@ public class Player {
             gameState.addToEventQueue(new UpdateSecretObjectiveEvent(gameState, gameState.singleClient(this.getClient()), new ArrayList<>(List.of(objectiveCard))));
             gameState.getEventQueue().notifyAll();
         }
-
-        // set options to null in order to manage reconnections
         objectiveCardOptions[0] = null;
         objectiveCardOptions[1] = null;
     }
@@ -331,6 +334,10 @@ public class Player {
         }
     }
 
+    /**
+     * Remove a Card from the hand of the player
+     * @param index The CardID
+     */
     public void removeFromHandCardsMap(Integer index) {
         System.out.println("Removing from hand card " + index);
         this.handCardsMap.remove(index);
@@ -340,6 +347,10 @@ public class Player {
         }
     }
 
+    /**
+     * Increments the player's point and notifies the other players about it
+     * @param points The amount of points to be incremented
+     */
     public void addPoints(int points) {
         this.points += points;
         synchronized (gameState.getEventQueue()) {
@@ -361,6 +372,11 @@ public class Player {
 
     // METHODS
 
+    /**
+     * Allows to change the side of a card in the hand of a player
+     * @param index PlayerIndex
+     * @param side The new side
+     */
     public void changeHandSide(Integer index, Side side) {
         this.handCardsMap.replace(index, side);
         synchronized (gameState.getEventQueue()) {

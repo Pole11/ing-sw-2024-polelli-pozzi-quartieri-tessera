@@ -61,6 +61,11 @@ public class Controller {
         return this.gameState.getPlayer(index).getNickname();
     }
 
+    /**
+     * Gets the different choices of secretObective
+     * @param playerId The id of the player who has to take the choice
+     * @return An array of N_OBJECTIVE_CARD_OPTIONS Objective card
+     */
     public ObjectiveCard[] getObjectiveCardOptions(int playerId) {
         ObjectiveCard[] objectiveCardsOptions = new ObjectiveCard[Config.N_OBJECTIVE_CARD_OPTIONS];
         for (int i = 0; i < Config.N_OBJECTIVE_CARD_OPTIONS; i++) {
@@ -77,7 +82,12 @@ public class Controller {
         }
     }
 
-    //this is runned after gameState is populated with cards and players
+    //this is run after gameState is populated with cards and players
+
+    /**
+     * Calls the corresponding function on gameState
+     * @param client
+     */
     public void startGame(VirtualView client) {
         synchronized (this.gameState) {
             try {
@@ -111,6 +121,22 @@ public class Controller {
 
     //----------------place, draw, flip-----------------------
 
+    /**
+     * Checks if a card can be placed in a specific place
+     * @param player The player which should possess the card
+     * @param placingCard The card
+     * @param placingCardId the Card ID
+     * @param tableCorner The corner of the card already placed
+     * @param placingCorner The corner that should be placed on the tableCorner
+     * @param placingCardSide The chosen side to be placed on
+     * @throws WrongInstanceTypeException The placing card is a starter, so it cant be placed
+     * @throws CardIsNotInHandException The placing card is not in the player's hand
+     * @throws CardAlreadPlacedException The placing card is already on a board
+     * @throws WrongPlacingPositionException The table corner is null
+     * @throws CardAlreadyPresentOnTheCornerException The table corner has already another card on itself
+     * @throws PlacingOnHiddenCornerException The table corner is hidden
+     * @throws GoldCardCannotBePlacedException The placing card cannot be placed due to lack of resources
+     */
     private void placeCardCheckings(Player player, CornerCard placingCard, int placingCardId,  Corner tableCorner, Corner placingCorner, Side placingCardSide) throws WrongInstanceTypeException, CardIsNotInHandException, CardAlreadPlacedException, WrongPlacingPositionException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, GoldCardCannotBePlacedException {
 
         //sent to client
@@ -138,7 +164,23 @@ public class Controller {
         if (!goldPlaceable(player, placingCard, placingCardSide)) throw new GoldCardCannotBePlacedException("You haven't the necessary resources to place the goldcard " + placingCardId);
     }
 
-
+    /**
+     * Place a card on another
+     * @param playerIndex Owner of the placing card
+     * @param placingCardId ID of the placing card
+     * @param tableCardId ID of the card already placed
+     * @param tableCornerPos Position on the table Card chosen to be covered
+     * @param placingCardSide Chosen side of the placing card
+     * @throws WrongPlacingPositionException The table corner is null
+     * @throws CardNotPlacedException The placing of the card has failed
+     * @throws GoldCardCannotBePlacedException The placing card cannot be placed due to lack of resources
+     * @throws CardAlreadyPresentOnTheCornerException The table corner has already another card on itself
+     * @throws PlacingOnHiddenCornerException The table corner is hidden
+     * @throws CardAlreadPlacedException The placing card is already on a board
+     * @throws CardIsNotInHandException The placing card is not in the player's hand
+     * @throws WrongInstanceTypeException The placing card is a starter, so it cant be placed
+     * @throws CardNotOnBoardException The table card is not on a board
+     */
     public void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos, Side placingCardSide) throws WrongPlacingPositionException, CardNotPlacedException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException, WrongInstanceTypeException, CardNotOnBoardException {
         synchronized (this.gameState) {
             Player player = gameState.getPlayer(playerIndex);
@@ -197,7 +239,13 @@ public class Controller {
         }
     }
 
-
+    /**
+     * Draw a card from the mainBoard
+     * @param drawType The selected card to be drawn : DECKGOLD, SHAREDGOLD1, SHAREDGOLD2, DECKRESOURCE, SHAREDRESOURCE1, SHAREDRESOURCE2
+     * @throws InvalidHandException The player has too many card in his hand
+     * @throws EmptyDeckException The selected deck is empty
+     * @throws EmptyMainBoardException The selected SharedCard doesnt exists
+     */
     public void drawCard(DrawType drawType) throws InvalidHandException, EmptyDeckException, EmptyMainBoardException {
         synchronized (this.gameState) {
             Board board = this.gameState.getMainBoard();
