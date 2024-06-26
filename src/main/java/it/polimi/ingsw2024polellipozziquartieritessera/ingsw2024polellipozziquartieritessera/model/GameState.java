@@ -440,7 +440,7 @@ public class GameState {
         System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + reconnectingPlayer.getClient());
 
         synchronized (eventQueue) {
-            eventQueue.add(new redirectOutEvent(this, clients, true));
+            eventQueue.add(new RedirectOutEvent(this, clients, true));
             GamePhase gamePhase = currentGamePhase;
             if (currentGamePhase.equals(GamePhase.TIMEOUT)){
                 gamePhase = prevGamePhase;
@@ -532,7 +532,7 @@ public class GameState {
                 Player currentPlayer = players.get(i);
                 eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
             }
-            eventQueue.add(new redirectOutEvent(this, clients, false));
+            eventQueue.add(new RedirectOutEvent(this, clients, false));
             eventQueue.notifyAll();
 
         }
@@ -881,7 +881,7 @@ public class GameState {
                 eventQueue.notifyAll();
             }
             this.answered.put(getPlayerIndex(e), true);
-            System.out.println(e.getNickname() + " chose his color, the number of answered is: " + numberAnswered());
+            System.out.println(e.getNickname() + " automatically chose his starter card, the number of answered is: " + numberAnswered());
         });
 
         Player player = this.players.get(playerIndex);
@@ -911,7 +911,7 @@ public class GameState {
 
 
         this.answered.put(playerIndex, true);
-        System.out.println(playerIndex + " chose his startercard, the number of answered is: " + numberAnswered());
+        System.out.println(getPlayer(playerIndex).getNickname() + " chose his startercard, the number of answered is: " + numberAnswered());
         //notify him and all the others about the change
         if (numberAnswered() == players.size()) {
             System.out.println("everyone answered");
@@ -930,7 +930,7 @@ public class GameState {
         players.stream().filter(e -> !e.isConnected() && e.getColor() == null).forEach(e->{
             e.setColor(Arrays.stream(Color.values()).filter(p-> !players.stream().map(Player::getColor).toList().contains(p)).findFirst().get());
             this.answered.put(getPlayerIndex(e), true);
-            System.out.println(e.getNickname() + " chose his color, the number of answered is: " + numberAnswered());
+            System.out.println(e.getNickname() + " automatically chose his color, the number of answered is: " + numberAnswered());
         });
 
 
@@ -1041,7 +1041,7 @@ public class GameState {
         players.stream().filter(e -> !e.isConnected() && e.getObjectiveCard() == null).forEach(e->{
             e.setObjectiveCard(e.getObjectiveCardOption(0));
             this.answered.put(getPlayerIndex(e), true);
-            System.out.println(e.getNickname() + " chose his objective, the number of ansewred is: " + numberAnswered());
+            System.out.println(e.getNickname() + " automatically chose his objective, the number of ansewred is: " + numberAnswered());
         });
 
         Player player = this.players.get(playerIndex);

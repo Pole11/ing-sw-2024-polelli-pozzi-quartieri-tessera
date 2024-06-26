@@ -55,7 +55,7 @@ public class Server implements VirtualServer {
 
         // listen to rmi
         System.setProperty("java.rmi.server.hostname", host);
-
+        System.setProperty("sun.rmi.transport.tcp.responseTimeout", "1000");
 
 
         String name = "VirtualServer";

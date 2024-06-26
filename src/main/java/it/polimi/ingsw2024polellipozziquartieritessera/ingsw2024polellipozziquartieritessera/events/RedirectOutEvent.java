@@ -6,10 +6,10 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class redirectOutEvent extends Event {
+public class RedirectOutEvent extends Event {
     private final boolean bool;
 
-    public redirectOutEvent(GameState gameState, ArrayList<VirtualView> clients, boolean bool) {
+    public RedirectOutEvent(GameState gameState, ArrayList<VirtualView> clients, boolean bool) {
         super(gameState, clients);
         this.bool = bool;
     }

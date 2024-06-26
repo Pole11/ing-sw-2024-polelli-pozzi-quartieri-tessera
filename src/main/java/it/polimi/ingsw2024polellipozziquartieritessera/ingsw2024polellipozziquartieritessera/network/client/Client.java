@@ -121,6 +121,7 @@ public class Client implements VirtualView {
         } else { //default rmi
             try {
                 if (myIp != null && !myIp.isEmpty()) System.setProperty("java.rmi.server.hostname", myIp);
+                System.setProperty("sun.rmi.transport.tcp.responseTimeout", "1000");
 
                 Registry registry = LocateRegistry.getRegistry(host, port);
                 this.server = (VirtualServer) registry.lookup("VirtualServer");
@@ -172,8 +173,13 @@ public class Client implements VirtualView {
         guiApplication.runGui(client, server, this, viewModel);
     }
 
+
+
+
+
     public void serverDisconnected(){
-        if (meDoGui){
+        //OLD
+        /*if (meDoGui){
             guiApplication.getGUIController().setServerError("There was an error in server, the server is not available, wait to be rederected in the login page");
         } else {
             System.out.println("server disconnected, wait to be notified of being connected to the server");
@@ -192,6 +198,31 @@ public class Client implements VirtualView {
             serverDisconnected();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+         */
+        while (true) {
+            if (meDoGui) {
+                guiApplication.getGUIController().setServerError("There was an error in server, the server is not available, wait to be redirected to the login page");
+            } else {
+                System.out.println("Server disconnected, wait to be notified of being connected to the server");
+            }
+
+            try {
+                Thread.sleep(1000 * Config.WAIT_DISCONNECTED_SERVER);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                startClient();
+                break; // If startClient() succeeds, break the loop
+            } catch (ConnectException e) {
+                System.out.println("Disconnection from client 2");
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
