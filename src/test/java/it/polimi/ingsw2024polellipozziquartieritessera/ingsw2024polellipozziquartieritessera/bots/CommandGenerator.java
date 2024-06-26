@@ -35,6 +35,8 @@ public class CommandGenerator {
                     }
                     secretChosen = false;
                     sideChosen = false;
+                } else if (BotConfig.CAN_START_IF_FULL && client.getViewModel().getPlayersSize() == BotConfig.PLAYER_NUM){
+                    command = "START";
                 }
                 break;
             case CHOOSESTARTERSIDEPHASE:

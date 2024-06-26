@@ -1,4 +1,4 @@
-package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events;
+package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.events;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -6,21 +6,21 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class GameEndedEvent extends Event {
-    private final ArrayList<Integer> winners;
+public class SendIndexEvent extends Event {
+    private final int id;
 
-    public GameEndedEvent(GameState gameState, ArrayList<VirtualView> clients, ArrayList<Integer> winners) {
+    public SendIndexEvent(GameState gameState, ArrayList<VirtualView> clients, int id) {
         super(gameState, clients);
-        this.winners = winners;
+        this.id = id;
     }
 
     @Override
     public void execute() {
         for (VirtualView client : clients) {
             try {
-                client.updateWinner(winners);
+                client.sendIndex(id);
             } catch (RemoteException e) {
-                playerDisconnected(client);
+                this.playerDisconnected(client);
             }
         }
     }

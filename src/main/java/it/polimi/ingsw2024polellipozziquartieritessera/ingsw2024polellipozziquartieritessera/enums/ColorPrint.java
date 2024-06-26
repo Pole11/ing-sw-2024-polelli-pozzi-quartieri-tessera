@@ -13,11 +13,11 @@ public enum ColorPrint {
     LIGHT_YELLOW_BACKGROUND("\033[48;5;229m", 5),
     BLACK("\033[0;30m", 10),    // BLACK
     GOLD("\033[38;5;179m", 11),
-    WHITE_BACKGROUND("\033[47m",12),   // WHITE
-    RED("\033[0;31m",13),      // RED
-    GREEN("\033[0;32m",14),    // GREEN
-    YELLOW("\033[0;33m",15),   // YELLOW
-    BLUE("\033[0;34m",16);     // BLUE
+    WHITE_BACKGROUND("\033[47m", 12),   // WHITE
+    RED("\033[0;31m", 13),      // RED
+    GREEN("\033[0;32m", 14),    // GREEN
+    YELLOW("\033[0;33m", 15),   // YELLOW
+    BLUE("\033[0;34m", 16);     // BLUE
 
     /*
     // Regular Colors. Normal color, no bold, background color etc.
@@ -50,19 +50,15 @@ public enum ColorPrint {
         return ColorPrint.RESET;
     }
 
-    @Override
-    public String toString() {
-        return code;
-    }
-
     public static int getColorIndex(int cardIndex) {
-        int i = (int)Math.floor((double)(cardIndex-1) / 10 + 1);
+        int i = (int) Math.floor((double) (cardIndex - 1) / 10 + 1);
         if (i > 4)
             i -= 4;
-        return Math.min(i,5);
+        return Math.min(i, 5);
     }
-    public static ColorPrint getColorPrint(Color c){
-        switch (c){
+
+    public static ColorPrint getColorPrint(Color c) {
+        switch (c) {
             case RED -> {
                 return RED;
             }
@@ -79,5 +75,10 @@ public enum ColorPrint {
                 return BLACK;
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return code;
     }
 }

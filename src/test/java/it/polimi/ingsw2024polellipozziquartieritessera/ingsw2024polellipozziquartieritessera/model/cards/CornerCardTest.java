@@ -1,11 +1,9 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards;
+
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.Controller;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerColorException;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerNicknameException;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
 import org.junit.jupiter.api.Test;
 
@@ -15,36 +13,37 @@ import java.rmi.*;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CornerCardTest {
     // ALL METHODS TESTED
     @Test
-    void testGetterSetter() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
+    void testGetterSetter() throws IOException {
         // setup
         Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
             @Override
-            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+            public Remote lookup(String name) throws RemoteException {
                 return null;
             }
 
             @Override
-            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+            public void bind(String name, Remote obj) throws RemoteException {
 
             }
 
             @Override
-            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+            public void unbind(String name) throws RemoteException {
 
             }
 
             @Override
-            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+            public void rebind(String name, Remote obj) throws RemoteException {
 
             }
 
             @Override
-            public String[] list() throws RemoteException, AccessException {
+            public String[] list() throws RemoteException {
                 return new String[0];
             }
         });
@@ -55,43 +54,17 @@ public class CornerCardTest {
         assertEquals(card.getFrontCorners().length, 4);
         assertEquals(card.getBackCorners().length, 4);
 
-        for (Corner corner : card.getFrontCorners()){
+        for (Corner corner : card.getFrontCorners()) {
             assertNotNull(corner);
         }
-        for (Corner corner : card.getBackCorners()){
+        for (Corner corner : card.getBackCorners()) {
             assertNotNull(corner);
         }
     }
 
     @Test
-    void testGetCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
-        Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
-            @Override
-            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
-                return null;
-            }
-
-            @Override
-            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
-
-            }
-
-            @Override
-            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
-
-            }
-
-            @Override
-            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
-
-            }
-
-            @Override
-            public String[] list() throws RemoteException, AccessException {
-                return new String[0];
-            }
-        });
-        GameState g = new GameState(s);
+    void testGetCorners() throws IOException {
+        GameState g = getGameState();
         Populate.populate(g);
         CornerCard card = (CornerCard) g.getCard(40);
 
@@ -108,36 +81,66 @@ public class CornerCardTest {
         assertEquals(4, backCorners.size());
 
         // verify corners are not null
-        for (Corner corner : allCorners){
+        for (Corner corner : allCorners) {
             assertNotNull(corner);
         }
     }
 
-    @Test
-    void testGetLinkedCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
+    private static GameState getGameState() throws IOException {
         Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
             @Override
-            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+            public Remote lookup(String name) throws RemoteException {
                 return null;
             }
 
             @Override
-            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+            public void bind(String name, Remote obj) throws RemoteException {
 
             }
 
             @Override
-            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+            public void unbind(String name) throws RemoteException {
 
             }
 
             @Override
-            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+            public void rebind(String name, Remote obj) throws RemoteException {
 
             }
 
             @Override
-            public String[] list() throws RemoteException, AccessException {
+            public String[] list() throws RemoteException {
+                return new String[0];
+            }
+        });
+        return new GameState(s);
+    }
+
+    @Test
+    void testGetLinkedCards() throws IOException {
+        Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
+            @Override
+            public Remote lookup(String name) throws RemoteException {
+                return null;
+            }
+
+            @Override
+            public void bind(String name, Remote obj) throws RemoteException {
+
+            }
+
+            @Override
+            public void unbind(String name) throws RemoteException {
+
+            }
+
+            @Override
+            public void rebind(String name, Remote obj) throws RemoteException {
+
+            }
+
+            @Override
+            public String[] list() throws RemoteException {
                 return new String[0];
             }
         });
@@ -160,30 +163,30 @@ public class CornerCardTest {
     }
 
     @Test
-    void testGetUncoveredCorners() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
+    void testGetUncoveredCorners() throws IOException {
         Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
             @Override
-            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
+            public Remote lookup(String name) throws RemoteException {
                 return null;
             }
 
             @Override
-            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+            public void bind(String name, Remote obj) throws RemoteException {
 
             }
 
             @Override
-            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+            public void unbind(String name) throws RemoteException {
 
             }
 
             @Override
-            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+            public void rebind(String name, Remote obj) throws RemoteException {
 
             }
 
             @Override
-            public String[] list() throws RemoteException, AccessException {
+            public String[] list() throws RemoteException {
                 return new String[0];
             }
         });
@@ -199,7 +202,7 @@ public class CornerCardTest {
         assertEquals(card.getUncoveredCorners(Side.BACK), cornersBack);
 
         // cover all the corners
-        for (Corner corner : card.getCorners()){
+        for (Corner corner : card.getCorners()) {
             corner.setCovered(true);
         }
 

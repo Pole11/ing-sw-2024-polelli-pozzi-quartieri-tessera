@@ -11,25 +11,27 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.SocketClient;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PlayerTest {
 
-    /*
     @Test
     void playerTestConstructor() {
         for (Color c : Color.values()){
-            // TODO: test with different nickname lengths
             assertAll(() -> new Player("Nickname", null, null));
         }
     }
 
     @Test
     void testSimpleMethods() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
-        GameState g = Populate.populate();
+        Server server = new Server(null, null, null);
+        GameState g = new GameState(server);
+        Populate.populate(g);
         Player player = new Player("Bob", null, g);
 
         int wons = player.getObjectivesWon();
@@ -38,19 +40,23 @@ public class PlayerTest {
     }
 
     @Test
-    void getCardPointsTest1() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException, EmptyDeckException {
+    void getCardPointsTest1() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException, EmptyDeckException, CardNotOnBoardException {
         int resourceCardId1 = 1;
         int resourceCardId2 = 13;
         int resourceCardId3 = 11;
         int resourceCardId4 = 18;
         int goldCardId1 = 56;
-        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
+        VirtualView client = new SocketClient(null, null, null);
 
         // create game state
-        GameState gs = Populate.createCardsMap();
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        Populate.populate(gs);
+
         gs.addPlayer("Nickname", client);
         Player player = gs.getPlayer(0);
-        Controller c = new Controller(gs);
+        Controller c = new Controller();
+        c.setGameState(gs);
         gs.getMainBoard().shuffleCards();
         gs.getMainBoard().initSharedGoldCards();
         gs.getMainBoard().initSharedResourceCards();
@@ -81,7 +87,7 @@ public class PlayerTest {
 
     // check points and elements
     @Test
-    void getCardPointsTest2() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException, EmptyDeckException {
+    void getCardPointsTest2() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadPlacedException, CardIsNotInHandException, EmptyDeckException, CardNotOnBoardException {
         // create cards map
         int starterCardId = 81;
         int resourceCardId1 = 31;
@@ -98,13 +104,16 @@ public class PlayerTest {
         int goldCardId4 = 54;
         int resourceCardId9 = 12;
         int goldCardId5 = 58;
-        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
+        VirtualView client = new SocketClient(null, null, null);
 
         // create game state
-        GameState gs = Populate.createCardsMap();
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        Populate.populate(gs);
         gs.addPlayer("jhonny", client);
         Player player = gs.getPlayer(0);
-        Controller c = new Controller(gs);
+        Controller c = new Controller();
+        c.setGameState(gs);
         gs.getMainBoard().shuffleCards();
         gs.getMainBoard().initSharedGoldCards();
         gs.getMainBoard().initSharedResourceCards();
@@ -221,7 +230,7 @@ public class PlayerTest {
         player.addToHandCardsMap(resourceCardId1, Side.FRONT);
         assertThrows(CardAlreadPlacedException.class, ()-> c.placeCard(0, resourceCardId7, resourceCardId4, CornerPos.UPRIGHT, Side.FRONT));
         assertThrows(CardAlreadPlacedException.class, ()-> c.placeCard(0, resourceCardId1, resourceCardId4, CornerPos.UPRIGHT, Side.FRONT));
-        
+
         //2 corner covered
         player.addToHandCardsMap(resourceCardId8, Side.FRONT);
         c.placeCard(0, resourceCardId8, goldCardId1, CornerPos.DOWNLEFT, Side.FRONT);
@@ -293,7 +302,7 @@ public class PlayerTest {
     }
 
     @Test
-    void getStructurePointsTest() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException, EmptyDeckException {
+    void getStructurePointsTest() throws IOException, NotUniquePlayerColorException, NotUniquePlayerNicknameException, WrongStructureConfigurationSizeException, GoldCardCannotBePlacedException, CardAlreadyPresentOnTheCornerException, WrongInstanceTypeException, CardNotPlacedException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardIsNotInHandException, CardAlreadPlacedException, EmptyDeckException, CardNotOnBoardException {
         // create cards map
         int starterCardId = 81;
         int resourceCardId1 = 3;
@@ -303,12 +312,15 @@ public class PlayerTest {
         int objectiveCardId2 = 90;
 
         // create game state
-        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
+        VirtualView client = new SocketClient(null, null, null);
 
-        GameState gs = Populate.createCardsMap();
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        Populate.populate(gs);
         gs.addPlayer("test", client);
         Player player = gs.getPlayer(0);
-        Controller c = new Controller(gs);
+        Controller c = new Controller();
+        c.setGameState(gs);
         gs.getMainBoard().shuffleCards();
         gs.getMainBoard().initSharedGoldCards();
         gs.getMainBoard().initSharedResourceCards();
@@ -337,14 +349,43 @@ public class PlayerTest {
     }
 
     @Test
-    public void getAllElementsTest() {
-    }
+    public void setterPlayerTest() {
+        Player player = new Player("Bob", null, new GameState(null));
 
-    @Test
-    public void getPlayerBorardTest() {
-    }
+        player.setClient(null);
 
-     */
+        ArrayList<ArrayList<Integer>> playerBoard = new ArrayList<>();
+        ArrayList<Integer> row = new ArrayList<>();
+        row.add(1);
+        row.add(2);
+        playerBoard.add(row);
+
+        assertNull(player.getObjectiveCardOption(0));
+
+        player.setPlayerBoard(playerBoard);
+
+        HashMap<Integer, Side> placedCardsMap = new HashMap<>();
+        placedCardsMap.put(1, Side.FRONT);
+        player.setPlacedCardsMap(placedCardsMap);
+        player.setPlacedCardsMap(player.getPlacedCardsMap());
+
+        HashMap<Integer, Side> handCardsMap = new HashMap<>();
+        handCardsMap.put(1, Side.BACK);
+        player.setHandCardsMap(handCardsMap);
+        player.setHandCardsMap(player.getHandCardsMap());
+
+        int objectivesWon = 5;
+        player.setObjectivesWon(objectivesWon);
+
+        HashMap<Integer, Element> centerResources = new HashMap<>();
+        centerResources.put(1, Element.PLANT);
+        player.setCenterResources(centerResources);
+        player.setCenterResources(player.getCenterResources());
+
+        HashMap<Element, Integer> allElements = new HashMap<>();
+        allElements.put(Element.PLANT, 10);
+        player.setAllElements(allElements);
+    }
 
 }
 

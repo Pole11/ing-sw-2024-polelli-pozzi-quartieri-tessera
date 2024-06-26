@@ -26,4 +26,14 @@ public class MessageTest {
             }
         }
     }
+
+    @Test
+    public void testMessageConstructorAndGetters() {
+        Message message = new Message(1, "Test content");
+
+        assertEquals(1, message.getAuthor());
+        assertEquals("Test content", message.getContent());
+        assertNotNull(message.getId());
+        assertTrue(message.getId() > 0);
+    }
 }

@@ -7,4 +7,6 @@ public class BotConfig {
     public static final int SPEED = 20; // speed for command insertion (millisecond) - suggested [10-1000]
     public static final boolean CHAT_ENABLED = true;
     public static final float CHAT_FLUENCY = 0.0001f; // probability to write in chat
+    public static final boolean CAN_START_IF_FULL = true;
+    public static final int PLAYER_NUM = 4;
 }

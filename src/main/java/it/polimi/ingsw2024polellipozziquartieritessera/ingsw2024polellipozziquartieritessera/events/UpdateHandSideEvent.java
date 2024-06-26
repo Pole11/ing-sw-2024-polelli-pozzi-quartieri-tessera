@@ -1,25 +1,27 @@
-package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events;
+package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.events;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.TurnPhase;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateTurnPhaseEvent extends Event {
-    private final TurnPhase turnPhase;
+public class UpdateHandSideEvent extends Event {
+    private final int index;
+    private final Side side;
 
-    public UpdateTurnPhaseEvent(GameState gameState, ArrayList<VirtualView> clients, TurnPhase turnPhase) {
+    public UpdateHandSideEvent(GameState gameState, ArrayList<VirtualView> clients, int index, Side side) {
         super(gameState, clients);
-        this.turnPhase = turnPhase;
+        this.index = index;
+        this.side = side;
     }
 
     @Override
     public void execute() {
         for (VirtualView client : clients) {
             try {
-                client.updateTurnPhase(turnPhase);
+                client.updateHandSide(index, side);
             } catch (RemoteException e) {
                 playerDisconnected(client);
             }

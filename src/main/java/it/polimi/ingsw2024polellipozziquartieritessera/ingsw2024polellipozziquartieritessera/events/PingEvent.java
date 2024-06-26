@@ -1,4 +1,4 @@
-package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events;
+package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.events;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -16,7 +16,7 @@ public class PingEvent extends Event {
     @Override
     public void execute() {
         System.out.println("I will ping to your mother and the following");
-        System.out.println(clients.stream().map(e->gameState.getPlayer(gameState.getPlayerIndex(e)).getNickname()).toList());
+        System.out.println(clients.stream().map(e -> gameState.getPlayer(gameState.getPlayerIndex(e)).getNickname()).toList());
         for (VirtualView clientIterator : this.clients) {
             try {
                 System.out.println("i will ping " + gameState.getPlayer(gameState.getPlayerIndex(clientIterator)).getNickname());

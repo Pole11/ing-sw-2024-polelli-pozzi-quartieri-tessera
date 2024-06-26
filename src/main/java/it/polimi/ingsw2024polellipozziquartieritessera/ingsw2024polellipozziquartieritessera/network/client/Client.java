@@ -2,8 +2,6 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Message;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.scene.control.Alert;
@@ -15,28 +13,26 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class Client implements VirtualView {
+    private final String rmiOrSocket;
+    private final String host;
+    private final int port;
+    ByteArrayOutputStream baos;
+    PrintStream restoreStream;
+    PrintStream oldPrintStream;
     private boolean meDoGui;
     private CLIController cliController;
     private GUIApplication guiApplication;
     private ViewModel viewModel;
     private VirtualView client;
     private VirtualServer server;
-
-    private final String rmiOrSocket;
-    private final String host;
-    private final int port;
     private boolean running;
-    ByteArrayOutputStream baos;
-    PrintStream restoreStream;
-    PrintStream oldPrintStream;
 
-    public Client(String rmiOrSocket, String host, String port){
+    public Client(String rmiOrSocket, String host, String port) {
         this.viewModel = new ViewModel();
         this.rmiOrSocket = rmiOrSocket;
         this.host = host;
@@ -58,7 +54,7 @@ public class Client implements VirtualView {
 
     }
 
-    public void resetViewModel(){
+    public void resetViewModel() {
         viewModel = new ViewModel();
         if (meDoGui) {
             guiApplication.setViewModel(viewModel);
@@ -68,7 +64,7 @@ public class Client implements VirtualView {
     }
 
     //GETTER
-    public VirtualView getClient(){
+    public VirtualView getClient() {
         return client;
     }
 
@@ -80,15 +76,15 @@ public class Client implements VirtualView {
         return guiApplication;
     }
 
-    public ViewModel getViewModel(){
+    public ViewModel getViewModel() {
         return viewModel;
     }
 
-    public boolean isMeDoGui(){
+    public boolean isMeDoGui() {
         return meDoGui;
     }
 
-    public boolean isRunning(){
+    public boolean isRunning() {
         return running;
     }
 
@@ -106,6 +102,7 @@ public class Client implements VirtualView {
             ((SocketClient) client).run();
         } else { //default rmi
             try {
+                System.setProperty("java.rmi.server.hostname", "192.168.191.151");
                 Registry registry = LocateRegistry.getRegistry(host, port);
                 this.server = (VirtualServer) registry.lookup("VirtualServer");
                 this.client = new RmiClient(server, this);
@@ -113,7 +110,7 @@ public class Client implements VirtualView {
             } catch (RemoteException e) {
                 serverDisconnected();
                 System.out.println("An error occurred while executing RmiClient!");
-            } catch (NotBoundException e){
+            } catch (NotBoundException e) {
                 e.printStackTrace();
             }
         }
@@ -140,21 +137,21 @@ public class Client implements VirtualView {
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
-            } else if (line != null){
+            } else if (line != null) {
                 System.out.print("> "); // print phase
             }
         }
     }
 
-    public void runGui(){
+    public void runGui() {
         running = true;
         meDoGui = true;
         guiApplication = new GUIApplication();
         guiApplication.runGui(client, server, this, viewModel);
     }
 
-    public void serverDisconnected(){
-        if (meDoGui){
+    public void serverDisconnected() {
+        if (meDoGui) {
             guiApplication.getGUIController().setServerError("There was an error in server, the server is not available, wait to be rederected in the login page");
         } else {
             System.out.println("server disconnected, wait to be notified of being connected to the server");
@@ -162,13 +159,13 @@ public class Client implements VirtualView {
 
 
         try {
-            Thread.sleep(1000* Config.WAIT_DISCONNECTED_SERVER);
+            Thread.sleep(1000 * Config.WAIT_DISCONNECTED_SERVER);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         try {
             startClient();
-        } catch (ConnectException e){
+        } catch (ConnectException e) {
             serverDisconnected();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -220,7 +217,7 @@ public class Client implements VirtualView {
                 case GamePhase.CHOOSECOLORPHASE -> {
                     System.out.print("Everyone chose his side, now please select a valid color from one of the lists with the command CHOOSECOLOR [Blue, Green, Yellow, Red]\n> ");
                 }
-                case GamePhase.CHOOSEOBJECTIVEPHASE ->  {
+                case GamePhase.CHOOSEOBJECTIVEPHASE -> {
                     cliController.ShowSecretObjective();
                 }
                 case GamePhase.MAINPHASE -> {
@@ -237,7 +234,7 @@ public class Client implements VirtualView {
     }
 
     @Override
-    public void updateTurnPhase(TurnPhase nextTurnPhase){
+    public void updateTurnPhase(TurnPhase nextTurnPhase) {
         viewModel.setTurnPhase(nextTurnPhase);
         if (meDoGui) guiApplication.updateController();
     }
@@ -254,8 +251,8 @@ public class Client implements VirtualView {
         viewModel.setNickname(playerIndex, nickname);
         viewModel.setConnection(playerIndex, true);
         viewModel.initializeElementMap(playerIndex);
-        if (playerIndex == viewModel.getPlayerIndex()){
-            if (viewModel.getPlayersSize() == 1){
+        if (playerIndex == viewModel.getPlayerIndex()) {
+            if (viewModel.getPlayersSize() == 1) {
                 System.out.print("you successfully entered the game with the nickname " + nickname + ", wait for at least two players to start the game\n> ");
             } else {
                 System.out.print("you successfully entered the game with the nickname " + nickname + ", there are " + viewModel.getPlayersSize() + " players connected, to start the game type START\n> ");
@@ -267,8 +264,6 @@ public class Client implements VirtualView {
     }
 
 
-
-
     @Override
     public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
         if (playerIndex == -1) { // me stesso
@@ -278,8 +273,8 @@ public class Client implements VirtualView {
             return;
         }
         viewModel.setConnection(playerIndex, connected);
-        if (playerIndex == viewModel.getPlayerIndex()){
-            if (connected){
+        if (playerIndex == viewModel.getPlayerIndex()) {
+            if (connected) {
                 System.out.print("you re-connected to the game\n> ");
             } else {
                 System.out.println("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>\n> ");
@@ -334,7 +329,7 @@ public class Client implements VirtualView {
         } else {
             System.out.print(viewModel.getNickname(playerIndex) + " chose the color: " + color + "\n> ");
         }
-        if (meDoGui)  guiApplication.updateController();
+        if (meDoGui) guiApplication.updateController();
     }
 
     @Override
@@ -375,9 +370,9 @@ public class Client implements VirtualView {
     @Override
     public void updateSecretObjective(int objectiveCardId1, int objectiveCardId2) throws RemoteException {
         viewModel.setSecretObjective(objectiveCardId1, objectiveCardId2);
-        if (objectiveCardId2 == -1){
+        if (objectiveCardId2 == -1) {
             System.out.print("you have chosen the objective card: " + objectiveCardId1 + "\n> ");
-        } else{
+        } else {
             System.out.print("Everyone chose his color, now please select one of the objective card from the selection with the command CHOOSEOBJECTIVE [0/1],\n to see your card use the command SHOWSECRETOBJECTIVES\n");
         }
         if (meDoGui) guiApplication.updateController();
@@ -393,7 +388,7 @@ public class Client implements VirtualView {
     @Override
     public void updateStarterCard(int playerIndex, int cardId1, Side side) throws RemoteException {
         viewModel.fillPoints();
-        if (side == null){
+        if (side == null) {
             viewModel.setStarterCard(cardId1);
             System.out.print("Chose your preferred side for the starter card with the command CHOOSESTARTER[Front/Back]\n");
         } else {
@@ -409,36 +404,36 @@ public class Client implements VirtualView {
     }
 
     @Override
-    public void updateWinner(ArrayList<Integer> playerIndexes){
+    public void updateWinner(ArrayList<Integer> playerIndexes) {
         viewModel.setGamePhase(GamePhase.FINALPHASE);
-        playerIndexes.stream().forEach(e-> {
+        playerIndexes.stream().forEach(e -> {
             viewModel.addWinner(e);
         });
-        if (meDoGui){
+        if (meDoGui) {
             HashMap<String, Object> params = new HashMap<>();
             ArrayList<String> playerNicknames = new ArrayList<>();
-            playerIndexes.stream().map(e-> viewModel.getNickname(e)).forEach(playerNicknames::add);
+            playerIndexes.stream().map(e -> viewModel.getNickname(e)).forEach(playerNicknames::add);
             params.put("playerNicknames", playerNicknames);
             guiApplication.changeScene("/fxml/final.fxml", params);
         }
         System.out.println("---------GAME ENDED----------");
-        if (playerIndexes.isEmpty()){
+        if (playerIndexes.isEmpty()) {
             System.out.println("No one won");
         }
-        if (playerIndexes.contains(viewModel.getPlayerIndex())){
-            if (playerIndexes.size() == 1){
+        if (playerIndexes.contains(viewModel.getPlayerIndex())) {
+            if (playerIndexes.size() == 1) {
                 System.out.println("Congratulations! You Won");
             } else {
                 System.out.print("Congratulations! Congratulations, you tied for first place with ");
                 playerIndexes.stream().filter(e -> e != viewModel.getPlayerIndex()).forEach(e -> {
-                    System.out.print(viewModel.getNickname(e)+ ", ");
+                    System.out.print(viewModel.getNickname(e) + ", ");
                 });
             }
             System.out.println();
         } else {
             System.out.println("You Lost");
             playerIndexes.forEach(e -> {
-                System.out.print(viewModel.getNickname(e)+ ", ");
+                System.out.print(viewModel.getNickname(e) + ", ");
             });
             System.out.println("won");
         }
@@ -457,7 +452,7 @@ public class Client implements VirtualView {
     }
 
     @Override
-    public void updateChat(int playerIndex, String content){
+    public void updateChat(int playerIndex, String content) {
         viewModel.setNewMessage(playerIndex, content);
         if (meDoGui) guiApplication.updateController();
     }
@@ -474,7 +469,7 @@ public class Client implements VirtualView {
 
     @Override
     public void ping(String ping) throws RemoteException {
-        if (meDoGui){
+        if (meDoGui) {
             guiApplication.getGUIController().ping(client, server);
         } else {
             cliController.ping(client, server);
@@ -489,14 +484,15 @@ public class Client implements VirtualView {
         System.err.print("\nERROR FROM SERVER: " + error + "\n> ");
     }
 
-    private void showMessageAlert(){
-        if (viewModel.getNewMessages() > 0){
+    private void showMessageAlert() {
+        if (viewModel.getNewMessages() > 0) {
             System.out.println("Unread messages: " + viewModel.getNewMessages() + " (use OPENCHAT command to read)");
             System.out.print("> ");
             viewModel.resetNewMessages();
         }
     }
-    private void restart(){
+
+    private void restart() {
         System.out.println("Restarting...");
         if (!meDoGui) cliController.restart(client, server);
         if (meDoGui) guiApplication.getGUIController().restart(client, server);

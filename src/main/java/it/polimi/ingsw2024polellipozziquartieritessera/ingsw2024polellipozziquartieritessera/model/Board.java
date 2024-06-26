@@ -1,10 +1,13 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.EmptyDeckException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.EmptyMainBoardException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.GoldCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ObjectiveCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ResourceCard;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
@@ -32,15 +35,16 @@ public class Board {
      * List of resource card in deck
      */
     private ArrayList<ResourceCard> resourceDeck;
+
     /**
      * Board Constructor
      */
-    public Board(){
+    public Board() {
         sharedGoldCards = new GoldCard[Config.N_SHARED_GOLDS];
         sharedResourceCards = new ResourceCard[Config.N_SHARED_RESOURCES];
         sharedObjectiveCards = new ObjectiveCard[Config.N_SHARED_OBJECTIVES];
         goldDeck = new ArrayList<>();
-        resourceDeck  = new ArrayList<>();
+        resourceDeck = new ArrayList<>();
     }
 
     //GETTER
@@ -69,12 +73,20 @@ public class Board {
         return new ArrayList<>(goldDeck);
     }
 
-    public ArrayList<ResourceCard> getResourceDeck() {
-        return new ArrayList<>(resourceDeck);
+    public void setGoldDeck(ArrayList<GoldCard> goldDeck) {
+        this.goldDeck = goldDeck;
     }
 
 
     //-----card------
+
+    public ArrayList<ResourceCard> getResourceDeck() {
+        return new ArrayList<>(resourceDeck);
+    }
+
+    public void setResourceDeck(ArrayList<ResourceCard> resourceDeck) {
+        this.resourceDeck = resourceDeck;
+    }
 
     public GoldCard getSharedGoldCard(int index) {
         return sharedGoldCards[index];
@@ -88,6 +100,8 @@ public class Board {
         return sharedObjectiveCards[index];
     }
 
+    //----size-----
+
     public GoldCard getFirstGoldDeckCard() throws NoSuchElementException {
         return goldDeck.getFirst();
     }
@@ -96,17 +110,15 @@ public class Board {
         return resourceDeck.getFirst();
     }
 
-    //----size-----
+    //SETTER
 
-    public int getGoldDeckSize(){
+    public int getGoldDeckSize() {
         return goldDeck.size();
     }
 
-    public int getResourceDeckSize(){
+    public int getResourceDeckSize() {
         return resourceDeck.size();
     }
-
-    //SETTER
 
     public void setSharedGoldCard(int index, GoldCard sharedGoldCard) {
         this.sharedGoldCards[index] = sharedGoldCard;
@@ -120,35 +132,30 @@ public class Board {
         this.sharedObjectiveCards[index] = sharedObjectiveCard;
     }
 
-    public void setGoldDeck(ArrayList<GoldCard> goldDeck) {
-        this.goldDeck = goldDeck;
-    }
-
-    public void setResourceDeck(ArrayList<ResourceCard> resourceDeck) {
-        this.resourceDeck = resourceDeck;
-    }
-
 
     //EMPTINESS
 
     /**
      * Check if the resource deck is empty
+     *
      * @return True if empty resource deck
      */
-    public boolean isResourceDeckEmpty(){
+    public boolean isResourceDeckEmpty() {
         return resourceDeck.isEmpty();
     }
 
     /**
      * Check if the gold deck is empty
+     *
      * @return True if empty gold deck
      */
-    public boolean isGoldDeckEmpty(){
+    public boolean isGoldDeckEmpty() {
         return goldDeck.isEmpty();
     }
 
     /**
      * Add a card to the gold deck
+     *
      * @param goldCard Gold card to add
      */
     public void addToGoldDeck(GoldCard goldCard) {
@@ -157,6 +164,7 @@ public class Board {
 
     /**
      * Add a card to the resource deck
+     *
      * @param resourceCard Resource card to add
      */
     public void addToResourceDeck(ResourceCard resourceCard) {
@@ -170,6 +178,7 @@ public class Board {
 
     /**
      * Initialize the shared gold cards on the board
+     *
      * @throws EmptyDeckException Deck is empty
      */
     public void initSharedGoldCards() throws EmptyDeckException {
@@ -180,6 +189,7 @@ public class Board {
 
     /**
      * Initialize the shared resource cards on the board
+     *
      * @throws EmptyDeckException Deck is empty
      */
     public void initSharedResourceCards() throws EmptyDeckException {
@@ -193,14 +203,14 @@ public class Board {
     public void shuffleCards() {
         Random randStream = new Random();
         for (int i = 0; i < this.goldDeck.size(); i++) {
-            int j = i + randStream.nextInt(this.goldDeck.size()-i);
+            int j = i + randStream.nextInt(this.goldDeck.size() - i);
             GoldCard temp = this.goldDeck.get(i);
             this.goldDeck.set(i, this.goldDeck.get(j));
             this.goldDeck.set(j, temp);
         }
 
         for (int i = 0; i < this.resourceDeck.size(); i++) {
-            int j = i + randStream.nextInt(this.resourceDeck.size()-i);
+            int j = i + randStream.nextInt(this.resourceDeck.size() - i);
             ResourceCard temp2 = this.resourceDeck.get(i);
             this.resourceDeck.set(i, this.resourceDeck.get(j));
             this.resourceDeck.set(j, temp2);
@@ -211,6 +221,7 @@ public class Board {
 
     /**
      * Get a card from the shared golds, removing it from the shared golds
+     *
      * @param pos Position of the shared gold card (1-2)
      * @return Gold card drawn
      * @throws EmptyMainBoardException A Card in the main board is not present
@@ -220,7 +231,7 @@ public class Board {
         if (pos < 1 || pos > this.sharedGoldCards.length) {
             throw new IllegalArgumentException("invalid position: " + pos);
         }
-        if (this.sharedGoldCards[pos-1] == null){
+        if (this.sharedGoldCards[pos - 1] == null) {
             throw new EmptyMainBoardException("This shared gold card is not present");
         }
         // get the card
@@ -237,6 +248,7 @@ public class Board {
 
     /**
      * Get a card from the shared resources, removing it from the shared resources
+     *
      * @param pos Position of the shared resource card (1-2)
      * @return Resource card drawn
      * @throws EmptyMainBoardException A Card in the main board is not present
@@ -246,7 +258,7 @@ public class Board {
         if (pos < 1 || pos > this.sharedResourceCards.length) {
             throw new IllegalArgumentException("Invalid position: " + pos);
         }
-        if (this.sharedResourceCards[pos-1] == null){
+        if (this.sharedResourceCards[pos - 1] == null) {
             throw new EmptyMainBoardException("This shared gold card is not present");
         }
         // get the specified card
@@ -263,6 +275,7 @@ public class Board {
 
     /**
      * Get a card from the resource deck, removing it from the deck
+     *
      * @return Resource card drawn
      * @throws EmptyDeckException Deck is empty
      */
@@ -276,6 +289,7 @@ public class Board {
 
     /**
      * Get a card from the gold deck, removing it from the deck
+     *
      * @return Gold card drawn
      * @throws EmptyDeckException Deck is empty
      */

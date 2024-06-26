@@ -1,4 +1,4 @@
-package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events;
+package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.events;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Board;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
@@ -25,7 +25,7 @@ public class UpdateMainBoardEvent extends Event {
             sharedGoldCard1 = -1;
         }
         int sharedGoldCard2;
-        try{
+        try {
             sharedGoldCard2 = mainBoard.getSharedGoldCard(1).getId();
         } catch (NullPointerException e) {
             sharedGoldCard2 = -1;
@@ -37,7 +37,7 @@ public class UpdateMainBoardEvent extends Event {
             sharedResourceCard1 = -1;
         }
         int sharedResourceCard2;
-        try{
+        try {
             sharedResourceCard2 = mainBoard.getSharedResourceCard(1).getId();
         } catch (NullPointerException e) {
             sharedResourceCard2 = -1;
@@ -45,13 +45,13 @@ public class UpdateMainBoardEvent extends Event {
         int firstGoldDeckCard;
         try {
             firstGoldDeckCard = mainBoard.getFirstGoldDeckCard().getId();
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             firstGoldDeckCard = -1;
         }
         int firstResourceDeckCard;
         try {
             firstResourceDeckCard = mainBoard.getFirstResourceDeckCard().getId();
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             firstResourceDeckCard = -1;
         }
         for (VirtualView client : clients) {

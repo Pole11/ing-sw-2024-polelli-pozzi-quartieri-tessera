@@ -8,6 +8,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.GoldCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ObjectiveCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -15,10 +16,11 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CoverageChallengeTest {
-    /*
     @Test
     void testTimesWon() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
-        GameState g = Populate.populate();
+        Server s = new Server(null, null, null);
+        GameState g = new GameState(s);
+        Populate.populate(g);
 
         GoldCard card1 = (GoldCard) g.getCard(54);
         ObjectiveCard card2 = (ObjectiveCard) g.getCard(94);
@@ -29,6 +31,4 @@ public class CoverageChallengeTest {
         assertThrows(RuntimeException.class, () -> c.getTimesWon(player, card2));
         assertEquals(c.getTimesWon(player,card1), 0);
     }
-
-     */
 }

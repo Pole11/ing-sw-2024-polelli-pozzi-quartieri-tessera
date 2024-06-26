@@ -1,13 +1,19 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Color;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.CornerPos;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Side;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.events.*;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongInstanceTypeException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.CornerCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ObjectiveCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.StarterCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Player class
@@ -17,6 +23,10 @@ public class Player {
      * Player nickname
      */
     private final String nickname;
+    /**
+     * Instance of the GameState, needed to make the player aware of the GameState he is in
+     */
+    private final GameState gameState;
     /**
      * Player board, structured like a variable matrix of card IDs
      */
@@ -70,18 +80,15 @@ public class Player {
      * Virtual view associated to the client
      */
     private VirtualView client;
-    /**
-     * Instance of the GameState, needed to make the player aware of the GameState he is in
-     */
-    private final GameState gameState;
 
     /**
      * Player Constructor
-     * @param nickname Player nickname string
-     * @param client Virtual view that this player is linked to
+     *
+     * @param nickname  Player nickname string
+     * @param client    Virtual view that this player is linked to
      * @param gameState Instance of the GameState the player is in
      */
-    public Player(String nickname, VirtualView client, GameState gameState){
+    public Player(String nickname, VirtualView client, GameState gameState) {
         this.gameState = gameState;
 
         this.points = 0;
@@ -111,6 +118,22 @@ public class Player {
 
     //GETTER
 
+    /**
+     * Get occurrences of a specific element inside a List of elements
+     *
+     * @param elements      List of elements
+     * @param targetElement Element to verify
+     * @return Number of occurrences
+     */
+    public static int getElementOccurrencies(ArrayList<Element> elements, Element targetElement) {
+        int count = 0;
+        for (Object element : elements) {
+            if (element != null && element.equals(targetElement)) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     public String getNickname() {
         return this.nickname;
@@ -118,6 +141,14 @@ public class Player {
 
     public Color getColor() {
         return this.color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+        synchronized (gameState.getEventQueue()) {
+            gameState.addToEventQueue(new UpdateColorEvent(gameState, gameState.allConnectedClients(), this, color));
+            gameState.getEventQueue().notifyAll();
+        }
     }
 
     public int getPoints() {
@@ -128,21 +159,52 @@ public class Player {
         return this.starterCard;
     }
 
+    public void setStarterCard(StarterCard starterCard) {
+        this.starterCard = starterCard;
+        this.placedCardsMap.put(this.getStarterCard().getId(), null); // also set the default side to FRONT todo: changed side to null because of restore-view needs it, it will crash? we will see
+        synchronized (gameState.getEventQueue()) {
+            gameState.addToEventQueue(new UpdateStarterCardEvent(gameState, gameState.singleClient(this.getClient()), gameState.getPlayerIndex(this), starterCard.getId(), null));
+            gameState.getEventQueue().notifyAll();
+        }
+    }
+
     public ObjectiveCard getObjectiveCard() {
         return this.objectiveCard;
     }
 
-    public Side getPlacedCardSide(Integer index){
+    public void setObjectiveCard(ObjectiveCard objectiveCard) {
+        this.objectiveCard = objectiveCard;
+        synchronized (gameState.getEventQueue()) {
+            //RIGUARDARE SE VA BENE PASSARE DA ARRAY A ARRAYLIST, NON E TANTO BELLO
+            gameState.addToEventQueue(new UpdateSecretObjectiveEvent(gameState, gameState.singleClient(this.getClient()), new ArrayList<>(List.of(objectiveCard))));
+            gameState.getEventQueue().notifyAll();
+        }
+
+        // set options to null in order to manage reconnections
+        objectiveCardOptions[0] = null;
+        objectiveCardOptions[1] = null;
+    }
+
+    public Side getPlacedCardSide(Integer index) {
         return this.placedCardsMap.get(index);
     }
 
-    public Side getHandCardSide(Integer index){
+    public Side getHandCardSide(Integer index) {
         return this.handCardsMap.get(index);
     }
 
-    public int getObjectivesWon(){
+    public int getObjectivesWon() {
         return this.objectivesWon;
     }
+
+    //--------size------------
+
+    public void setObjectivesWon(int objectivesWon) {
+        this.objectivesWon = objectivesWon;
+    }
+
+
+    //-----------collections copy----------------
 
     public ObjectiveCard getObjectiveCardOption(int index) {
         return this.objectiveCardOptions[index];
@@ -152,38 +214,65 @@ public class Player {
         return centerResources.get(index);
     }
 
-    public VirtualView getClient(){
+    public VirtualView getClient() {
         return this.client;
     }
 
-    public boolean isConnected(){
+    public void setClient(VirtualView client) {
+        this.client = client;
+    }
+
+    public boolean isConnected() {
         return this.connected;
     }
 
-    //--------size------------
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+        synchronized (gameState.getEventQueue()) {
+            gameState.addToEventQueue(new ConnectionInfoEvent(gameState, gameState.allClients(), this, connected));
+            gameState.getEventQueue().notifyAll();
+        }
+    }
 
-    public int getHandSize(){
+    //--------------contains-------------
+
+    public int getHandSize() {
         return this.handCardsMap.size();
     }
 
-
-    //-----------collections copy----------------
-
     public HashMap<Element, Integer> getAllElements() {
         return new HashMap<>(allElements);
+    }
+
+
+    //SETTER
+
+    public void setAllElements(HashMap<Element, Integer> allElements) {
+        this.allElements = allElements;
     }
 
     public ArrayList<ArrayList<Integer>> getPlayerBoard() {
         return new ArrayList<>(this.playerBoard);
     }
 
+    public void setPlayerBoard(ArrayList<ArrayList<Integer>> playerBoard) {
+        this.playerBoard = new ArrayList<>(playerBoard);
+    }
 
     public HashMap<Integer, Side> getPlacedCardsMap() {
         return new HashMap<>(placedCardsMap);
     }
 
+    public void setPlacedCardsMap(HashMap<Integer, Side> placedCardsMap) {
+        this.placedCardsMap = placedCardsMap;
+    }
+
     public HashMap<Integer, Side> getHandCardsMap() {
         return new HashMap<>(handCardsMap);
+    }
+
+    public void setHandCardsMap(HashMap<Integer, Side> handCardsMap) {
+        this.handCardsMap = handCardsMap;
     }
 
     public ObjectiveCard[] getObjectiveCardOptions() {
@@ -199,116 +288,48 @@ public class Player {
         return new HashMap<>(centerResources);
     }
 
-    //--------------contains-------------
+    public void setCenterResources(HashMap<Integer, Element> centerResource) {
+        this.centerResources = centerResource;
+    }
 
-    public boolean placedCardContains(Integer index){
+    public boolean placedCardContains(Integer index) {
         return this.placedCardsMap.containsKey(index);
     }
 
-
-    public boolean handCardContains(Integer index){
+    public boolean handCardContains(Integer index) {
         return this.handCardsMap.containsKey(index);
     }
 
-
-    //SETTER
-
-    public void setClient(VirtualView client){
-        this.client = client;
-    }
-
-    public void setObjectiveCard(ObjectiveCard objectiveCard) {
-        this.objectiveCard = objectiveCard;
-        synchronized (gameState.getEventQueue()){
-            //RIGUARDARE SE VA BENE PASSARE DA ARRAY A ARRAYLIST, NON E TANTO BELLO
-            gameState.addToEventQueue(new UpdateSecretObjectiveEvent(gameState, gameState.singleClient(this.getClient()), new ArrayList<>(List.of(objectiveCard))));
-            gameState.getEventQueue().notifyAll();
-        }
-
-        // set options to null in order to manage reconnections
-        objectiveCardOptions[0] = null;
-        objectiveCardOptions[1] = null;
-    }
-
-    public void setStarterCard(StarterCard starterCard) {
-        this.starterCard = starterCard;
-        this.placedCardsMap.put(this.getStarterCard().getId(), null); // also set the default side to FRONT todo: changed side to null because of restore-view needs it, it will crash? we will see
-        synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateStarterCardEvent(gameState, gameState.singleClient(this.getClient()), gameState.getPlayerIndex(this), starterCard.getId(), null));
-            gameState.getEventQueue().notifyAll();
-        }
-    }
+    //ADDER/REMOVER
 
     public void setSecretObjectiveCardOptions(ObjectiveCard[] objectiveCards) {
         this.objectiveCardOptions = objectiveCards;
-        synchronized (gameState.getEventQueue()){
+        synchronized (gameState.getEventQueue()) {
             gameState.addToEventQueue(new UpdateSecretObjectiveEvent(gameState, gameState.singleClient(this.getClient()), new ArrayList<>(List.of(objectiveCards))));
             gameState.getEventQueue().notifyAll();
         }
     }
 
-    public void setColor(Color color){
-        this.color = color;
-        synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new UpdateColorEvent(gameState, gameState.allConnectedClients(), this, color));
-            gameState.getEventQueue().notifyAll();
-        }
+    public void incrementObjectivesWon() {
+        this.objectivesWon++;
     }
 
-    public void setConnected(boolean connected){
-        this.connected = connected;
-        synchronized (gameState.getEventQueue()){
-            gameState.addToEventQueue(new ConnectionInfoEvent(gameState, gameState.allClients(), this, connected));
-            gameState.getEventQueue().notifyAll();
-        }
-    }
-
-    public void setPlayerBoard(ArrayList<ArrayList<Integer>> playerBoard) {
-        this.playerBoard = new ArrayList<>(playerBoard);
-    }
-
-    public void setPlacedCardsMap(HashMap<Integer, Side> placedCardsMap) {
-        this.placedCardsMap = placedCardsMap;
-    }
-
-    public void setHandCardsMap(HashMap<Integer, Side> handCardsMap){
-        this.handCardsMap = handCardsMap;
-    }
-
-    public void setObjectivesWon(int objectivesWon){
-        this.objectivesWon = objectivesWon;
-    }
-
-    public void setCenterResources(HashMap<Integer, Element> centerResource){
-        this.centerResources = centerResource;
-    }
-
-    public void setAllElements(HashMap<Element, Integer> allElements){
-        this.allElements = allElements;
-    }
-
-    //ADDER/REMOVER
-
-    public void incrementObjectivesWon(){
-        this.objectivesWon ++;
-    }
-
-    public void addToPlacedCardsMap(Integer index, Side side){
+    public void addToPlacedCardsMap(Integer index, Side side) {
         this.placedCardsMap.put(index, side);
     }
 
-    public void addToHandCardsMap(Integer index, Side side){
+    public void addToHandCardsMap(Integer index, Side side) {
         this.handCardsMap.put(index, side);
-        synchronized (gameState.getEventQueue()){
+        synchronized (gameState.getEventQueue()) {
             gameState.addToEventQueue(new UpdateAddHandEvent(gameState, gameState.allConnectedClients(), this, index));
             gameState.getEventQueue().notifyAll();
         }
     }
 
-    public void removeFromHandCardsMap(Integer index){
+    public void removeFromHandCardsMap(Integer index) {
         System.out.println("Removing from hand card " + index);
         this.handCardsMap.remove(index);
-        synchronized (gameState.getEventQueue()){
+        synchronized (gameState.getEventQueue()) {
             gameState.addToEventQueue(new UpdateRemoveHandEvent(gameState, gameState.allConnectedClients(), this, index));
             gameState.getEventQueue().notifyAll();
         }
@@ -316,35 +337,38 @@ public class Player {
 
     public void addPoints(int points) {
         this.points += points;
-        synchronized (gameState.getEventQueue()){
+        synchronized (gameState.getEventQueue()) {
             gameState.addToEventQueue(new UpdatePointsEvent(gameState, gameState.allConnectedClients(), this, this.points));
             gameState.getEventQueue().notifyAll();
         }
     }
 
-    public void removeFromAllElements(Element cornerEle){
+    public void removeFromAllElements(Element cornerEle) {
         this.allElements.replace(cornerEle, allElements.get(cornerEle) - 1);
-    }
-
-    public void addToAllElements(Element element, int number) {
-        this.allElements.put(element, number);
     }
 
 
     //--------------MODIFIER/UPDATER--------------------
 
-    public void changeHandSide(Integer index, Side side){
+    public void addToAllElements(Element element, int number) {
+        this.allElements.put(element, number);
+    }
+
+    // METHODS
+
+    public void changeHandSide(Integer index, Side side) {
         this.handCardsMap.replace(index, side);
-        synchronized (gameState.getEventQueue()){
+        synchronized (gameState.getEventQueue()) {
             gameState.addToEventQueue(new UpdateHandSideEvent(gameState, gameState.singleClient(this.getClient()), index, side));
             gameState.getEventQueue().notifyAll();
         }
     }
 
-    // METHODS
+// -------------------Place Cards Map Managing-----------------
 
     /**
      * Get the Side of a specific played card on the player board
+     *
      * @param cardId Card identifier
      * @return Side of the placed card
      */
@@ -352,15 +376,14 @@ public class Player {
         return this.placedCardsMap.get(cardId);
     }
 
-// -------------------Place Cards Map Managing-----------------
-
     /**
      * Place the card on the player board
-     * @param placingCardId ID of the card to place
-     * @param placingCard Card to be placed
-     * @param tableCard Card on the board
-     * @param tableCardId ID of the card on the board
-     * @param tableCornerPos Corner position of the board card to which link the placing card
+     *
+     * @param placingCardId   ID of the card to place
+     * @param placingCard     Card to be placed
+     * @param tableCard       Card on the board
+     * @param tableCardId     ID of the card on the board
+     * @param tableCornerPos  Corner position of the board card to which link the placing card
      * @param placingCardSide Side of placing of the placing card
      * @throws WrongInstanceTypeException Card not placeable
      */
@@ -369,7 +392,7 @@ public class Player {
         removeFromHandCardsMap(placingCardId);
         updateBoard(placingCardId, tableCardId, tableCornerPos);
         this.centerResources.put(placingCardId, placingCard.getResourceType());
-        synchronized (gameState.getEventQueue()){
+        synchronized (gameState.getEventQueue()) {
             Event event = new UpdateBoardEvent(gameState, gameState.allConnectedClients(), this, placingCardId, tableCardId, tableCornerPos, placingCardSide);
             gameState.addToEventQueue(event);
             gameState.getEventQueue().notifyAll();
@@ -378,28 +401,12 @@ public class Player {
         }
     }
 
-    /**
-     * Get occurrences of a specific element inside a List of elements
-     * @param elements List of elements
-     * @param targetElement Element to verify
-     * @return Number of occurrences
-     */
-    public static int getElementOccurrencies(ArrayList<Element> elements, Element targetElement) {
-        int count = 0;
-        for (Object element : elements) {
-            if (element != null && element.equals(targetElement)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
 // -------------------Board Matrix Managing-----------------------
 
     /**
      * Initialization of the player board, as a 1x1 with the StarterCard in the center
      */
-    public void initializeBoard(){
+    public void initializeBoard() {
         this.playerBoard.clear(); // re-initialize the board it is previously contained something
         ArrayList<Integer> row = new ArrayList<>();
         row.add(getStarterCard().getId());
@@ -408,8 +415,9 @@ public class Player {
 
     /**
      * Update the board after a card is placed
-     * @param placingCardId ID of the placed card
-     * @param tableCardId ID of the card on the player board
+     *
+     * @param placingCardId  ID of the placed card
+     * @param tableCardId    ID of the card on the player board
      * @param tableCornerPos Corner position of the board card to which the new card is linked
      */
     public synchronized void updateBoard(int placingCardId, int tableCardId, CornerPos tableCornerPos) {
@@ -466,38 +474,27 @@ public class Player {
         // Check if rowIndex is within bounds
         if (rowIndex < 0 || rowIndex >= playerBoard.size()) {
             System.out.println("ROW");
-            printPlayerBoard();
             throw new IllegalArgumentException("Invalid row index: " + rowIndex);
         }
 
         // Check if colIndex is within bounds
         if (colIndex < 0 || colIndex >= playerBoard.get(rowIndex).size()) {
             System.out.println("COL");
-            printPlayerBoard();
             throw new IllegalArgumentException("Invalid column index: " + colIndex);
         }
-        //******
 
 
         // Place the new card at the specified position
         this.playerBoard.get(rowIndex).set(colIndex, placingCardId);
     }
 
-    public void printPlayerBoard() {
-        for (ArrayList<Integer> row : this.playerBoard) {
-            for (int col : row) {
-                System.out.printf("%4d", col); // Adjust the width as needed
-            }
-            System.out.println();
-        }
-    }
-
     /**
      * Helper function to expand the board size if needed
+     *
      * @param rowIndex Final rows number
      * @param colIndex Final column number
      */
-    synchronized private void expandBoard(int rowIndex, int colIndex){
+    synchronized private void expandBoard(int rowIndex, int colIndex) {
         // Expand the matrix to include the new position (remember that this supports only one execute: row++/-- or col++/--)
         // Expand rows if needed
         int rowDim = this.playerBoard.getFirst().size();

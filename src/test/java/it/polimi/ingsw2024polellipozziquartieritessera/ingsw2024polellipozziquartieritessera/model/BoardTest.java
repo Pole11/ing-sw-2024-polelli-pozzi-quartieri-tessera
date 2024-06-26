@@ -3,14 +3,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.controller.Controller;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.EmptyDeckException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerColorException;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerNicknameException;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.GoldCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ResourceCard;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -20,294 +18,153 @@ import java.rmi.registry.Registry;
 import java.util.*;
 
 public class BoardTest {
-    // ALL METHODS TESTED
+    private Server server;
+    private GameState gameState;
+    private Board board;
+
+    @BeforeEach
+    void setUp() {
+        server = new Server(null, null, null);
+        gameState = new GameState(server);
+        try {
+            Populate.populate(gameState);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+        board = gameState.getMainBoard();
+    }
 
     @Test
     void testGetterSetter() {
-        // setup
-        //TODO
-        /*
-        try {
-            Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
-                @Override
-                public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
-                    return null;
-                }
+        board.setSharedObjectiveCard(0, board.getSharedObjectiveCard(0));
+        board.setSharedObjectiveCard(1, board.getSharedObjectiveCard(1));
+        board.setSharedResourceCard(0, board.getSharedResourceCard(0));
+        board.setSharedGoldCard(0, board.getSharedGoldCard(0));
+        board.setSharedResourceCard(1, board.getSharedResourceCard(1));
+        board.setSharedGoldCard(1, board.getSharedGoldCard(1));
 
-                @Override
-                public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+        assertEquals(board.getSharedObjectiveCards().length, 2);
+        assertEquals(board.getSharedResourceCards().length, 2);
+        assertEquals(board.getSharedGoldCards().length, 2);
 
-                }
+        board.setGoldDeck(board.getGoldDeck());
+        board.setResourceDeck(board.getResourceDeck());
 
-                @Override
-                public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+        assertEquals(40, board.getGoldDeckSize(), "Gold deck size should be 40.");
+        assertEquals(40, board.getResourceDeckSize(), "Resource deck size should be 40.");
 
-                }
+        assertNotNull(board.getFirstGoldDeckCard(), "First gold deck card should not be null.");
+        assertNotNull(board.getFirstResourceDeckCard(), "First resource deck card should not be null.");
 
-                @Override
-                public void rebind(String name, Remote obj) throws RemoteException, AccessException {
-
-                }
-
-                @Override
-                public String[] list() throws RemoteException, AccessException {
-                    return new String[0];
-                }
-            });
-            GameState g = new GameState(s);
-            Populate.populate(g);
-
-            Board b = g.getMainBoard();
-
-            b.setSharedObjectiveCard(0,b.getSharedObjectiveCard(0));
-            b.setSharedObjectiveCard(1,b.getSharedObjectiveCard(1));
-            b.setSharedResourceCard(0,b.getSharedResourceCard(0));
-            b.setSharedGoldCard(0,b.getSharedGoldCard(0));
-            b.setSharedResourceCard(1,b.getSharedResourceCard(1));
-            b.setSharedGoldCard(1,b.getSharedGoldCard(1));
-
-            assertEquals(b.getGoldDeckSize(), 40);
-            assertEquals(b.getResourceDeckSize(), 40);
-
-            assertNotNull(b.getFirstGoldDeckCard());
-            assertNotNull(b.getFirstResourceDeckCard());
-
-            assertFalse(b.isResourceDeckEmpty());
-            assertFalse(b.isGoldDeckEmpty());
-
-        } catch (WrongStructureConfigurationSizeException | IOException | NotUniquePlayerNicknameException |
-                 NotUniquePlayerColorException  e) {
-            throw new RuntimeException(e);
-        }
-
-         */
+        assertFalse(board.isResourceDeckEmpty(), "Resource deck should not be empty.");
+        assertFalse(board.isGoldDeckEmpty(), "Gold deck should not be empty.");
     }
-/*
+
     @Test
-    void testDrawSharedCards() {
-        // setup
-        try {
-            Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
-                @Override
-                public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
-                    return null;
-                }
+    void testDrawSharedCards() throws EmptyDeckException, EmptyMainBoardException {
+        board.initSharedResourceCards();
+        board.initSharedGoldCards();
 
-                @Override
-                public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
+        ResourceCard[] initialResourceCards = {board.getSharedResourceCard(0), board.getSharedResourceCard(1)};
+        GoldCard[] initialGoldCards = {board.getSharedGoldCard(0), board.getSharedGoldCard(1)};
 
-                }
+        ResourceCard drawnResourceCard1 = board.drawSharedResourceCard(1);
+        ResourceCard drawnResourceCard2 = board.drawSharedResourceCard(2);
+        GoldCard drawnGoldCard1 = board.drawSharedGoldCard(1);
+        GoldCard drawnGoldCard2 = board.drawSharedGoldCard(2);
 
-                @Override
-                public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
+        assertNotNull(drawnResourceCard1, "Drawn resource card 1 should not be null.");
+        assertNotNull(drawnResourceCard2, "Drawn resource card 2 should not be null.");
+        assertNotNull(drawnGoldCard1, "Drawn gold card 1 should not be null.");
+        assertNotNull(drawnGoldCard2, "Drawn gold card 2 should not be null.");
 
-                }
+        assertNotNull(board.getSharedResourceCard(0), "Shared resource card 0 should not be null.");
+        assertNotNull(board.getSharedResourceCard(1), "Shared resource card 1 should not be null.");
+        assertNotNull(board.getSharedGoldCard(0), "Shared gold card 0 should not be null.");
+        assertNotNull(board.getSharedGoldCard(1), "Shared gold card 1 should not be null.");
 
-                @Override
-                public void rebind(String name, Remote obj) throws RemoteException, AccessException {
+        assertArrayEquals(new ResourceCard[]{drawnResourceCard1, drawnResourceCard2}, initialResourceCards, "Drawn resource cards should match initial shared cards.");
+        assertArrayEquals(new GoldCard[]{drawnGoldCard1, drawnGoldCard2}, initialGoldCards, "Drawn gold cards should match initial shared cards.");
 
-                }
-
-                @Override
-                public String[] list() throws RemoteException, AccessException {
-                    return new String[0];
-                }
-            });
-            GameState g = new GameState(s);
-            Populate.populate(g);
-            Board b = g.getMainBoard();
-            b.initSharedResourceCards();
-            b.initSharedGoldCards();
-
-            // get initial state
-            ResourceCard[] initialResourceCards = {b.getSharedResourceCard(0), b.getSharedResourceCard(1)};
-            GoldCard[] initialGoldCards = {b.getSharedGoldCard(0), b.getSharedGoldCard(1)};
-
-            // draw cards
-            ResourceCard drawnResourceCard1 = b.drawSharedResourceCard(1);
-            ResourceCard drawnResourceCard2 = b.drawSharedResourceCard(2);
-            GoldCard drawnGoldCard1 = b.drawSharedGoldCard(1);
-            GoldCard drawnGoldCard2 = b.drawSharedGoldCard(2);
-
-            // verify drawn cards not null
-            assertNotNull(drawnResourceCard1);
-            assertNotNull(drawnResourceCard2);
-            assertNotNull(drawnGoldCard1);
-            assertNotNull(drawnGoldCard2);
-
-            // verify cards has been replaced
-            assertNotNull(b.getSharedResourceCard(0));
-            assertNotNull(b.getSharedResourceCard(1));
-            assertNotNull(b.getSharedGoldCard(0));
-            assertNotNull(b.getSharedGoldCard(1));
-
-            // verify drawn cards in initial shared
-            assertArrayEquals(new ResourceCard[]{drawnResourceCard1, drawnResourceCard2}, initialResourceCards);
-            assertArrayEquals(new GoldCard[]{drawnGoldCard1, drawnGoldCard2}, initialGoldCards);
-
-            // test if launch exception
-            assertThrows(IllegalArgumentException.class, () -> b.drawSharedGoldCard(4));
-            assertThrows(IllegalArgumentException.class, () -> b.drawSharedResourceCard(4));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (EmptyDeckException e) {
-            throw new RuntimeException(e);
-        }
+        assertThrows(IllegalArgumentException.class, () -> board.drawSharedGoldCard(4), "Expected IllegalArgumentException when drawing invalid gold card index.");
+        assertThrows(IllegalArgumentException.class, () -> board.drawSharedResourceCard(4), "Expected IllegalArgumentException when drawing invalid resource card index.");
     }
-*/
+
     @Test
     void testGetFromResourceDeck() throws EmptyDeckException {
-        // setup
-        try {
-            Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
-                @Override
-                public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
-                    return null;
-                }
+        ResourceCard drawnCard = board.drawFromResourceDeck();
+        assertNotNull(drawnCard, "Drawn resource card should not be null.");
 
-                @Override
-                public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
-
-                }
-
-                @Override
-                public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
-
-                }
-
-                @Override
-                public void rebind(String name, Remote obj) throws RemoteException, AccessException {
-
-                }
-
-                @Override
-                public String[] list() throws RemoteException, AccessException {
-                    return new String[0];
-                }
-            });
-            GameState g = new GameState(s);
-            Populate.populate(g);
-            Board b = g.getMainBoard();
-
-            // function to test
-            ResourceCard drawnCard = b.drawFromResourceDeck();
-            // Verify not null
-            assertNotNull(drawnCard);
-            // Draw every card from the deck
-            while (!b.isResourceDeckEmpty()) {
-                // Verify card has been removed
-                assertNotSame(b.drawFromResourceDeck(), drawnCard);
-            }
-
-            // If deck is ended
-            assertThrows(EmptyDeckException.class, ()->b.drawFromResourceDeck());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        while (!board.isResourceDeckEmpty()) {
+            assertNotSame(drawnCard, board.drawFromResourceDeck(), "Drawn card should not be same as previous card.");
         }
+
+        assertThrows(EmptyDeckException.class, board::drawFromResourceDeck, "Expected EmptyDeckException when drawing from an empty resource deck.");
     }
 
     @Test
     void testDrawFromGoldDeck() throws EmptyDeckException {
+        GoldCard firstCard = board.getFirstGoldDeckCard();
+        GoldCard drawnCard = board.drawFromGoldDeck();
+        assertNotNull(drawnCard, "Drawn gold card should not be null.");
+        assertNotSame(firstCard, board.getFirstGoldDeckCard(), "First card should not be same after drawing.");
+
+        while (!board.isGoldDeckEmpty()) {
+            assertNotSame(drawnCard, board.drawFromGoldDeck(), "Drawn card should not be same as previous card.");
+        }
+
+        assertThrows(EmptyDeckException.class, board::drawFromGoldDeck, "Expected EmptyDeckException when drawing from an empty gold deck.");
+    }
+
+    @Test
+    void testShuffleCards() {
+        ArrayList<GoldCard> initialGoldDeck = new ArrayList<>(board.getGoldDeck());
+        ArrayList<ResourceCard> initialResourceDeck = new ArrayList<>(board.getResourceDeck());
+
+        board.shuffleCards();
+
+        assertNotEquals(initialGoldDeck, board.getGoldDeck(), "Gold deck should be shuffled.");
+        assertNotEquals(initialResourceDeck, board.getResourceDeck(), "Resource deck should be shuffled.");
+
+        assertTrue(initialGoldDeck.containsAll(board.getGoldDeck()) && board.getGoldDeck().containsAll(initialGoldDeck), "Gold deck should contain the same elements after shuffle.");
+        assertTrue(initialResourceDeck.containsAll(board.getResourceDeck()) && board.getResourceDeck().containsAll(initialResourceDeck), "Resource deck should contain the same elements after shuffle.");
+    }
+
+    @Test
+    void testShuffleCards2() {
+        int goldSize = board.getGoldDeckSize();
+
+        int resourceSize = board.getResourceDeckSize();
+        board.shuffleCards();
+
+        assertEquals(goldSize, board.getGoldDeckSize(), "Gold deck size should remain the same after shuffle.");
+        assertEquals(resourceSize, board.getResourceDeckSize(), "Resource deck size should remain the same after shuffle.");
+    }
+
+    @Test
+    void drawAllCards() {
+        try {
+            while (board.drawSharedGoldCard(1) != null) {
+                assertNotNull(board);
+            }
+            assertNull(board.drawSharedGoldCard(1));
+            board.drawSharedGoldCard(2);
+            assertNull(board.drawSharedGoldCard(2));
+
+        } catch (EmptyMainBoardException e) {
+            System.out.println("Gold ended");
+        }
 
         try {
-
-            GameState g = new GameState(null);
-            Populate.populate(g);
-            Board b = g.getMainBoard();
-
-            GoldCard firstCard = b.getFirstGoldDeckCard();
-
-            // function to test
-            GoldCard drawnCard = b.drawFromGoldDeck();
-            // Verify not null
-            assertNotNull(drawnCard);
-
-            assertNotSame(firstCard, b.getFirstGoldDeckCard());
-
-
-            // Draw every card from the deck
-            while (!b.isGoldDeckEmpty()) {
-                assertNotSame(b.drawFromGoldDeck(), drawnCard);
+            while (board.drawSharedResourceCard(1) != null) {
+                assertNotNull(board);
             }
+            assertNull(board.drawSharedResourceCard(1));
+            board.drawSharedResourceCard(2);
+            assertNull(board.drawSharedResourceCard(2));
 
-
-            // If deck is ended
-            assertThrows(EmptyDeckException.class, b::drawFromGoldDeck);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (EmptyMainBoardException e) {
+            System.out.println("Resources ended");
         }
-    }
-
-    @Test
-    void testShuffleCards() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
-        //TODO
-        /*
-        GameState g = Populate.populate();
-        Board b = g.getMainBoard();
-
-        // Save initial state
-        ArrayList<GoldCard> initialGoldDeck = new ArrayList<>(b.getGoldDeck());
-        ArrayList<ResourceCard> initialResourceDeck = new ArrayList<>(b.getResourceDeck());
-
-        // Shuffle decks
-        b.shuffleCards();
-
-        // verify if different position of the cards
-        assertNotEquals(initialGoldDeck, b.getGoldDeck());
-        assertNotEquals(initialResourceDeck, b.getResourceDeck());
-
-        // verify that the lists contains the same elements of before
-        assertTrue(initialGoldDeck.containsAll(b.getGoldDeck()) && b.getGoldDeck().containsAll(initialGoldDeck));
-        assertTrue(initialResourceDeck.containsAll(b.getResourceDeck()) && b.getResourceDeck().containsAll(initialResourceDeck));
-
-         */
-    }
-
-
-
-
-
-
-    @Test
-    void testShuffleCards2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException {
-        Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
-            @Override
-            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
-                return null;
-            }
-
-            @Override
-            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
-
-            }
-
-            @Override
-            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
-
-            }
-
-            @Override
-            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
-
-            }
-
-            @Override
-            public String[] list() throws RemoteException, AccessException {
-                return new String[0];
-            }
-        });
-        GameState g = new GameState(s);
-        Populate.populate(g);
-        Board b = g.getMainBoard();
-
-        // Save initial length
-        int goldSize = b.getGoldDeckSize();
-        int resourceSize = b.getGoldDeckSize();
-
-        // Shuffle decks
-        b.shuffleCards();
-
-        assertEquals(goldSize, b.getGoldDeckSize());
-        assertEquals(resourceSize, b.getResourceDeckSize());
     }
 }

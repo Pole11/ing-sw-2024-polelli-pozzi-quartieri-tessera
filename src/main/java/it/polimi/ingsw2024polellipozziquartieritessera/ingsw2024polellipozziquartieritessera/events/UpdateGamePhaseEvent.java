@@ -1,27 +1,25 @@
-package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events;
+package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.events;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.GamePhase;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateChatEvent extends Event {
-    int playerIndex;
-    String content;
+public class UpdateGamePhaseEvent extends Event {
+    private final GamePhase gamePhase;
 
-    public UpdateChatEvent(GameState gameState, ArrayList<VirtualView> clients, int playerIndex, String content) {
+    public UpdateGamePhaseEvent(GameState gameState, ArrayList<VirtualView> clients, GamePhase gamePhase) {
         super(gameState, clients);
-        this.playerIndex = playerIndex;
-        this.content = content;
+        this.gamePhase = gamePhase;
     }
 
     @Override
     public void execute() {
-        String decodedContent = content.replace("~", " ");
         for (VirtualView client : clients) {
             try {
-                client.updateChat(playerIndex, decodedContent);
+                client.updateGamePhase(gamePhase);
             } catch (RemoteException e) {
                 playerDisconnected(client);
             }

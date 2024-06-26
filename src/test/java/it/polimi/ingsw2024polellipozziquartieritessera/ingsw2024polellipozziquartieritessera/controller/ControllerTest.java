@@ -40,40 +40,15 @@ public class ControllerTest {
         CornerPos goldCardToTableCornerPos = CornerPos.UPLEFT;
 
         // create game state
-        Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
-            @Override
-            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
-                return null;
-            }
-
-            @Override
-            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
-
-            }
-
-            @Override
-            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
-
-            }
-
-            @Override
-            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
-
-            }
-
-            @Override
-            public String[] list() throws RemoteException, AccessException {
-                return new String[0];
-            }
-        });
+        Server s = new Server(null, null, null);
         GameState gs = new GameState(s);
         Populate.populate(gs);
 
         Populate.populate(gs);
-        gs.addPlayer("paolo", new Client(null, null, null));
-        gs.addPlayer("piergiorgio", new Client(null, null, null));
-        gs.addPlayer("fungiforme", new Client(null, null, null));
-        gs.addPlayer("paola", new Client(null, null, null));
+        gs.addPlayer("paolo", new SocketClient(null, null, null));
+        gs.addPlayer("piergiorgio", new SocketClient(null, null, null));
+        gs.addPlayer("fungiforme", new SocketClient(null, null, null));
+        gs.addPlayer("paola", new SocketClient(null, null, null));
         Player player = gs.getPlayer(0);
         Controller c = new Controller();
         c.setGameState(gs);
@@ -296,38 +271,13 @@ public class ControllerTest {
         int starterCardId = 81;
 
         // create game state
-        Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
-            @Override
-            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
-                return null;
-            }
-
-            @Override
-            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
-
-            }
-
-            @Override
-            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
-
-            }
-
-            @Override
-            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
-
-            }
-
-            @Override
-            public String[] list() throws RemoteException, AccessException {
-                return new String[0];
-            }
-        });
+        Server s = new Server(null, null, null);
         GameState gs = new GameState(s);
         Populate.populate(gs);
-        gs.addPlayer("paolo", new Client(null, null, null));
-        gs.addPlayer("piergiorgio", new Client(null, null, null));
-        gs.addPlayer("fungiforme", new Client(null, null, null));
-        gs.addPlayer("paola", new Client(null, null, null));
+        gs.addPlayer("paolo", new SocketClient(null, null, null));
+        gs.addPlayer("piergiorgio", new SocketClient(null, null, null));
+        gs.addPlayer("fungiforme", new SocketClient(null, null, null));
+        gs.addPlayer("paola", new SocketClient(null, null, null));
 
         gs.setPlayersConnected(0, true);
         gs.setPlayersConnected(1, true);
@@ -405,61 +355,17 @@ public class ControllerTest {
         //assertTrue(player.handCardContains(card1.getId()));
         assertEquals(gs.getMainBoard().getResourceDeckSize(), size -1);
         //assertNotEquals(gs.getMainBoard().getResourceDeck().getLast(), card1);
-
-
-        //TODO: this test cannot be done because we dont have the card to remove
-        /*
-        player.removeFromHandCardsMap(player.getHan);
-        //place instead of manually remove
-        c.placeCard(, player);
-        //card1 = gs.getMainBoard().getGoldDeck().getLast();
-        size = gs.getMainBoard().getGoldDeckSize();
-        entry = player.getHandCardsMap().entrySet().iterator().next();
-        player.getHandCardsMap().remove(entry.getKey());
-        c.drawCard(DrawType.DECKGOLD);
-        card1 = gs.getMainBoard().drawFromGoldDeck();
-        assertEquals(1,gs.getCurrentPlayerIndex());
-        gs.setCurrentPlayerIndex(0);
-        //assertTrue(player.handCardContains(card1.getId()));
-        assertEquals(gs.getMainBoard().getGoldDeckSize(), size -1);
-        //assertNotEquals(gs.getMainBoard().getGoldDeckSize().getLast(), card1);
-        */
     }
 
     @Test
     void flipCardTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardIsNotInHandException {
-        Server s = new Server(new ServerSocket(), new Controller(), new Registry() {
-            @Override
-            public Remote lookup(String name) throws RemoteException, NotBoundException, AccessException {
-                return null;
-            }
-
-            @Override
-            public void bind(String name, Remote obj) throws RemoteException, AlreadyBoundException, AccessException {
-
-            }
-
-            @Override
-            public void unbind(String name) throws RemoteException, NotBoundException, AccessException {
-
-            }
-
-            @Override
-            public void rebind(String name, Remote obj) throws RemoteException, AccessException {
-
-            }
-
-            @Override
-            public String[] list() throws RemoteException, AccessException {
-                return new String[0];
-            }
-        });
+        Server s = new Server(null, null, null);
         GameState gs = new GameState(s);
         Populate.populate(gs);
-        gs.addPlayer("paolo", new Client(null, null, null));
-        gs.addPlayer("piergiorgio", new Client(null, null, null));
-        gs.addPlayer("fungiforme", new Client(null, null, null));
-        gs.addPlayer("paola", new Client(null, null, null));
+        gs.addPlayer("paolo", new SocketClient(null, null, null));
+        gs.addPlayer("piergiorgio", new SocketClient(null, null, null));
+        gs.addPlayer("fungiforme", new SocketClient(null, null, null));
+        gs.addPlayer("paola", new SocketClient(null, null, null));
         Controller c = new Controller();
         c.setGameState(gs);
 
@@ -469,8 +375,6 @@ public class ControllerTest {
         assertEquals(Side.BACK, gs.getPlayer(0).getHandCardSide(1));
         c.flipCard(0, 1);
         assertEquals(Side.FRONT, gs.getPlayer(0).getHandCardSide(1));
-
-
     }
 
 }

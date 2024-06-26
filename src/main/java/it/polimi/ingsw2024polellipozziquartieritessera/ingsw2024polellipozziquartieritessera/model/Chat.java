@@ -1,29 +1,49 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+/**
+ * The Chat class represents a chat that contains a list of messages.
+ */
 public class Chat {
     private ArrayList<Message> messages; // may be final (the reference only)
 
-    public Chat(){
+    /**
+     * Constructs an empty Chat.
+     */
+    public Chat() {
         messages = new ArrayList<Message>();
     }
 
+    /**
+     * Adds a message to the chat.
+     *
+     * @param playerIndex the index of the player sending the message
+     * @param content     the content of the message
+     */
     public void addMessage(int playerIndex, String content) {
         Message message = new Message(playerIndex, content);
-        messages.addLast(message);
+        messages.add(message);
     }
 
+    /**
+     * Returns the list of messages in the chat.
+     *
+     * @return the list of messages
+     */
     public ArrayList<Message> getMessages() {
         return messages;
     }
 
-    public Message getLastMessage(){
-        if (messages.isEmpty()){
+    /**
+     * Returns the last message in the chat.
+     *
+     * @return the last message, or null if the chat is empty
+     */
+    public Message getLastMessage() {
+        if (messages.isEmpty()) {
             return null;
         }
-        return messages.getLast();
+        return messages.get(messages.size() - 1);
     }
 }

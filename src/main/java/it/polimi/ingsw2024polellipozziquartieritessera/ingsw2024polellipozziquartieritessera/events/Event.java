@@ -1,4 +1,4 @@
-package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events;
+package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.events;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
@@ -41,8 +41,8 @@ public abstract class Event {
      *
      * @param client The client (virtual view) that disconnected.
      */
-    public void playerDisconnected(VirtualView client){
-        if (gameState.getPlayer(gameState.getPlayerIndex(client)).isConnected()){
+    public void playerDisconnected(VirtualView client) {
+        if (gameState.getPlayer(gameState.getPlayerIndex(client)).isConnected()) {
             System.out.println("Client " + gameState.getPlayer(gameState.getPlayerIndex(client)).getNickname() + " disconnected because a remoteException was thrown");
             gameState.setPlayersConnected(gameState.getPlayerIndex(client), false);
             gameState.playerDisconnected(gameState.getPlayerIndex(client));

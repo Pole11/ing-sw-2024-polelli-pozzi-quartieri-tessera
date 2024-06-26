@@ -2,26 +2,26 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.Element;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.GoldCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ElementChallengeTest {
     @Test
-    void structureChallengeTestConfigurationSize() {
-        Element[][] mat33 = new Element[3][3];
-        Element[][] mat34 = new Element[3][4];
-        Element[][] mat43 = new Element[4][3];
-        Element[][] mat24 = new Element[2][4];
-        Element[][] mat42 = new Element[4][2];
-        Element[][] mat44 = new Element[4][4];
+    void testGetElements() throws IOException {
+        Server s = new Server(null, null, null);
+        GameState g = new GameState(s);
+        Populate.populate(g);
 
-        assertAll(() -> new StructureChallenge(mat33));
-        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat34));
-        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat43));
-        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat24));
-        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat42));
-        assertThrows(WrongStructureConfigurationSizeException.class, () -> new StructureChallenge(mat44));
+        GoldCard card1 = (GoldCard) g.getCard(53);
+
+        assertEquals( 1, ((ElementChallenge) card1.getChallenge()).getElements().size());
+        assertEquals( Element.INKWELL, ((ElementChallenge) card1.getChallenge()).getElements().getFirst());
     }
 }

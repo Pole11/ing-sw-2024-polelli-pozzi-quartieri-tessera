@@ -5,7 +5,6 @@ import java.io.*;
 import java.util.*;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.StarterCard;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.SocketClient;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
@@ -13,18 +12,24 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.ObjectiveCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server;
 import org.junit.jupiter.api.Test;
 
 public class GameStateTest {
-    /*
     @Test
     void SetObjectiveTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, InvalidObjectiveCardException {
-        VirtualView client1 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
-        VirtualView client2 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
-        VirtualView client3 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
-        VirtualView client4 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
+        VirtualView client1 = new SocketClient(null, null, null);;
+        VirtualView client2 = new SocketClient(null, null, null);;
+        VirtualView client3 = new SocketClient(null, null, null);;
+        VirtualView client4 = new SocketClient(null, null, null);;
 
-        GameState gs = Populate.populate();
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
         gs.addPlayer("paolo", client1);
         gs.addPlayer("piergiorgio", client2);
         gs.addPlayer("fungiforme", client3);
@@ -47,10 +52,16 @@ public class GameStateTest {
     @Test
     void NicknameAndColorTest() throws WrongStructureConfigurationSizeException, IOException, NotUniquePlayerNicknameException, NotUniquePlayerColorException {
         // same colors and nicknames
-        VirtualView client1 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
-        VirtualView client2 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
+        VirtualView client1 = new SocketClient(null, null, null);;
+        VirtualView client2 = new SocketClient(null, null, null);;
 
-        GameState gs = Populate.createCardsMap();
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
         gs.addPlayer("paolo", client1);
         gs.addPlayer("piergiorgio", client2);
         gs.setColor(0, Color.BLUE);
@@ -58,15 +69,22 @@ public class GameStateTest {
     }
 
     @Test
-    void calculateFinalPointsTest() throws CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, EmptyDeckException {
+    void calculateFinalPointsTest() throws CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, EmptyDeckException, CardNotOnBoardException {
 
 //-----------------------RECREATE SITUATION IN getCardPointsTest2-------------------------
 
-        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
+        VirtualView client = new SocketClient(null, null, null);;
 
-        GameState gs = Populate.createCardsMap();
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
         gs.addPlayer("paolo", client);
-        Controller c = new Controller(gs);
+        Controller c = new Controller();
+        c.setGameState(gs);
         Player player = gs.getPlayer(0);
 
         int starterCardId = 81;
@@ -328,12 +346,19 @@ public class GameStateTest {
 
 
     @Test
-    void calculateFinalPointsTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, EmptyDeckException {
-        VirtualView client = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
+    void calculateFinalPointsTest2() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, EmptyDeckException, CardNotOnBoardException {
+        VirtualView client = new SocketClient(null, null, null);;
 
-        GameState gs = Populate.createCardsMap();
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
         gs.addPlayer("paolo", client);
-        Controller c = new Controller(gs);
+        Controller c = new Controller();
+        c.setGameState(gs);
         Player player = gs.getPlayer(0);
 
         int starterCardId = 85;
@@ -379,9 +404,15 @@ public class GameStateTest {
 
     @Test
     void getWinnerPlayerIndexTest() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, GameIsNotEndedException, CardNotPlacedException, WrongInstanceTypeException {
-        GameState gs = Populate.populate();
-        VirtualView client1 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
-        VirtualView client2 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+        VirtualView client1 = new SocketClient(null, null, null);;
+        VirtualView client2 = new SocketClient(null, null, null);;
 
         gs.addPlayer("paolo", client1);
         gs.addPlayer("piergiorgio", client2);
@@ -422,17 +453,31 @@ public class GameStateTest {
     }
 
     @Test
-    void testWholeGame() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, EmptyDeckException, InvalidHandException {
-        VirtualView client1 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
-        VirtualView client2 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
-        VirtualView client3 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
-        VirtualView client4 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
+    void testWholeGame() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, EmptyDeckException, InvalidHandException, CardNotOnBoardException, EmptyMainBoardException {
+        VirtualView client1 = new SocketClient(null, null, null);
+        VirtualView client2 = new SocketClient(null, null, null);
+        VirtualView client3 = new SocketClient(null, null, null);
+        VirtualView client4 = new SocketClient(null, null, null);
 
         // client not in the game
-        VirtualView client5 = new SocketClient(new BufferedReader(new InputStreamReader(InputStream.nullInputStream())), new BufferedWriter(new OutputStreamWriter(OutputStream.nullOutputStream())), new Client());
+        VirtualView client5 = null;
 
-        GameState gs = Populate.populate();
-        Controller c = new Controller(gs);
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+        Controller c = new Controller();
+        c.setGameState(gs);
+
+        // random commands
+        c.getGamePhase();
+        c.getCurrentPlayerIndex();
+        c.getPlayerIndex(client1);
+        c.getTurnPhase();
+
 
         c.addPlayer(client1, "Pippo");
 
@@ -475,6 +520,17 @@ public class GameStateTest {
         c.chooseInitialColor(1, Color.GREEN);
         c.chooseInitialColor(2, Color.GREEN); // intentional error
         c.chooseInitialColor(2, Color.YELLOW);
+
+        assertEquals(gs.getAnswered().get(0), true);
+        gs.setAnswered(0, true);
+        gs.setAnswered(3,false);
+
+        // random commands
+        c.getGamePhase();
+        c.getCurrentPlayerIndex();
+        c.getPlayerIndex(client1);
+        c.getTurnPhase();
+
         c.chooseInitialColor(3, Color.BLUE);
 
         // objectives choice
@@ -497,14 +553,20 @@ public class GameStateTest {
                 break;
             }
         }
-        c.placeCard(0, handCardId, gs.getPlayer(0).getStarterCard().getId(), CornerPos.UPRIGHT, Side.FRONT);
-        c.drawCard(DrawType.DECKRESOURCE);
-
+        c.placeCard(0, handCardId, gs.getPlayer(0).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
         // verification of the turn
         assertEquals(gs.getCurrentGamePhase(), GamePhase.MAINPHASE);
         gs.setCurrentGamePhase(GamePhase.MAINPHASE);
         assertEquals(TurnPhase.DRAWPHASE, gs.getCurrentGameTurn());
         gs.setCurrentGameTurn(TurnPhase.DRAWPHASE);
+
+        c.drawCard(DrawType.DECKRESOURCE);
+
+        // verification of the turn
+        assertEquals(gs.getCurrentGamePhase(), GamePhase.MAINPHASE);
+        gs.setCurrentGamePhase(GamePhase.MAINPHASE);
+        assertEquals(TurnPhase.PLACINGPHASE, gs.getCurrentGameTurn());
+        gs.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
 
         for (int i = 0; i<102; i++){
             if(gs.getPlayer(1).handCardContains(i)){
@@ -512,8 +574,8 @@ public class GameStateTest {
                 break;
             }
         }
-        c.placeCard(1, handCardId, gs.getPlayer(1).getStarterCard().getId(), CornerPos.UPRIGHT, Side.FRONT);
-        c.drawCard(DrawType.DECKRESOURCE);
+        c.placeCard(1, handCardId, gs.getPlayer(1).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
+        c.drawCard(DrawType.DECKGOLD);
 
         for (int i = 0; i<102; i++){
             if(gs.getPlayer(2).handCardContains(i)){
@@ -521,8 +583,15 @@ public class GameStateTest {
                 break;
             }
         }
-        c.placeCard(2, handCardId, gs.getPlayer(2).getStarterCard().getId(), CornerPos.UPRIGHT, Side.FRONT);
-        c.drawCard(DrawType.DECKRESOURCE);
+        c.placeCard(2, handCardId, gs.getPlayer(2).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
+        c.drawCard(DrawType.SHAREDGOLD1);
+
+        // random commands
+        c.getGamePhase();
+        c.getCurrentPlayerIndex();
+        c.getPlayerIndex(client1);
+        c.getTurnPhase();
+        c.getObjectiveCardOptions(0);
 
         for (int i = 0; i<102; i++){
             if(gs.getPlayer(3).handCardContains(i)){
@@ -530,8 +599,8 @@ public class GameStateTest {
                 break;
             }
         }
-        c.placeCard(3, handCardId, gs.getPlayer(3).getStarterCard().getId(), CornerPos.UPRIGHT, Side.FRONT);
-        c.drawCard(DrawType.DECKRESOURCE);
+        c.placeCard(3, handCardId, gs.getPlayer(3).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
+        c.drawCard(DrawType.SHAREDRESOURCE1);
 
         // end game
         gs.getPlayer(0).addPoints(100);
@@ -547,8 +616,8 @@ public class GameStateTest {
                 break;
             }
         }
-        c.placeCard(0, handCardId, gs.getPlayer(0).getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
-        c.drawCard(DrawType.DECKRESOURCE);
+        c.placeCard(0, handCardId, gs.getPlayer(0).getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
+        c.drawCard(DrawType.SHAREDGOLD2);
 
         for (int i = 0; i<102; i++){
             if(gs.getPlayer(1).handCardContains(i)){
@@ -556,8 +625,8 @@ public class GameStateTest {
                 break;
             }
         }
-        c.placeCard(1, handCardId, gs.getPlayer(1).getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
-        c.drawCard(DrawType.DECKRESOURCE);
+        c.placeCard(1, handCardId, gs.getPlayer(1).getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
+        c.drawCard(DrawType.SHAREDRESOURCE2);
 
         for (int i = 0; i<102; i++){
             if(gs.getPlayer(2).handCardContains(i)){
@@ -565,7 +634,7 @@ public class GameStateTest {
                 break;
             }
         }
-        c.placeCard(2, handCardId, gs.getPlayer(2).getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
+        c.placeCard(2, handCardId, gs.getPlayer(2).getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
         c.drawCard(DrawType.DECKRESOURCE);
 
         for (int i = 0; i<102; i++){
@@ -574,9 +643,205 @@ public class GameStateTest {
                 break;
             }
         }
-        c.placeCard(3, handCardId, gs.getPlayer(3).getStarterCard().getId(), CornerPos.UPLEFT, Side.FRONT);
+        c.placeCard(3, handCardId, gs.getPlayer(3).getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
         c.drawCard(DrawType.DECKRESOURCE);
+
+        assertEquals(gs.getTurnToPlay(), 0);
+        assertNull(gs.getPrevGamePhase());
+        gs.setTurnToPlay(gs.getTurnToPlay());
+
+        gs.playerDisconnected(0);
+        gs.clientEnded(client1);
+        gs.pingAnswer(client2);
+        gs.allConnectedClients();
+        gs.allClients();
     }
 
-     */
+    @Test
+    void testAddPlayerThread() {
+        List<Thread> playerThreads = new ArrayList<>();
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+
+        assertDoesNotThrow(gs::addPlayerThread);
+    }
+
+    @Test
+    void testPingThreadRunnable() throws InterruptedException {
+        // Setup
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+        gs.addPlayerThread(); // Adding a thread to the list
+
+        VirtualView client = new SocketClient(null, null, null);
+        gs.addPlayer(new Player("Player1", client, gs));
+
+        Thread pingThread = new Thread(gs::pingThreadRunnable);
+        pingThread.start();
+
+        // Wait for the ping thread to run a bit
+        Thread.sleep(2000);
+
+        pingThread.interrupt();
+    }
+
+    @Test
+    void testPingAnswer() throws InterruptedException {
+        // Setup
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+        gs.addPlayerThread();
+        VirtualView client = new SocketClient(null, null, null);
+
+        gs.addPlayer(new Player("Player1", client, gs));
+
+        // Start the pingThreadRunnable
+        Thread pingThread = new Thread(gs::pingThreadRunnable);
+        pingThread.start();
+
+        // Wait for the ping thread to run a bit
+        Thread.sleep(2000);
+
+        // Send a ping answer
+        gs.pingAnswer(client);
+
+        Thread.sleep(1000);
+        // Stop the ping thread
+        pingThread.interrupt();
+    }
+
+    @Test
+    void testManageReconnection() {
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+        gs.addPlayerThread();
+        VirtualView client1 = new SocketClient(null, null, null);
+        VirtualView client2 = new SocketClient(null, null, null);
+        VirtualView client3 = new SocketClient(null, null, null);
+
+
+        // Mock per Player e VirtualView
+        Player player1 = new Player("Bob", client1, gs);
+        gs.addPlayer(player1);
+
+        Player player2 = new Player("Jean", client2, gs);
+        gs.addPlayer(player2);
+
+        Player player3 = new Player("Peter", client3, gs);
+        gs.addPlayer(player3);
+
+        gs.playerDisconnected(0);
+        gs.setPlayersConnected(0, false);
+        gs.setPlayersConnected(0, true);
+
+        gs.setPrevGamePhase(GamePhase.MAINPHASE);
+        gs.restoreView(client1);
+
+        gs.setPrevGamePhase(GamePhase.CHOOSEOBJECTIVEPHASE);
+        gs.restoreView(client2);
+
+        gs.setPrevGamePhase(GamePhase.ENDPHASE);
+        gs.restoreView(client1);
+
+        gs.setPrevGamePhase(GamePhase.NICKNAMEPHASE);
+        gs.restoreView(client1);
+
+        gs.setPrevGamePhase(GamePhase.CHOOSESTARTERSIDEPHASE);
+        gs.restoreView(client1);
+
+        gs.setPrevGamePhase(GamePhase.CHOOSECOLORPHASE);
+        gs.restoreView(client1);
+
+        gs.setPrevGamePhase(GamePhase.TIMEOUT);
+        gs.restoreView(client1);
+    }
+
+    @Test
+    public void testGameStateSetter(){
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+
+        gs.startThreads();
+    }
+
+    @Test
+    public void addMessageTest(){
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+        gs.addMessage(0,"I am 0");
+        gs.addMessage(1,"I am 1");
+
+        assertNotNull(gs.getChat().getMessages());
+        assertEquals(2, gs.getChat().getMessages().size());
+    }
+
+    @Test
+    public void reconnectionTest(){
+        VirtualView client1 = new SocketClient(null, null, null);
+        VirtualView client2 = new SocketClient(null, null, null);
+        VirtualView client3 = new SocketClient(null, null, null);
+        VirtualView client4 = new SocketClient(null, null, null);
+
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+        Controller c = new Controller();
+        c.setGameState(gs);
+
+        c.addPlayer(client1, "Pippo");
+        c.addPlayer(client2, "Jhonny");
+        c.addPlayer(client3, "Rezzonico");
+        c.addPlayer(client4, "Pollo");
+
+        assertEquals(gs.allConnectedClients().size(),4);
+        gs.playerDisconnected(0);
+        gs.playerDisconnected(1);
+
+        gs.setPlayersConnected(0, false);
+        gs.setPlayersConnected(1, false);
+
+        c.manageDisconnection();
+
+
+        assertEquals(gs.allConnectedClients().size(),2);
+
+        gs.setPlayersConnected(0, true);
+        gs.setPlayersConnected(1, true);
+
+        c.manageDisconnection();
+    }
 }

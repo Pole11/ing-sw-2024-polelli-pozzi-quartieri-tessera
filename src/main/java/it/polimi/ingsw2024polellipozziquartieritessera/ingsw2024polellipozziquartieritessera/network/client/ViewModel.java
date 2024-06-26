@@ -160,8 +160,7 @@ public class ViewModel {
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side){
         // for starter cards (initialization)
         if (!boardsMap.containsKey(playerIndex)){
-            // TODO: DAFARE
-            System.out.println("Errooooooooooooor!");
+            new IllegalStateException("Starter card not initialized for this player!").printStackTrace();
         }
 
         // for all the other placements
