@@ -22,6 +22,7 @@ public class NicknameEvent extends Event {
             try {
                 clientIterator.nicknameUpdate(playerIndex, nickname);
             } catch (RemoteException e) {
+                System.out.println("nickname event disconnected");
                 this.playerDisconnected(clientIterator);
             }
         }

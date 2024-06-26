@@ -6,10 +6,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.ViewModel;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.AddMessageCommandRunnable;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.GameEndedCommandRunnable;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.gui.GUIApplication;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 import javafx.animation.KeyFrame;
@@ -39,6 +36,8 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
 
+import static java.lang.Thread.sleep;
+
 abstract public class GUIController {
     @FXML public Label serverMessageLabel;
     @FXML public Label serverErrorLabel;
@@ -46,6 +45,7 @@ abstract public class GUIController {
     @FXML private Button handleOpenChatButton;
     private final ArrayDeque<CommandRunnable> commandQueue;
     private Thread executeCommands;
+    private Thread pongThread;
     private VirtualView client; // temp
     private VirtualServer server; // temp
     private Client clientContainer;
@@ -63,6 +63,9 @@ abstract public class GUIController {
     //private static PacmanBuffer<ImageView> imageViewRingBuffer;
 
     private boolean executeCommandRunning;
+    private boolean pongRunning;
+
+    private Thread serverThread;
 
     @FXML
     private void initialize() {
@@ -94,8 +97,61 @@ abstract public class GUIController {
     public GUIController() {
         this.commandQueue = new ArrayDeque();
         executeCommandRunning = true;
+        pongRunning = true;
         restartExecuteCommand();
+
     }
+
+    public void pongAnswer(){
+        serverThread.interrupt();
+    }
+    
+    public void restartPong(VirtualServer server, VirtualView client, Client clientContainer){
+        if (pongThread != null && pongThread.isAlive()){
+            pongRunning = false;
+            pongThread.interrupt();
+            try {
+                pongThread.join();
+            } catch (InterruptedException e) {
+
+            }
+        }
+
+
+
+        pongRunning = true;
+        pongThread = new Thread(()->{
+            while (pongRunning) {
+                if (serverThread == null || !serverThread.isAlive()){
+                    serverThread = new Thread(()->{
+                        try {
+                            Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
+                            clientContainer.serverDisconnected();
+                        } catch (InterruptedException e) {
+
+                        }
+                    });
+                    serverThread.start();
+                }
+                synchronized (commandQueue){
+                    PongCommandRunnable commandRunnable = new PongCommandRunnable();
+                    commandRunnable.setClient(client);
+                    commandRunnable.setServer(server);
+                    commandRunnable.setClientContainer(clientContainer);
+                    commandQueue.add(commandRunnable);
+                    commandQueue.notifyAll();
+                }
+                try {
+                    sleep(1000*Config.NEXT_PONG);
+                    //sleep(5000);
+                } catch (InterruptedException e) {
+                    System.out.println("pong thread interrupted");
+                }
+            }
+        });
+        pongThread.start();
+    }
+
 
     public void restartExecuteCommand(){
         System.out.println("restartExecuteCommand in guii");
@@ -185,6 +241,7 @@ abstract public class GUIController {
                 command = commandQueue.remove();
                 //commandQueue.notifyAll();
             }
+            System.out.println(command);
             command.executeGUI();
         }
     }

@@ -20,6 +20,7 @@ public enum Command {
     FLIPCARD(FlipCardCommandRunnable::new, "Network"),
     HELP(HelpCommandRunnable::new, "Local"),
     PING(PingCommandRunnable::new, "Network"),
+    PONG(PongCommandRunnable::new, "Network"),
     PLACECARD(PlaceCardCommandRunnable::new, "Network"),
     SHOWBOARD(ShowBoardCommandRunnable::new, "Local"),
     SHOWCOLORS(ShowColorsCommand::new, "Local"),
@@ -30,7 +31,7 @@ public enum Command {
     SHOWPLAYERS(ShowPlayersCommandRunnable::new, "Local"),
     SHOWPOINTS(ShowPointsCommandRunnable::new, "Local"),
     SHOWSECRETOBJECTIVES(ShowSecretObjectiveCommandRunnable::new, "Local"),
-    STATUS(StatusCommandRunnable::new, "Local"),
+    STATUS(StatusCommandRunnable::new,"Local"),
     OPENCHAT(OpenChatCommandRunnable::new, "Local"),
     START(StartCommandRunnable::new, "Network"),
     GAMEENDED(GameEndedCommandRunnable::new, "Network");

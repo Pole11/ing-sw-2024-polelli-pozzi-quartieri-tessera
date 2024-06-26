@@ -37,11 +37,15 @@ public class Server implements VirtualServer {
     public static void main(String[] argv) throws IOException {
         System.out.println("Executing server");
 
-        String host = argv[0];
-        int socketport = Integer.parseInt(argv[1]);
-        int rmiport = Integer.parseInt(argv[2]);
+        try {
+            String host = argv[0];
+            int socketport = Integer.parseInt(argv[1]);
+            int rmiport = Integer.parseInt(argv[2]);
 
-        startServer(host, socketport, rmiport);
+            startServer(host, socketport, rmiport);
+        } catch (Exception e) {
+            System.out.println("This is the server, please remember to use the right parameters: [server ip] [server port socket] [server port rmi]");
+        }
     }
 
     public static void startServer(String host, int socketport, int rmiport) throws IOException{
@@ -50,12 +54,9 @@ public class Server implements VirtualServer {
 
         // listen to rmi
         System.setProperty("java.rmi.server.hostname", host);
-        //set timeout for rmi after which it throws a remoteException
-        System.setProperty("sun.rmi.transport.tcp.responseTimeout", Config.RMI_RESPONSE_TIMEOUT);
-        System.setProperty("Sun.rmi.transport.tcp.readTimeout", "2000");
-        System.setProperty("Sun.rmi.transport.connectionTimeout", "2000");
-        System.setProperty("Sun.rmi.transport.proxy.connectTimeout", "2000");
-        System.setProperty("Sun.rmi.transport.tcp.handshakeTimeout", "2000");
+
+
+
         String name = "VirtualServer";
         Registry registry = LocateRegistry.createRegistry(rmiport);
 
@@ -253,6 +254,11 @@ public class Server implements VirtualServer {
     }
 
     @Override
+    public void pong(VirtualView client) throws RemoteException {
+        client.pong();
+    }
+
+    @Override
     public void gameEnded(VirtualView client) throws RemoteException {
         try {
             this.controller.gameEnded(client);
@@ -269,13 +275,10 @@ public class Server implements VirtualServer {
         } catch (IndexOutOfBoundsException e){
             client.sendError("you don't exist, to reconnect login with ADDUSER <your previous nickname>");
             client.connectionInfo(getPlayerIndex(client), false);
-        }
-        if (!controller.isConnected(client)){
-            client.sendError("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>");
-            client.connectionInfo(getPlayerIndex(client), false);
             return false;
         }
-        return true;
+        return connected;
+
     }
 
 

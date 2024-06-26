@@ -30,5 +30,7 @@ public interface VirtualServer extends Remote {
 
     public void ping(VirtualView client) throws RemoteException;
 
+    public void pong(VirtualView client) throws RemoteException;
+
     public void gameEnded(VirtualView client) throws RemoteException;
 }

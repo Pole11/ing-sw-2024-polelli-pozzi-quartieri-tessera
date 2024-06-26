@@ -242,7 +242,7 @@ public class FullGameTest {
         try {
             Thread.sleep(1000*Config.TIMEOUT_TIME + 1);
         } catch (InterruptedException e) {
-            System.out.println("The game ended, but there is no server to restart, success");
+            System.out.println("Game ended");
         }
     }
 }

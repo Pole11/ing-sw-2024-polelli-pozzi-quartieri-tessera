@@ -269,9 +269,16 @@ public class GameState {
                 event = eventQueue.remove();
 
             }
+            if (event instanceof PingEvent){
+                new Thread(event::execute).start();
+            } else {
+                event.execute();
+            }
             Populate.saveState(this);
             System.out.println(event);
-            event.execute();
+            System.out.println("THIS IS THE CLIENTS" + players.stream().map(Player::getClient).toList());
+            System.out.println(players.stream().map(Player::getNickname).toList());
+            //event.execute();
         }
     }
 
@@ -369,6 +376,7 @@ public class GameState {
      * @param client The client who has responded
      */
     public void pingAnswer(VirtualView client) {
+        System.out.println("in ping answer");
         System.out.println(getPlayerIndex(client));
         System.out.println(getPlayer(getPlayerIndex(client)).getNickname());
         synchronized (players) {
@@ -403,6 +411,7 @@ public class GameState {
             currentGamePhase = prevGamePhase;
             prevGamePhase = null;
         }
+        System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + player.getClient());
         restoreView(player.getClient());
         synchronized (players) {
             player.setConnected(true);
@@ -424,8 +433,10 @@ public class GameState {
         ArrayList<VirtualView> clients = new ArrayList<>();
         clients.add(client);
         Player reconnectingPlayer = getPlayer(getPlayerIndex(client));
+        System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + reconnectingPlayer.getClient());
+
         synchronized (eventQueue) {
-            eventQueue.add(new redirectOutEvent(this, clients, true));
+            eventQueue.add(new RedirectOutEvent(this, clients, true));
             GamePhase gamePhase = currentGamePhase;
             if (currentGamePhase.equals(GamePhase.TIMEOUT)){
                 gamePhase = prevGamePhase;
@@ -468,6 +479,8 @@ public class GameState {
                 });
                 //eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
             }
+            System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + reconnectingPlayer.getClient());
+
 
             //send common objectives
             if (gamePhase.ordinal() >= GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()) {
@@ -496,6 +509,8 @@ public class GameState {
             if (gamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
                 eventQueue.add(new UpdateCurrentPlayerEvent(this, clients, currentPlayerIndex));
             }
+            System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + reconnectingPlayer.getClient());
+
 
             // for every placingCardEvent, place a card in the boardsMap and in placedOrderCardMap
             placedEventList.stream().forEach(e -> {
@@ -513,7 +528,7 @@ public class GameState {
                 Player currentPlayer = players.get(i);
                 eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
             }
-            eventQueue.add(new redirectOutEvent(this, clients, false));
+            eventQueue.add(new RedirectOutEvent(this, clients, false));
             eventQueue.notifyAll();
 
         }
@@ -696,6 +711,8 @@ public class GameState {
 
                     playerThreads.get(j).interrupt();
                     players.get(j).setClient(client);
+                    System.out.println("THIS IS THE CLIENT OF THE PLAYER TO BE RESTORED" + client);
+                    System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + players.get(j).getClient());
                     this.manageReconnection(players.get(j));
                     synchronized (eventQueue) {
                         eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(client), this.currentGamePhase));
@@ -968,6 +985,7 @@ public class GameState {
             players.get(i).addToHandCardsMap(goldCard.getId(), Side.FRONT); // default is front side
             players.get(i).addToHandCardsMap(resourceCard1.getId(), Side.FRONT); // default is front side
             players.get(i).addToHandCardsMap(resourceCard2.getId(), Side.FRONT); // default is front side
+
         }
     }
 
