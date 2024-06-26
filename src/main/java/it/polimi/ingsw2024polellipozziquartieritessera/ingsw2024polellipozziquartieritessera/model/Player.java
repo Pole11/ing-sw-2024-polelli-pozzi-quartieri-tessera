@@ -297,7 +297,10 @@ public class Player {
         this.placedCardsMap.put(index, side);
     }
 
-    public void addToHandCardsMap(Integer index, Side side){
+    public void addToHandCardsMap(Integer index, Side side) throws InvalidHandException {
+        if (handCardsMap.keySet().size() >= Config.MAX_HAND_CARDS){
+            throw new InvalidHandException("Player " + this.getNickname() + " has too many cards in hand");
+        }
         this.handCardsMap.put(index, side);
         synchronized (gameState.getEventQueue()){
             gameState.addToEventQueue(new UpdateAddHandEvent(gameState, gameState.allConnectedClients(), this, index));

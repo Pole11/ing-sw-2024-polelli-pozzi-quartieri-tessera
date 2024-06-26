@@ -66,6 +66,7 @@ public class Client implements VirtualView {
             }
             (new Client(rmiOrSocket, host, port, myIp)).startClient();
         } catch(Exception e) {
+            e.printStackTrace();
             System.out.println("This is the client, please remember to use the right parameters: [rmi/socket] [server ip] [server port (depends on rmi and socket)] [optional with rmi: ip address of the current machine]");
         }
 
@@ -120,6 +121,7 @@ public class Client implements VirtualView {
         } else { //default rmi
             try {
                 if (myIp != null && !myIp.isEmpty()) System.setProperty("java.rmi.server.hostname", myIp);
+
                 Registry registry = LocateRegistry.getRegistry(host, port);
                 this.server = (VirtualServer) registry.lookup("VirtualServer");
                 this.client = new RmiClient(server, this);
@@ -133,13 +135,15 @@ public class Client implements VirtualView {
         }
     }
 
+
+
     public void runCli() {
         //the first time this code is executed, running is false and is changed to true
         //the following times this code is executed running is true
         // in this way runCli will be runned one time only
         meDoGui = false;
-
         cliController = new CLIController(viewModel);
+        cliController.restartPong(server, client, this);
 
         running = true;
         Scanner scan = new Scanner(System.in);

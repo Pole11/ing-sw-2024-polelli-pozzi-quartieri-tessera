@@ -17,6 +17,8 @@ public class RedirectOutEvent extends Event {
         try {
             clients.get(0).redirectOut(bool);
         }catch (RemoteException e){
+            e.printStackTrace();
+            System.out.println("redirect oout dico");
             playerDisconnected(clients.get(0));
         }
     }

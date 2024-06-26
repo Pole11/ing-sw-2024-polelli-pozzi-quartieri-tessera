@@ -38,8 +38,11 @@ public class RmiClient extends UnicastRemoteObject implements VirtualView {
                 if (clientContainer.isMeDoGui()){
                     clientContainer.getGuiApplication().setClientServer(this, server);
                     clientContainer.getGuiApplication().changeScene("/fxml/lobby.fxml");
+                    clientContainer.getGuiApplication().getGUIController().restartPong(server, this, clientContainer);
+
                 } else {
                     //clientContainer.runCli();
+                    clientContainer.getCliController().restartPong(server, this, clientContainer);
                     System.out.println("the server is now available, try to re-connect with command ADDUSER");
                 }
             }

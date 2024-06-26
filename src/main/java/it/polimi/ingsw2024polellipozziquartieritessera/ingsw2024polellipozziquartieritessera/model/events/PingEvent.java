@@ -22,7 +22,7 @@ public class PingEvent extends Event {
                 System.out.println("i will ping " + gameState.getPlayer(gameState.getPlayerIndex(clientIterator)).getNickname());
                 clientIterator.ping("ping");
                 System.out.println("I finished pinging to " + gameState.getPlayer(gameState.getPlayerIndex(clientIterator)).getNickname());
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 System.out.println("remote exception");
                 playerDisconnected(clientIterator);
             }

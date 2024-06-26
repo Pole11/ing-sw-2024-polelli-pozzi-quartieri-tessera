@@ -98,15 +98,31 @@ abstract public class GUIController {
         pongRunning = true;
         restartExecuteCommand();
 
-        restartPong();
     }
     
-    public void restartPong(){
+    public void restartPong(VirtualServer server, VirtualView client, Client clientContainer){
+        if (pongThread != null && pongThread.isAlive()){
+            pongRunning = false;
+            pongThread.interrupt();
+            try {
+                pongThread.join();
+            } catch (InterruptedException e) {
+
+            }
+        }
+
+        pongRunning = true;
         pongThread = new Thread(()->{
             while (pongRunning) {
-                if (server == null) continue;
-                PongCommandRunnable command = new PongCommandRunnable();
-                addCommand(command, this);
+                //if (server == null) continue;
+                synchronized (commandQueue){
+                    PongCommandRunnable commandRunnable = new PongCommandRunnable();
+                    commandRunnable.setClient(client);
+                    commandRunnable.setServer(server);
+                    commandRunnable.setClientContainer(clientContainer);
+                    commandQueue.add(commandRunnable);
+                    commandQueue.notifyAll();
+                }
                 try {
                     sleep(5000);
                 } catch (InterruptedException e) {

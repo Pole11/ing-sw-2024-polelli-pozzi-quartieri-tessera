@@ -12,6 +12,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.CommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.GameEndedCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PingCommandRunnable;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable.PongCommandRunnable;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
 
@@ -19,11 +20,15 @@ import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.Thread.sleep;
+
 public class CLIController {
     private ViewModel viewModel;
     private final ArrayDeque<CommandRunnable> commandQueue;
     private Thread executeCommands;
+    private Thread pongThread;
     private boolean executeCommandRunning;
+    private boolean pongRunning;
 
     public CLIController(ViewModel viewModel){
         this.commandQueue = new ArrayDeque();
@@ -31,6 +36,42 @@ public class CLIController {
 
         executeCommandRunning = true;
         restartExecuteCommand();
+
+        pongRunning = true;
+    }
+
+
+    public void restartPong(VirtualServer server, VirtualView client, Client clientContainer){
+        if (pongThread != null && pongThread.isAlive()){
+            pongRunning = false;
+            pongThread.interrupt();
+            try {
+                pongThread.join();
+            } catch (InterruptedException e) {
+
+            }
+        }
+        pongRunning = true;
+
+        pongThread = new Thread(()->{
+            while (pongRunning) {
+                if (server == null) continue;
+                synchronized (commandQueue){
+                    PongCommandRunnable commandRunnable = new PongCommandRunnable();
+                    commandRunnable.setClient(client);
+                    commandRunnable.setServer(server);
+                    commandRunnable.setClientContainer(clientContainer);
+                    commandQueue.add(commandRunnable);
+                    commandQueue.notifyAll();
+                }
+                try {
+                    sleep(5000);
+                } catch (InterruptedException e) {
+                    System.out.println("pong thread interrupted");
+                }
+            }
+        });
+        pongThread.start();
     }
 
     //old

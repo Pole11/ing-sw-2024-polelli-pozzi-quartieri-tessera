@@ -116,6 +116,10 @@ public class ViewModel {
     }
 
     public void setElement(int playerIndex, Element element, int numberOfElements){
+        System.out.println("ELEMENTSMAP");
+        System.out.println(elementsMap.keySet());
+        System.out.println(elementsMap.values());
+
         elementsMap.get(playerIndex).put(element, numberOfElements);
     }
 

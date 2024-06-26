@@ -119,6 +119,7 @@ public class GUIApplication extends Application {
 
         guiController = fxmlLoader.getController();
         initGameController(guiController);
+        guiController.restartPong(server, client, clientContainer);
     }
 
     public static int getSize() {
