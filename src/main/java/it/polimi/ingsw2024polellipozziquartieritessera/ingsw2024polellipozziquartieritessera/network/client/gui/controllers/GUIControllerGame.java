@@ -549,7 +549,7 @@ public class GUIControllerGame extends GUIController {
             @Override
             public void run() {
                 System.out.println("[DEBUG] Rendering server message: " + serverMessage);
-                showSingleAlert(Alert.AlertType.INFORMATION, "Message from server", serverMessage);
+                showAlert(Alert.AlertType.INFORMATION, "Message from server", serverMessage);
             }
         });
     }
@@ -560,7 +560,7 @@ public class GUIControllerGame extends GUIController {
             @Override
             public void run() {
                 System.err.println("[DEBUG] Rendering server error: " + serverMessage);
-                showAlert(Alert.AlertType.WARNING, "Error from server", serverMessage);
+                showSingleAlert(Alert.AlertType.WARNING, "Error from server", serverMessage);
             }
         });
     }

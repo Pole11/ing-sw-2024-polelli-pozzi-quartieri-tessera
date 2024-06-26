@@ -58,7 +58,8 @@ abstract public class GUIController {
     private int windowHeight = 920;
     private ListView<Text> chatListView;
     private boolean chatOpen;
-    private static boolean alertIsOpen;
+    private static boolean alertIsOpen = false;
+    private Alert alert;
     //private static PacmanBuffer<ImageView> imageViewRingBuffer;
 
     private boolean executeCommandRunning;
@@ -633,7 +634,23 @@ abstract public class GUIController {
     }
 
     // Method to show a simple alert
-    public Alert showAlert(Alert.AlertType alertType, String title, String content) {
+    public void showAlert(Alert.AlertType alertType, String title, String content) {
+        Platform.runLater(() -> {
+            Alert alert = showAlertHelper(alertType, title, content);
+            alert.showAndWait();
+        });
+    }
+
+    public void showSingleAlert(Alert.AlertType alertType, String title, String content) {
+        Platform.runLater(() -> {
+            if (alert == null || !alert.isShowing()) {
+                alert = showAlertHelper(alertType, title, content);
+                alert.showAndWait();
+            }
+        });
+    }
+
+    private Alert showAlertHelper(Alert.AlertType alertType, String title, String content) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -645,18 +662,7 @@ abstract public class GUIController {
 
         // Apply a custom style class to the alert
         alert.getDialogPane().getStyleClass().add("myAlert");
-
-        alert.showAndWait();
-
         return alert;
-    }
-
-    public void showSingleAlert(Alert.AlertType alertType, String title, String content) {
-        if (alertIsOpen) return;
-        Alert alert = showAlert(alertType, title, content);
-        alertIsOpen = true;
-        alert.setOnCloseRequest(event -> { alertIsOpen = false; });
-
     }
 
 }
