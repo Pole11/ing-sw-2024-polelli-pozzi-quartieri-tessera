@@ -28,6 +28,7 @@ public class SocketClient implements VirtualView {
             try {
                 runVirtualServer();
             } catch (ConnectException e) {
+
                 clientContainer.serverDisconnected();
             } catch (IOException e){
                 e.printStackTrace();
@@ -41,7 +42,6 @@ public class SocketClient implements VirtualView {
             String input = scan.nextLine();
             if (input != null && (input.equals("") || input.equalsIgnoreCase("y"))) {
                 clientContainer.runGui();
-                clientContainer.getGuiApplication().getGUIController().restartPong(server, this, clientContainer);
             } else if (input.equalsIgnoreCase("n")) {
                 this.server.connectRmi(this);
                 clientContainer.runCli();

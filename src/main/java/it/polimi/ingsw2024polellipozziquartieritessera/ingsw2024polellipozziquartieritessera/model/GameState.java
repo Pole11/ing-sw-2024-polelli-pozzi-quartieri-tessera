@@ -186,6 +186,10 @@ public class GameState {
         return eventQueue;
     }
 
+    public ArrayList<UpdateBoardEvent> getPlacedEventList(){
+        return new ArrayList(placedEventList);
+    }
+
     // SETTER
     public void setCurrentPlayerIndex(int currentPlayerIndex) {
         this.currentPlayerIndex = currentPlayerIndex;

@@ -41,10 +41,12 @@ public abstract class CommandRunnable {
     public abstract void executeHelp();
 
     public void serverDisconnectedCLI() {
+
         clientContainer.serverDisconnected();
     }
 
     public void serverDisconnectedGUI() {
+        System.out.println("disconncetion from guicommandrunnable");
         clientContainer.serverDisconnected();
     }
 

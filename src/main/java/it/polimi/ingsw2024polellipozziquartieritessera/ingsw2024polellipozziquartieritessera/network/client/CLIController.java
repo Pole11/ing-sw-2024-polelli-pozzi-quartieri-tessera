@@ -65,6 +65,7 @@ public class CLIController {
                     serverThread = new Thread(()->{
                         try {
                             Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
+                            System.out.println("disconnection from cli controller");
                             clientContainer.serverDisconnected();
                         } catch (InterruptedException e) {
                             System.out.println("serverThread interrupted");
@@ -117,6 +118,7 @@ public class CLIController {
 
 //new
     public void restartExecuteCommand(){
+        System.out.println("restaring clii");
         if (executeCommands != null && executeCommands.isAlive()){
             //executeCommandRunning = false;
             executeCommands.interrupt();

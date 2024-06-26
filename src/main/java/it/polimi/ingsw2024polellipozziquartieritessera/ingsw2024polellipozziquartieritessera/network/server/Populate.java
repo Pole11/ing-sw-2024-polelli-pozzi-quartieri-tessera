@@ -18,6 +18,7 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.CoverageChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.ElementChallenge;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.challenges.StructureChallenge;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.events.UpdateBoardEvent;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -210,6 +211,18 @@ public class Populate {
         });
 
 
+        ArrayList<Object> placedEventList = new ArrayList<>();
+        for (UpdateBoardEvent event : gameState.getPlacedEventList()) {
+            HashMap<String, Object> eventMap = new HashMap<>();
+            eventMap.put("playerIndex", event.getPlayerIndex());
+            eventMap.put("placingCardId", event.getPlacingCardId());
+            eventMap.put("tableCardId", event.getTableCardId());
+            eventMap.put("existingCornerPos", event.getExistingCornerPos());
+            eventMap.put("side", event.getSide());
+            placedEventList.add(eventMap);
+        }
+
+        saveMap.put("placedEventList", placedEventList);
         saveMap.put("mainBoard", mainBoard);
         saveMap.put("chat", messages);
         saveMap.put("players", players);
@@ -285,10 +298,12 @@ public class Populate {
         Map<String, ?> cards = mapper.readValue(cardsInputStream, Map.class);
 
         //if the json is an empty object
-        if (jsonState.isEmpty()){
+        if (jsonState.isEmpty()) {
             System.out.println("there is no state");
             return;
         }
+
+
 
         //restore MainBoard
         Map<String, ?> jsonBoard = (Map<String, ?>) jsonState.get("mainBoard");
@@ -308,6 +323,7 @@ public class Populate {
             int objectiveId = sharedObjectives.get(i);
             gameState.getMainBoard().setSharedObjectiveCard(i,(ObjectiveCard) createCard(false, (Map) cards.get(String.valueOf(objectiveId)), objectiveId));
         }
+
 
         ArrayList<Integer> goldDeckInt = (ArrayList<Integer>) jsonBoard.get("goldDeck");
         ArrayList<Integer> resourceDeckInt = (ArrayList<Integer>) jsonBoard.get("resourceDeck");
@@ -419,6 +435,17 @@ public class Populate {
             gameState.addPlayer(player);
 
         }
+
+
+        //restore placedList
+        ArrayList<Map> jsonPlacedList = (ArrayList<Map>) jsonState.get("placedEventList");
+        for (Map event : jsonPlacedList){
+            int index = (int) event.get("playerIndex");
+            Player player = gameState.getPlayer(index);
+            UpdateBoardEvent backupEvent = new UpdateBoardEvent(gameState, new ArrayList<>(), player, (int) event.get("placingCardId"), (int) event.get("tableCardId") , CornerPos.valueOf((String) event.get("existingCornerPos")), Side.valueOf((String) event.get("side")));
+            gameState.addPlacedEvent(backupEvent);
+        }
+
 
         gameState.setCurrentPlayerIndex((int)jsonState.get("currentPlayerIndex"));
         gameState.setCurrentGamePhase(GamePhase.valueOf((String) jsonState.get("currentGamePhase")));

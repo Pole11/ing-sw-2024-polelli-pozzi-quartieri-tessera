@@ -6,10 +6,11 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class UpdateBoardEvent extends Event {
+public class UpdateBoardEvent extends Event implements Serializable {
     private final Player player;
     private final int placingCardId;
     private final int tableCardId;
@@ -41,6 +42,26 @@ public class UpdateBoardEvent extends Event {
                 playerDisconnected(client);
             }
         }
+    }
+
+    public int getPlayerIndex() {
+        return gameState.getPlayerIndex(player);
+    }
+
+    public int getPlacingCardId() {
+        return placingCardId;
+    }
+
+    public int getTableCardId() {
+        return tableCardId;
+    }
+
+    public CornerPos getExistingCornerPos() {
+        return existingCornerPos;
+    }
+
+    public Side getSide() {
+        return side;
     }
 
     public void setRestoreClients(ArrayList<VirtualView> restoreClients) {

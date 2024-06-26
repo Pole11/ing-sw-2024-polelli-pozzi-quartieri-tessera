@@ -58,14 +58,14 @@ abstract public class GUIController {
     private int windowHeight = 920;
     private ListView<Text> chatListView;
     private boolean chatOpen;
-    private static boolean alertIsOpen = false;
     private Alert alert;
     //private static PacmanBuffer<ImageView> imageViewRingBuffer;
 
     private boolean executeCommandRunning;
     private boolean pongRunning;
 
-    private Thread serverThread;
+    private static boolean alertIsOpen = false;
+    public static Thread serverThread;
 
     @FXML
     private void initialize() {
@@ -103,7 +103,9 @@ abstract public class GUIController {
     }
 
     public void pongAnswer(){
-        serverThread.interrupt();
+        System.out.println("ponganswered");
+        System.out.println("serverThread: " + serverThread);
+        if (serverThread!= null)serverThread.interrupt();
     }
     
     public void restartPong(VirtualServer server, VirtualView client, Client clientContainer){
@@ -122,10 +124,14 @@ abstract public class GUIController {
         pongRunning = true;
         pongThread = new Thread(()->{
             while (pongRunning) {
+                System.out.println("hey amico");
+                System.out.println(serverThread);
                 if (serverThread == null || !serverThread.isAlive()){
+                    System.out.println("down");
                     serverThread = new Thread(()->{
                         try {
                             Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
+                            System.out.println("disconnection from gui controller");
                             clientContainer.serverDisconnected();
                         } catch (InterruptedException e) {
 
@@ -141,6 +147,7 @@ abstract public class GUIController {
                     commandQueue.add(commandRunnable);
                     commandQueue.notifyAll();
                 }
+                System.out.println(serverThread);
                 try {
                     sleep(1000*Config.NEXT_PONG);
                     //sleep(5000);
@@ -194,6 +201,7 @@ abstract public class GUIController {
             commandQueue.notifyAll();
         }
         restartExecuteCommand();
+        //restartPong(server, client, clientContainer);
     }
 
     public int getWindowHeight() {
@@ -242,8 +250,15 @@ abstract public class GUIController {
                 //commandQueue.notifyAll();
             }
             System.out.println(command);
+            System.out.println("serverThread pre execute gui " + serverThread);
             command.executeGUI();
+            System.out.println("serverThread post execute gui" + serverThread);
+
         }
+    }
+
+    public Thread getServerThread(){
+        return serverThread;
     }
 
 

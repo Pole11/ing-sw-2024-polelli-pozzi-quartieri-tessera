@@ -127,6 +127,7 @@ public class Client implements VirtualView {
                 this.client = new RmiClient(server, this);
                 ((RmiClient) client).run();
             } catch (RemoteException e) {
+                System.out.println("disconncetion from client");
                 serverDisconnected();
                 System.out.println("An error occurred while executing RmiClient!");
             } catch (NotBoundException e){
@@ -187,6 +188,7 @@ public class Client implements VirtualView {
         try {
             startClient();
         } catch (ConnectException e){
+            System.out.println("disconnection from client 2");
             serverDisconnected();
         } catch (IOException e) {
             throw new RuntimeException(e);
