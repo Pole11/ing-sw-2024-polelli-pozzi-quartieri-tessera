@@ -168,7 +168,7 @@ public class GUIControllerGame extends GUIController {
                 );
                 addTextToContainer(sharedGoldContainerGame, "Shared Gold");
             } catch (Exception e) {
-                System.out.println("The gold deck is empty");
+                System.err.println("The gold deck is empty");
             }
 
             try {
@@ -179,7 +179,7 @@ public class GUIControllerGame extends GUIController {
                         false
                 );
             } catch (Exception e) {
-                System.out.println("The first gold shared is empty");
+                System.err.println("The first gold shared is empty");
             }
 
             try {
@@ -190,7 +190,7 @@ public class GUIControllerGame extends GUIController {
                         false
                 );
             } catch (Exception e) {
-                System.out.println("The second gold shared is empty");
+                System.err.println("The second gold shared is empty");
             }
 
             configurePlateau();
@@ -205,7 +205,7 @@ public class GUIControllerGame extends GUIController {
                 );
                 addTextToContainer(sharedResourceContainerGame, "Shared Resource");
             } catch (Exception e) {
-                System.out.println("The resource deck is empty");
+                System.err.println("The resource deck is empty");
             }
 
             try {
@@ -216,7 +216,7 @@ public class GUIControllerGame extends GUIController {
                         false
                 );
             } catch (Exception e) {
-                System.out.println("The first resource shared is empty");
+                System.err.println("The first resource shared is empty");
             }
 
             try {
@@ -227,7 +227,7 @@ public class GUIControllerGame extends GUIController {
                         false
                 );
             } catch (Exception e) {
-                System.out.println("The second resource shared is empty");
+                System.err.println("The second resource shared is empty");
             }
         });
     }
@@ -336,7 +336,6 @@ public class GUIControllerGame extends GUIController {
                 expandButton.setOnMousePressed(mouseEvent -> {
                     HashMap<String, Object> paramsMap = new HashMap<>();
                     paramsMap.put("playerId", playerId);
-                    System.out.println(playerId);
                     goToScene("/fxml/board.fxml", paramsMap);
                 });
                 infoContainerVBox.getChildren().addAll(nicknameText, expandButton, connectionText);
@@ -548,7 +547,6 @@ public class GUIControllerGame extends GUIController {
         Platform.runLater(new Runnable() { // da quello che ho capito qui ci metto quello che voglio far fare al thread della UI
             @Override
             public void run() {
-                System.out.println("[DEBUG] Rendering server message: " + serverMessage);
                 showAlert(Alert.AlertType.INFORMATION, "Message from server", serverMessage);
             }
         });

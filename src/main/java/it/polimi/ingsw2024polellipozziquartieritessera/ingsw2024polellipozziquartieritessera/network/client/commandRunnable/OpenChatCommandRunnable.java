@@ -1,5 +1,8 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable;
 
+/**
+ * Allows a client to open the chat
+ */
 public class OpenChatCommandRunnable extends CommandRunnable {
     @Override
     public void executeCLI() {

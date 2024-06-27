@@ -349,10 +349,10 @@ public class Populate {
         try {
             jsonState = mapper.readValue(Paths.get(filePath + Config.GAME_STATE_PATH).toFile(), Map.class);
         } catch (IOException e) {
-            System.out.println("there is no state");
+            System.out.println("POPULATE: " + "there is no state");
             return;
         }
-        System.out.println("Found a state file in location: " + filePath + Config.GAME_STATE_PATH);
+        System.out.println("POPULATE: " + "Found a state file in location: " + filePath + Config.GAME_STATE_PATH);
 
         // Load cards.json
         InputStream cardsInputStream = Populate.class.getResourceAsStream("/cards.json");
@@ -363,7 +363,7 @@ public class Populate {
 
         //if the json is an empty object
         if (jsonState.isEmpty()) {
-            System.out.println("there is no state");
+            System.out.println("POPULATE: " + "there is no state");
             return;
         }
 
@@ -415,7 +415,7 @@ public class Populate {
         //restore players
         ArrayList<?> players = (ArrayList<?>) jsonState.get("players");
         if (players.isEmpty()){
-            System.out.println("the players are empty");
+            System.out.println("POPULATE: " + "the players are empty");
         }
         for (int i = 0; i < players.size(); i++){
             Map playerJson = (Map) players.get(i);
@@ -424,9 +424,7 @@ public class Populate {
             player.setConnected(false);
             player.addPoints((int) playerJson.get("points"));
             Object playerBoardObj = playerJson.get("playerBoard");
-            System.out.println(playerBoardObj);
             ArrayList<ArrayList<Integer>> playerBoardArrayList = (ArrayList<ArrayList<Integer>>) playerBoardObj;
-            System.out.println(playerBoardArrayList);
             player.setPlayerBoard(playerBoardArrayList);
 
 
@@ -435,10 +433,7 @@ public class Populate {
             for (Object key : handJson.keySet()){
                 handCardsMap.put(Integer.parseInt((String) key), Side.valueOf((String) handJson.get(key)));
             }
-            System.out.println(playerJson.get("handCardsMap"));
-            System.out.println(handCardsMap);
             player.setHandCardsMap(handCardsMap);
-            System.out.println(player.getHandCardsMap());
 
             Color color = null;
             if (!playerJson.get("color").equals("")){
@@ -524,6 +519,6 @@ public class Populate {
             gameState.setAnswered((Integer.parseInt((String) key)), (Boolean) answeredJson.get((String) key));
         }
 
-        System.out.println("I restored the state");
+        System.out.println("POPULATE: " + "I restored the state");
     }
 }

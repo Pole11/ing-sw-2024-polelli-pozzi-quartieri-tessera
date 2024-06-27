@@ -266,7 +266,7 @@ public class GameState {
                     try {
                         eventQueue.wait();
                     } catch (InterruptedException e) {
-                        System.out.println("execute events interrupted");
+                        System.out.println("GAMESTATE: execute events interrupted");
                         return;
                     }
                 }
@@ -275,16 +275,12 @@ public class GameState {
 
             }
 
-            System.out.println(event);
             if (event instanceof PingEvent){
                 new Thread(event::execute).start();
             } else {
                 event.execute();
             }
             Populate.saveState(this);
-
-            System.out.println("THIS IS THE CLIENTS" + players.stream().map(Player::getClient).toList());
-            System.out.println(players.stream().map(Player::getNickname).toList());
             //event.execute();
         }
     }
@@ -343,12 +339,10 @@ public class GameState {
                 if (!playerThreads.get(i).isAlive()){
                     playerThreads.set(i, new Thread(() -> {
                         int j = finalI;
-                        System.out.println("player to be pinged" + j);
                         try {
                             //wait for the answer of players
                             Thread.sleep(1000*Config.WAIT_FOR_PING_TIME);
                             if (players.get(j).isConnected()){
-                                System.out.println("client "  + getPlayer(j).getNickname() + " disconnected because ping didn't arrive in time");
                                 synchronized (players) {
                                     players.get(j).setConnected(false);
                                 }
@@ -383,16 +377,12 @@ public class GameState {
      * @param client The client who has responded
      */
     public void pingAnswer(VirtualView client) {
-        System.out.println("in ping answer");
-        System.out.println(client);
-        System.out.println(getPlayerIndex(client));
-        System.out.println(getPlayer(getPlayerIndex(client)).getNickname());
         synchronized (players) {
             playerThreads.get(getPlayerIndex(client)).interrupt();
             try {
                 playerThreads.get(getPlayerIndex(client)).join();
             } catch (InterruptedException e) {
-                System.out.println("playerThread interrupted from outside");
+                System.err.println("playerThread interrupted from outside");
             }
         }
     }
@@ -425,7 +415,6 @@ public class GameState {
                 }
             });
         }
-        System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + player.getClient());
         restoreView(player.getClient());
         synchronized (players) {
             player.setConnected(true);
@@ -442,12 +431,10 @@ public class GameState {
      * @param client Client to be reconnected
      */
     public void restoreView(VirtualView client) {
-        System.out.println("RESTORE VIEWWWWWWWWWW");
         //send everything to client
         ArrayList<VirtualView> clients = new ArrayList<>();
         clients.add(client);
         Player reconnectingPlayer = getPlayer(getPlayerIndex(client));
-        System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + reconnectingPlayer.getClient());
 
         synchronized (eventQueue) {
             eventQueue.add(new RedirectOutEvent(this, clients, true));
@@ -487,12 +474,10 @@ public class GameState {
                 HashMap<Element, Integer> elements = currentPlayer.getAllElements();
                 int finalI = i;
                 elements.keySet().stream().forEach(e->{
-                    System.out.println("i am in update elments of restore view");
                     eventQueue.add(new UpdateElementsEvent(this, clients, finalI, e, elements.get(e)));
                 });
                 //eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
             }
-            System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + reconnectingPlayer.getClient());
 
 
             //send common objectives
@@ -523,7 +508,6 @@ public class GameState {
             if (gamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
                 eventQueue.add(new UpdateCurrentPlayerEvent(this, clients, currentPlayerIndex));
             }
-            System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + reconnectingPlayer.getClient());
 
 
             // for every placingCardEvent, place a card in the boardsMap and in placedOrderCardMap
@@ -760,9 +744,7 @@ public class GameState {
     public void addPlayer(String nickname, VirtualView client) {
         Player player = new Player(nickname, client, this);
         //if someone choose his nickname, he is inside the match, even if he is temporanely disconnected
-        System.out.println("i am in gamestate" + client + nickname);
         if (allConnectedClients().contains(client)) {
-            System.out.println("1");
             synchronized (eventQueue) {
                 eventQueue.add(new ErrorEvent(this, singleClient(client), "You already chose a nickname, you cannot change it"));
                 eventQueue.notifyAll();
@@ -772,32 +754,21 @@ public class GameState {
 
         //checks for reconnections or same nickname exception
         for (int j = 0; j < players.size(); j++) {
-            System.out.println("2");
 
             if (player.getNickname().equals(players.get(j).getNickname())) {
-                System.out.println("3");
-
                 //takes for granted that player connection is updated
                 //if the player is not connected but the gameState doesn't know, the following code fails
                 if (!players.get(j).isConnected()) {
-                    System.out.println("4");
-
                     playerThreads.get(j).interrupt();
                     players.get(j).setClient(client);
-                    System.out.println("THIS IS THE CLIENT OF THE PLAYER TO BE RESTORED" + client);
-                    System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + players.get(j).getClient());
                     this.manageReconnection(players.get(j));
                     synchronized (eventQueue) {
                         eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(client), this.currentGamePhase));
                         eventQueue.notifyAll();
                     }
                 } else {
-                    System.out.println("5");
-
                     if (allConnectedClients().size()<Config.MAX_PLAYERS){
-                        System.out.println("6");
-
-                        synchronized (eventQueue) {
+                            synchronized (eventQueue) {
                             ArrayList<VirtualView> clients = new ArrayList<>();
                             clients.add(client);
                             eventQueue.add(new ErrorEvent(this, clients, "The nickname is already used, please choose another one"));
@@ -810,8 +781,6 @@ public class GameState {
         }
 
         if (players.size() >= Config.MAX_PLAYERS) {
-            System.out.println("7");
-
             synchronized (eventQueue) {
                 ArrayList<VirtualView> clients = new ArrayList<>();
                 clients.add(client);
@@ -823,9 +792,6 @@ public class GameState {
 
 
         if (currentGamePhase.equals(GamePhase.NICKNAMEPHASE)){
-            System.out.println("8");
-
-
             players.add(player);
             playerThreads.add(new Thread());
             synchronized (eventQueue) {
@@ -838,10 +804,8 @@ public class GameState {
                 }
                 eventQueue.notifyAll();
             }
-            System.out.println(nickname + " connected");
+            System.out.println("GAMESTATE: " + nickname + " connected");
         } else {
-            System.out.println("9");
-
             ArrayList<VirtualView> clients = new ArrayList<>();
             clients.add(client);
             synchronized (eventQueue) {
@@ -901,7 +865,7 @@ public class GameState {
         this.mainBoard.initSharedResourceCards();
         updateMainBoard();
         this.initStarters(); // set the starters cards for every player
-        System.out.println("Starting game");
+        System.out.println("GAMESTATE: Starting game");
         this.currentGamePhase.changePhase(this);
     }
 
@@ -940,9 +904,7 @@ public class GameState {
      */
     public void setStarterSide(int playerIndex, Side side) {
         //TODO: try catch id player not registerred
-        System.out.println(allConnectedClients());
         players.stream().filter(e -> !e.isConnected() && !answered.get(getPlayerIndex(e))).forEach(e->{
-            System.out.println(e.getNickname());
             e.addToPlacedCardsMap(e.getStarterCard().getId(), Side.BACK);
             updateElements(e, e.getStarterCard(), Side.BACK);
             synchronized (eventQueue) {
@@ -950,8 +912,7 @@ public class GameState {
                 eventQueue.notifyAll();
             }
             this.answered.put(getPlayerIndex(e), true);
-            System.out.println(e.getNickname() + " automatically chose his starter, the number of answered is: " + numberAnswered());
-        });
+            });
 
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
@@ -980,10 +941,10 @@ public class GameState {
 
 
         this.answered.put(playerIndex, true);
-        System.out.println(playerIndex + " chose his startercard, the number of answered is: " + numberAnswered());
+        System.out.println("GAMESTATE: " + playerIndex + " chose his startercard, the number of answered is: " + numberAnswered());
         //notify him and all the others about the change
         if (numberAnswered() == players.size()) {
-            System.out.println("everyone answered");
+            System.out.println("GAMESTATE: everyone answered");
             this.currentGamePhase.changePhase(this);
             resetAnswered();
         }
@@ -1001,7 +962,7 @@ public class GameState {
             if (colorOptional.isPresent()){
                 e.setColor(colorOptional.get());
                 this.answered.put(getPlayerIndex(e), true);
-                System.out.println(e.getNickname() + " automatically chose his color, the number of answered is: " + numberAnswered());
+                System.out.println("GAMESTATE:" + e.getNickname() + " automatically chose his color, the number of answered is: " + numberAnswered());
             }
 
         });
@@ -1028,11 +989,11 @@ public class GameState {
         }
         player.setColor(color);
         this.answered.put(playerIndex, true);
-        System.out.println(getPlayer(playerIndex).getNickname() + " chose his color, the number of answered is: " + numberAnswered());
+        System.out.println("GAMESTATE:" + getPlayer(playerIndex).getNickname() + " chose his color, the number of answered is: " + numberAnswered());
 
 
         if (numberAnswered() == players.size()) {
-            System.out.println("everyone answered");
+            System.out.println("GAMESTATE:" + "everyone answered");
             resetAnswered();
             try {
                 //send also the cards to the view
@@ -1114,7 +1075,7 @@ public class GameState {
         players.stream().filter(e -> !e.isConnected() && e.getObjectiveCard() == null).forEach(e->{
             e.setObjectiveCard(e.getObjectiveCardOption(0));
             this.answered.put(getPlayerIndex(e), true);
-            System.out.println(e.getNickname() + " automatically chose his objective, the number of ansewred is: " + numberAnswered());
+            System.out.println("GAMESTATE:" + e.getNickname() + " automatically chose his objective, the number of ansewred is: " + numberAnswered());
         });
 
         Player player = this.players.get(playerIndex);
@@ -1136,11 +1097,11 @@ public class GameState {
 
         player.setObjectiveCard(player.getObjectiveCardOption(cardIndex));
         this.answered.put(playerIndex, true);
-        System.out.println(getPlayer(playerIndex).getNickname() + " chose his objective, the number of ansewred is: " + numberAnswered());
+        System.out.println("GAMESTATE:" + getPlayer(playerIndex).getNickname() + " chose his objective, the number of answered is: " + numberAnswered());
 
 
         if (numberAnswered() == players.size()) {
-            System.out.println("everyone answered");
+            System.out.println("GAMESTATE:" + "everyone answered");
             resetAnswered();
             this.currentGamePhase.changePhase(this);
             currentPlayerIndex = players.size() -1;
@@ -1214,7 +1175,7 @@ public class GameState {
         if (!tableCardExists) throw new CardNotOnBoardException("You are trying to place on a card that is not on table");
 
         updateElements(player, placingCard, placingCardSide);
-        System.out.println(player.getNickname() + " placed card " + placingCardId);
+        System.out.println("GAMESTATE:" + player.getNickname() + " placed card " + placingCardId);
     }
 
     private void placeCardHelper(Player player, int matrixCardId, CornerCard placingCard, Side placingCardSide, CornerPos matrixCardCornerPos, CornerPos indirectPlacingCornerPos) throws PlacingOnHiddenCornerException {
@@ -1254,7 +1215,6 @@ public class GameState {
                 int newOccurencies = Collections.frequency(placingCard.getUncoveredElements(placingCardSide), ele);
                 player.addToAllElements(ele, currentOccurencies + newOccurencies);
             }
-            System.out.println("i am in update elements of update elements");
             eventQueue.add(new UpdateElementsEvent(this, allClients(), getPlayerIndex(player), ele, player.getAllElements().get(ele)));
         }
     }
@@ -1265,6 +1225,7 @@ public class GameState {
      * Check if game is ended by one of the possible conditions
      */
     public void checkGameEnded() {
+        System.out.println("CONTROLLO");
         // switch to end phase
         if (!currentGamePhase.equals(GamePhase.ENDPHASE)) {
             // first endphase entering: player reach 20 points
@@ -1341,9 +1302,9 @@ public class GameState {
         ArrayList<Integer> winnerPlayerIndeces = new ArrayList<>();
         boolean playerReachedPoints = false;
         for (int i = 0; i < this.players.size(); i++) {
-            if (this.players.get(i).getPoints() >= Config.POINTSTOENDPHASE) {
+            /*if (this.players.get(i).getPoints() >= Config.POINTSTOENDPHASE) {
                 playerReachedPoints = true;
-            }
+            }*/
             if (this.players.get(i).getPoints() > maxPoints) {
                 winnerPlayerIndeces = new ArrayList<>();
                 winnerPlayerIndeces.add(i);
@@ -1352,9 +1313,9 @@ public class GameState {
                 winnerPlayerIndeces.add(i);
             }
         }
-        if (!playerReachedPoints) {
+        /*if (!playerReachedPoints) {
             throw new GameIsNotEndedException("You called getWinnerPlayerIndex even if the game is not ended, no one is at 20 points");
-        }
+        }*/
 
         // now winnerPlayerIndeces contains who has the maximum number of points
         // decide the real winner if there is a draw

@@ -339,7 +339,7 @@ public class Player {
      * @param index The CardID
      */
     public void removeFromHandCardsMap(Integer index) {
-        System.out.println("Removing from hand card " + index);
+        System.out.println("PLAYER: " +"Removing from hand card " + index);
         this.handCardsMap.remove(index);
         synchronized (gameState.getEventQueue()) {
             gameState.addToEventQueue(new UpdateRemoveHandEvent(gameState, gameState.allConnectedClients(), this, index));
@@ -494,13 +494,11 @@ public class Player {
         //TODO: remove (only testing)
         // Check if rowIndex is within bounds
         if (rowIndex < 0 || rowIndex >= playerBoard.size()) {
-            System.out.println("ROW");
             throw new IllegalArgumentException("Invalid row index: " + rowIndex);
         }
 
         // Check if colIndex is within bounds
         if (colIndex < 0 || colIndex >= playerBoard.get(rowIndex).size()) {
-            System.out.println("COL");
             throw new IllegalArgumentException("Invalid column index: " + colIndex);
         }
 

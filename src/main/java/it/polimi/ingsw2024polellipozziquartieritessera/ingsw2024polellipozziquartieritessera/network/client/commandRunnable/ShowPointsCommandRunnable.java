@@ -1,5 +1,8 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable;
 
+/**
+ * Allows the client to show the points of another player
+ */
 public class ShowPointsCommandRunnable extends CommandRunnable{
     @Override
     public void executeCLI() {

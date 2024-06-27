@@ -1,17 +1,19 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.bots;
 
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client;
+
 import java.io.IOException;
 import java.io.PipedOutputStream;
-
-import static it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.bots.ClientBot.client;
 
 public class InputInserter implements Runnable {
     public static boolean sideChosen = false;
     public static boolean secretChosen = false;
-    private PipedOutputStream pos;
+    private final PipedOutputStream pos;
+    private final Client client;
 
-    public InputInserter(PipedOutputStream pos) {
+    public InputInserter(PipedOutputStream pos, Client client) {
         this.pos = pos;
+        this.client = client;
     }
 
     @Override

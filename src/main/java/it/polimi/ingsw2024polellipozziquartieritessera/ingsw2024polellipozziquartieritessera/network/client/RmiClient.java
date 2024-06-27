@@ -9,16 +9,31 @@ import java.rmi.server.*;
 import java.rmi.registry.*;
 import java.rmi.*;
 
+/**
+ * Represents an RMI client implementation that communicates with a VirtualServer.
+ */
 public class RmiClient extends UnicastRemoteObject implements VirtualView {
     private final VirtualServer server;
     private final Client clientContainer;
 
-    // TODO: it is public for testing purpose
+    // TODO: now it's public...
+    /**
+     * Constructs an RMI client with the specified server and client container.
+     *
+     * @param server The VirtualServer instance to communicate with.
+     * @param clientContainer The client container which manages the client's behavior.
+     * @throws RemoteException If there is an issue with RMI communication.
+     */
     public RmiClient(VirtualServer server, Client clientContainer) throws RemoteException {
         this.server = server;
         this.clientContainer = clientContainer;
     }
 
+    /**
+     * Runs the RMI client logic based on whether the client is running or not.
+     * If not running, prompts the user to choose between GUI or CLI mode.
+     * If running, reinitializes either GUI or CLI components based on the current mode.
+     */
     public void run() {
         try {
             if (!clientContainer.isRunning()){

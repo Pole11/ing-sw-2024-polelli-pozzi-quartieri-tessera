@@ -2,6 +2,9 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import java.rmi.RemoteException;
 
+/**
+ * Allow a client to signal that he has the game ended
+ */
 public class GameEndedCommandRunnable extends CommandRunnable{
     @Override
     public void executeCLI() {

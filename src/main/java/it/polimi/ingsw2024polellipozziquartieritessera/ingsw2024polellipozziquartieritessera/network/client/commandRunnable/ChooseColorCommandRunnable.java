@@ -4,6 +4,9 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.rmi.RemoteException;
 
+/**
+ * Allows a client to choose his own color during the CHOOSECOLORPHASE
+ */
 public class ChooseColorCommandRunnable extends CommandRunnable{
     Color color;
 

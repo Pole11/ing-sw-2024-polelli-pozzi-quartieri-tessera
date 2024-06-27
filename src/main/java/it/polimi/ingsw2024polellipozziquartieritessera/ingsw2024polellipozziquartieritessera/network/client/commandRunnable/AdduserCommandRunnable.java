@@ -3,6 +3,9 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import java.rmi.RemoteException;
 import java.util.Arrays;
 
+/**
+ * Allows a client to register into a new game or login in a previews game, with the same name, if it has previously disconnected
+ */
 public class AdduserCommandRunnable extends CommandRunnable{
     private String nickname;
 
@@ -15,8 +18,6 @@ public class AdduserCommandRunnable extends CommandRunnable{
         try {
             try {
                 String username = String.join(" ", Arrays.copyOfRange(messageFromCli, 1, messageFromCli.length));
-                System.out.print("i am in adduser command runnable");
-                System.out.println(username);
                 if (checkNickname(username)){
                     if (clientContainer != null){
                         clientContainer.resetViewModel();
@@ -41,15 +42,10 @@ public class AdduserCommandRunnable extends CommandRunnable{
             return;
         }
         try {
-            System.out.print("i am in adduser command runnable");
-            System.out.println(nickname);
             if (checkNickname(nickname)){
                 if (clientContainer != null){
-                    System.out.println("old vm" + clientContainer.getViewModel());
                     clientContainer.resetViewModel();
-                    System.out.println("new vm" + clientContainer.getViewModel());
                 }
-                System.out.println("boh" + nickname);
                 server.addConnectedPlayer(client, this.nickname);
             } else {
                 guiController.setServerError("To reconnect use your previous nickname");
@@ -68,8 +64,6 @@ public class AdduserCommandRunnable extends CommandRunnable{
         //this is runned only if I am in the client
 
         if (clientContainer != null){
-            System.out.println(nicknameToCheck);
-            System.out.println(clientContainer.getViewModel().getNickname(clientContainer.getViewModel().getPlayerIndex()));
             //if the user already connected
             int index = clientContainer.getViewModel().getPlayerIndex();
             if (index!= -1){

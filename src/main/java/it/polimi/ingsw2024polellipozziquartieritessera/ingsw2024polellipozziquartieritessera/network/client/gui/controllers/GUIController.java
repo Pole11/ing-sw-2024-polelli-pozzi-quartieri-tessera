@@ -103,8 +103,6 @@ abstract public class GUIController {
     }
 
     public void pongAnswer(){
-        System.out.println("ponganswered");
-        System.out.println("serverThread: " + serverThread);
         if (serverThread!= null)serverThread.interrupt();
     }
     
@@ -124,13 +122,9 @@ abstract public class GUIController {
         pongRunning = true;
         pongThread = new Thread(()->{
             while (pongRunning) {
-                System.out.println("hey amico");
-                System.out.println(serverThread);
                 if (serverThread == null || !serverThread.isAlive()){
-                    System.out.println("down");
                     serverThread = new Thread(()->{
                         try {
-                            System.out.println("INTHREAD "+ serverThread );
                             Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
                             System.out.println("disconnection from gui controller");
                             clientContainer.serverDisconnected();
@@ -148,12 +142,11 @@ abstract public class GUIController {
                     commandQueue.add(commandRunnable);
                     commandQueue.notifyAll();
                 }
-                System.out.println(serverThread);
                 try {
                     sleep(1000*Config.NEXT_PONG);
                     //sleep(5000);
                 } catch (InterruptedException e) {
-                    System.out.println("pong thread interrupted");
+                    System.err.println("pong thread interrupted");
                 }
             }
         });
@@ -162,7 +155,7 @@ abstract public class GUIController {
 
 
     public void restartExecuteCommand(){
-        System.out.println("restartExecuteCommand in guii");
+        System.out.println("restartExecuteCommand in gui");
         if (executeCommands != null && executeCommands.isAlive()){
             //executeCommandRunning = false;
             executeCommands.interrupt();

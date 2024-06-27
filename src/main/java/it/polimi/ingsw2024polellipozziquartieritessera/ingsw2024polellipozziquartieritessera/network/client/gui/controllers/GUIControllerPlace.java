@@ -36,7 +36,6 @@ public class GUIControllerPlace extends GUIController {
     public void initPreviousHandCardAmount() {
         Platform.runLater(() -> {
             if (getViewModel() != null) {
-                System.out.println("Init");
                 previousHandCardAmount = getViewModel().getHand(getViewModel().getPlayerIndex()).size();
             }
         });

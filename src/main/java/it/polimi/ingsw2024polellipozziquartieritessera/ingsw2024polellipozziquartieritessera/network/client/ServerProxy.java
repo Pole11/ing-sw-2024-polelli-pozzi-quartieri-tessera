@@ -8,9 +8,17 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.VirtualServer;
 
+/**
+ * Represents a proxy for interacting with a server via output streams.
+ */
 public class ServerProxy implements VirtualServer {
     final PrintWriter output;
 
+    /**
+     * Costructor for the ServerProxy.
+     *
+     * @param output The BufferedWriter used to send output to the server.
+     */
     public ServerProxy(BufferedWriter output) {
         this.output = new PrintWriter(output);
     }

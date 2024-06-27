@@ -16,8 +16,21 @@ public class UpdateBoardEvent extends Event implements Serializable {
     private final int tableCardId;
     private final CornerPos existingCornerPos;
     private final Side side;
+    /**
+     * for PlacedEventList, updateBoard.clients needs to be set after construction
+     */
     private ArrayList<VirtualView> restoreClients;
 
+    /**
+     * Informs the clients about the placing of a card
+     * @param gameState current game state
+     * @param clients List of clients to be informed
+     * @param player Player who is placing
+     * @param placingCardId Card that is going to be placed
+     * @param tableCardId Card that is going to be covered
+     * @param existingCornerPos Position of the covered corner
+     * @param side Side of the placing card
+     */
     public UpdateBoardEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) {
         super(gameState, clients);
         this.player = player;
@@ -30,7 +43,7 @@ public class UpdateBoardEvent extends Event implements Serializable {
     @Override
     public void execute() {
         ArrayList<VirtualView> actualClients;
-        if (clients.isEmpty()) { //for PlacedEventList, updateBoard.clients needs to be set after construction
+        if (clients.isEmpty()) {
             actualClients = restoreClients;
         } else {
             actualClients = clients;

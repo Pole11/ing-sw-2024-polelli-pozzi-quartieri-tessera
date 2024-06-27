@@ -1,5 +1,8 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable;
 
+/**
+ * Allows the client to view his hand
+ */
 public class
 ShowHandCommandRunnable extends  CommandRunnable{
 

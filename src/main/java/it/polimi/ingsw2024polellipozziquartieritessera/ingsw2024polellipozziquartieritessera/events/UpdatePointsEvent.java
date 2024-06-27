@@ -11,6 +11,13 @@ public class UpdatePointsEvent extends Event {
     private final Player player;
     private final int points;
 
+    /**
+     * Informs clients about the increments of a player's points counter
+     * @param gameState current game state
+     * @param clients List of all clients
+     * @param player Player who earned points
+     * @param points New amount of points
+     */
     public UpdatePointsEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, int points) {
         super(gameState, clients);
         this.player = player;

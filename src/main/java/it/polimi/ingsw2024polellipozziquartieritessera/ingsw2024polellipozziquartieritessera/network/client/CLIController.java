@@ -22,6 +22,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Thread.sleep;
 
+/**
+ * Class that manage cli printings and cli actions
+ */
 public class CLIController {
     private ViewModel viewModel;
     private final ArrayDeque<CommandRunnable> commandQueue;
@@ -32,6 +35,11 @@ public class CLIController {
 
     private Thread serverThread;
 
+    /**
+     * Initializes a new CLIController with the specified ViewModel.
+     *
+     * @param viewModel the ViewModel to be associated with this controller
+     */
     public CLIController(ViewModel viewModel){
         this.commandQueue = new ArrayDeque();
         this.viewModel = viewModel;
@@ -42,10 +50,20 @@ public class CLIController {
         pongRunning = true;
     }
 
+    /**
+     * Interrupts the server thread to respond to a pong.
+     */
     public void pongAnswer(){
         serverThread.interrupt();
     }
 
+    /**
+     * Restarts the pong mechanism with the given server, client, and client container.
+     *
+     * @param server         the VirtualServer instance
+     * @param client         the VirtualView instance
+     * @param clientContainer the Client instance
+     */
     public void restartPong(VirtualServer server, VirtualView client, Client clientContainer){
         if (pongThread != null && pongThread.isAlive()){
             pongRunning = false;
@@ -68,7 +86,7 @@ public class CLIController {
                             System.out.println("disconnection from cli controller");
                             clientContainer.serverDisconnected();
                         } catch (InterruptedException e) {
-                            System.out.println("serverThread interrupted");
+                            //System.out.println("serverThread interrupted");
                         }
                     });
                     serverThread.start();
@@ -112,13 +130,21 @@ public class CLIController {
     }
 
      */
+
+    /**
+     * Sets the ViewModel associated with this controller.
+     *
+     * @param viewModel the ViewModel to be set
+     */
     public void setViewModel(ViewModel viewModel){
         this.viewModel = viewModel;
     }
 
 //new
+    /**
+     * Restarts the execution of commands.
+     */
     public void restartExecuteCommand(){
-        System.out.println("restaring clii");
         if (executeCommands != null && executeCommands.isAlive()){
             //executeCommandRunning = false;
             executeCommands.interrupt();
@@ -133,7 +159,12 @@ public class CLIController {
         this.executeCommands.start();
     }
 
-
+    /**
+     * Restarts the controller with the given client and server.
+     *
+     * @param client the VirtualView instance
+     * @param server the VirtualServer instance
+     */
     public void restart(VirtualView client, VirtualServer server) {
         synchronized (commandQueue) {
             commandQueue.clear();
@@ -162,13 +193,21 @@ public class CLIController {
                 command = commandQueue.remove();
                 //commandQueue.notifyAll();
             }
-            System.out.println(command);
+            //System.out.println(command);
             command.executeCLI();
 
         }
     }
 
-
+    /**
+     * Manages the input from the client.
+     *
+     * @param server          the VirtualServer instance
+     * @param client          the VirtualView instance
+     * @param clientContainer the Client instance
+     * @param message         the input message
+     * @throws RemoteException if a remote error occurs
+     */
     public void manageInput(VirtualServer server, VirtualView client, Client clientContainer, String[] message) throws RemoteException {
         //
         if (message[0].equalsIgnoreCase(Command.PING.toString()) || message[0].equalsIgnoreCase(Command.GAMEENDED.toString())){
@@ -197,6 +236,12 @@ public class CLIController {
         }
     }
 
+    /**
+     * Sends a ping to the server.
+     *
+     * @param client the VirtualView instance that sends the ping
+     * @param server the VirtualServer instance that should receive the ping
+     */
     public void ping(VirtualView client, VirtualServer server){
         synchronized (commandQueue) {
             PingCommandRunnable commandRunnable = new PingCommandRunnable();
@@ -207,10 +252,19 @@ public class CLIController {
         }
     }
 
+    /**
+     * Displays the elements visible to the current player.
+     */
     public void showElements(){
         int index = viewModel.getPlayerIndex();
         showElements(index);
     }
+
+    /**
+     * Displays the elements of a specified player.
+     *
+     * @param index the index of the player
+     */
     public void showElements(int index){
         if(index >= viewModel.getPlayersSize() || index < 0){
             System.err.print("the index doesn't match an existing player");
@@ -230,6 +284,9 @@ public class CLIController {
         System.out.print("> ");
     }
 
+    /**
+     * Prints all available commands.
+     */
     public void printAllCommands() {
         AtomicInteger i = new AtomicInteger();
         System.out.print("The possible commands are: \n[");
@@ -246,6 +303,12 @@ public class CLIController {
         System.out.print("To see in more detail: <COMMAND> -h\n> ");
     }
 
+    /**
+     * Prints the specified board and card order.
+     *
+     * @param board      the board to be printed
+     * @param cardsOrder the order of the cards on the board
+     */
     public void printBoard(ArrayList<ArrayList<Integer>> board, ArrayList<Integer> cardsOrder){
         int i = 0, j = 0, u = 0 ,v = 0, colorIndex = 0;
         int irel = 0, jrel = 0;
@@ -343,9 +406,12 @@ public class CLIController {
 
     }
 
+    /**
+     * Displays the cards in the current player's hand.
+     */
     public void showHand(){
         if(viewModel.getGamePhase().ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
-            System.err.println("your hand is not initialized yet");
+            System.out.println("your hand is not initialized yet");
         } else {
             ArrayList<Integer> hand = viewModel.getHand(viewModel.getPlayerIndex());
             ArrayList<Side> sides = new ArrayList<>();
@@ -357,6 +423,9 @@ public class CLIController {
         }
     }
 
+    /**
+     * Displays the common objectives of the game.
+     */
     public void ShowCommonObjective(){
         if(viewModel.getGamePhase().ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
             System.err.print("common objectives are not initialized yet\n> ");
@@ -374,6 +443,9 @@ public class CLIController {
         }
     }
 
+    /**
+     * Displays the secret objectives of the current player.
+     */
     public void ShowSecretObjective(){
         if(viewModel.getGamePhase().ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
             System.err.print("Secret objectives not initialized yet\n>   ");
@@ -393,9 +465,14 @@ public class CLIController {
         }
     }
 
+    /**
+     * Displays the board of the player at the specified index.
+     *
+     * @param player_index the index of the player whose board is to be displayed
+     */
     public void showBoard(int player_index){
         if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()){
-            System.err.print("this board does not exists yet\n> ");
+            System.out.print("this board does not exists yet\n> ");
         } else {
             String playerName = viewModel.getNickname(player_index) + " 's";
             ArrayList<ArrayList<Integer>> board = viewModel.getPlayerBoard(player_index);
@@ -406,10 +483,17 @@ public class CLIController {
             printBoard(board, cardsOrder);
         }
     }
+
+    /**
+     * Displays the board of the current player.
+     */
     public void showBoard(){
         showBoard(viewModel.getPlayerIndex());
     }
 
+    /**
+     * Displays the starter card of the current player.
+     */
     public void showStarterCard(){
         ArrayList<Integer> cards = new ArrayList<>();
         ArrayList<Side> sides = new ArrayList<>();
@@ -422,6 +506,10 @@ public class CLIController {
         printNCards(cards, sides);
 
     }
+
+    /**
+     * Displays the nicknames and connection statuses of all players.
+     */
     public void showPlayers(){
         int n_players = viewModel.getPlayersSize();
         String colorPlayer = "";
@@ -443,6 +531,9 @@ public class CLIController {
         }
     }
 
+    /**
+     * Displays the points of all players.
+     */
     public void showPoints(){
         if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()) {
             System.err.print("you cant ask players points before the main phase has started\n> ");
@@ -457,6 +548,9 @@ public class CLIController {
         }
     }
 
+    /**
+     * Displays the current state of all decks.
+     */
     public void showDecks(){
         if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()) {
             System.err.print("you cant ask to see the decks before the main phase has starter\n> ");
@@ -464,7 +558,7 @@ public class CLIController {
             ArrayList<Integer> cards = new ArrayList<>();
             ArrayList<Side> sides = new ArrayList<>();
             int[] decks = viewModel.getSharedCards();
-            String[] titles = {"SHARED RESOURCE 0","SHARED RESOURCE 1","SHARED GOLD 0","SHARED GOLD 1","RESOURCE DECK","GOLD DECK"};
+            String[] titles = {"SHAREDRESOURCE 1","SHAREDRESOURCE 2","SHAREDGOLD 1","SHAREDGOLD 2","DECKRESOURCE","DECKGOLD"};
 
             for (int i = 0; i < decks.length; i++) {
                 cards.add(decks[i]);
@@ -484,6 +578,9 @@ public class CLIController {
         }
     }
 
+    /**
+     * Displays the colors assigned to the current player and other players.
+     */
     public void showColors(){
         System.out.println("your color is: " + viewModel.getColorsMap(viewModel.getPlayerIndex()));
         for (int i = 0; i < viewModel.getPlayersSize(); i++){
@@ -494,13 +591,20 @@ public class CLIController {
         }
     }
 
+    /**
+     * Prints the specified card with the given side.
+     *
+     * @param card the card to be printed
+     * @param side the side of the card to be printed
+     * @return a list of strings representing the printed card
+     */
     private ArrayList<String> printCard(Card card, Side side){
         if(card == null){
            ArrayList<String> emptyCard = new ArrayList<>();
            emptyCard.add("+-----------------+");
            emptyCard.add("|      \\   /      |");
            emptyCard.add("|       \\ /       |");
-           emptyCard.add("|        X        |");
+           emptyCard.add("|        X         |");
            emptyCard.add("|       / \\       |");
            emptyCard.add("|      /   \\      |");
            emptyCard.add("+-----------------+");
@@ -518,6 +622,14 @@ public class CLIController {
         }
 
     }
+
+    /**
+     * Prints an ObjectiveCard.
+     *
+     * @param card The ObjectiveCard to be printed.
+     * @param side The side of the card to be printed.
+     * @return A formatted representation of the card as an ArrayList of strings.
+     */
     private ArrayList<String> printCard(ObjectiveCard card, Side side) {
         // attributes
         int points;
@@ -608,6 +720,13 @@ public class CLIController {
         return output;
     }
 
+    /**
+     * Prints a ResourceCard.
+     *
+     * @param card The ResourceCard to be printed.
+     * @param side The side of the card to be printed.
+     * @return A formatted representation of the card as an ArrayList of strings.
+     */
     private ArrayList<String> printCard(ResourceCard card, Side side){
         // attributes
         int points;
@@ -658,6 +777,12 @@ public class CLIController {
         return output;
     }
 
+    /**
+     * Prints multiple cards.
+     *
+     * @param cards A list of card IDs to be printed.
+     * @param sides A list of sides (FRONT or BACK) for each card to be printed.
+     */
     private void printNCards(ArrayList<Integer> cards, ArrayList<Side> sides){
         ArrayList<String> output = new ArrayList<>();
         ArrayList<String> temp = new ArrayList<>();
@@ -677,6 +802,13 @@ public class CLIController {
 
     }
 
+    /**
+     * Prints a GoldCard.
+     *
+     * @param card The GoldCard to be printed.
+     * @param side The side of the card to be printed.
+     * @return A formatted representation of the card as an ArrayList of strings.
+     */
     private ArrayList<String> printCard(GoldCard card, Side side){
         //todo remove id from backs
 
@@ -772,6 +904,13 @@ public class CLIController {
         return output;
     }
 
+    /**
+     * Prints a StarterCard.
+     *
+     * @param card The StarterCard to be printed.
+     * @param side The side of the card to be printed.
+     * @return A formatted representation of the card as an ArrayList of strings.
+     */
     private ArrayList<String> printCard(StarterCard card, Side side){
         // attributes
         String[] frontCornerStrings = new String[Config.N_CORNERS];
@@ -828,7 +967,13 @@ public class CLIController {
         return output;
     }
 
-
+    /**
+     * Formats a string to be centered within a specified length.
+     *
+     * @param length The total length of the formatted string.
+     * @param content The content to be centered.
+     * @return The formatted string with the content centered.
+     */
     private String getFormattedString(int length, String content){
         // ------
         if (length%2 == 0){
@@ -853,7 +998,11 @@ public class CLIController {
 
 
 
-
+    /**
+     * Resizes a matrix of strings by removing empty rows and columns.
+     *
+     * @param matrix The matrix to be resized.
+     */
     private void resizeS(ArrayList<ArrayList<String>> matrix){
         //remove empty rows
         for(int j = 0; j < matrix.size(); j++){
@@ -891,7 +1040,12 @@ public class CLIController {
         }
     }
 
-    private  void resizeI(ArrayList<ArrayList<Integer>> matrix){
+    /**
+     * Resizes a matrix of integers by removing empty rows and columns.
+     *
+     * @param matrix The matrix to be resized.
+     */
+    private void resizeI(ArrayList<ArrayList<Integer>> matrix){
         //remove empty rows
         for(int j = 0; j < matrix.size(); j++){
             Boolean isEmpty = true;
@@ -928,6 +1082,9 @@ public class CLIController {
         }
     }
 
+    /**
+     * Displays the game chat.
+     */
     public void showChat() {
         Chat chat = viewModel.getChat();
 
@@ -940,6 +1097,10 @@ public class CLIController {
 
         System.out.print("> ");
     }
+
+    /**
+     * Displays the current game status.
+     */
     public void status(){
         System.out.println("-----GAME-STATUS-----");
         GamePhase currentGamePhase = viewModel.getGamePhase();

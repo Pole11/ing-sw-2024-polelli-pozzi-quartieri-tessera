@@ -2,6 +2,9 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import java.rmi.RemoteException;
 
+/**
+ * Allows a client to flip a card
+ */
 public class FlipCardCommandRunnable extends CommandRunnable{
     private int cardId;
 
@@ -20,7 +23,7 @@ public class FlipCardCommandRunnable extends CommandRunnable{
             try {
                 cardId = Integer.parseInt(messageFromCli[1]);
             } catch (NumberFormatException e) {
-                System.out.print("Please enter a valid card id\n> ");
+                System.err.print("Please enter a valid card id\n> ");
                 return;
             }
             try {
