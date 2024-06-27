@@ -418,6 +418,12 @@ public class GameState {
             this.timeoutThread.interrupt();
             currentGamePhase = prevGamePhase;
             prevGamePhase = null;
+            players.stream().forEach(e-> {
+                if (!e.isConnected() && currentPlayerIndex == getPlayerIndex(e)){
+                    currentGameTurn = TurnPhase.DRAWPHASE;
+                    changeCurrentPlayer();
+                }
+            });
         }
         System.out.println("THIS IS THE CLIENT TO BE RESTORED IN PLAYER" + player.getClient());
         restoreView(player.getClient());
@@ -494,6 +500,7 @@ public class GameState {
                 ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();
                 sharedObjectives.add(mainBoard.getSharedObjectiveCard(0));
                 sharedObjectives.add(mainBoard.getSharedObjectiveCard(1));
+                if (sharedObjectives.get(0) == null || sharedObjectives.get(1) == null)
                 eventQueue.add((new UpdateSharedObjectiveEvent(this, clients, sharedObjectives)));
             }
             //send correct secret objective
@@ -559,6 +566,10 @@ public class GameState {
             if (InternetCheck.isConnectedToInternet()){
                 this.prevGamePhase = currentGamePhase;
                 this.currentGamePhase = GamePhase.TIMEOUT;
+                synchronized (eventQueue){
+                    eventQueue.add(new UpdateGamePhaseEvent(this, allConnectedClients(), currentGamePhase));
+                    eventQueue.notifyAll();
+                }
                 System.out.println("Timeout for ending the game started");
                 timeoutThread = new Thread(() -> {
                     try {
@@ -607,6 +618,10 @@ public class GameState {
                         }
                         Player currentPlayer = getPlayer(index);
                         currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
+                        synchronized (eventQueue){
+                            eventQueue.add(new UpdateMainBoardEvent(this, allConnectedClients(), mainBoard));
+                            eventQueue.notifyAll();
+                        }
                     }
                     currentGameTurn = TurnPhase.DRAWPHASE;
                     changeCurrentPlayer();

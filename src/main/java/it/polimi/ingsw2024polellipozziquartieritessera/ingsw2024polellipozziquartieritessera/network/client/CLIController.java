@@ -53,7 +53,7 @@ public class CLIController {
             try {
                 pongThread.join();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
         pongRunning = true;

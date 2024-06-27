@@ -115,7 +115,7 @@ abstract public class GUIController {
             try {
                 pongThread.join();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
 
@@ -130,6 +130,7 @@ abstract public class GUIController {
                     System.out.println("down");
                     serverThread = new Thread(()->{
                         try {
+                            System.out.println("INTHREAD "+ serverThread );
                             Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
                             System.out.println("disconnection from gui controller");
                             clientContainer.serverDisconnected();

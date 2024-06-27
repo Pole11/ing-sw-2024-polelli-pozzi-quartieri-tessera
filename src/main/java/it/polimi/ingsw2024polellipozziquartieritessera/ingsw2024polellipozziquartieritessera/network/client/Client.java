@@ -182,9 +182,11 @@ public class Client implements VirtualView {
 
     public void serverDisconnected(){
         System.out.println(serverIsConnected);
-        if (!serverIsConnected){
+        /*if (!serverIsConnected){
             return;
         }
+
+         */
         serverIsConnected = false;
         //OLD
         /*if (meDoGui){
