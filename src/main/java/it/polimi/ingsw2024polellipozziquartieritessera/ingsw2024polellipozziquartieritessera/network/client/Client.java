@@ -217,9 +217,11 @@ public class Client implements VirtualView {
 
          */
         if (meDoGui) {
-            guiApplication.getGUIController().setServerError("There was an error in server, the server is not available, wait to be redirected to the login page");
+            //guiApplication.getGUIController().setServerError("There was an error in server, the server is not available, wait to be redirected to the login page");
+            guiApplication.getGUIController().setServerError("server disconnected, restart the game and wait the server to be reconnected");
         } else {
-            System.out.println("Server disconnected, wait to be notified of being connected to the server");
+            //System.out.println("Server disconnected, wait to be notified of being connected to the server");
+            System.out.println("server disconnected, restart the game and wait the server to be reconnected");
         }
 
         /*try {
@@ -231,8 +233,8 @@ public class Client implements VirtualView {
 
          */
 
-        try {
-            startClient();
+        /*try {
+            //startClient();
             serverIsConnected = true;
             //break; // If startClient() succeeds, break the loop
         } catch (ConnectException e) {
@@ -241,6 +243,8 @@ public class Client implements VirtualView {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+         */
     }
 
 
