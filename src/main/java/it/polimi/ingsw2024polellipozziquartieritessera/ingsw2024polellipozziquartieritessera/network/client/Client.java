@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+/**
+ * The Client class (that can run a RMIClient or a SocketClient).
+ */
 public class Client implements VirtualView {
     private boolean meDoGui;
     private CLIController cliController;
@@ -38,6 +41,14 @@ public class Client implements VirtualView {
     PrintStream restoreStream;
     PrintStream oldPrintStream;
 
+    /**
+     * Constructs a new Client with the specified connection type, host, port, and IP address.
+     *
+     * @param rmiOrSocket the type of connection (either "rmi" or "socket")
+     * @param host the server host
+     * @param port the server port
+     * @param myIp the IP address of the client
+     */
     public Client(String rmiOrSocket, String host, String port, String myIp){
         this.viewModel = new ViewModel();
         this.rmiOrSocket = rmiOrSocket;
@@ -50,6 +61,12 @@ public class Client implements VirtualView {
         this.oldPrintStream = null;
     }
 
+    /**
+     * The main method to execute the client. It parses the arguments and starts the client.
+     *
+     * @param args the command-line arguments
+     * @throws IOException if an I/O error occurs
+     */
     public static void main(String[] args) throws IOException {
         System.out.println("Executing client");
 
@@ -72,6 +89,9 @@ public class Client implements VirtualView {
 
     }
 
+    /**
+     * Resets the ViewModel and updates the GUI or CLI controller accordingly.
+     */
     public void resetViewModel(){
         viewModel = new ViewModel();
         if (meDoGui) {
@@ -106,6 +126,12 @@ public class Client implements VirtualView {
         return running;
     }
 
+    /**
+     * Starts the client by establishing a connection to the server using either
+     * socket or RMI, and initializes the respective client.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public void startClient() throws IOException {
         if (rmiOrSocket.equalsIgnoreCase("socket")) {
             Socket socketToServer = new Socket(host, port);
@@ -138,7 +164,9 @@ public class Client implements VirtualView {
     }
 
 
-
+    /**
+     * Runs the command-line interface (CLI) for the client.
+     */
     public void runCli() {
         //the first time this code is executed, running is false and is changed to true
         //the following times this code is executed running is true
@@ -166,6 +194,9 @@ public class Client implements VirtualView {
         }
     }
 
+    /**
+     * Runs the graphical user interface (GUI) for the client.
+     */
     public void runGui(){
         running = true;
         meDoGui = true;
@@ -173,10 +204,9 @@ public class Client implements VirtualView {
         guiApplication.runGui(client, server, this, viewModel);
     }
 
-
-
-
-
+    /**
+     * Handles server disconnection and attempts to reconnect.
+     */
     public void serverDisconnected(){
         //OLD
         /*if (meDoGui){
@@ -549,6 +579,11 @@ public class Client implements VirtualView {
         System.err.print("\nERROR FROM SERVER: " + error + "\n> ");
     }
 
+    /**
+     * Displays an alert message in the console if there are unread messages.
+     * It prints the number of unread messages and a prompt to read them.
+     * Resets the new message count in the ViewModel afterward.
+     */
     private void showMessageAlert(){
         if (viewModel.getNewMessages() > 0){
             System.out.println("Unread messages: " + viewModel.getNewMessages() + " (use OPENCHAT command to read)");
@@ -556,6 +591,12 @@ public class Client implements VirtualView {
             viewModel.resetNewMessages();
         }
     }
+
+    /**
+     * Restarts the client application. It prints a restarting message,
+     * restarts the CLI or GUI controller based on the current mode,
+     * and reinitializes the ViewModel.
+     */
     private void restart(){
         System.out.println("Restarting...");
         if (!meDoGui) cliController.restart(client, server);

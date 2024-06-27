@@ -10,19 +10,33 @@ import java.net.ConnectException;
 import java.rmi.*;
 import java.util.*;
 
-
-
+/**
+ * Represents a socket client implementation that communicates with a VirtualServer.
+ */
 public class SocketClient implements VirtualView {
     private final  BufferedReader input;
     private final ServerProxy server;
     private final Client clientContainer;
 
+    /**
+     * Constructs a socket client with the specified input reader, server proxy, and client container.
+     *
+     * @param input The BufferedReader for reading input messages from the server.
+     * @param server The ServerProxy instance to communicate with.
+     * @param clientContainer The client container which manages the client's behavior.
+     */
     public SocketClient(BufferedReader input, VirtualServer server, Client clientContainer) {
         this.input = input;
         this.server = (ServerProxy) server;
         this.clientContainer = clientContainer;
     }
 
+    /**
+     * Runs the socket client logic. Starts a new thread for running the virtual server interaction.
+     * Handles user interaction based on whether the client is currently running or not.
+     *
+     * @throws RemoteException If there is an issue with RMI communication.
+     */
     public void run() throws RemoteException {
         new Thread(() -> {
             try {
@@ -62,6 +76,11 @@ public class SocketClient implements VirtualView {
 
     }
 
+    /**
+     * Handles incoming messages from the virtual server.
+     *
+     * @throws IOException If there is an issue reading from the input stream.
+     */
     private void runVirtualServer() throws IOException {
         String line;
         // Read message type

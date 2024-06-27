@@ -23,29 +23,125 @@ import java.util.Map;
 
 import static it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate.readJSON;
 
+/**
+ * The ViewModel class represents the data model for managing game state and player information inside the client.
+ * It holds various maps and attributes to track game elements, player details, and game phases.
+ */
 public class ViewModel {
+    /**
+     * Index of the player using this ViewModel.
+     */
     private int playerIndex;
-    private final HashMap<Integer,String> nicknamesMap;
+
+    /**
+     * Maps player indices to their corresponding nicknames.
+     */
+    private final HashMap<Integer, String> nicknamesMap;
+
+    /**
+     * Maps player indices to their connection status (true if connected, false otherwise).
+     */
     private final HashMap<Integer, Boolean> connessionMap;
+
+    /**
+     * Maps player indices to their chosen colors.
+     */
     private final HashMap<Integer, Color> colorsMap;
+
+    /**
+     * Maps player indices to their current points.
+     */
     private final HashMap<Integer, Integer> pointsMap;
+
+    /**
+     * Maps player indices to their element counts.
+     */
     private final HashMap<Integer, HashMap> elementsMap;
+
+    /**
+     * Chat instance for managing in-game communication.
+     */
     private final Chat chat;
+
+    /**
+     * ID of the starter card.
+     */
     private int starterCardId;
-    private final int[] objectives; // 0,1 are common - 2,3 are secret (2 is the chosen one) // if the card is not set it is -1
+
+    /**
+     * Array representing objectives:
+     * - indices 0 and 1: common objectives
+     * - indices 2 and 3: secret objectives (index 2 is the chosen secret objective)
+     * If a card is not set, it is represented as -1.
+     */
+    private final int[] objectives;
+
+    /**
+     * Current game phase.
+     */
     private GamePhase gamePhase;
+
+    /**
+     * Current turn phase.
+     */
     private TurnPhase turnPhase;
+
+    /**
+     * Index of the current player whose turn it is.
+     */
     private int currentPlayer;
+
+    /**
+     * Map of card IDs to their corresponding Card objects.
+     */
     private final HashMap<Integer, Card> cardsMap;
-    private final HashMap<Integer,ArrayList<Integer>> handsMap; // mappa delle hands dei player
-    private final HashMap<Integer,Side> placedSideMap; // side delle carte sulla board (unico per id)
-    private final HashMap<Integer,Side> handsSideMap; // side delle carte in mano (unico per id)
-    private final HashMap<Integer,ArrayList<ArrayList<Integer>>> boardsMap; // mappa delle board dei players
-    private int[] mainBoard; // se la carta non c'è viene inizializzata a -1
-    private HashMap<Integer,ArrayList<Integer>> placingCardOrderMap;
-    private int newMessages; // only for cli
+
+    /**
+     * Map of player indices to lists of card IDs in their hands.
+     */
+    private final HashMap<Integer, ArrayList<Integer>> handsMap;
+
+    /**
+     * Map of card IDs to their placed sides on the board.
+     */
+    private final HashMap<Integer, Side> placedSideMap;
+
+    /**
+     * Map of card IDs to their held sides in the hands.
+     */
+    private final HashMap<Integer, Side> handsSideMap;
+
+    /**
+     * Map of player indices to lists of card IDs on their boards.
+     */
+    private final HashMap<Integer, ArrayList<ArrayList<Integer>>> boardsMap;
+    /**
+     * Array representing the main board:
+     * - indices 0 and 1: shared resource cards
+     * - indices 2 and 3: shared gold cards
+     * - indices 4 and 5: first resource and gold deck cards respectively
+     * If a card is not present, it is initialized to -1.
+     */
+    private int[] mainBoard;
+
+    /**
+     * Map of player indices to lists of card IDs in the order they were placed.
+     */
+    private HashMap<Integer, ArrayList<Integer>> placingCardOrderMap;
+
+    /**
+     * Number of new unread messages (for CLI only).
+     */
+    private int newMessages;
+
+    /**
+     * List of player indices representing the winners of the game.
+     */
     private ArrayList<Integer> winners;
 
+    /**
+     * Constructs a new ViewModel instance initializing all necessary data structures.
+     */
     public ViewModel() {
         playerIndex = -1;
         elementsMap = new HashMap<>();
@@ -73,40 +169,82 @@ public class ViewModel {
     }
 
     // BASIC SETTER
+    /**
+     * Sets the index of the current player.
+     * @param playerIndex The index of the player
+     */
     public void setPlayerIndex(int playerIndex) {
         this.playerIndex = playerIndex;
     }
+
+    /**
+     * Sets the ID of the starter card.
+     * @param starterCardId The ID of the starter card
+     */
     public void setStarterCard(int starterCardId){
         this.starterCardId = starterCardId;
     }
 
+    /**
+     * Sets the nickname of a player identified by playerIndex.
+     * @param playerIndex The index of the player
+     * @param nickname The nickname to set
+     */
     public void setNickname(int playerIndex, String nickname) {
         this.nicknamesMap.put(playerIndex, nickname);
     }
 
+    /**
+     * Sets the connection status of a player identified by playerIndex.
+     * @param playerIndex The index of the player
+     * @param isConnected The connection status to set
+     */
     public void setConnection(int playerIndex, boolean isConnected){
         this.connessionMap.put(playerIndex, isConnected);
     }
 
+    /**
+     * Sets the color chosen by a player identified by playerIndex.
+     * @param playerIndex The index of the player
+     * @param color The color to set
+     */
     public void setColor(int playerIndex, Color color){
         this.colorsMap.put(playerIndex, color);
     }
 
     // GAME UPDATES
+    /**
+     * Adds a player index to the list of winners.
+     * @param winner The index of the winning player
+     */
     public void addWinner(int winner){
         winners.add(winner);
     }
 
-
+    /**
+     * Sets the shared objectives for the game.
+     * @param objectiveCardId1 ID of the first shared objective card
+     * @param objectiveCardId2 ID of the second shared objective card
+     */
     public void setSharedObjectives(int objectiveCardId1, int objectiveCardId2) {
         objectives[0] = objectiveCardId1;
         objectives[1] = objectiveCardId2;
     }
+
+    /**
+     * Sets the secret objectives for a player.
+     * @param objectiveCardId1 ID of the first secret objective card
+     * @param objectiveCardId2 ID of the second secret objective card
+     */
     public void setSecretObjective(int objectiveCardId1, int objectiveCardId2){
         objectives[2] = objectiveCardId1;
         objectives[3] = objectiveCardId2;
     }
 
+    /**
+     * Initializes the element map for a player.
+     * @param playerIndex The index of the player
+     */
     public void initializeElementMap(int playerIndex){
         HashMap <Element, Integer> map = new HashMap<>();
         Arrays.stream(Element.values()).forEach(e-> {
@@ -115,6 +253,12 @@ public class ViewModel {
         elementsMap.put(playerIndex, map);
     }
 
+    /**
+     * Sets the number of a specific element for a player.
+     * @param playerIndex The index of the player
+     * @param element The element to set
+     * @param numberOfElements The number of elements to set
+     */
     public void setElement(int playerIndex, Element element, int numberOfElements){
         System.out.println("ELEMENTSMAP");
         System.out.println(elementsMap.keySet());
@@ -123,22 +267,48 @@ public class ViewModel {
         elementsMap.get(playerIndex).put(element, numberOfElements);
     }
 
+    /**
+     * Sets the turn phase of the game.
+     * @param turnPhase The turn phase to set
+     */
     public void setTurnPhase(TurnPhase turnPhase){
         this.turnPhase = turnPhase;
     }
 
+    /**
+     * Sets the game phase of the game.
+     * @param gamePhase The game phase to set
+     */
     public void setGamePhase(GamePhase gamePhase){
         this.gamePhase = gamePhase;
     }
+
+    /**
+     * Sets the index of the current player.
+     * @param playerIndex The index of the current player
+     */
     public void setCurrentPlayer(int playerIndex){
         currentPlayer = playerIndex;
     }
 
+    /**
+     * Sets the points of a player.
+     * @param playerIndex The index of the player
+     * @param points The points to set
+     */
     public void setPoints(int playerIndex, int points){
         this.pointsMap.put(playerIndex, points);
     }
 
-    // position are: resource [0,1], gold [2,3], firstResource[4] firstGold[5]
+    /**
+     * Sets the main board with shared resource and gold cards.
+     * @param sharedGoldCard1 ID of the first shared gold card
+     * @param sharedGoldCard2 ID of the second shared gold card
+     * @param sharedResourceCard1 ID of the first shared resource card
+     * @param sharedResourceCard2 ID of the second shared resource card
+     * @param firtGoldDeckCard ID of the first gold deck card
+     * @param firstResourceDeckCard ID of the first resource deck card
+     */
     public void setMainBoard(int sharedGoldCard1, int sharedGoldCard2, int sharedResourceCard1, int sharedResourceCard2, int firtGoldDeckCard, int firstResourceDeckCard) {
         mainBoard[0] = sharedResourceCard1;
         mainBoard[1] = sharedResourceCard2;
@@ -148,7 +318,13 @@ public class ViewModel {
         mainBoard[5] = firtGoldDeckCard;
     }
 
-
+    /**
+     * Adds a card to the hand of a specified player.
+     * If the player's hand does not exist yet, it initializes an empty hand.
+     *
+     * @param playerIndex The index of the player.
+     * @param cardId The ID of the card to add to the hand.
+     */
     public void addedCardToHand(int playerIndex, int cardId) {
         if (!handsMap.containsKey(playerIndex)){
             handsMap.put(playerIndex, new ArrayList<>());
@@ -156,11 +332,27 @@ public class ViewModel {
         handsMap.get(playerIndex).add(cardId);
     }
 
+    /**
+     * Removes a specified card from the hand of a player.
+     * Also removes any side association of the card.
+     *
+     * @param playerIndex The index of the player.
+     * @param cardId The ID of the card to remove from the hand.
+     */
     public void removedCardFromHand(int playerIndex, int cardId){
         handsMap.get(playerIndex).remove(handsMap.get(playerIndex).indexOf(cardId));
         handsSideMap.remove(cardId);
     }
 
+    /**
+     * Updates the player's board by placing a card at a specific position.
+     *
+     * @param playerIndex The index of the player.
+     * @param placingCardId The ID of the card being placed.
+     * @param tableCardId The ID of the existing card on the table where 'placingCardId' is being placed.
+     * @param existingCornerPos The position on the existing card where 'placingCardId' will be placed.
+     * @param side The side of the card being placed.
+     */
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side){
         // for starter cards (initialization)
         if (!boardsMap.containsKey(playerIndex)){
@@ -176,35 +368,75 @@ public class ViewModel {
         placedSideMap.put(placingCardId, side);
     }
 
+    /**
+     * Sets the side (front or back) of a card in the player's hand.
+     *
+     * @param cardId The ID of the card.
+     * @param side The side (front or back) to set for the card.
+     */
     public void setHandSide(int cardId, Side side){
         handsSideMap.put(cardId, side);
     }
+
+    /**
+     * Sets the side (front or back) of a placed card on the table.
+     *
+     * @param cardId The ID of the card.
+     * @param side The side (front or back) to set for the placed card.
+     */
     public void setPlacedSide(int cardId, Side side){
         placedSideMap.put(cardId, side);
     }
 
     // GETTERS FOR CLI&GUI
+
+    /**
+     * Get the game winners
+     * @return the winners ArrayList
+     */
     public ArrayList<Integer> getWinners(){
         return new ArrayList<>(winners);
     }
 
+    /**
+     * Get the elements map
+     * @return the elements map
+     */
     public HashMap<Integer, HashMap> getElementsMap(){return elementsMap;}
     public int getPlayerIndex() {
         return playerIndex;
     }
 
+    /**
+     * Get the nickname of a specific player
+     * @param playerIndex the index of the player
+     * @return the nickname of the chosen player
+     */
     public String getNickname(int playerIndex) {
         return nicknamesMap.get(playerIndex);
     }
 
+    /**
+     * Get the size of the players in game
+     * @return the number of player in game
+     */
     public int getPlayersSize(){
         return nicknamesMap.keySet().size();
     }
 
+    /**
+     * Get the objcetives of the player
+     * @return the objectives list
+     */
     public int[] getObjectives() {
         return objectives;
     }
 
+    /**
+     * Method to get a card by it's id
+     * @param id the identifier of the card
+     * @return the card with that id
+     */
     public Card cardById(int id){
         if(id < 0){
             return null;
@@ -212,6 +444,10 @@ public class ViewModel {
         return cardsMap.get(id);
     }
 
+    /**
+     * Get the common objectives in the game
+     * @return the common objective cards identifiers
+     */
     public int[] getCommonObjectiveCards() {
         int[] commonObjectives = new int[2];
         commonObjectives[0] = objectives[0];
@@ -219,6 +455,10 @@ public class ViewModel {
         return commonObjectives;
     }
 
+    /**
+     * Get the secret objectives in the game
+     * @return the secret objective cards identifiers
+     */
     public int[] getSecretObjectiveCards(){
         int[] secretObjectives = new int[2];
         secretObjectives[0] = objectives[2];
