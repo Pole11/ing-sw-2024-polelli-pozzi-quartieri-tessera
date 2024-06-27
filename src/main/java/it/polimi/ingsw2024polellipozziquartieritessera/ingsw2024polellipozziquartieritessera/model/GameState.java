@@ -1314,12 +1314,7 @@ public class GameState {
 
             calculateFinalPoints();
             ArrayList<Integer> winners;
-            try {
-                winners = getWinnerPlayerIndex();
-            } catch (GameIsNotEndedException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            winners = getWinnerPlayerIndex();
             gameEnded(winners);
         }
     }
@@ -1348,9 +1343,8 @@ public class GameState {
     /**
      * Get the winner player
      * @return List of indexes of winners
-     * @throws GameIsNotEndedException Game not ended
      */
-    public ArrayList<Integer> getWinnerPlayerIndex() throws GameIsNotEndedException {
+    public ArrayList<Integer> getWinnerPlayerIndex() {
         int maxPoints = 0;
         ArrayList<Integer> winnerPlayerIndeces = new ArrayList<>();
         boolean playerReachedPoints = false;
