@@ -7,7 +7,13 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.io.IOException;
 
+/**
+ * Abstract class that represent all command used by the clients
+ */
 public abstract class CommandRunnable {
+    /**
+     *
+     */
     VirtualServer server;
     String[] messageFromCli;
     Client clientContainer;

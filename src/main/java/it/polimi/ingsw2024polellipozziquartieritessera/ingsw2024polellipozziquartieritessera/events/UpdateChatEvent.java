@@ -10,6 +10,13 @@ public class UpdateChatEvent extends Event {
     int playerIndex;
     String content;
 
+    /**
+     * Informs all clients about a new message in chat
+     * @param gameState Current game state
+     * @param clients List of all clients
+     * @param playerIndex Author of the message
+     * @param content Text of the message
+     */
     public UpdateChatEvent(GameState gameState, ArrayList<VirtualView> clients, int playerIndex, String content) {
         super(gameState, clients);
         this.playerIndex = playerIndex;

@@ -9,6 +9,12 @@ import java.util.ArrayList;
 public class UpdateCurrentPlayerEvent extends Event {
     private final int currentPlayerIndex;
 
+    /**
+     * Informs the clients about the change of the current player
+     * @param gameState current game state
+     * @param clients List of all clients
+     * @param currentPlayerIndex new current player
+     */
     public UpdateCurrentPlayerEvent(GameState gameState, ArrayList<VirtualView> clients, int currentPlayerIndex) {
         super(gameState, clients);
         this.currentPlayerIndex = currentPlayerIndex;

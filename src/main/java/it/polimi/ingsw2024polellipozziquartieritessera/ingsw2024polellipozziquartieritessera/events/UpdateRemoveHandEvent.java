@@ -11,6 +11,13 @@ public class UpdateRemoveHandEvent extends Event {
     private final Player player;
     private final int index;
 
+    /**
+     * Informs clients of the removing of card in a player's hand
+     * @param gameState current game state
+     * @param clients List of all clients
+     * @param player Owner of the hand
+     * @param index Removed card ID
+     */
     public UpdateRemoveHandEvent(GameState gameState, ArrayList<VirtualView> clients, Player player, int index) {
         super(gameState, clients);
         this.player = player;
