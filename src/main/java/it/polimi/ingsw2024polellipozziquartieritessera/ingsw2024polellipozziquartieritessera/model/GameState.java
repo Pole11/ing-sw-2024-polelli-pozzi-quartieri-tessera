@@ -415,7 +415,7 @@ public class GameState {
      */
     private void manageReconnection(Player player) {
         if (this.currentGamePhase.equals(GamePhase.TIMEOUT)) {
-            this.timeoutThread.interrupt();
+            if (this.timeoutThread != null) this.timeoutThread.interrupt();
             currentGamePhase = prevGamePhase;
             prevGamePhase = null;
             players.stream().forEach(e-> {
@@ -595,39 +595,81 @@ public class GameState {
                 });
                 timeoutThread.start();
             }
-        } else {
-            //automatically plays for the player disconnected
-            switch (currentGamePhase){
-                case CHOOSESTARTERSIDEPHASE -> setStarterSide(index, Side.BACK);
-                //choose between the availables
-                case CHOOSECOLORPHASE -> setColor(index, Arrays.stream(Color.values()).filter(e-> !players.stream().map(Player::getColor).toList().contains(e)).findFirst().get());
-                case CHOOSEOBJECTIVEPHASE -> setSecretObjective(index, 0);
-            }
-            if (numberAnswered() == players.size()){
-                currentGamePhase.changePhase(this);
-            }
+        }
 
-            if (currentPlayerIndex == index){
-                if (currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
-                    if (currentGameTurn.equals(TurnPhase.DRAWPHASE)){
-                        ResourceCard newResourceCard = null;
+        //automatically plays for the player disconnected
+        switch (currentGamePhase){
+            case CHOOSESTARTERSIDEPHASE -> setStarterSide(index, Side.BACK);
+            //choose between the availables
+            case CHOOSECOLORPHASE -> setColor(index, Arrays.stream(Color.values()).filter(e-> !players.stream().map(Player::getColor).toList().contains(e)).findFirst().get());
+            case CHOOSEOBJECTIVEPHASE -> setSecretObjective(index, 0);
+        }
+        if (numberAnswered() == players.size()){
+            currentGamePhase.changePhase(this);
+        }
+
+        System.out.println("0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        if (currentPlayerIndex == index){
+            System.out.println("1AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            if (currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
+                System.out.println("2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                if (currentGameTurn.equals(TurnPhase.DRAWPHASE)){
+                    System.out.println("3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                    ResourceCard newResourceCard = null;
+                    GoldCard newGoldCard = null;
+                    try {
+                        newResourceCard = getMainBoard().drawFromResourceDeck();
+                    } catch (EmptyDeckException emptyResourceDeck) {
+                        emptyResourceDeck.printStackTrace();
+                        checkGameEnded();
                         try {
-                            newResourceCard = getMainBoard().drawFromResourceDeck();
-                        } catch (EmptyDeckException e) {
+                            newResourceCard = getMainBoard().drawSharedResourceCard(1);
+                        } catch (EmptyMainBoardException emptyResourceShared1) {
+                            emptyResourceShared1.printStackTrace();
                             checkGameEnded();
-                        }
-                        Player currentPlayer = getPlayer(index);
-                        currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
-                        synchronized (eventQueue){
-                            eventQueue.add(new UpdateMainBoardEvent(this, allConnectedClients(), mainBoard));
-                            eventQueue.notifyAll();
+                            try {
+                                newResourceCard = getMainBoard().drawSharedResourceCard(2);
+                            } catch (EmptyMainBoardException emptyResourceShared2) {
+                                emptyResourceShared2.printStackTrace();
+                                checkGameEnded();
+                                try {
+                                    newGoldCard = getMainBoard().drawFromGoldDeck();
+                                } catch (EmptyDeckException emptyGoldDeck) {
+                                    emptyGoldDeck.printStackTrace();
+                                    checkGameEnded();
+                                    try {
+                                        newGoldCard = getMainBoard().drawSharedGoldCard(1);
+                                    } catch (EmptyMainBoardException emptyGoldShared1) {
+                                        emptyGoldShared1.printStackTrace();
+                                        checkGameEnded();
+                                        try {
+                                            newGoldCard = getMainBoard().drawSharedGoldCard(2);
+                                        } catch (EmptyMainBoardException emptyGoldShared2) {
+                                            emptyGoldShared2.printStackTrace();
+                                            checkGameEnded();
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                    currentGameTurn = TurnPhase.DRAWPHASE;
-                    changeCurrentPlayer();
+                    Player currentPlayer = getPlayer(index);
+
+                    if (newResourceCard != null) currentPlayer.addToHandCardsMap(newResourceCard.getId(), Side.FRONT);
+                    else if(newGoldCard != null) currentPlayer.addToHandCardsMap(newGoldCard.getId(), Side.FRONT);
+                    else return;
+
+                    synchronized (eventQueue){
+                        eventQueue.add(new UpdateMainBoardEvent(this, allConnectedClients(), mainBoard));
+                        eventQueue.notifyAll();
+                    }
                 }
+                currentGameTurn = TurnPhase.DRAWPHASE;
+                changeCurrentPlayer();
             }
         }
+
         System.out.println(currentGameTurn);
     }
 
@@ -652,6 +694,7 @@ public class GameState {
         }
         //TODO: capire se va bene decrementare di 1 in ogni caso
         if (currentGamePhase.equals(GamePhase.ENDPHASE)) {
+            if (turnToPlay <= 0) checkGameEnded();
             turnToPlay--;
         }
         //playerDisconnected();

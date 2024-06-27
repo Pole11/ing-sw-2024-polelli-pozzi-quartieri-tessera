@@ -154,6 +154,24 @@ public class Board {
     }
 
     /**
+     * Check if the shared resource cards are empty (extreme case where the deck is empty and the players skip to draw phase)
+     *
+     * @return True if both the shared resource cards are null
+     */
+    public boolean areResourceSharedEmpty() {
+        return sharedResourceCards[0] == null && sharedResourceCards[1] == null;
+    }
+
+    /**
+     * Check if the shared gold cards are empty (extreme case where the deck is empty and the players skip to draw phase)
+     *
+     * @return True if both the shared gold cards are null
+     */
+    public boolean areGoldSharedEmpty() {
+        return sharedGoldCards[0] == null && sharedGoldCards[1] == null;
+    }
+
+    /**
      * Add a card to the gold deck
      *
      * @param goldCard Gold card to add
@@ -267,7 +285,7 @@ public class Board {
         try {
             this.sharedResourceCards[pos - 1] = drawFromResourceDeck();
         } catch (EmptyDeckException e) {
-            this.sharedGoldCards[pos - 1] = null;
+            this.sharedResourceCards[pos - 1] = null;
         }
         // return the card
         return drawnCard;

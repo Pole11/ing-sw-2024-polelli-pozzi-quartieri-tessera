@@ -271,6 +271,7 @@ public class Client implements VirtualView {
                 }
                 case GamePhase.TIMEOUT -> {
                     guiApplication.getGUIController().showAlert(Alert.AlertType.INFORMATION, "Timeout", "No one is connected, we are waiting " + Config.TIMEOUT_TIME + " seconds for the other players to re-join");
+                    guiApplication.getGUIController().setServerMessage("No one is connected, we are waiting " + Config.TIMEOUT_TIME + " seconds for the other players to re-join");
                 }
             }
             guiApplication.updateController();

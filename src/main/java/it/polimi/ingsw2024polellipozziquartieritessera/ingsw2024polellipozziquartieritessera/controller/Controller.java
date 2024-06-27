@@ -220,7 +220,15 @@ public class Controller {
 
             player.addPoints(placingCard.calculatePoints(player));
 
-            gameState.getCurrentGameTurn().changePhase(gameState);
+            if (gameState.getMainBoard().isGoldDeckEmpty() &&
+                    gameState.getMainBoard().isResourceDeckEmpty() &&
+                    gameState.getMainBoard().areGoldSharedEmpty() &&
+                    gameState.getMainBoard().areResourceSharedEmpty()) {
+                gameState.changeCurrentPlayer();
+                gameState.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
+            } else {
+                gameState.getCurrentGameTurn().changePhase(gameState);
+            }
         }
     }
 

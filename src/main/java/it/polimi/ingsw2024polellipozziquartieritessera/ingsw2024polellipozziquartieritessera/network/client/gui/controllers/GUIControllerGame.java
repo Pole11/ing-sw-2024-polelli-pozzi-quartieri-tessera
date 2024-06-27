@@ -529,7 +529,7 @@ public class GUIControllerGame extends GUIController {
             clearAllchilds();
             initTable();
             highlightCurrentPlayerTable();
-            //setCurrentPhase();
+            setCurrentPhase();
             setNewMessageChat();
             populateChatListview();
             updatePoints();
