@@ -244,7 +244,7 @@ public class Controller {
      * @param drawType The selected card to be drawn : DECKGOLD, SHAREDGOLD1, SHAREDGOLD2, DECKRESOURCE, SHAREDRESOURCE1, SHAREDRESOURCE2
      * @throws InvalidHandException The player has too many card in his hand
      * @throws EmptyDeckException The selected deck is empty
-     * @throws EmptyMainBoardException The selected SharedCard doesnt exists
+     * @throws EmptyMainBoardException The selected SharedCard doesn't exist
      */
     public void drawCard(DrawType drawType) throws InvalidHandException, EmptyDeckException, EmptyMainBoardException {
         synchronized (this.gameState) {
@@ -293,6 +293,12 @@ public class Controller {
         System.out.println(getPlayerNickname(getCurrentPlayerIndex())+ " drew a card");
     }
 
+    /**
+     * Allows to see the other side of a card
+     * @param playerIndex Owner of the card
+     * @param cardId ID of the card
+     * @throws CardIsNotInHandException The card isn't in the player's hand
+     */
     public void flipCard(int playerIndex, int cardId) throws CardIsNotInHandException {
         synchronized (this.gameState) {
             Player player = gameState.getPlayer(playerIndex);
@@ -309,21 +315,37 @@ public class Controller {
         }
     }
 
+    /**
+     * Add a message to the chat
+     * @param playerIndex Author of the message
+     * @param content Text of the message
+     */
     public void addMessage(int playerIndex, String content){
         synchronized (this.gameState){
             gameState.addMessage(playerIndex, content);
         }
     }
 
+    /**
+     * Sends a ping message to a client
+     * @param client the ping receiver
+     */
     public synchronized void ping(VirtualView client){
         System.out.println(getPlayerIndex(client));
         gameState.pingAnswer(client);
     }
 
+    /**
+     * Calls the corresponding method on gamestate
+     * @param client
+     */
     public synchronized void gameEnded(VirtualView client){
         gameState.clientEnded(client);
     }
 
+    /**
+     * Manage the disconnections of the clients
+     */
     public void manageDisconnection(){
         gameState.updatePlayersConnected();
     }
