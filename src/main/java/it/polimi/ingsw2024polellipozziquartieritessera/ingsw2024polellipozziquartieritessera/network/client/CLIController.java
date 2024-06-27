@@ -119,7 +119,7 @@ public class CLIController {
                         pongRunning = false;
                         clientContainer.serverDisconnected();
                     } catch (InterruptedException e) {
-                        System.out.println("serverhread interrupted");
+
                     }
                 });
                 serverThread.start();
