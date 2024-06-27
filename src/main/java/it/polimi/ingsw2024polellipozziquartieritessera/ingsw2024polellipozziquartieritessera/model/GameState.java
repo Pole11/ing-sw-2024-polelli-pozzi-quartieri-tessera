@@ -645,20 +645,20 @@ public class GameState {
                 });
                 timeoutThread.start();
             }
-        }
         } else {
             //automatically plays for the player disconnected
-            switch (currentGamePhase){
+            switch (currentGamePhase) {
                 case CHOOSESTARTERSIDEPHASE -> setStarterSide(index, Side.BACK);
                 //choose between the availables
-                case CHOOSECOLORPHASE -> setColor(index, Arrays.stream(Color.values()).filter(e-> !players.stream().map(Player::getColor).toList().contains(e)).findFirst().get());
+                case CHOOSECOLORPHASE ->
+                        setColor(index, Arrays.stream(Color.values()).filter(e -> !players.stream().map(Player::getColor).toList().contains(e)).findFirst().get());
                 case CHOOSEOBJECTIVEPHASE -> setSecretObjective(index, 0);
             }
-            if (numberAnswered() == players.size()){
+            if (numberAnswered() == players.size()) {
                 currentGamePhase.changePhase(this);
                 resetAnswered();
             }
-
+        }
         if (currentPlayerIndex == index){
             if (currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
                 if (currentGameTurn.equals(TurnPhase.DRAWPHASE)){
