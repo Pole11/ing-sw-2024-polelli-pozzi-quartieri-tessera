@@ -278,6 +278,7 @@ public class Server implements VirtualServer {
     @Override
     public synchronized void pong(VirtualView client) throws RemoteException {
         client.pong();
+
     }
 
     @Override

@@ -115,7 +115,7 @@ abstract public class GUIController {
             try {
                 pongThread.join();
             } catch (InterruptedException e) {
-
+                throw new RuntimeException(e);
             }
         }
 

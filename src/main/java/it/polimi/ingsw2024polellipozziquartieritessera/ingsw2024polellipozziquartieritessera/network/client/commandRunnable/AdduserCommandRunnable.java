@@ -36,6 +36,10 @@ public class AdduserCommandRunnable extends CommandRunnable{
 
     @Override
     public void executeGUI() {
+        if (nickname.isEmpty()){
+            guiController.setServerError("empty nickname");
+            return;
+        }
         try {
             System.out.print("i am in adduser command runnable");
             System.out.println(nickname);
