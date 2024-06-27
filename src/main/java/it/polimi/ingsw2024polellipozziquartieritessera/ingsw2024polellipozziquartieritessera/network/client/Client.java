@@ -38,6 +38,8 @@ public class Client implements VirtualView {
     PrintStream restoreStream;
     PrintStream oldPrintStream;
 
+    private boolean serverIsConnected;
+
     public Client(String rmiOrSocket, String host, String port, String myIp){
         this.viewModel = new ViewModel();
         this.rmiOrSocket = rmiOrSocket;
@@ -48,6 +50,7 @@ public class Client implements VirtualView {
         this.baos = new ByteArrayOutputStream();
         this.restoreStream = new PrintStream(baos);
         this.oldPrintStream = null;
+        this.serverIsConnected = true;
     }
 
     public static void main(String[] args) throws IOException {
@@ -129,7 +132,7 @@ public class Client implements VirtualView {
                 ((RmiClient) client).run();
             } catch (RemoteException e) {
                 System.out.println("disconncetion from client");
-                serverDisconnected();
+                if (!running)serverDisconnected();
                 System.out.println("An error occurred while executing RmiClient!");
             } catch (NotBoundException e){
                 e.printStackTrace();
@@ -178,6 +181,10 @@ public class Client implements VirtualView {
 
 
     public void serverDisconnected(){
+        if (!serverIsConnected){
+            return;
+        }
+        serverIsConnected = false;
         //OLD
         /*if (meDoGui){
             guiApplication.getGUIController().setServerError("There was an error in server, the server is not available, wait to be rederected in the login page");
@@ -216,6 +223,7 @@ public class Client implements VirtualView {
 
             try {
                 startClient();
+                serverIsConnected = true;
                 break; // If startClient() succeeds, break the loop
             } catch (ConnectException e) {
                 System.out.println("Disconnection from client 2");

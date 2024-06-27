@@ -68,6 +68,7 @@ public class ClientProxy implements VirtualView {
 
     @Override
     public void connectionInfo(int playerIndex, boolean connected) throws RemoteException {
+        System.out.println("I am in connectionInfo, the message is: " + Messages.CONNECTIONINFO + "; " + playerIndex + "; " + connected);
         output.println(Messages.CONNECTIONINFO + "; " + playerIndex + "; " + connected);
         output.flush();
     }

@@ -108,6 +108,9 @@ public class ViewModel {
     }
 
     public void initializeElementMap(int playerIndex){
+        if (elementsMap.get(playerIndex) != null){
+            return;
+        }
         HashMap <Element, Integer> map = new HashMap<>();
         Arrays.stream(Element.values()).forEach(e-> {
             map.put(e, 0);
@@ -119,7 +122,9 @@ public class ViewModel {
         System.out.println("ELEMENTSMAP");
         System.out.println(elementsMap.keySet());
         System.out.println(elementsMap.values());
-
+        if (elementsMap.get(playerIndex) == null){
+            initializeElementMap(playerIndex);
+        }
         elementsMap.get(playerIndex).put(element, numberOfElements);
     }
 

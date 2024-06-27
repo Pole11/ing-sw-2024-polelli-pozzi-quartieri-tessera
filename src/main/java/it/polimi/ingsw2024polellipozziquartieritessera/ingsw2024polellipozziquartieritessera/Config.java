@@ -16,7 +16,7 @@ public class Config {
     public static final int STARTERQTY = 6;
 
     //al timeout in seconds
-    public static final int TIMEOUT_TIME = 60;
+    public static final int TIMEOUT_TIME = 180;
     public static final int WAIT_FOR_PONG_TIME = 2;
     public static final int NEXT_PONG = 5;
     public static final int NEXT_PING_TIME = 4; // 10

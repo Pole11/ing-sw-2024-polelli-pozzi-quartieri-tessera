@@ -28,7 +28,6 @@ public class SocketClient implements VirtualView {
             try {
                 runVirtualServer();
             } catch (ConnectException e) {
-
                 clientContainer.serverDisconnected();
             } catch (IOException e){
                 e.printStackTrace();
@@ -153,7 +152,7 @@ public class SocketClient implements VirtualView {
                     break;
             }
         }
-        clientContainer.serverDisconnected();
+        //clientContainer.serverDisconnected();
         //TODO: controllare se funziona anche se il server perde la connesisone e non solo se crasha
     }
 

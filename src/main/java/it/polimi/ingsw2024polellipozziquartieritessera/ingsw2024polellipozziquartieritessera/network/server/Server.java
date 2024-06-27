@@ -265,6 +265,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void ping(VirtualView client) throws RemoteException {
+        System.out.println(client);
         System.out.println(getPlayerIndex(client));
         try {
             this.controller.ping(client);
