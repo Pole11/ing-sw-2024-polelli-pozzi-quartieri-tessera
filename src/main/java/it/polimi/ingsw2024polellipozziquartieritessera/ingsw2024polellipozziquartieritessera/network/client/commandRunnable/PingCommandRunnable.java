@@ -2,6 +2,9 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import java.rmi.RemoteException;
 
+/**
+ * Allowa a client to send a ping
+ */
 public class PingCommandRunnable extends CommandRunnable{
     @Override
     public void executeCLI() {

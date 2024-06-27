@@ -2,6 +2,9 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import java.rmi.RemoteException;
 
+/**
+ * Allows the client to start the game
+ */
 public class StartCommandRunnable extends CommandRunnable{
     @Override
     public void executeCLI() {

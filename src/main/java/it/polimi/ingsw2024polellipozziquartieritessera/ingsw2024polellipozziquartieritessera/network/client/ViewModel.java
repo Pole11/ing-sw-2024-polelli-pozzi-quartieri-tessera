@@ -466,58 +466,135 @@ public class ViewModel {
         return secretObjectives;
     }
 
+    /**
+     * Retrieves the current game phase.
+     *
+     * @return The current GamePhase enum value representing the game phase.
+     */
     public GamePhase getGamePhase() {
         return gamePhase;
     }
 
+    /**
+     * Retrieves the current turn phase.
+     *
+     * @return The current TurnPhase enum value representing the turn phase.
+     */
     public TurnPhase getTurnPhase() {
         return turnPhase;
     }
 
+    /**
+     * Retrieves the ID of the starter card.
+     *
+     * @return The ID of the starter card.
+     */
     public int getStarterCard() {
         return starterCardId;
     }
 
+    /**
+     * Retrieves the hand of cards for a specified player.
+     *
+     * @param playerIndex The index of the player.
+     * @return An ArrayList of integers representing the cards in the player's hand.
+     */
     public ArrayList<Integer> getHand(int playerIndex){
         return handsMap.get(playerIndex);
     }
 
+    /**
+     * Retrieves the side (front or back) of a card in the player's hand.
+     *
+     * @param cardId The ID of the card.
+     * @return The Side enum value representing the side of the card in the player's hand.
+     */
     public Side getHandCardsSide(int cardId){
         return handsSideMap.get(cardId);
     }
 
+    /**
+     * Retrieves the side (front or back) of a placed card on the table.
+     *
+     * @param cardId The ID of the card.
+     * @return The Side enum value representing the side of the placed card on the table.
+     */
     public Side getPlacedCardSide(int cardId){
         return placedSideMap.get(cardId);
     }
 
+    /**
+     * Retrieves the player's board configuration.
+     *
+     * @param playerIndex The index of the player.
+     * @return An ArrayList of ArrayLists of integers representing the player's board.
+     */
     public ArrayList<ArrayList<Integer>> getPlayerBoard(int playerIndex){
         return boardsMap.get(playerIndex);
     }
 
+    /**
+     * Retrieves an array of integers representing the shared cards on the main board.
+     *
+     * @return An array of integers representing the shared cards on the main board.
+     */
     public int[] getSharedCards() {
         return mainBoard;
     }
 
+    /**
+     * Retrieves an array of integers representing the shared resource cards on the main board.
+     *
+     * @return An array of integers representing the shared resource cards on the main board.
+     */
     public int[] getSharedResourceCards() {
         return new int[] { mainBoard[0], mainBoard[1] };
     }
 
+    /**
+     * Retrieves an array of integers representing the shared gold cards on the main board.
+     *
+     * @return An array of integers representing the shared gold cards on the main board.
+     */
     public int[] getSharedGoldCards() {
         return new int[] { mainBoard[2], mainBoard[3] };
     }
 
+    /**
+     * Checks if the player at the specified index is connected (online or offline).
+     *
+     * @param playerIndex The index of the player.
+     * @return true if the player is connected, false otherwise.
+     */
     public boolean getConnession(int playerIndex) {
         return connessionMap.get(playerIndex);
     }
 
+    /**
+     * Retrieves the color associated with the player at the specified index.
+     *
+     * @param playerIndex The index of the player.
+     * @return The Color object representing the player's color.
+     */
     public Color getColorsMap(int playerIndex) {
         return colorsMap.get(playerIndex);
     }
 
+    /**
+     * Retrieves the points scored by the player at the specified index.
+     *
+     * @param playerIndex The index of the player.
+     * @return The total points scored by the player.
+     */
     public int getPointsMap(int playerIndex) {
         return pointsMap.get(playerIndex);
     }
 
+    /**
+     * Retrieves the index of the current player whose turn it is.
+     *
+     * @return The index of the current player.
+     */
     public int getCurrentPlayer() {
         return currentPlayer;
     }
@@ -532,11 +609,23 @@ public class ViewModel {
         return placingCardOrderMap.get(playerId).indexOf(card1) > placingCardOrderMap.get(playerId).indexOf(card2);
     }
 
+    /**
+     * Retrieves the placing card order map for the specified player.
+     *
+     * @param playerIndex The index of the player.
+     * @return An ArrayList of integers representing the placing card order for the player.
+     */
     public ArrayList<Integer> getPlacingCardOrderMap(int playerIndex) {
         return new ArrayList<>(this.placingCardOrderMap.get(playerIndex));
     }
 
     // UTILS METHOD
+    /**
+     * Initializes the board for the specified player with a placing card.
+     *
+     * @param playerIndex The index of the player.
+     * @param placingCardId The ID of the placing card to initialize the board.
+     */
     public void initializeBoard(int playerIndex, int placingCardId){
         this.boardsMap.put(playerIndex, new ArrayList<>());
         this.boardsMap.get(playerIndex).clear();
@@ -548,6 +637,14 @@ public class ViewModel {
         placingCardOrderMap.get(playerIndex).addLast(placingCardId);
     }
 
+    /**
+     * Places a card on the player's board at the specified position.
+     *
+     * @param playerIndex The index of the player.
+     * @param placingCardId The ID of the card to place.
+     * @param tableCardId The ID of the card already on the table where placingCardId will be placed.
+     * @param tableCornerPos The position (corner) where the placingCardId will be placed relative to tableCardId.
+     */
     private void placeCard(int playerIndex, int placingCardId, int tableCardId, CornerPos tableCornerPos){
         ArrayList<ArrayList<Integer>> playerBoard = this.boardsMap.get(playerIndex);
 
@@ -603,12 +700,23 @@ public class ViewModel {
 
         placingCardOrderMap.get(playerIndex).addLast(placingCardId);
     }
+
+    /**
+     * Fills the points map with initial values for all players.
+     */
     public void fillPoints(){
         for (int i = 0; i < nicknamesMap.size(); i++){
             pointsMap.put(i, 0);
         }
     }
 
+    /**
+     * Expands the player's board matrix to accommodate a new card position.
+     *
+     * @param rowIndex The index of the row where expansion is needed.
+     * @param colIndex The index of the column where expansion is needed.
+     * @param playerBoard The player's board matrix to expand.
+     */
     private void expandBoard(int rowIndex, int colIndex, ArrayList<ArrayList<Integer>> playerBoard){
         // Expand the matrix to include the new position (remember that this supports only one execute: row++/-- or col++/--)
         // Expand rows if needed
@@ -637,6 +745,9 @@ public class ViewModel {
     }
 
     //TODO: guardare se servono le modifiche di Global
+    /**
+     * Populates the cards map from the JSON file.
+     */
     private void populateCardsMap() {
         String jsonString = null;
         try {
@@ -690,6 +801,13 @@ public class ViewModel {
             }
         }
     }
+
+    /**
+     * Creates a challenge based on the card details.
+     *
+     * @param card The card details in Map form.
+     * @return The created Challenge object.
+     */
     private static Challenge createChallenge(Map card) {
         Challenge challenge = null;
         if (card.get("Type").equals("Objective") || card.get("Type").equals("Gold")){
@@ -720,6 +838,14 @@ public class ViewModel {
         return challenge;
     }
 
+    /**
+     * Creates an array of corners based on the card details.
+     *
+     * @param side The side of corners (FrontCorners or BackCorners).
+     * @param card The card details in Map form.
+     * @param id The ID of the card.
+     * @return An array of Corner objects.
+     */
     private static Corner[] createCorners(String side, Map card, Integer id){
         Corner[] corners = new Corner[Config.N_CORNERS];
         //for in frontCorners
@@ -738,19 +864,38 @@ public class ViewModel {
         return corners;
     }
 
+    /**
+     * Sets a new message in the chat for the specified player.
+     *
+     * @param playerIndex The index of the player.
+     * @param content The content of the message.
+     */
     public void setNewMessage(int playerIndex, String content) {
         chat.addMessage(playerIndex, content);
         newMessages+=1;
     }
 
+    /**
+     * Retrieves the number of new messages.
+     *
+     * @return The number of new messages.
+     */
     public int getNewMessages() {
         return newMessages;
     }
 
+    /**
+     * Resets the count of new messages to zero.
+     */
     public void resetNewMessages(){
         newMessages = 0;
     }
 
+    /**
+     * Retrieves the chat.
+     *
+     * @return The entire Chat object.
+     */
     public Chat getChat(){
         return chat;
     }

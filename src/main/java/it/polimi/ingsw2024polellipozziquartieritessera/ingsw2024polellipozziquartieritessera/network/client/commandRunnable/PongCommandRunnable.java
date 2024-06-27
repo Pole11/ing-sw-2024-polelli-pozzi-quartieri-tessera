@@ -2,6 +2,9 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import java.rmi.RemoteException;
 
+/**
+ * Allows a client to send a pong
+ */
 public class PongCommandRunnable extends CommandRunnable {
     @Override
     public void executeCLI() {

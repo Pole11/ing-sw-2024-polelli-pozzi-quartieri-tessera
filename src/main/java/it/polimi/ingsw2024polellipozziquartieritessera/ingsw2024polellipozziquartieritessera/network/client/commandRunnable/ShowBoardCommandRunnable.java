@@ -1,5 +1,8 @@
 package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.commandRunnable;
 
+/**
+ * Allows a client to show the board
+ */
 public class ShowBoardCommandRunnable extends CommandRunnable {
     @Override
     public void executeCLI() {
