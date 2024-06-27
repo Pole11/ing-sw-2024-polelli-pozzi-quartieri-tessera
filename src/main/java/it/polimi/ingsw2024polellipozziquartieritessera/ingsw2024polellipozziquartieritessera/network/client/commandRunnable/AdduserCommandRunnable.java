@@ -17,6 +17,10 @@ public class AdduserCommandRunnable extends CommandRunnable{
                 String username = String.join(" ", Arrays.copyOfRange(messageFromCli, 1, messageFromCli.length));
                 System.out.print("i am in adduser command runnable");
                 System.out.println(username);
+                if (username.isEmpty()){
+                    System.err.print("empty nickname\n> ");
+                    return;
+                }
                 if (checkNickname(username)){
                     if (clientContainer != null){
                         clientContainer.resetViewModel();

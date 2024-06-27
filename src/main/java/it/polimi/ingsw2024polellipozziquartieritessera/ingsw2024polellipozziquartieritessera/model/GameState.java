@@ -244,7 +244,7 @@ public class GameState {
     /**
      * Resets the number of answers (even if there aren't always 4 players)
      */
-    private void resetAnswered() {
+    public void resetAnswered() {
         this.answered.put(0, false);
         this.answered.put(1, false);
         this.answered.put(2, false);
@@ -255,7 +255,7 @@ public class GameState {
      * Get the number of player that has answered the request
      * @return Number of answers
      */
-    private int numberAnswered() {
+    public int numberAnswered() {
         return this.answered.values().stream().mapToInt(e -> e ? 1 : 0).sum();
     }
 
@@ -279,21 +279,30 @@ public class GameState {
 
             }
 
+            System.out.println(event);
             for (VirtualView client : event.getClients()){
-                int index = getPlayerIndex(client);
-                synchronized (allEventQueues.get(index)){
-                    ArrayList<VirtualView> clients = new ArrayList<>();
-                    clients.add(client);
-                    Event cloned;
-                    try {
-                        cloned = event.clone();
-                    } catch (CloneNotSupportedException e) {
-                        throw new RuntimeException(e);
+                List<VirtualView> clientsTmp = players.stream().map(Player::getClient).toList();
+                if (clientsTmp.contains(client)){
+                    int index = getPlayerIndex(client);
+                    System.out.println(index);
+                    synchronized (allEventQueues.get(index)){
+                        ArrayList<VirtualView> clients = new ArrayList<>();
+                        clients.add(client);
+                        Event cloned;
+                        try {
+                            cloned = event.clone();
+                        } catch (CloneNotSupportedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        cloned.setClients(clients);
+                        allEventQueues.get(index).add(cloned);
+                        allEventQueues.get(index).notifyAll();
                     }
-                    cloned.setClients(clients);
-                    allEventQueues.get(index).add(cloned);
-                    allEventQueues.get(index).notifyAll();
+                } else {
+                    System.out.println(event);
+                    new Thread(event::execute).start();
                 }
+
             }
             //System.out.println(event);
             /*if (event instanceof PingEvent){
@@ -468,7 +477,7 @@ public class GameState {
      */
     private void manageReconnection(Player player) {
         if (this.currentGamePhase.equals(GamePhase.TIMEOUT)) {
-            this.timeoutThread.interrupt();
+            if (timeoutThread != null) this.timeoutThread.interrupt();
             currentGamePhase = prevGamePhase;
             prevGamePhase = null;
             players.stream().forEach(e-> {
@@ -553,8 +562,9 @@ public class GameState {
                 ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();
                 sharedObjectives.add(mainBoard.getSharedObjectiveCard(0));
                 sharedObjectives.add(mainBoard.getSharedObjectiveCard(1));
-                if (sharedObjectives.get(0) == null || sharedObjectives.get(1) == null)
-                eventQueue.add((new UpdateSharedObjectiveEvent(this, clients, sharedObjectives)));
+                if (sharedObjectives.get(0) != null && sharedObjectives.get(1) != null){
+                    eventQueue.add((new UpdateSharedObjectiveEvent(this, clients, sharedObjectives)));
+                }
             }
             //send correct secret objective
             ArrayList<ObjectiveCard> secretObjectives = new ArrayList<>();
@@ -658,6 +668,7 @@ public class GameState {
             }
             if (numberAnswered() == players.size()){
                 currentGamePhase.changePhase(this);
+                resetAnswered();
             }
 
             if (currentPlayerIndex == index){
@@ -967,6 +978,10 @@ public class GameState {
             }
             this.answered.put(getPlayerIndex(e), true);
             System.out.println(e.getNickname() + " automatically chose his starter, the number of answered is: " + numberAnswered());
+            if (numberAnswered() == players.size()){
+                currentGamePhase.changePhase(this);
+                resetAnswered();
+            }
         });
 
         Player player = this.players.get(playerIndex);
@@ -1018,6 +1033,11 @@ public class GameState {
                 e.setColor(colorOptional.get());
                 this.answered.put(getPlayerIndex(e), true);
                 System.out.println(e.getNickname() + " automatically chose his color, the number of answered is: " + numberAnswered());
+                if (numberAnswered() == players.size()){
+                    currentGamePhase.changePhase(this);
+                    resetAnswered();
+                }
+
             }
 
         });
@@ -1131,6 +1151,10 @@ public class GameState {
             e.setObjectiveCard(e.getObjectiveCardOption(0));
             this.answered.put(getPlayerIndex(e), true);
             System.out.println(e.getNickname() + " automatically chose his objective, the number of ansewred is: " + numberAnswered());
+            if (numberAnswered() == players.size()){
+                currentGamePhase.changePhase(this);
+                resetAnswered();
+            }
         });
 
         Player player = this.players.get(playerIndex);

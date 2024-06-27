@@ -126,20 +126,30 @@ abstract public class GUIController {
             while (pongRunning) {
                 System.out.println("hey amico");
                 System.out.println(serverThread);
-                if (serverThread == null || !serverThread.isAlive()){
-                    System.out.println("down");
-                    serverThread = new Thread(()->{
-                        try {
-                            System.out.println("INTHREAD "+ serverThread );
-                            Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
-                            System.out.println("disconnection from gui controller");
-                            clientContainer.serverDisconnected();
-                        } catch (InterruptedException e) {
-
-                        }
-                    });
-                    serverThread.start();
+                if (serverThread!= null) System.out.println(serverThread.getState());
+                if (serverThread != null){
+                    if (serverThread.isAlive()){
+                        serverThread.interrupt();
+                    }
+                    try {
+                        serverThread.join();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
+                System.out.println("down");
+                serverThread = new Thread(()->{
+                    try {
+                        System.out.println("INTHREAD "+ serverThread );
+                        Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
+                        System.out.println("disconnection from gui controller");
+                        pongRunning = false;
+                        clientContainer.serverDisconnected();
+                    } catch (InterruptedException e) {
+                        System.out.println("serverhread interrupted");
+                    }
+                });
+                serverThread.start();
                 synchronized (commandQueue){
                     PongCommandRunnable commandRunnable = new PongCommandRunnable();
                     commandRunnable.setClient(client);
@@ -151,7 +161,6 @@ abstract public class GUIController {
                 System.out.println(serverThread);
                 try {
                     sleep(1000*Config.NEXT_PONG);
-                    //sleep(5000);
                 } catch (InterruptedException e) {
                     System.out.println("pong thread interrupted");
                 }

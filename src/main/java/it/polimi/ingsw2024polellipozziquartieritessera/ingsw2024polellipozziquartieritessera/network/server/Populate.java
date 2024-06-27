@@ -523,6 +523,12 @@ public class Populate {
         for (Object key : answeredJson.keySet()){
             gameState.setAnswered((Integer.parseInt((String) key)), (Boolean) answeredJson.get((String) key));
         }
+        /*if (gameState.numberAnswered() == gameState.getPlayersSize()){
+            gameState.getCurrentGamePhase().changePhase(gameState);
+            gameState.resetAnswered();
+        }
+
+         */
 
         System.out.println("I restored the state");
     }

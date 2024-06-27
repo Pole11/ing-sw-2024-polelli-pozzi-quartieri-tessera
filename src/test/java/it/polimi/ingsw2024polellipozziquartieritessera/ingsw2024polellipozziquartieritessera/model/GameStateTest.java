@@ -668,7 +668,7 @@ public class GameStateTest {
             throw new RuntimeException("Error during setup: " + e.getMessage(), e);
         }
 
-        assertDoesNotThrow(gs::addPlayerThread);
+        assertDoesNotThrow(()->gs.addPlayerThread(0));
     }
 
     @Test
@@ -681,7 +681,7 @@ public class GameStateTest {
         } catch (IOException e) {
             throw new RuntimeException("Error during setup: " + e.getMessage(), e);
         }
-        gs.addPlayerThread(); // Adding a thread to the list
+        gs.addPlayerThread(0); // Adding a thread to the list
 
         VirtualView client = new SocketClient(null, null, null);
         gs.addPlayer(new Player("Player1", client, gs));
@@ -705,7 +705,7 @@ public class GameStateTest {
         } catch (IOException e) {
             throw new RuntimeException("Error during setup: " + e.getMessage(), e);
         }
-        gs.addPlayerThread();
+        gs.addPlayerThread(0);
         VirtualView client = new SocketClient(null, null, null);
 
         gs.addPlayer(new Player("Player1", client, gs));
@@ -734,7 +734,7 @@ public class GameStateTest {
         } catch (IOException e) {
             throw new RuntimeException("Error during setup: " + e.getMessage(), e);
         }
-        gs.addPlayerThread();
+        gs.addPlayerThread(0);
         VirtualView client1 = new SocketClient(null, null, null);
         VirtualView client2 = new SocketClient(null, null, null);
         VirtualView client3 = new SocketClient(null, null, null);
