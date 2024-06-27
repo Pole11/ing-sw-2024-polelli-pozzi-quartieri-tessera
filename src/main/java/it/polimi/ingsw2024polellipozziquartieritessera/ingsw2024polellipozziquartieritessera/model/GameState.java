@@ -405,7 +405,9 @@ public class GameState {
      */
     private void manageReconnection(Player player) {
         if (this.currentGamePhase.equals(GamePhase.TIMEOUT)) {
-            if (this.timeoutThread != null) this.timeoutThread.interrupt();
+            if(this.timeoutThread != null) {
+                this.timeoutThread.interrupt();
+            }
             currentGamePhase = prevGamePhase;
             prevGamePhase = null;
             players.stream().forEach(e-> {
@@ -592,13 +594,9 @@ public class GameState {
             currentGamePhase.changePhase(this);
         }
 
-        System.out.println("0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         if (currentPlayerIndex == index){
-            System.out.println("1AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             if (currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
-                System.out.println("2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                 if (currentGameTurn.equals(TurnPhase.DRAWPHASE)){
-                    System.out.println("3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                     ResourceCard newResourceCard = null;
                     GoldCard newGoldCard = null;
                     try {
@@ -611,31 +609,6 @@ public class GameState {
                         } catch (EmptyMainBoardException emptyResourceShared1) {
                             emptyResourceShared1.printStackTrace();
                             checkGameEnded();
-                            try {
-                                newResourceCard = getMainBoard().drawSharedResourceCard(2);
-                            } catch (EmptyMainBoardException emptyResourceShared2) {
-                                emptyResourceShared2.printStackTrace();
-                                checkGameEnded();
-                                try {
-                                    newGoldCard = getMainBoard().drawFromGoldDeck();
-                                } catch (EmptyDeckException emptyGoldDeck) {
-                                    emptyGoldDeck.printStackTrace();
-                                    checkGameEnded();
-                                    try {
-                                        newGoldCard = getMainBoard().drawSharedGoldCard(1);
-                                    } catch (EmptyMainBoardException emptyGoldShared1) {
-                                        emptyGoldShared1.printStackTrace();
-                                        checkGameEnded();
-                                        try {
-                                            newGoldCard = getMainBoard().drawSharedGoldCard(2);
-                                        } catch (EmptyMainBoardException emptyGoldShared2) {
-                                            emptyGoldShared2.printStackTrace();
-                                            checkGameEnded();
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
                         }
                     }
                     Player currentPlayer = getPlayer(index);
@@ -653,8 +626,7 @@ public class GameState {
                 changeCurrentPlayer();
             }
         }
-
-        System.out.println(currentGameTurn);
+        System.out.println("GAMESTATE: currente game turn is " + currentGameTurn);
     }
 
     /**
@@ -1225,7 +1197,6 @@ public class GameState {
      * Check if game is ended by one of the possible conditions
      */
     public void checkGameEnded() {
-        System.out.println("CONTROLLO");
         // switch to end phase
         if (!currentGamePhase.equals(GamePhase.ENDPHASE)) {
             // first endphase entering: player reach 20 points
