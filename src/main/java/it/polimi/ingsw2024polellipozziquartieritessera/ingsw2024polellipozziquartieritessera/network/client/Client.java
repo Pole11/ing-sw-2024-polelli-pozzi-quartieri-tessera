@@ -346,6 +346,7 @@ public class Client implements VirtualView {
             } else {
                 System.out.println("you disconnected from the game, to reconnect login with ADDUSER <your previous nickname>\n> ");
                 viewModel = new ViewModel();
+                if(meDoGui)
                 guiApplication.changeScene("/fxml/lobby.fxml");
             }
         } else {
@@ -380,6 +381,7 @@ public class Client implements VirtualView {
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
         viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
         if (viewModel.getPlayerIndex() == playerIndex) {
+            cliController.showDecks();
             System.out.print("you placed a card, now you have to draw your card with DRAWCARD [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");
         } else {
             System.out.print(viewModel.getNickname(playerIndex) + " placed a card\n> ");

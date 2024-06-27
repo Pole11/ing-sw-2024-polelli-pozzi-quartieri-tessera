@@ -405,7 +405,9 @@ public class GameState {
      */
     private void manageReconnection(Player player) {
         if (this.currentGamePhase.equals(GamePhase.TIMEOUT)) {
-            this.timeoutThread.interrupt();
+            if(this.timeoutThread != null) {
+                this.timeoutThread.interrupt();
+            }
             currentGamePhase = prevGamePhase;
             prevGamePhase = null;
             players.stream().forEach(e-> {

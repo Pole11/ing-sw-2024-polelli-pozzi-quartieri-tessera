@@ -553,7 +553,7 @@ public class CLIController {
      */
     public void showDecks(){
         if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()) {
-            System.err.print("you cant ask to see the decks before the main phase has starter\n> ");
+            System.out.print("you cant ask to see the decks before the main phase has starter\n> ");
         } else {
             ArrayList<Integer> cards = new ArrayList<>();
             ArrayList<Side> sides = new ArrayList<>();
@@ -604,7 +604,7 @@ public class CLIController {
            emptyCard.add("+-----------------+");
            emptyCard.add("|      \\   /      |");
            emptyCard.add("|       \\ /       |");
-           emptyCard.add("|        X         |");
+           emptyCard.add("|        X        |");
            emptyCard.add("|       / \\       |");
            emptyCard.add("|      /   \\      |");
            emptyCard.add("+-----------------+");
