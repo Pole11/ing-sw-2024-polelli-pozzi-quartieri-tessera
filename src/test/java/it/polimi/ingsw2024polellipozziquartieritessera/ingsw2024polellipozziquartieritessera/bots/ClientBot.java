@@ -4,56 +4,65 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.*;
 
 import java.io.*;
-import java.util.*;
-import static it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.bots.ClientBot.client;
 
 public class ClientBot {
-    static Client client;
+    public static Client client;
+    public static boolean sideChosen = false;
+    public static boolean secretChosen = false;
 
     public static void main(String[] args) throws IOException {
-        String input = "";
-        String host = "";
-        String port = "";
-        String myIp = "";
-        try {
-            input = args[0];
-            host = args[1];
-            port = args[2];
-            try {
-                myIp = args[3];
-            } catch (IndexOutOfBoundsException e) {
-                if (input.equals("rmi")) System.out.println("If you are encountering an error with rmi, please provide the ip address of the current machine");
-            }
-        } catch(Exception e) {
-            System.out.println("This is the bot, please remember to use the right parameters: [rmi/socket] [server ip] [server port (depends on rmi and socket)] [optional with rmi: ip address of the current machine]");
-            return;
-        }
+
+        String input = args[0];
+        String host = args[1];
+        String port = args[2];
+        String myIp = args.length > 3 ? args[3] : "";
 
         PipedOutputStream pos = new PipedOutputStream();
         PipedInputStream pis = new PipedInputStream(pos);
         System.setIn(pis);
 
-        String finalHost = host;
-        String finalInput = input;
-        String finalPort = port;
-        String finalMyIp = myIp;
         Thread starter = new Thread(() -> {
             try {
-                client = new Client(finalInput, finalHost, finalPort, finalMyIp);
+                client = new Client(input, host, port, myIp);
                 client.startClient();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to start client", e);
             }
         });
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        Thread inputInserter = new Thread(() -> {
+            try {
+                Thread.sleep(2000); // Give the client some time to start
+                pos.write(("n\n").getBytes());
+                System.out.println("n");
+                pos.flush();
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
 
-        Thread inputInserter = new Thread(new InputInserter(pos, client));
+            while (true) {
+                try {
+                    Thread.sleep(BotConfig.SPEED);
+
+                    String command = CommandGenerator.generateCommand();
+                    if (command != null) {
+                        sendCommand(command + "\n", pos);
+                    }
+
+                } catch (InterruptedException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
         starter.start();
         inputInserter.start();
+    }
+
+    private static void sendCommand(String command, PipedOutputStream pos) throws IOException {
+        System.out.print(command);
+        pos.write(command.getBytes());
+        pos.flush();
     }
 }
