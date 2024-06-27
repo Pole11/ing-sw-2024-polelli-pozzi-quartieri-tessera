@@ -85,14 +85,15 @@ public class GameState {
      */
     private GamePhase prevGamePhase;
 
-
     /**
      * Number of turns left to play
      */
     private int turnToPlay;
     private ArrayList<UpdateBoardEvent> placedEventList;
 
+    private ArrayList<Thread> executingThreads;
 
+    private ArrayList<ArrayDeque<Event>> allEventQueues ;
     /**
      * GameState Constructor
      */
@@ -129,12 +130,15 @@ public class GameState {
 
         this.turnToPlay = Integer.MAX_VALUE;
         this.placedEventList = new ArrayList<>();
+        this.allEventQueues = new ArrayList<>();
+        this.executingThreads = new ArrayList<>();
     }
 
     public void startThreads(){
         this.executeEvents.start();
         this.pingThread.start();
     }
+
 
 
     // GETTER
@@ -258,7 +262,7 @@ public class GameState {
     /**
      * Run the event queue listener
      */
-    private void executeEventsRunnable() {
+    private void executeEventsRunnable()  {
         while (executeEventRunning) {
             Event event = null;
             synchronized (eventQueue) {
@@ -275,17 +279,58 @@ public class GameState {
 
             }
 
-            System.out.println(event);
-            if (event instanceof PingEvent){
+            for (VirtualView client : event.getClients()){
+                int index = getPlayerIndex(client);
+                synchronized (allEventQueues.get(index)){
+                    ArrayList<VirtualView> clients = new ArrayList<>();
+                    clients.add(client);
+                    Event cloned;
+                    try {
+                        cloned = event.clone();
+                    } catch (CloneNotSupportedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    cloned.setClients(clients);
+                    allEventQueues.get(index).add(cloned);
+                    allEventQueues.get(index).notifyAll();
+                }
+            }
+            //System.out.println(event);
+            /*if (event instanceof PingEvent){
                 new Thread(event::execute).start();
             } else {
                 event.execute();
-            }
+            }*/
+
+
             Populate.saveState(this);
 
             System.out.println("THIS IS THE CLIENTS" + players.stream().map(Player::getClient).toList());
             System.out.println(players.stream().map(Player::getNickname).toList());
             //event.execute();
+
+
+        }
+    }
+
+    public void executingThreadsRunnable(int index){
+        while (true){
+            Event event = null;
+            synchronized (allEventQueues.get(index)) {
+                while (allEventQueues.get(index).isEmpty()) {
+                    try {
+                        allEventQueues.get(index).wait();
+                    } catch (InterruptedException e) {
+                        System.out.println("execute events interrupted");
+                        return;
+                    }
+                }
+                event = allEventQueues.get(index).remove();
+            }
+            System.out.println("index: "+ index);
+            System.out.println(event);
+            event.execute();
+
         }
     }
 
@@ -374,9 +419,17 @@ public class GameState {
         }
     }
 
-    public void addPlayerThread(){
+    public void addPlayerThread(int index){
         playerThreads.add(new Thread());
+        allEventQueues.add(new ArrayDeque<Event>());
+        Thread thread = new Thread(()->{
+            executingThreadsRunnable(index);
+        });
+        executingThreads.add(thread);
+        executingThreads.getLast().start();
     }
+
+
 
     /**
      * Get the ping response from a player
@@ -785,6 +838,12 @@ public class GameState {
 
             players.add(player);
             playerThreads.add(new Thread());
+            allEventQueues.add(new ArrayDeque<Event>());
+            Thread thread = new Thread(()->{
+                executingThreadsRunnable(getPlayerIndex(player));
+            });
+            executingThreads.add(thread);
+            executingThreads.getLast().start();
             synchronized (eventQueue) {
                 eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
                 eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));

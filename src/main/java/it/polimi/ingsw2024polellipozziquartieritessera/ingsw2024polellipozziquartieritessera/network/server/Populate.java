@@ -495,7 +495,7 @@ public class Populate {
             }
             player.setAllElements(allElements);
 
-            gameState.addPlayerThread();
+            gameState.addPlayerThread(i);
             gameState.addPlayer(player);
 
         }
