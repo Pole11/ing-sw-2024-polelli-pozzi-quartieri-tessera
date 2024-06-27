@@ -140,7 +140,6 @@ public class Server implements VirtualServer {
 
     @Override
     public void addConnectedPlayer(VirtualView client, String nickname) throws RemoteException {
-        System.out.println(client + "   " + nickname);
         this.controller.addPlayer(client, nickname);
     }
 
@@ -265,8 +264,7 @@ public class Server implements VirtualServer {
 
     @Override
     public void ping(VirtualView client) throws RemoteException {
-        System.out.println(client);
-        System.out.println(getPlayerIndex(client));
+
         try {
             this.controller.ping(client);
         } catch (IndexOutOfBoundsException e){
@@ -277,9 +275,7 @@ public class Server implements VirtualServer {
 
     @Override
     public synchronized void pong(VirtualView client) throws RemoteException {
-        System.out.println("ponged");
         client.pong();
-
     }
 
     @Override

@@ -68,7 +68,7 @@ public class CLIController {
                             System.out.println("disconnection from cli controller");
                             clientContainer.serverDisconnected();
                         } catch (InterruptedException e) {
-                            System.out.println("serverThread interrupted");
+                            //System.out.println("serverThread interrupted");
                         }
                     });
                     serverThread.start();
@@ -118,7 +118,6 @@ public class CLIController {
 
 //new
     public void restartExecuteCommand(){
-        System.out.println("restaring clii");
         if (executeCommands != null && executeCommands.isAlive()){
             //executeCommandRunning = false;
             executeCommands.interrupt();
@@ -162,7 +161,7 @@ public class CLIController {
                 command = commandQueue.remove();
                 //commandQueue.notifyAll();
             }
-            System.out.println(command);
+            //System.out.println(command);
             command.executeCLI();
 
         }
@@ -345,7 +344,7 @@ public class CLIController {
 
     public void showHand(){
         if(viewModel.getGamePhase().ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
-            System.err.println("your hand is not initialized yet");
+            System.out.println("your hand is not initialized yet");
         } else {
             ArrayList<Integer> hand = viewModel.getHand(viewModel.getPlayerIndex());
             ArrayList<Side> sides = new ArrayList<>();
@@ -395,7 +394,7 @@ public class CLIController {
 
     public void showBoard(int player_index){
         if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()){
-            System.err.print("this board does not exists yet\n> ");
+            System.out.print("this board does not exists yet\n> ");
         } else {
             String playerName = viewModel.getNickname(player_index) + " 's";
             ArrayList<ArrayList<Integer>> board = viewModel.getPlayerBoard(player_index);
@@ -464,7 +463,7 @@ public class CLIController {
             ArrayList<Integer> cards = new ArrayList<>();
             ArrayList<Side> sides = new ArrayList<>();
             int[] decks = viewModel.getSharedCards();
-            String[] titles = {"SHARED RESOURCE 0","SHARED RESOURCE 1","SHARED GOLD 0","SHARED GOLD 1","RESOURCE DECK","GOLD DECK"};
+            String[] titles = {"SHAREDRESOURCE 1","SHAREDRESOURCE 2","SHAREDGOLD 1","SHAREDGOLD 2","DECKRESOURCE","DECKGOLD"};
 
             for (int i = 0; i < decks.length; i++) {
                 cards.add(decks[i]);

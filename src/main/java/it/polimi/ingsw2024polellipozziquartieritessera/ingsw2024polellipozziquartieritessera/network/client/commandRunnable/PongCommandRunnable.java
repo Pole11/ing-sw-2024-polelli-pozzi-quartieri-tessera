@@ -16,7 +16,6 @@ public class PongCommandRunnable extends CommandRunnable {
     @Override
     public void executeGUI() {
         try {
-            System.out.println(clientContainer.getGuiApplication().getGUIController().getServerThread());
             server.pong(client);
         } catch (RemoteException e) {
             serverDisconnectedGUI();

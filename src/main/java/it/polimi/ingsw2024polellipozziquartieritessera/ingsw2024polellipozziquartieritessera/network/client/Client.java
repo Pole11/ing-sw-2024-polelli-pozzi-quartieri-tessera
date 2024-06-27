@@ -65,7 +65,8 @@ public class Client implements VirtualView {
             try {
                 myIp = args[3];
             } catch (IndexOutOfBoundsException e) {
-                if (rmiOrSocket.equals("rmi")) System.out.println("If you are encountering an error with rmi, please provide the ip address of the current machine");
+                if (rmiOrSocket.equals("rmi"))
+                    System.out.println("If you are encountering an error with rmi, please provide the ip address of the current machine");
             }
             (new Client(rmiOrSocket, host, port, myIp)).startClient();
         } catch(Exception e) {
@@ -131,9 +132,9 @@ public class Client implements VirtualView {
                 this.client = new RmiClient(server, this);
                 ((RmiClient) client).run();
             } catch (RemoteException e) {
-                System.out.println("disconncetion from client");
+                System.err.println("disconnection from client");
                 if (!running)serverDisconnected();
-                System.out.println("An error occurred while executing RmiClient!");
+                System.err.println("An error occurred while executing RmiClient!");
             } catch (NotBoundException e){
                 e.printStackTrace();
             }
@@ -181,7 +182,6 @@ public class Client implements VirtualView {
 
 
     public void serverDisconnected(){
-        System.out.println(serverIsConnected);
         /*if (!serverIsConnected){
             return;
         }
@@ -229,7 +229,7 @@ public class Client implements VirtualView {
                 serverIsConnected = true;
                 break; // If startClient() succeeds, break the loop
             } catch (ConnectException e) {
-                System.out.println("Disconnection from client 2");
+                System.err.println("Disconnection from client 2");
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -312,7 +312,6 @@ public class Client implements VirtualView {
 
     @Override
     public void nicknameUpdate(int playerIndex, String nickname) {
-        System.out.print(viewModel);
         viewModel.setNickname(playerIndex, nickname);
         viewModel.setConnection(playerIndex, true);
         viewModel.initializeElementMap(playerIndex);
@@ -378,7 +377,6 @@ public class Client implements VirtualView {
 
     @Override
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
-        System.err.println("updating board");
         viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
         if (viewModel.getPlayerIndex() == playerIndex) {
             System.out.print("you placed a card, now you have to draw your card with DRAWCARD [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");
@@ -526,12 +524,12 @@ public class Client implements VirtualView {
 
     @Override
     public void redirectOut(boolean bool) throws RemoteException {
-        /*if(bool){
+        if(bool){
             oldPrintStream = System.out;
             System.setOut(restoreStream);
         } else {
             System.setOut(oldPrintStream);
-        }*/
+        }
     }
 
     @Override

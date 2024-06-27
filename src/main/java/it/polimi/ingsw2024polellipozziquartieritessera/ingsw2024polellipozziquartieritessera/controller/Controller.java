@@ -290,7 +290,7 @@ public class Controller {
             gameState.checkGameEnded();
             gameState.updateMainBoard();
         }
-        System.out.println(getPlayerNickname(getCurrentPlayerIndex())+ " drew a card");
+        System.out.println("CONTROLLER: " + getPlayerNickname(getCurrentPlayerIndex())+ " drew a card");
     }
 
     public void flipCard(int playerIndex, int cardId) throws CardIsNotInHandException {
@@ -316,8 +316,6 @@ public class Controller {
     }
 
     public synchronized void ping(VirtualView client){
-        System.out.println(client);
-        System.out.println(getPlayerIndex(client));
         gameState.pingAnswer(client);
     }
 

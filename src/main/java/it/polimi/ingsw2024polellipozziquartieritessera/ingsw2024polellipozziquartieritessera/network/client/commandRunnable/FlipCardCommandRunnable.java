@@ -20,7 +20,7 @@ public class FlipCardCommandRunnable extends CommandRunnable{
             try {
                 cardId = Integer.parseInt(messageFromCli[1]);
             } catch (NumberFormatException e) {
-                System.out.print("Please enter a valid card id\n> ");
+                System.err.print("Please enter a valid card id\n> ");
                 return;
             }
             try {
