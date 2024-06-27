@@ -592,6 +592,9 @@ public class GameState {
                 case CHOOSECOLORPHASE -> setColor(index, Arrays.stream(Color.values()).filter(e-> !players.stream().map(Player::getColor).toList().contains(e)).findFirst().get());
                 case CHOOSEOBJECTIVEPHASE -> setSecretObjective(index, 0);
             }
+            if (numberAnswered() == players.size()){
+                currentGamePhase.changePhase(this);
+            }
 
             if (currentPlayerIndex == index){
                 if (currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {

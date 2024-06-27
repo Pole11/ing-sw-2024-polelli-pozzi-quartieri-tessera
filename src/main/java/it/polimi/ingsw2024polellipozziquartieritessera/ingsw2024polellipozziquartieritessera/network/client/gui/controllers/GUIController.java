@@ -45,7 +45,6 @@ abstract public class GUIController {
     @FXML private Button handleOpenChatButton;
     private final ArrayDeque<CommandRunnable> commandQueue;
     private Thread executeCommands;
-    private Thread pongThread;
     private VirtualView client; // temp
     private VirtualServer server; // temp
     private Client clientContainer;
@@ -65,7 +64,8 @@ abstract public class GUIController {
     private boolean pongRunning;
 
     private static boolean alertIsOpen = false;
-    public static Thread serverThread;
+    private static Thread pongThread;
+    private static Thread serverThread;
 
     @FXML
     private void initialize() {
