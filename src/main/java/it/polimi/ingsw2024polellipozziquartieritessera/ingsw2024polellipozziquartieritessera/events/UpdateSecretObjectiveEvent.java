@@ -10,7 +10,12 @@ import java.util.ArrayList;
 public class UpdateSecretObjectiveEvent extends Event {
     private final ArrayList<ObjectiveCard> objectiveCards;
 
-
+    /**
+     * Informs a client about his objective card(s)
+     * @param gameState Current game state
+     * @param clients Single client
+     * @param objectiveCards List of objective cards: if it has only a card, it means that the secretObjective has been already chosen, otherwise the client has to chose between two cards
+     */
     public UpdateSecretObjectiveEvent(GameState gameState, ArrayList<VirtualView> clients, ArrayList<ObjectiveCard> objectiveCards) {
         super(gameState, clients);
         this.objectiveCards = objectiveCards;

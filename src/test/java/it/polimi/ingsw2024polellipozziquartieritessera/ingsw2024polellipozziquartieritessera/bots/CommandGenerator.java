@@ -472,7 +472,7 @@ public class CommandGenerator {
 
     private static String drawCardCommand() {
         if (new Random().nextFloat(1f) < BotConfig.PASSIVITY) {
-            return (DrawType.values()[new Random().nextInt(DrawType.values().length)].toString());
+            return (String.format("DRAWCARD %s", DrawType.values()[new Random().nextInt(DrawType.values().length)].toString()));
         }
 
         ViewModel viewModel = client.getViewModel();

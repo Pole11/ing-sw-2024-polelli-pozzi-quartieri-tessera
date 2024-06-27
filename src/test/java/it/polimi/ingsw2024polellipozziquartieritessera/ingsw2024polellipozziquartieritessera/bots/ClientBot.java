@@ -46,7 +46,13 @@ public class ClientBot {
             }
         });
 
-        Thread inputInserter = new Thread(new InputInserter(pos));
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        Thread inputInserter = new Thread(new InputInserter(pos, client));
         starter.start();
         inputInserter.start();
     }

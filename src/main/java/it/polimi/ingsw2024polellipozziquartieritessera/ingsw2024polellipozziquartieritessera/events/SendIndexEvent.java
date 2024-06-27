@@ -7,8 +7,17 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class SendIndexEvent extends Event {
+    /**
+     * PlayerIndex
+     */
     private final int id;
 
+    /**
+     * informs a client about his index
+     * @param gameState current game state
+     * @param clients Player
+     * @param id new indexPlayer
+     */
     public SendIndexEvent(GameState gameState, ArrayList<VirtualView> clients, int id) {
         super(gameState, clients);
         this.id = id;

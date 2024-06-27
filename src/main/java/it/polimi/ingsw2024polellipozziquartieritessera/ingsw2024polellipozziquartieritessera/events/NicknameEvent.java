@@ -8,8 +8,18 @@ import java.util.ArrayList;
 
 public class NicknameEvent extends Event {
     private final String nickname;
+    /**
+     * ID of the player who is setting his nickname
+     */
     private final int playerIndex;
 
+    /**
+     * Informs all clients about the update of a nickname
+     * @param gameState Current game state
+     * @param clients List of all clients
+     * @param playerIndex ID of the player who is setting his nickname
+     * @param nickname String
+     */
     public NicknameEvent(GameState gameState, ArrayList<VirtualView> clients, int playerIndex, String nickname) {
         super(gameState, clients);
         this.nickname = nickname;

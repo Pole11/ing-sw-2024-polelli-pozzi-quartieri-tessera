@@ -11,6 +11,12 @@ import java.util.NoSuchElementException;
 public class UpdateMainBoardEvent extends Event {
     private final Board mainBoard;
 
+    /**
+     * Informs the clients about a change in the main board
+     * @param gameState current game state
+     * @param clients List of all clients
+     * @param mainBoard new main board
+     */
     public UpdateMainBoardEvent(GameState gameState, ArrayList<VirtualView> clients, Board mainBoard) {
         super(gameState, clients);
         this.mainBoard = mainBoard;
