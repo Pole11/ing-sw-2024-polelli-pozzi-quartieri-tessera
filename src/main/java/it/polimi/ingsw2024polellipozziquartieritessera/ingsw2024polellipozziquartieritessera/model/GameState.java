@@ -279,12 +279,10 @@ public class GameState {
 
             }
 
-            System.out.println(event);
             for (VirtualView client : event.getClients()){
                 List<VirtualView> clientsTmp = players.stream().map(Player::getClient).toList();
                 if (clientsTmp.contains(client)){
                     int index = getPlayerIndex(client);
-                    System.out.println(index);
                     synchronized (allEventQueues.get(index)){
                         ArrayList<VirtualView> clients = new ArrayList<>();
                         clients.add(client);
@@ -333,8 +331,6 @@ public class GameState {
                 }
                 event = allEventQueues.get(index).remove();
             }
-            System.out.println("index: "+ index);
-            System.out.println(event);
             event.execute();
 
         }
@@ -440,6 +436,7 @@ public class GameState {
      * @param client The client who has responded
      */
     public void pingAnswer(VirtualView client) {
+        //System.out.println(getPlayerIndex(client));
         synchronized (players) {
             playerThreads.get(getPlayerIndex(client)).interrupt();
             try {
@@ -578,7 +575,7 @@ public class GameState {
 
             // for every placingCardEvent, place a card in the boardsMap and in placedOrderCardMap
             placedEventList.stream().forEach(e -> {
-                e.setRestoreClients(clients); //events in placedEventList have the attribute 'clients' empty, it needs to be setted
+                e.setClients(clients); //events in placedEventList have the attribute 'clients' empty, it needs to be setted
                 eventQueue.add(e);
             });
             // send mainBoard

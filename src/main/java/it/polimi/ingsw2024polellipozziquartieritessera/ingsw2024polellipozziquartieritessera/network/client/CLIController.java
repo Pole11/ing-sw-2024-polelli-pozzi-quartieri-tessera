@@ -442,7 +442,7 @@ public class CLIController {
      * Displays the cards in the current player's hand.
      */
     public void showHand(){
-        if(viewModel.getGamePhase().ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal()){
+        if(viewModel.getGamePhase().ordinal() < GamePhase.CHOOSEOBJECTIVEPHASE.ordinal() || viewModel.getHand(viewModel.getPlayerIndex())==null){
             System.out.println("your hand is not initialized yet");
         } else {
             ArrayList<Integer> hand = viewModel.getHand(viewModel.getPlayerIndex());
@@ -503,7 +503,7 @@ public class CLIController {
      * @param player_index the index of the player whose board is to be displayed
      */
     public void showBoard(int player_index){
-        if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal()){
+        if(viewModel.getGamePhase().ordinal() < GamePhase.MAINPHASE.ordinal() || viewModel.getPlayerBoard(player_index)==null){
             System.out.print("this board does not exists yet\n> ");
         } else {
             String playerName = viewModel.getNickname(player_index) + " 's";
@@ -1144,7 +1144,7 @@ public class CLIController {
             if (viewModel.getPlayerIndex() == viewModel.getCurrentPlayer()) {
                 System.out.print("it's your turn to play" + "\n >");
             } else {
-                System.out.print("the current player is: " + viewModel.getNickname(viewModel.getCurrentPlayer()) + "\n >");
+                System.out.print("the current player is: " + viewModel.getNickname(viewModel.getCurrentPlayer()) + "\n> ");
             }
         }
     }
