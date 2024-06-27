@@ -122,18 +122,27 @@ abstract public class GUIController {
         pongRunning = true;
         pongThread = new Thread(()->{
             while (pongRunning) {
-                if (serverThread == null || !serverThread.isAlive()){
-                    serverThread = new Thread(()->{
-                        try {
-                            Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
-                            System.out.println("disconnection from gui controller");
-                            clientContainer.serverDisconnected();
-                        } catch (InterruptedException e) {
-
-                        }
-                    });
-                    serverThread.start();
+                if (serverThread != null){
+                    if (serverThread.isAlive()){
+                        serverThread.interrupt();
+                    }
+                    try {
+                        serverThread.join();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
+                serverThread = new Thread(()->{
+                    try {
+                        Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
+                        System.out.println("disconnection from gui controller");
+                        pongRunning = false;
+                        clientContainer.serverDisconnected();
+                    } catch (InterruptedException e) {
+                        System.out.println("serverhread interrupted");
+                    }
+                });
+                serverThread.start();
                 synchronized (commandQueue){
                     PongCommandRunnable commandRunnable = new PongCommandRunnable();
                     commandRunnable.setClient(client);
@@ -144,7 +153,6 @@ abstract public class GUIController {
                 }
                 try {
                     sleep(1000*Config.NEXT_PONG);
-                    //sleep(5000);
                 } catch (InterruptedException e) {
                     System.err.println("pong thread interrupted");
                 }

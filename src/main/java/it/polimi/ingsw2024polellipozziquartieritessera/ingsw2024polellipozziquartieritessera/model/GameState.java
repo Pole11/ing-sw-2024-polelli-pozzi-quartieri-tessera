@@ -85,14 +85,15 @@ public class GameState {
      */
     private GamePhase prevGamePhase;
 
-
     /**
      * Number of turns left to play
      */
     private int turnToPlay;
     private ArrayList<UpdateBoardEvent> placedEventList;
 
+    private ArrayList<Thread> executingThreads;
 
+    private ArrayList<ArrayDeque<Event>> allEventQueues ;
     /**
      * GameState Constructor
      */
@@ -129,12 +130,15 @@ public class GameState {
 
         this.turnToPlay = Integer.MAX_VALUE;
         this.placedEventList = new ArrayList<>();
+        this.allEventQueues = new ArrayList<>();
+        this.executingThreads = new ArrayList<>();
     }
 
     public void startThreads(){
         this.executeEvents.start();
         this.pingThread.start();
     }
+
 
 
     // GETTER
@@ -240,7 +244,7 @@ public class GameState {
     /**
      * Resets the number of answers (even if there aren't always 4 players)
      */
-    private void resetAnswered() {
+    public void resetAnswered() {
         this.answered.put(0, false);
         this.answered.put(1, false);
         this.answered.put(2, false);
@@ -251,14 +255,14 @@ public class GameState {
      * Get the number of player that has answered the request
      * @return Number of answers
      */
-    private int numberAnswered() {
+    public int numberAnswered() {
         return this.answered.values().stream().mapToInt(e -> e ? 1 : 0).sum();
     }
 
     /**
      * Run the event queue listener
      */
-    private void executeEventsRunnable() {
+    private void executeEventsRunnable()  {
         while (executeEventRunning) {
             Event event = null;
             synchronized (eventQueue) {
@@ -275,13 +279,64 @@ public class GameState {
 
             }
 
-            if (event instanceof PingEvent){
+            System.out.println(event);
+            for (VirtualView client : event.getClients()){
+                List<VirtualView> clientsTmp = players.stream().map(Player::getClient).toList();
+                if (clientsTmp.contains(client)){
+                    int index = getPlayerIndex(client);
+                    System.out.println(index);
+                    synchronized (allEventQueues.get(index)){
+                        ArrayList<VirtualView> clients = new ArrayList<>();
+                        clients.add(client);
+                        Event cloned;
+                        try {
+                            cloned = event.clone();
+                        } catch (CloneNotSupportedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        cloned.setClients(clients);
+                        allEventQueues.get(index).add(cloned);
+                        allEventQueues.get(index).notifyAll();
+                    }
+                } else {
+                    System.out.println(event);
+                    new Thread(event::execute).start();
+                }
+
+            }
+            //System.out.println(event);
+            /*if (event instanceof PingEvent){
                 new Thread(event::execute).start();
             } else {
                 event.execute();
-            }
+            }*/
+
+
             Populate.saveState(this);
             //event.execute();
+
+
+        }
+    }
+
+    public void executingThreadsRunnable(int index){
+        while (true){
+            Event event = null;
+            synchronized (allEventQueues.get(index)) {
+                while (allEventQueues.get(index).isEmpty()) {
+                    try {
+                        allEventQueues.get(index).wait();
+                    } catch (InterruptedException e) {
+                        System.out.println("execute events interrupted");
+                        return;
+                    }
+                }
+                event = allEventQueues.get(index).remove();
+            }
+            System.out.println("index: "+ index);
+            System.out.println(event);
+            event.execute();
+
         }
     }
 
@@ -368,9 +423,17 @@ public class GameState {
         }
     }
 
-    public void addPlayerThread(){
+    public void addPlayerThread(int index){
         playerThreads.add(new Thread());
+        allEventQueues.add(new ArrayDeque<Event>());
+        Thread thread = new Thread(()->{
+            executingThreadsRunnable(index);
+        });
+        executingThreads.add(thread);
+        executingThreads.getLast().start();
     }
+
+
 
     /**
      * Get the ping response from a player
@@ -487,8 +550,9 @@ public class GameState {
                 ArrayList<ObjectiveCard> sharedObjectives = new ArrayList<>();
                 sharedObjectives.add(mainBoard.getSharedObjectiveCard(0));
                 sharedObjectives.add(mainBoard.getSharedObjectiveCard(1));
-                if (sharedObjectives.get(0) == null || sharedObjectives.get(1) == null)
-                eventQueue.add((new UpdateSharedObjectiveEvent(this, clients, sharedObjectives)));
+                if (sharedObjectives.get(0) != null && sharedObjectives.get(1) != null){
+                    eventQueue.add((new UpdateSharedObjectiveEvent(this, clients, sharedObjectives)));
+                }
             }
             //send correct secret objective
             ArrayList<ObjectiveCard> secretObjectives = new ArrayList<>();
@@ -582,17 +646,18 @@ public class GameState {
                 timeoutThread.start();
             }
         }
-
-        //automatically plays for the player disconnected
-        switch (currentGamePhase){
-            case CHOOSESTARTERSIDEPHASE -> setStarterSide(index, Side.BACK);
-            //choose between the availables
-            case CHOOSECOLORPHASE -> setColor(index, Arrays.stream(Color.values()).filter(e-> !players.stream().map(Player::getColor).toList().contains(e)).findFirst().get());
-            case CHOOSEOBJECTIVEPHASE -> setSecretObjective(index, 0);
-        }
-        if (numberAnswered() == players.size()){
-            currentGamePhase.changePhase(this);
-        }
+        } else {
+            //automatically plays for the player disconnected
+            switch (currentGamePhase){
+                case CHOOSESTARTERSIDEPHASE -> setStarterSide(index, Side.BACK);
+                //choose between the availables
+                case CHOOSECOLORPHASE -> setColor(index, Arrays.stream(Color.values()).filter(e-> !players.stream().map(Player::getColor).toList().contains(e)).findFirst().get());
+                case CHOOSEOBJECTIVEPHASE -> setSecretObjective(index, 0);
+            }
+            if (numberAnswered() == players.size()){
+                currentGamePhase.changePhase(this);
+                resetAnswered();
+            }
 
         if (currentPlayerIndex == index){
             if (currentGamePhase.ordinal() >= GamePhase.MAINPHASE.ordinal()) {
@@ -766,6 +831,12 @@ public class GameState {
         if (currentGamePhase.equals(GamePhase.NICKNAMEPHASE)){
             players.add(player);
             playerThreads.add(new Thread());
+            allEventQueues.add(new ArrayDeque<Event>());
+            Thread thread = new Thread(()->{
+                executingThreadsRunnable(getPlayerIndex(player));
+            });
+            executingThreads.add(thread);
+            executingThreads.getLast().start();
             synchronized (eventQueue) {
                 eventQueue.add(new SendIndexEvent(this, singleClient(player.getClient()), getPlayerIndex(player)));
                 eventQueue.add(new UpdateGamePhaseEvent(this, singleClient(player.getClient()), GamePhase.NICKNAMEPHASE));
@@ -884,7 +955,12 @@ public class GameState {
                 eventQueue.notifyAll();
             }
             this.answered.put(getPlayerIndex(e), true);
-            });
+            System.out.println(e.getNickname() + " automatically chose his starter, the number of answered is: " + numberAnswered());
+            if (numberAnswered() == players.size()){
+                currentGamePhase.changePhase(this);
+                resetAnswered();
+            }
+        });
 
         Player player = this.players.get(playerIndex);
         if (this.answered.get(playerIndex)) {
@@ -934,7 +1010,12 @@ public class GameState {
             if (colorOptional.isPresent()){
                 e.setColor(colorOptional.get());
                 this.answered.put(getPlayerIndex(e), true);
-                System.out.println("GAMESTATE:" + e.getNickname() + " automatically chose his color, the number of answered is: " + numberAnswered());
+                System.out.println(e.getNickname() + " automatically chose his color, the number of answered is: " + numberAnswered());
+                if (numberAnswered() == players.size()){
+                    currentGamePhase.changePhase(this);
+                    resetAnswered();
+                }
+
             }
 
         });
@@ -1047,7 +1128,11 @@ public class GameState {
         players.stream().filter(e -> !e.isConnected() && e.getObjectiveCard() == null).forEach(e->{
             e.setObjectiveCard(e.getObjectiveCardOption(0));
             this.answered.put(getPlayerIndex(e), true);
-            System.out.println("GAMESTATE:" + e.getNickname() + " automatically chose his objective, the number of ansewred is: " + numberAnswered());
+            System.out.println(e.getNickname() + " automatically chose his objective, the number of ansewred is: " + numberAnswered());
+            if (numberAnswered() == players.size()){
+                currentGamePhase.changePhase(this);
+                resetAnswered();
+            }
         });
 
         Player player = this.players.get(playerIndex);

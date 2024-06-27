@@ -19,9 +19,9 @@ public class Config {
     public static final int TIMEOUT_TIME = 180;
     public static final int WAIT_FOR_PONG_TIME = 2;
     public static final int NEXT_PONG = 5;
-    public static final int NEXT_PING_TIME = 4; // 10
-    public static final int WAIT_FOR_PING_TIME = 4; // 5
-    public static final int WAIT_DISCONNECTED_SERVER = 3;
+    public static final int NEXT_PING_TIME = 10; // 10
+    public static final int WAIT_FOR_PING_TIME = 6; // 5
+    public static final int WAIT_DISCONNECTED_SERVER = 5;
     //this timout is in millisecond
     public static final String RMI_RESPONSE_TIMEOUT = "2000";
 

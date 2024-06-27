@@ -8,12 +8,12 @@ import java.util.ArrayList;
 /**
  * Represents an abstract event in the game.
  */
-public abstract class Event {
+public abstract class Event implements Cloneable {
 
     /**
      * List of clients associated with this event.
      */
-    protected final ArrayList<VirtualView> clients;
+    protected ArrayList<VirtualView> clients;
 
     /**
      * The current game state.
@@ -47,5 +47,18 @@ public abstract class Event {
             gameState.setPlayersConnected(gameState.getPlayerIndex(client), false);
             gameState.playerDisconnected(gameState.getPlayerIndex(client));
         }
+    }
+
+    public void setClients(ArrayList<VirtualView> clients){
+        this.clients = clients;
+    }
+
+    public ArrayList<VirtualView> getClients(){
+        return clients;
+    }
+
+    @Override
+    public Event clone() throws CloneNotSupportedException {
+        return (Event) super.clone();
     }
 }
