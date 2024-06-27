@@ -3,6 +3,9 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import java.rmi.RemoteException;
 import java.util.Arrays;
 
+/**
+ * Allows a client to register into a new game or login in a previews game, with the same name, if it has previously disconnected
+ */
 public class AdduserCommandRunnable extends CommandRunnable{
     private String nickname;
 

@@ -4,6 +4,9 @@ import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+/**
+ * Allows clients to add a message to the chat
+ */
 public class AddMessageCommandRunnable extends CommandRunnable {
 private String content;
 

@@ -114,6 +114,11 @@ public class Server implements VirtualServer {
         gameState.startThreads();
     }
 
+    /**
+     * Runs the server, accepting incoming client connections and handling them with separate threads.
+     *
+     * @throws IOException if an I/O error occurs when waiting for a connection.
+     */
     private void runServer() throws IOException {
         Socket clientSocket = null;
         while ((clientSocket = this.listenSocket.accept()) != null) {
@@ -292,6 +297,13 @@ public class Server implements VirtualServer {
         }
     }
 
+    /**
+     * Checks if the specified client is connected.
+     *
+     * @param client the VirtualView instance representing the client to check.
+     * @return true if the client is connected; false otherwise.
+     * @throws RemoteException if a remote communication error occurs.
+     */
     private boolean checkConnected(VirtualView client) throws RemoteException {
         boolean connected;
         try{
@@ -306,10 +318,22 @@ public class Server implements VirtualServer {
     }
 
 
+    /**
+     * Retrieves the player index for the specified client.
+     *
+     * @param client the VirtualView instance representing the client.
+     * @return the player index of the specified client.
+     */
     private int getPlayerIndex(VirtualView client) {
         return controller.getPlayerIndex(client);
     }
 
+    /**
+     * Checks if it is the specified player's turn.
+     *
+     * @param playerIndex the index of the player to check.
+     * @return true if it is the specified player's turn; false otherwise.
+     */
     private boolean isRightTurn(int playerIndex){
         return (controller.getCurrentPlayerIndex() == playerIndex);
     }

@@ -2,6 +2,9 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 
 import java.rmi.RemoteException;
 
+/**
+ * Allows a client to choose his secret objective between his options
+ */
 public class ChooseObjectiveCommandRunnable extends CommandRunnable{
     private int index;
 

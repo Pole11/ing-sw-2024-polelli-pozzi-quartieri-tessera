@@ -12,6 +12,14 @@ public class UpdateElementsEvent extends Event {
     private final Element element;
     private final int numberOfElements;
 
+    /**
+     * Informs the clients about the update of some elements on a player's board
+     * @param gameState current game state
+     * @param clients List of all clients
+     * @param playerIndex Owner of the changed board
+     * @param element type of element
+     * @param numberOfElements number of elements
+     */
     public UpdateElementsEvent(GameState gameState, ArrayList<VirtualView> clients, int playerIndex, Element element, int numberOfElements) {
         super(gameState, clients);
         this.playerIndex = playerIndex;

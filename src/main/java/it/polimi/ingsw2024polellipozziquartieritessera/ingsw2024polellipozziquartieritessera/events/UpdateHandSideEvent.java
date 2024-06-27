@@ -11,6 +11,14 @@ public class UpdateHandSideEvent extends Event {
     private final int index;
     private final Side side;
 
+    /**
+     * Informs clients about the change of the side of a card
+     * @param gameState Current game state
+     * @param clients Owner of the hand
+     * @param index Card ID
+     * @param side new side
+     */
+
     public UpdateHandSideEvent(GameState gameState, ArrayList<VirtualView> clients, int index, Side side) {
         super(gameState, clients);
         this.index = index;

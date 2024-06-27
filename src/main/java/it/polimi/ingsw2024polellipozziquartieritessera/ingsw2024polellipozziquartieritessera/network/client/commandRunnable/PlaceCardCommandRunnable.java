@@ -5,6 +5,9 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.rmi.RemoteException;
 
+/**
+ * Allows a client to place a card
+ */
 public class PlaceCardCommandRunnable extends CommandRunnable{
     private int placingCardId;
     private int tableCardId;

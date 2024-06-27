@@ -4,6 +4,9 @@ import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquar
 
 import java.rmi.RemoteException;
 
+/**
+ * Allows a client to draw a card
+ */
 public class DrawCardCommandRunnable extends CommandRunnable{
     DrawType drawType;
 
