@@ -490,7 +490,7 @@ public class Populate {
             }
             player.setAllElements(allElements);
 
-            gameState.addPlayerThread();
+            gameState.addPlayerThread(i);
             gameState.addPlayer(player);
 
         }
@@ -518,6 +518,12 @@ public class Populate {
         for (Object key : answeredJson.keySet()){
             gameState.setAnswered((Integer.parseInt((String) key)), (Boolean) answeredJson.get((String) key));
         }
+        /*if (gameState.numberAnswered() == gameState.getPlayersSize()){
+            gameState.getCurrentGamePhase().changePhase(gameState);
+            gameState.resetAnswered();
+        }
+
+         */
 
         System.out.println("POPULATE: " + "I restored the state");
     }

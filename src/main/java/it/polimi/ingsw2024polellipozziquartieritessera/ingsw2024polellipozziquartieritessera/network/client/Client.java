@@ -213,12 +213,7 @@ public class Client implements VirtualView {
         }
 
          */
-        while (true) {
-            if (meDoGui) {
-                guiApplication.getGUIController().setServerError("There was an error in server, the server is not available, wait to be redirected to the login page");
-            } else {
-                System.out.println("Server disconnected, wait to be notified of being connected to the server");
-            }
+        /*while (true) {
 
             try {
                 Thread.sleep(1000 * Config.WAIT_DISCONNECTED_SERVER);
@@ -236,6 +231,37 @@ public class Client implements VirtualView {
                 throw new RuntimeException(e);
             }
         }
+
+         */
+        if (meDoGui) {
+            //guiApplication.getGUIController().setServerError("There was an error in server, the server is not available, wait to be redirected to the login page");
+            guiApplication.getGUIController().setServerError("server disconnected, restart the game and wait the server to be reconnected");
+        } else {
+            //System.out.println("Server disconnected, wait to be notified of being connected to the server");
+            System.out.println("server disconnected, restart the game and wait the server to be reconnected");
+        }
+
+        /*try {
+            Thread.sleep(1000 * Config.WAIT_DISCONNECTED_SERVER);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return;
+        }
+
+         */
+
+        /*try {
+            //startClient();
+            serverIsConnected = true;
+            //break; // If startClient() succeeds, break the loop
+        } catch (ConnectException e) {
+            System.out.println("Disconnection from client 2");
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+         */
     }
 
 
@@ -406,7 +432,7 @@ public class Client implements VirtualView {
         viewModel.setCurrentPlayer(currentPlayerIndex);
         if (viewModel.getPlayerIndex() == currentPlayerIndex) {
             System.out.print("it's your turn\n> ");
-            if (!meDoGui) {
+            if (!meDoGui && viewModel.getGamePhase().ordinal()>=GamePhase.MAINPHASE.ordinal()) {
                 cliController.showBoard();
                 cliController.showHand();
             }

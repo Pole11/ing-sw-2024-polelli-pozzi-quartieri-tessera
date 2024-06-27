@@ -76,21 +76,53 @@ public class CLIController {
         }
         pongRunning = true;
 
+
+        if (serverThread != null){
+            if (serverThread.isAlive()){
+                serverThread.interrupt();
+            }
+            try {
+                serverThread.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        serverThread = new Thread(()->{
+            try {
+                Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
+                System.out.println("disconnection from gui controller");
+                pongRunning = false;
+                clientContainer.serverDisconnected();
+            } catch (InterruptedException e) {
+                System.out.println("serverhread interrupted");
+            }
+        });
+
+
         pongThread = new Thread(()->{
             while (pongRunning) {
                 if (server == null) continue;
-                if (serverThread == null || !serverThread.isAlive()){
-                    serverThread = new Thread(()->{
-                        try {
-                            Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
-                            System.out.println("disconnection from cli controller");
-                            clientContainer.serverDisconnected();
-                        } catch (InterruptedException e) {
-                            //System.out.println("serverThread interrupted");
-                        }
-                    });
-                    serverThread.start();
+                if (serverThread != null){
+                    if (serverThread.isAlive()){
+                        serverThread.interrupt();
+                    }
+                    try {
+                        serverThread.join();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
+                serverThread = new Thread(()->{
+                    try {
+                        Thread.sleep(1000*Config.WAIT_FOR_PONG_TIME);
+                        System.out.println("disconnection from gui controller");
+                        pongRunning = false;
+                        clientContainer.serverDisconnected();
+                    } catch (InterruptedException e) {
+
+                    }
+                });
+                serverThread.start();
                 synchronized (commandQueue){
                     PongCommandRunnable commandRunnable = new PongCommandRunnable();
                     commandRunnable.setClient(client);
