@@ -10,16 +10,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.bots.ClientBot.client;
-import static it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.bots.InputInserter.secretChosen;
-import static it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.bots.InputInserter.sideChosen;
+import static it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.bots.ClientBot.*;
 
 public class CommandGenerator {
-    public static String generateCommand(Client client) {
+
+    public static String generateCommand() {
         String command = null;
         GamePhase gamePhase = client.getViewModel().getGamePhase();
 
-        if (BotConfig.CHAT_ENABLED && new Random().nextFloat(1f) < BotConfig.CHAT_FLUENCY) {
+        if (BotConfig.CHAT_ENABLED && new Random().nextFloat(1f) < BotConfig.CHAT_FLUENCY * BotConfig.SPEED / 1000) {
             command = String.format("ADDMESSAGE %s", generateMessage());
             return command;
         }
@@ -28,14 +27,14 @@ public class CommandGenerator {
             case NICKNAMEPHASE:
                 if (client.getViewModel().getPlayerIndex() == -1) {
                     String nick = client.getViewModel().getNickname(client.getViewModel().getPlayerIndex());
-                    if (nick != null){
-                        command = "ADDUSER , " + nick;
+                    if (nick != null) {
+                        command = "ADDUSER " + nick;
                     } else {
                         command = String.format("ADDUSER %s", generateName());
                     }
                     secretChosen = false;
                     sideChosen = false;
-                } else if (BotConfig.CAN_START_IF_FULL && client.getViewModel().getPlayersSize() == BotConfig.PLAYER_NUM){
+                } else if (BotConfig.CAN_START_IF_FULL && client.getViewModel().getPlayersSize() == BotConfig.PLAYER_NUM) {
                     command = "START";
                 }
                 break;
@@ -53,7 +52,7 @@ public class CommandGenerator {
             case CHOOSEOBJECTIVEPHASE:
                 if (!secretChosen) {
                     command = String.format("CHOOSEOBJECTIVE %d", generateNumber(1));
-                    secretChosen = true;
+                    secretChosen = false;
                 }
                 break;
             case MAINPHASE:
@@ -74,8 +73,8 @@ public class CommandGenerator {
         if (viewModel.getCurrentPlayer() == viewModel.getPlayerIndex()) {
             TurnPhase turnPhase = viewModel.getTurnPhase();
             return switch (turnPhase) {
-                case PLACINGPHASE -> placeCardCommand();
-                case DRAWPHASE -> drawCardCommand();
+                case PLACINGPHASE -> placeCardCommand(client);
+                case DRAWPHASE -> drawCardCommand(client);
             };
         }
         return null;
@@ -306,7 +305,6 @@ public class CommandGenerator {
 
     private static String generateSide() {
         Side[] sides = Side.values();
-
         Random random = new Random();
         int index = random.nextInt(sides.length);
         return sides[index].toString();
@@ -314,7 +312,6 @@ public class CommandGenerator {
 
     private static String generateColor() {
         Color[] colors = Color.values();
-
         Random random = new Random();
         int index = random.nextInt(colors.length);
         return colors[index].toString();
@@ -325,7 +322,7 @@ public class CommandGenerator {
         return random.nextInt(max + 1);
     }
 
-    private static String placeCardCommand() {
+    private static String placeCardCommand(Client client) {
         ViewModel viewModel = client.getViewModel();
 
         // CHOOSE CARD TO PLACE AND SIDE
@@ -334,7 +331,7 @@ public class CommandGenerator {
         Side side;
         int placingCard = chooseCardToPlace(handCards);
         if (placingCard == -1) {
-            placingCard = handCards.getFirst();
+            placingCard = handCards.get(0);
             side = Side.BACK;
         } else {
             side = Side.FRONT;
@@ -343,17 +340,17 @@ public class CommandGenerator {
         // CHOOSE TABLE CARD
         ArrayList<Integer> tableCards = viewModel.getPlacingCardOrderMap(viewModel.getPlayerIndex());
 
-        int tableCard = chooseTableCard(tableCards);
-        CornerPos position = choosePlacingPosition(tableCard);
+        int tableCard = chooseTableCard(tableCards, client);
+        CornerPos position = choosePlacingPosition(client, tableCard);
 
         return String.format("PLACECARD %d %d %s %s", placingCard, tableCard, position, side);
     }
 
-    private static CornerPos choosePlacingPosition(int tableCard) {
+    private static CornerPos choosePlacingPosition(Client client, int tableCard) {
         if (new Random().nextFloat(1f) < BotConfig.PASSIVITY) {
             List<CornerPos> cornerPos = new ArrayList<>(List.of(CornerPos.values()));
             Collections.shuffle(cornerPos);
-            return cornerPos.getFirst();
+            return cornerPos.get(0);
         }
 
         ViewModel viewModel = client.getViewModel();
@@ -377,34 +374,36 @@ public class CommandGenerator {
                 switch (cornerIndex) {
                     case 0:
                         suitablePositions.add(CornerPos.UPLEFT);
+                        break;
                     case 1:
                         suitablePositions.add(CornerPos.UPRIGHT);
+                        break;
                     case 2:
                         suitablePositions.add(CornerPos.DOWNRIGHT);
+                        break;
                     case 3:
                         suitablePositions.add(CornerPos.DOWNLEFT);
+                        break;
                 }
             }
             cornerIndex++;
         }
-
 
         if (suitablePositions.isEmpty()) {
             suitablePositions.addAll(List.of(CornerPos.values()));
         }
 
         Collections.shuffle(suitablePositions);
-        return suitablePositions.getFirst();
+        return suitablePositions.get(0);
     }
 
-    private static int chooseTableCard(ArrayList<Integer> tableCards) {
-
+    private static int chooseTableCard(ArrayList<Integer> tableCards, Client client) {
         ViewModel viewModel = client.getViewModel();
 
         Collections.shuffle(tableCards);
 
         if (new Random().nextFloat(1f) < BotConfig.PASSIVITY) {
-            return tableCards.getFirst();
+            return tableCards.get(0);
         }
 
         // try finding a card with empty corner
@@ -430,12 +429,12 @@ public class CommandGenerator {
                         return cardId;
                     }
                 }
-
             }
         }
 
-        return tableCards.getFirst();
+        return tableCards.get(0);
     }
+
 
     private static int chooseCardToPlace(ArrayList<Integer> handCards) {
         if (new Random().nextFloat(1f) < BotConfig.PASSIVITY) {
@@ -470,9 +469,9 @@ public class CommandGenerator {
         }
     }
 
-    private static String drawCardCommand() {
+    private static String drawCardCommand(Client client) {
         if (new Random().nextFloat(1f) < BotConfig.PASSIVITY) {
-            return (String.format("DRAWCARD %s", DrawType.values()[new Random().nextInt(DrawType.values().length)].toString()));
+            return String.format("DRAWCARD %s", DrawType.values()[new Random().nextInt(DrawType.values().length)].toString());
         }
 
         ViewModel viewModel = client.getViewModel();
@@ -500,7 +499,7 @@ public class CommandGenerator {
         }
 
         Collections.shuffle(choices);
-        return String.format("DRAWCARD %s", choices.getFirst().toString());
+        return String.format("DRAWCARD %s", choices.get(0).toString());
     }
 }
 

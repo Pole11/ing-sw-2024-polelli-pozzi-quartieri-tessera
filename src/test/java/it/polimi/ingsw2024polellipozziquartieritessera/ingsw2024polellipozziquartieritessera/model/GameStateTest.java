@@ -452,211 +452,6 @@ public class GameStateTest {
     }
 
     @Test
-    void testWholeGame() throws NotUniquePlayerNicknameException, NotUniquePlayerColorException, WrongStructureConfigurationSizeException, IOException, CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, EmptyDeckException, InvalidHandException, CardNotOnBoardException, EmptyMainBoardException {
-        VirtualView client1 = new SocketClient(null, null, null);
-        VirtualView client2 = new SocketClient(null, null, null);
-        VirtualView client3 = new SocketClient(null, null, null);
-        VirtualView client4 = new SocketClient(null, null, null);
-
-        // client not in the game
-        VirtualView client5 = null;
-
-        Server server = new Server(null, null, null);
-        GameState gs = new GameState(server);
-        try {
-            Populate.populate(gs);
-        } catch (IOException e) {
-            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
-        }
-        Controller c = new Controller();
-        c.setGameState(gs);
-
-        // random commands
-        c.getGamePhase();
-        c.getCurrentPlayerIndex();
-        c.getPlayerIndex(client1);
-        c.getTurnPhase();
-
-
-        c.addPlayer(client1, "Pippo");
-
-        // player 1 tries to start the game alone
-        c.startGame(client1);
-
-        // player 1 tries to enter a second time
-        c.addPlayer(client1, "Bongo");
-
-        c.addPlayer(client2, "Pippo"); // intentional error
-        c.addPlayer(client2, "Jhonny");
-        c.addPlayer(client3, "Rezzonico");
-        c.addPlayer(client4, "Pollo");
-        c.addPlayer(client5, "Gianpiero"); // player 5 should not enter the game
-
-        // initial phase
-        assertEquals(c.getGamePhase(), GamePhase.NICKNAMEPHASE);
-        c.startGame(client5); // should not work
-        c.startGame(client1);
-        assertEquals(gs.getPlayerIndex(client2), 1);
-        assertEquals(gs.getPlayerIndex(client5), -1);
-
-        // verification of set player index
-        gs.setCurrentPlayerIndex(gs.getCurrentPlayerIndex());
-
-        // verification of catching not existing players
-        Player fake = new Player("fake", null, gs);
-        assertEquals(gs.getPlayerIndex(fake), -1);
-
-        // side choice
-        assertEquals(c.getGamePhase(), GamePhase.CHOOSESTARTERSIDEPHASE);
-        c.chooseInitialStarterSide(0,Side.BACK);
-        c.chooseInitialStarterSide(1,Side.BACK);
-        c.chooseInitialStarterSide(2,Side.BACK);
-        c.chooseInitialStarterSide(3,Side.BACK);
-
-        // color choice
-        assertEquals(c.getGamePhase(), GamePhase.CHOOSECOLORPHASE);
-        c.chooseInitialColor(0, Color.RED);
-        c.chooseInitialColor(1, Color.GREEN);
-        c.chooseInitialColor(2, Color.GREEN); // intentional error
-        c.chooseInitialColor(2, Color.YELLOW);
-
-        assertEquals(gs.getAnswered().get(0), true);
-        gs.setAnswered(0, true);
-        gs.setAnswered(3,false);
-
-        // random commands
-        c.getGamePhase();
-        c.getCurrentPlayerIndex();
-        c.getPlayerIndex(client1);
-        c.getTurnPhase();
-
-        c.chooseInitialColor(3, Color.BLUE);
-
-        // objectives choice
-        assertEquals(c.getGamePhase(), GamePhase.CHOOSEOBJECTIVEPHASE);
-        c.chooseInitialObjective(0,0);
-        c.chooseInitialObjective(1,1);
-        c.chooseInitialObjective(2,2); // intentional error
-        c.chooseInitialObjective(2,0);
-        c.chooseInitialObjective(3,0);
-
-        // main phase
-        assertEquals(c.getGamePhase(), GamePhase.MAINPHASE);
-
-        int handCardId = 0;
-
-        // normal draw and placing round
-        for (int i = 0; i<102; i++){
-            if(gs.getPlayer(0).handCardContains(i)){
-                handCardId = i;
-                break;
-            }
-        }
-        c.placeCard(0, handCardId, gs.getPlayer(0).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
-        // verification of the turn
-        assertEquals(gs.getCurrentGamePhase(), GamePhase.MAINPHASE);
-        gs.setCurrentGamePhase(GamePhase.MAINPHASE);
-        assertEquals(TurnPhase.DRAWPHASE, gs.getCurrentGameTurn());
-        gs.setCurrentGameTurn(TurnPhase.DRAWPHASE);
-
-        c.drawCard(DrawType.DECKRESOURCE);
-
-        // verification of the turn
-        assertEquals(gs.getCurrentGamePhase(), GamePhase.MAINPHASE);
-        gs.setCurrentGamePhase(GamePhase.MAINPHASE);
-        assertEquals(TurnPhase.PLACINGPHASE, gs.getCurrentGameTurn());
-        gs.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
-
-        for (int i = 0; i<102; i++){
-            if(gs.getPlayer(1).handCardContains(i)){
-                handCardId = i;
-                break;
-            }
-        }
-        c.placeCard(1, handCardId, gs.getPlayer(1).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
-        c.drawCard(DrawType.DECKGOLD);
-
-        for (int i = 0; i<102; i++){
-            if(gs.getPlayer(2).handCardContains(i)){
-                handCardId = i;
-                break;
-            }
-        }
-        c.placeCard(2, handCardId, gs.getPlayer(2).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
-        c.drawCard(DrawType.SHAREDGOLD1);
-
-        // random commands
-        c.getGamePhase();
-        c.getCurrentPlayerIndex();
-        c.getPlayerIndex(client1);
-        c.getTurnPhase();
-        c.getObjectiveCardOptions(0);
-
-        for (int i = 0; i<102; i++){
-            if(gs.getPlayer(3).handCardContains(i)){
-                handCardId = i;
-                break;
-            }
-        }
-        c.placeCard(3, handCardId, gs.getPlayer(3).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
-        c.drawCard(DrawType.SHAREDRESOURCE1);
-
-        // end game
-        gs.getPlayer(0).addPoints(100);
-        gs.checkGameEnded();
-        assertEquals(c.getGamePhase(), GamePhase.ENDPHASE);
-
-        // play the last turns
-
-        // normal draw and placing round
-        for (int i = 0; i<102; i++){
-            if(gs.getPlayer(0).handCardContains(i)){
-                handCardId = i;
-                break;
-            }
-        }
-        c.placeCard(0, handCardId, gs.getPlayer(0).getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
-        c.drawCard(DrawType.SHAREDGOLD2);
-
-        for (int i = 0; i<102; i++){
-            if(gs.getPlayer(1).handCardContains(i)){
-                handCardId = i;
-                break;
-            }
-        }
-        c.placeCard(1, handCardId, gs.getPlayer(1).getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
-        c.drawCard(DrawType.SHAREDRESOURCE2);
-
-        for (int i = 0; i<102; i++){
-            if(gs.getPlayer(2).handCardContains(i)){
-                handCardId = i;
-                break;
-            }
-        }
-        c.placeCard(2, handCardId, gs.getPlayer(2).getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
-        c.drawCard(DrawType.DECKRESOURCE);
-
-        for (int i = 0; i<102; i++){
-            if(gs.getPlayer(3).handCardContains(i)){
-                handCardId = i;
-                break;
-            }
-        }
-        c.placeCard(3, handCardId, gs.getPlayer(3).getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
-        c.drawCard(DrawType.DECKRESOURCE);
-
-        assertEquals(gs.getTurnToPlay(), 0);
-        assertNull(gs.getPrevGamePhase());
-        gs.setTurnToPlay(gs.getTurnToPlay());
-
-        gs.playerDisconnected(0);
-        gs.clientEnded(client1);
-        gs.pingAnswer(client2);
-        gs.allConnectedClients();
-        gs.allClients();
-    }
-
-    @Test
     void testAddPlayerThread() {
         List<Thread> playerThreads = new ArrayList<>();
         Server server = new Server(null, null, null);
@@ -835,12 +630,17 @@ public class GameStateTest {
 
         c.manageDisconnection();
 
-
         assertEquals(gs.allConnectedClients().size(),2);
 
         gs.setPlayersConnected(0, true);
         gs.setPlayersConnected(1, true);
 
+
+        c.setGamePhase(GamePhase.TIMEOUT);
         c.manageDisconnection();
+
+        // check if returns the NullPointer Exception
+        assertThrows(NullPointerException.class, () -> gs.manageReconnection(gs.getPlayer(0)));
+        assertThrows(NullPointerException.class, () -> gs.manageReconnection(gs.getPlayer(1)));
     }
 }

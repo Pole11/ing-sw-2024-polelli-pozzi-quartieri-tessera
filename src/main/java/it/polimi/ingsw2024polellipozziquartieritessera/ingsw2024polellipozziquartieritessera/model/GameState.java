@@ -1294,7 +1294,7 @@ public class GameState {
                 }
             }
             // second endphase entering: all decks are empty
-            if (this.getMainBoard().isResourceDeckEmpty() && this.getMainBoard().isGoldDeckEmpty()){
+            if (this.getMainBoard().isResourceDeckEmpty() && this.getMainBoard().isGoldDeckEmpty() && !currentGamePhase.equals(GamePhase.ENDPHASE)){
                 currentGamePhase.changePhase(this);
             }
 
