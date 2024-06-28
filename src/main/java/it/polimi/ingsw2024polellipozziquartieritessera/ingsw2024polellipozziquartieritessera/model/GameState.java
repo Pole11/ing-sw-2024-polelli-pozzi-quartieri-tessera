@@ -1360,7 +1360,11 @@ public class GameState {
                 winnerPlayerIndeces.add(i);
             }
         }
-        /*if (!playerReachedPoints) {
+        /*if (!playerReachedPoints &&
+                !(getMainBoard().isGoldDeckEmpty() &&
+                getMainBoard().isResourceDeckEmpty() &&
+                getMainBoard().areGoldSharedEmpty() &&
+                getMainBoard().areResourceSharedEmpty())) {
             throw new GameIsNotEndedException("You called getWinnerPlayerIndex even if the game is not ended, no one is at 20 points");
         }*/
 
