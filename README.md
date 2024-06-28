@@ -61,7 +61,4 @@ Per la CLI abbiamo ripreso lo stile di una shell del terminale. Infatti richiede
 
 ### Bot
 
-Nella fase di testing ci è sembrato necessario creare dei bot che giocassero con noi. Questi hanno reso la fase di sviluppo molto più veloce.  
-Essendo perfettamente funzionanti (e anche discretamente intelligenti), forniamo anche il loro `.jar` nel caso si voglia rendere più interessante una partita o nel caso in cui si stia giocando da soli. 
-
-I parametri da linea di comando sono gli stessi del client, fare riferimento al paragrafo precedente.
+Nella fase di testing ci è sembrato necessario creare dei bot che potessero giocare da soli, questi hanno reso la fase di sviluppo molto più veloce.  
