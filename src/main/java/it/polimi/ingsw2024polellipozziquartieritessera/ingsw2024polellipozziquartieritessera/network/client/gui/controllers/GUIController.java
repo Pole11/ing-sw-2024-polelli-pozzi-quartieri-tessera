@@ -532,6 +532,17 @@ abstract public class GUIController {
             for (int i = messages.size() - 1; i >= 0; i--) {
                 Message m = messages.get(i);
                 if (m == null) continue;
+
+                if (m.getAuthor() != getViewModel().getPlayerIndex()) {
+                    for (int j = 0; j < getViewModel().getPlayersSize(); j++) {
+                        if (j != getViewModel().getPlayerIndex()) {
+                            if (m.getContent().startsWith(getViewModel().getNickname(j))) {
+                                messages.remove(m);
+                            }
+                        }
+                    }
+                }
+
                 Text tempText = new Text(getViewModel().getNickname(m.getAuthor()) + ": " + m.getContent());
                 chatListView.getItems().add(tempText);
             }
