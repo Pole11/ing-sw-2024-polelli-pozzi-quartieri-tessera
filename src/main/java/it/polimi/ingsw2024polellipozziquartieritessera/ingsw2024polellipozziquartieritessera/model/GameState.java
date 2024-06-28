@@ -470,7 +470,7 @@ public class GameState {
      * Manage the reconnection of a player
      * @param player Player to be reconnected
      */
-    private void manageReconnection(Player player) {
+    public void manageReconnection(Player player) {
         if (this.currentGamePhase.equals(GamePhase.TIMEOUT)) {
             if(this.timeoutThread != null) {
                 this.timeoutThread.interrupt();
@@ -955,7 +955,6 @@ public class GameState {
      * @param side Side chosen
      */
     public void setStarterSide(int playerIndex, Side side) {
-        //TODO: try catch id player not registerred
         players.stream().filter(e -> !e.isConnected() && !answered.get(getPlayerIndex(e))).forEach(e->{
             e.addToPlacedCardsMap(e.getStarterCard().getId(), Side.BACK);
             updateElements(e, e.getStarterCard(), Side.BACK);
