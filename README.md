@@ -35,7 +35,7 @@ Di default restart-rescue è false, si può decidere, mettendolo a true,  di rip
 Una volta scaricato il `.jar` del client, per farlo partire:
 
 ```bash
-java -jar client.jar [rmi/socket] [porta]
+java -jar client.jar [rmi/socket] [ip del server] [porta]
 ```
 
 Da notare che con `porta` si intende la porta corrispondente del server, quindi cambia nel caso di RMI o Socket.
@@ -45,7 +45,7 @@ Questa è la configurazione "base", da usare in qualsiasi contesto. Sia creando 
 Nel caso di RMI, se si riscontrano problemi, potrebbe essere necessario per il client specificare il proprio indirizzo ip. In tal caso basta procedere come segue:
 
 ```bash
-java -jar client.jar [rmi/socket] [porta] [ip macchina corrente]
+java -jar client.jar [rmi/socket] [ip del server] [porta] [ip macchina corrente]
 ```
 
 All'inizio, verrà chiesto all'utente di inserire la propria preferenza sull'utilizzo della GUI o meno.
