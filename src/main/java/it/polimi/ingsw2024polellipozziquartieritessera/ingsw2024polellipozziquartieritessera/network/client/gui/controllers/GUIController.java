@@ -105,7 +105,14 @@ abstract public class GUIController {
     public void pongAnswer(){
         if (serverThread!= null)serverThread.interrupt();
     }
-    
+
+    /**
+     * Restarts the pong mechanism with the given server, client, and client container.
+     *
+     * @param client the VirtualView instance
+     * @param server the VirtualServer instance
+     * @param clientContainer the Client instance which contains the common implementations between VirtualViews
+     */
     public void restartPong(VirtualServer server, VirtualView client, Client clientContainer){
         if (pongThread != null && pongThread.isAlive()){
             pongRunning = false;
