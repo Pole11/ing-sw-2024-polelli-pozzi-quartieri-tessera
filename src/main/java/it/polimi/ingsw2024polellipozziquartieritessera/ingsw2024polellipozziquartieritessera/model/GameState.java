@@ -589,7 +589,6 @@ public class GameState {
             if(gamePhase.ordinal() >= GamePhase.CHOOSESTARTERSIDEPHASE.ordinal()) {
                 eventQueue.add(new UpdateMainBoardEvent(this, clients, mainBoard));
             }
-            //todo send Chat
 
             //send points
             for(int i = 0; i < players.size(); i++){
@@ -989,13 +988,6 @@ public class GameState {
             eventQueue.add(new UpdateStarterCardEvent(this, allConnectedClients(), playerIndex, playerStarterCard.getId(), side));
             eventQueue.notifyAll();
         }
-
-        // TODO: this part of code is a duplicate of the part above (should be deleted)
-        /* add the initial elements of the starter card
-        for (Element ele : player.getStarterCard().getUncoveredElements(side)) {
-            int currentOccurrences = player.getAllElements().get(ele);
-            player.addToAllElements(ele, currentOccurrences + 1);
-        }*/
 
 
         this.answered.put(playerIndex, true);
