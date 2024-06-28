@@ -21,23 +21,14 @@ Per prima cosa scaricare i `.jar` nella cartella `deliverables`, poi procedere n
 Una volta scaricato il `.jar` del server, per farlo partire:
 
 ```bash
-java -jar server.jar [ip del server] [porta rmi] [porta socket]
+java -jar server.jar [ip del server] [porta rmi] [porta socket] [restart-rescue]
 ```
 
-Questa è la configurazione "base", da usare in qualsiasi contesto. Sia creando una propria LAN, che deployando il server su un server con ip pubblico statico. 
-Visto che vogliamo migliorare la consapevolezza del server nel caso di un deploy su server connesso a internet, di base è abilitata la funzione di "am i down right now", che cerca di capire se è connesso a internet o meno. Se si vuole fornire un ip pubblico di fiducia specifico per effetturare questo controllo, si può specificare aggiungendo un parametro. Per esempio il classico `8.8.8.8`. In questo caso si procede nel seguente modo:
+Visto che vogliamo migliorare la consapevolezza del server nel caso di un deploy su server connesso a internet, è abilitata la funzione di "am i down right now", che cerca di capire se è connesso a internet o meno, grazie ad un ping a `8.8.8.8`.
 
-```bash
-java -jar server.jar [ip del server] [porta rmi] [porta socket] [ip di fiducia]
-```
+Ogni partita genera, ogni volta che viene inviato un evento alle view, un file, chiamato `rescue.json` che contiene lo stato della partita. Nel caso si sposti il server da un computer a un altro o si spenga il server, per riprendere la partita dove si era lasciata basta collocare il file `rescue.json` nella stessa cartella del `server.jar` (viene fatto in automatico). 
 
-Per disabilitare la suddetta funzionalità:
-
-```bash
-java -jar server.jar [ip del server] [porta rmi] [porta socket] no
-```
-
-Ogni partita genera ad intervalli temporali costanti un file, chiamato `rescue.json` che contiene lo stato della partita. Nel caso si sposti il server da un computer a un altro o si spenga il server, per riprendere la partita dove si era lasciata basta collocare il file `rescue.json` nella stessa cartella del `server.jar` (viene fatto in automatico). 
+Di default restart-rescue è false, si può decidere, mettendolo a true,  di ripulire il rescue per iniziare una nuova partita, in ogni caso quando una partita termina, il rescue viene ripulito automaticamente
 
 ### Client
 

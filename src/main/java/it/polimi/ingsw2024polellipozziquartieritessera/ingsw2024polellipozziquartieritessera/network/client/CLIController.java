@@ -62,7 +62,7 @@ public class CLIController {
      *
      * @param server         the VirtualServer instance
      * @param client         the VirtualView instance
-     * @param clientContainer the Client instance
+     * @param clientContainer the Client instance which contains the common implementations between VirtualViews
      */
     public void restartPong(VirtualServer server, VirtualView client, Client clientContainer){
         if (pongThread != null && pongThread.isAlive()){
@@ -142,27 +142,6 @@ public class CLIController {
         pongThread.start();
     }
 
-    //old
-    /*public void restartExecuteCommand(){
-        if (executeCommands != null && executeCommands.isAlive()){
-            executeCommandRunning = false;
-            executeCommands.interrupt();
-            synchronized (commandQueue){
-                commandQueue.notifyAll();
-            }
-
-            try {
-                executeCommands.join();
-            } catch (InterruptedException ignored) {}
-
-        }
-        executeCommandRunning = true;
-        this.executeCommands = new Thread(this::executeCommandsRunnable);
-        this.executeCommands.start();
-    }
-
-     */
-
     /**
      * Sets the ViewModel associated with this controller.
      *
@@ -223,9 +202,7 @@ public class CLIController {
                 }
 
                 command = commandQueue.remove();
-                //commandQueue.notifyAll();
             }
-            //System.out.println(command);
             command.executeCLI();
 
         }
@@ -422,10 +399,7 @@ public class CLIController {
                 }
             }
             sides.add(viewModel.getPlacedCardSide(cardsOrder.get(k)));
-/*            cardToPrint = printCard(card, viewModel.getPlacedCardSide(cardsOrder.get(k)));
-            for(i = 0; i < cardList.size(); i++){
-                cardList.get(i).concat(openString + " " + cardToPrint.get(i) + closeString);
-            }*/
+
         }
         for(i = 0; i < printedBoard.size(); i++){
             for (j = 0; j < printedBoard.get(i).size(); j++){
