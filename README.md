@@ -21,7 +21,7 @@ Per prima cosa scaricare i `.jar` nella cartella `deliverables`, poi procedere n
 Una volta scaricato il `.jar` del server, per farlo partire:
 
 ```bash
-java -jar server.jar [ip del server] [porta rmi] [porta socket] [restart-rescue]
+java -jar server.jar [ip del server] [porta socket] [porta rmi] [restart-rescue]
 ```
 
 Visto che vogliamo migliorare la consapevolezza del server nel caso di un deploy su server connesso a internet, è abilitata la funzione di "am i down right now", che cerca di capire se è connesso a internet o meno, grazie ad un ping a `8.8.8.8`.
