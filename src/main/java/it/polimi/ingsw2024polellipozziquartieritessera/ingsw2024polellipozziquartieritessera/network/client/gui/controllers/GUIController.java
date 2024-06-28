@@ -536,7 +536,7 @@ abstract public class GUIController {
                 if (m.getAuthor() != getViewModel().getPlayerIndex()) {
                     for (int j = 0; j < getViewModel().getPlayersSize(); j++) {
                         if (j != getViewModel().getPlayerIndex()) {
-                            if (m.getContent().startsWith(getViewModel().getNickname(j))) {
+                            if (m.getContent().startsWith(getViewModel().getNickname(j) + " ")) {
                                 messages.remove(m);
                             }
                         }
