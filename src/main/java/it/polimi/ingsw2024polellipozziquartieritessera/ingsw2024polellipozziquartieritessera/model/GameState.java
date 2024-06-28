@@ -279,12 +279,10 @@ public class GameState {
 
             }
 
-            System.out.println(event);
             for (VirtualView client : event.getClients()){
                 List<VirtualView> clientsTmp = players.stream().map(Player::getClient).toList();
                 if (clientsTmp.contains(client)){
                     int index = getPlayerIndex(client);
-                    System.out.println(index);
                     synchronized (allEventQueues.get(index)){
                         ArrayList<VirtualView> clients = new ArrayList<>();
                         clients.add(client);
@@ -333,8 +331,6 @@ public class GameState {
                 }
                 event = allEventQueues.get(index).remove();
             }
-            System.out.println("index: "+ index);
-            System.out.println(event);
             event.execute();
 
         }
@@ -440,6 +436,7 @@ public class GameState {
      * @param client The client who has responded
      */
     public void pingAnswer(VirtualView client) {
+        //System.out.println(getPlayerIndex(client));
         synchronized (players) {
             playerThreads.get(getPlayerIndex(client)).interrupt();
             try {
@@ -578,7 +575,7 @@ public class GameState {
 
             // for every placingCardEvent, place a card in the boardsMap and in placedOrderCardMap
             placedEventList.stream().forEach(e -> {
-                e.setRestoreClients(clients); //events in placedEventList have the attribute 'clients' empty, it needs to be setted
+                e.setClients(clients); //events in placedEventList have the attribute 'clients' empty, it needs to be setted
                 eventQueue.add(e);
             });
             // send mainBoard
@@ -1317,12 +1314,7 @@ public class GameState {
 
             calculateFinalPoints();
             ArrayList<Integer> winners;
-            try {
-                winners = getWinnerPlayerIndex();
-            } catch (GameIsNotEndedException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            winners = getWinnerPlayerIndex();
             gameEnded(winners);
         }
     }
@@ -1351,9 +1343,8 @@ public class GameState {
     /**
      * Get the winner player
      * @return List of indexes of winners
-     * @throws GameIsNotEndedException Game not ended
      */
-    public ArrayList<Integer> getWinnerPlayerIndex() throws GameIsNotEndedException {
+    public ArrayList<Integer> getWinnerPlayerIndex() {
         int maxPoints = 0;
         ArrayList<Integer> winnerPlayerIndeces = new ArrayList<>();
         boolean playerReachedPoints = false;
@@ -1369,7 +1360,11 @@ public class GameState {
                 winnerPlayerIndeces.add(i);
             }
         }
-        /*if (!playerReachedPoints) {
+        /*if (!playerReachedPoints &&
+                !(getMainBoard().isGoldDeckEmpty() &&
+                getMainBoard().isResourceDeckEmpty() &&
+                getMainBoard().areGoldSharedEmpty() &&
+                getMainBoard().areResourceSharedEmpty())) {
             throw new GameIsNotEndedException("You called getWinnerPlayerIndex even if the game is not ended, no one is at 20 points");
         }*/
 

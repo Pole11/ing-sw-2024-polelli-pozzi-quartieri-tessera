@@ -425,7 +425,6 @@ public class GameStateTest {
         first_second_win.add(0);
         first_second_win.add(1);
 
-        assertThrows(GameIsNotEndedException.class, gs::getWinnerPlayerIndex);
 
         gs.getPlayer(0).addPoints(24);
         assertEquals(first_wins, gs.getWinnerPlayerIndex());

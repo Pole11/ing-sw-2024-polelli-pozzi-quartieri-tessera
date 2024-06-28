@@ -10,13 +10,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ChatTest {
     private Chat chat;
 
-    @BeforeEach
-    public void setUp() {
-        chat = new Chat();
-    }
-
     @Test
     public void testAddMessage() {
+        chat = new Chat();
         chat.addMessage(1, "Hello, world!");
         ArrayList<Message> messages = chat.getMessages();
 
@@ -27,6 +23,7 @@ public class ChatTest {
 
     @Test
     public void testGetLastMessage() {
+        chat = new Chat();
         assertNull(chat.getLastMessage());
 
         chat.addMessage(1, "First message");

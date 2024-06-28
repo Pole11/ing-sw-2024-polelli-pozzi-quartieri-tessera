@@ -408,7 +408,12 @@ public class Client implements VirtualView {
     public void updatePlayerBoard(int playerIndex, int placingCardId, int tableCardId, CornerPos existingCornerPos, Side side) throws RemoteException {
         viewModel.updatePlayerBoard(playerIndex, placingCardId, tableCardId, existingCornerPos, side);
         if (viewModel.getPlayerIndex() == playerIndex) {
-            cliController.showDecks();
+            try {
+                cliController.showDecks();
+            } catch (NullPointerException e){
+                System.out.println("the decks ");
+            }
+
             System.out.print("you placed a card, now you have to draw your card with DRAWCARD [SHAREDGOLD1/SHAREDGOLD2/SHAREDRESOURCE1/SHAREDRESOURCE/DECKGOLD/DECKRESOURCE]\n> ");
         } else {
             System.out.print(viewModel.getNickname(playerIndex) + " placed a card\n> ");
@@ -432,9 +437,14 @@ public class Client implements VirtualView {
         viewModel.setCurrentPlayer(currentPlayerIndex);
         if (viewModel.getPlayerIndex() == currentPlayerIndex) {
             System.out.print("it's your turn\n> ");
-            if (!meDoGui && viewModel.getGamePhase().ordinal()>=GamePhase.MAINPHASE.ordinal()) {
-                cliController.showBoard();
-                cliController.showHand();
+            if (!meDoGui && viewModel.getGamePhase().ordinal()>=GamePhase.MAINPHASE.ordinal() && !viewModel.getGamePhase().equals(GamePhase.TIMEOUT)) {
+                try{
+                    cliController.showBoard();
+                    cliController.showHand();
+                } catch (NullPointerException e){
+                    System.out.println();
+                }
+
             }
             showMessageAlert();
             System.out.print("to place your card use the command PLACECARD [placingCardId] [tableCardId] [tableCornerPos(Upright/Upleft/Downright/Downleft)] [placingCardSide(Front/Back)] to place your card\n> ");

@@ -504,6 +504,7 @@ public class Populate {
             UpdateBoardEvent backupEvent = new UpdateBoardEvent(gameState, new ArrayList<>(), player, (int) event.get("placingCardId"), (int) event.get("tableCardId") , CornerPos.valueOf((String) event.get("existingCornerPos")), Side.valueOf((String) event.get("side")));
             gameState.addPlacedEvent(backupEvent);
         }
+        System.out.println(gameState.getPlacedEventList());
 
 
         gameState.setCurrentPlayerIndex((int)jsonState.get("currentPlayerIndex"));
