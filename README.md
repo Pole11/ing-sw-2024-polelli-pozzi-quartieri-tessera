@@ -26,9 +26,9 @@ java -jar server.jar [ip del server] [porta socket] [porta rmi] [restart-rescue]
 
 Visto che vogliamo migliorare la consapevolezza del server nel caso di un deploy su server connesso a internet, è abilitata la funzione di "am i down right now", che cerca di capire se è connesso a internet o meno, grazie ad un ping a `8.8.8.8`.
 
-Ogni partita genera, ogni volta che viene inviato un evento alle view, un file, chiamato `rescue.json` che contiene lo stato della partita. Nel caso si sposti il server da un computer a un altro o si spenga il server, per riprendere la partita dove si era lasciata basta collocare il file `rescue.json` nella stessa cartella del `server.jar` (viene fatto in automatico). 
+Ogni partita genera, ogni volta che viene inviato un evento alle view, un file, chiamato `rescue.json` che contiene lo stato della partita. Nel caso si sposti il server da un computer a un altro o si spenga il server è possibile riprendere la partita dove si era lasciata.
 
-Di default restart-rescue è false, si può decidere, mettendolo a true,  di ripulire il rescue per iniziare una nuova partita, in ogni caso quando una partita termina, il rescue viene ripulito automaticamente
+Di default `restart-rescue` è false, si può decidere, mettendolo a true, di ripulire il rescue per iniziare una nuova partita, in ogni caso quando una partita termina, il rescue viene ripulito automaticamente
 
 ### Client
 
