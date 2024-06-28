@@ -37,7 +37,6 @@ public class Client implements VirtualView {
     ByteArrayOutputStream baos;
     PrintStream restoreStream;
     PrintStream oldPrintStream;
-    private boolean serverIsConnected;
 
     public Client(String rmiOrSocket, String host, String port, String myIp){
         this.viewModel = new ViewModel();
@@ -49,7 +48,6 @@ public class Client implements VirtualView {
         this.baos = new ByteArrayOutputStream();
         this.restoreStream = new PrintStream(baos);
         this.oldPrintStream = null;
-        this.serverIsConnected = true;
     }
 
     public static void main(String[] args) throws IOException {
@@ -183,56 +181,6 @@ public class Client implements VirtualView {
 
     public void serverDisconnected(){
 
-        /*if (!serverIsConnected){
-            return;
-        }
-
-         */
-        serverIsConnected = false;
-
-        //OLD
-        /*if (meDoGui){
-            guiApplication.getGUIController().setServerError("There was an error in server, the server is not available, wait to be rederected in the login page");
-        } else {
-            System.out.println("server disconnected, wait to be notified of being connected to the server");
-        }
-
-
-        try {
-            Thread.sleep(1000* Config.WAIT_DISCONNECTED_SERVER);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        try {
-            startClient();
-        } catch (ConnectException e){
-            System.out.println("disconnection from client 2");
-            serverDisconnected();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-         */
-        /*while (true) {
-
-            try {
-                Thread.sleep(1000 * Config.WAIT_DISCONNECTED_SERVER);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                startClient();
-                break; // If startClient() succeeds, break the loop
-            } catch (ConnectException e) {
-                System.err.println("Disconnection from client 2");
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-         */
         if (meDoGui) {
             //guiApplication.getGUIController().setServerError("There was an error in server, the server is not available, wait to be redirected to the login page");
             guiApplication.getGUIController().setServerError("server disconnected, restart the game and wait the server to be reconnected");
@@ -241,27 +189,6 @@ public class Client implements VirtualView {
             System.out.println("server disconnected, restart the game and wait the server to be reconnected");
         }
 
-        /*try {
-            Thread.sleep(1000 * Config.WAIT_DISCONNECTED_SERVER);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return;
-        }
-
-         */
-
-        /*try {
-            //startClient();
-            serverIsConnected = true;
-            //break; // If startClient() succeeds, break the loop
-        } catch (ConnectException e) {
-            System.out.println("Disconnection from client 2");
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-         */
     }
 
 

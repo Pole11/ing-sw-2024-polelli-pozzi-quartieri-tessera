@@ -2,9 +2,11 @@ package it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziqua
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.rmi.RemoteException;
 import java.util.*;
 
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.cards.StarterCard;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.RmiClient;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.SocketClient;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.VirtualView;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Populate;
@@ -642,5 +644,65 @@ public class GameStateTest {
         // check if returns the NullPointer Exception
         assertThrows(NullPointerException.class, () -> gs.manageReconnection(gs.getPlayer(0)));
         assertThrows(NullPointerException.class, () -> gs.manageReconnection(gs.getPlayer(1)));
+    }
+
+    @Test public void testDisconnectedChoices(){
+        Server server = new Server(null, null, null);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        VirtualView client1 = null;
+        VirtualView client2 = null;
+        try {
+            client2 = new RmiClient(null, null);
+            client1 = new RmiClient(null, null);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+        VirtualView client3 = new SocketClient(null, null, null);
+        VirtualView client4 = new SocketClient(null, null, null);
+
+        GameState g = new GameState(server);
+        try {
+            Populate.populate(g);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Controller c = new Controller();
+        c.setGameState(g);
+
+        c.addPlayer(client1, "A");
+        c.addPlayer(client2, "B");
+        c.addPlayer(client3, "C");
+        c.addPlayer(client4, "D");
+
+        g.playerDisconnected(0);
+        g.getPlayer(0).setConnected(false);
+
+        c.startGame(client2);
+
+        g.playerDisconnected(3);
+        g.getPlayer(3).setConnected(false);
+
+        c.chooseInitialStarterSide(1, Side.FRONT);
+        c.chooseInitialStarterSide(2, Side.BACK);
+
+        assertEquals(GamePhase.CHOOSECOLORPHASE,g.getCurrentGamePhase());
+
+        c.chooseInitialColor(1, Color.YELLOW);
+        c.chooseInitialColor(1, Color.BLUE);
+        c.chooseInitialColor(1, Color.GREEN);
+        c.chooseInitialColor(1, Color.RED);
+        c.chooseInitialColor(2, Color.RED);
+        c.chooseInitialColor(2, Color.GREEN);
+        c.chooseInitialColor(2, Color.BLUE);
+        c.chooseInitialColor(2, Color.YELLOW);
+
+        assertEquals(GamePhase.CHOOSEOBJECTIVEPHASE,g.getCurrentGamePhase());
     }
 }

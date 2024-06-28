@@ -595,6 +595,10 @@ public class GameState {
                 Player currentPlayer = players.get(i);
                 eventQueue.add(new UpdatePointsEvent(this, clients, currentPlayer, currentPlayer.getPoints()));
             }
+            //send chat
+            for(Message message : chat.getMessages()){
+                eventQueue.add(new UpdateChatEvent(this, clients, message.getAuthor(), message.getContent()));
+            }
             eventQueue.add(new RedirectOutEvent(this, clients, false));
             eventQueue.notifyAll();
 

@@ -486,4 +486,141 @@ public class FullGameTest {
         gs.allConnectedClients();
         gs.allClients();
     }
+
+    @Test
+    void testGameEndDecks() throws CardNotPlacedException, CardIsNotInHandException, WrongPlacingPositionException, PlacingOnHiddenCornerException, CardAlreadyPresentOnTheCornerException, GoldCardCannotBePlacedException, CardAlreadPlacedException, WrongInstanceTypeException, EmptyDeckException, InvalidHandException, CardNotOnBoardException, EmptyMainBoardException {
+        VirtualView client1 = new SocketClient(null, null, null);
+        VirtualView client2 = new SocketClient(null, null, null);
+        VirtualView client3 = new SocketClient(null, null, null);
+        VirtualView client4 = new SocketClient(null, null, null);
+
+        Server server = new Server(null, null, null);
+        GameState gs = new GameState(server);
+        try {
+            Populate.populate(gs);
+        } catch (IOException e) {
+            throw new RuntimeException("Error during setup: " + e.getMessage(), e);
+        }
+        Controller c = new Controller();
+        c.setGameState(gs);
+
+        c.addPlayer(client1, "Pippo");
+        c.addPlayer(client2, "Jhonny");
+        c.addPlayer(client3, "Rezzonico");
+        c.addPlayer(client4, "Pollo");
+
+        // initial phase
+        assertEquals(c.getGamePhase(), GamePhase.NICKNAMEPHASE);
+        c.startGame(client1);
+
+        // side choice
+        assertEquals(c.getGamePhase(), GamePhase.CHOOSESTARTERSIDEPHASE);
+        c.chooseInitialStarterSide(0,Side.BACK);
+        c.chooseInitialStarterSide(1,Side.BACK);
+        c.chooseInitialStarterSide(2,Side.BACK);
+        c.chooseInitialStarterSide(3,Side.BACK);
+
+        // color choice
+        assertEquals(c.getGamePhase(), GamePhase.CHOOSECOLORPHASE);
+        c.chooseInitialColor(0, Color.RED);
+        c.chooseInitialColor(1, Color.GREEN);
+        c.chooseInitialColor(2, Color.YELLOW);
+        c.chooseInitialColor(3, Color.BLUE);
+
+        // objectives choice
+        assertEquals(c.getGamePhase(), GamePhase.CHOOSEOBJECTIVEPHASE);
+        c.chooseInitialObjective(0,0);
+        c.chooseInitialObjective(1,1);
+        c.chooseInitialObjective(2,0);
+        c.chooseInitialObjective(3,0);
+
+        // main phase
+        assertEquals(c.getGamePhase(), GamePhase.MAINPHASE);
+
+        int handCardId = 0;
+
+        // normal draw and placing round
+        for (int i = 0; i<102; i++){
+            if(gs.getPlayer(0).handCardContains(i)){
+                handCardId = i;
+                break;
+            }
+        }
+        c.placeCard(0, handCardId, gs.getPlayer(0).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
+
+        // verification of the turn
+        assertEquals(gs.getCurrentGamePhase(), GamePhase.MAINPHASE);
+        gs.setCurrentGamePhase(GamePhase.MAINPHASE);
+        assertEquals(TurnPhase.DRAWPHASE, gs.getCurrentGameTurn());
+        gs.setCurrentGameTurn(TurnPhase.DRAWPHASE);
+
+        c.drawCard(DrawType.DECKRESOURCE);
+
+        // verification of the turn
+        assertEquals(gs.getCurrentGamePhase(), GamePhase.MAINPHASE);
+        gs.setCurrentGamePhase(GamePhase.MAINPHASE);
+        assertEquals(TurnPhase.PLACINGPHASE, gs.getCurrentGameTurn());
+        gs.setCurrentGameTurn(TurnPhase.PLACINGPHASE);
+
+        for (int i = 0; i<102; i++){
+            if(gs.getPlayer(1).handCardContains(i)){
+                handCardId = i;
+                break;
+            }
+        }
+        c.placeCard(1, handCardId, gs.getPlayer(1).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
+        c.drawCard(DrawType.DECKGOLD);
+
+        for (int i = 0; i<102; i++){
+            if(gs.getPlayer(2).handCardContains(i)){
+                handCardId = i;
+                break;
+            }
+        }
+        c.placeCard(2, handCardId, gs.getPlayer(2).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
+        c.drawCard(DrawType.SHAREDGOLD1);
+
+        // random commands
+        c.getGamePhase();
+        c.getCurrentPlayerIndex();
+        c.getPlayerIndex(client1);
+        c.getTurnPhase();
+        c.getObjectiveCardOptions(0);
+
+        for (int i = 0; i<102; i++){
+            if(gs.getPlayer(3).handCardContains(i)){
+                handCardId = i;
+                break;
+            }
+        }
+        c.placeCard(3, handCardId, gs.getPlayer(3).getStarterCard().getId(), CornerPos.UPRIGHT, Side.BACK);
+        c.drawCard(DrawType.SHAREDRESOURCE1);
+
+        // end game
+        while (!gs.getMainBoard().isGoldDeckEmpty()){
+            gs.getMainBoard().drawFromGoldDeck();
+        }
+
+        while (!gs.getMainBoard().isResourceDeckEmpty()){
+            gs.getMainBoard().drawFromResourceDeck();
+        }
+
+        gs.getMainBoard().drawSharedResourceCard(1);
+        gs.getMainBoard().drawSharedResourceCard(2);
+        gs.getMainBoard().drawSharedGoldCard(1);
+        gs.getMainBoard().drawSharedGoldCard(2);
+
+        gs.checkGameEnded();
+
+        handCardId = 0;
+
+        // normal draw and placing round
+        for (int i = 0; i<102; i++){
+            if(gs.getPlayer(0).handCardContains(i)){
+                handCardId = i;
+                break;
+            }
+        }
+        c.placeCard(0, handCardId, gs.getPlayer(0).getStarterCard().getId(), CornerPos.UPLEFT, Side.BACK);
+    }
 }
