@@ -14,6 +14,10 @@ private String content;
 
     @Override
     public void executeCLI() {
+        if (messageFromCli.length <= 1){
+            System.err.print("empty message\n> ");
+            return;
+        }
         try {
             try{
                 server.addMessage(client, Arrays.stream(messageFromCli)
@@ -30,6 +34,10 @@ private String content;
 
     @Override
     public void executeGUI() {
+        if (content.isEmpty()){
+            guiController.setServerError("empty message");
+            return;
+        }
         try {
             server.addMessage(client, content);
         } catch (RemoteException e) {
