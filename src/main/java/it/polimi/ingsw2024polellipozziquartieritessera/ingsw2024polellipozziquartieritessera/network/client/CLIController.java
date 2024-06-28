@@ -1119,12 +1119,26 @@ public class CLIController {
      */
     public void showChat() {
         Chat chat = viewModel.getChat();
-
+        ArrayList<Message> messages = chat.getMessages();
+        boolean toBePrinted = true;
         System.out.println("-------- GAME CHAT --------");
         for (Message message : chat.getMessages()){
-            String playerName = viewModel.getNickname(message.getAuthor());
-            System.out.println("[" + playerName + "] " + message.getContent());
+            toBePrinted = true;
+            if (message.getAuthor() != viewModel.getPlayerIndex()) {
+                for (int j = 0; j < viewModel.getPlayersSize(); j++) {
+                    if (j != viewModel.getPlayerIndex()) {
+                        if (message.getContent().startsWith(viewModel.getNickname(j) + " ")) {
+                            toBePrinted = false;
+                        }
+                    }
+                }
+            }
+            if(toBePrinted) {
+                String playerName = viewModel.getNickname(message.getAuthor());
+                System.out.println("[" + playerName + "] " + message.getContent());
+            }
         }
+
         viewModel.resetNewMessages();
 
         System.out.print("> ");
