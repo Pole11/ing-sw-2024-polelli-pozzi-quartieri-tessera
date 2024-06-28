@@ -50,6 +50,22 @@ public class Server implements VirtualServer {
             String host = argv[0];
             int socketport = Integer.parseInt(argv[1]);
             int rmiport = Integer.parseInt(argv[2]);
+            boolean restartRescue = false;
+            if (argv.length == 4) {
+                 restartRescue = Boolean.parseBoolean(argv[3]);
+            }
+
+            if (restartRescue){
+                //erase state
+                Gson gson = new Gson();
+                String filePath = new File("").getAbsolutePath() + Config.GAME_STATE_PATH;
+                try (Writer writer = new FileWriter(filePath)) {
+                    gson.toJson(new HashMap<>(), writer);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            }
 
             startServer(host, socketport, rmiport);
         } catch (Exception e) {

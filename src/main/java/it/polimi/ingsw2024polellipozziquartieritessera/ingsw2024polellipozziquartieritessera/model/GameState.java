@@ -62,6 +62,9 @@ public class GameState {
      * Thread that reads and manages the queque
      */
     private final Thread executeEvents;
+    /**
+     * Flag for executing executeEvents
+     */
     private boolean executeEventRunning;
     /**
      * Map that set if a player has answered to the request or not (useful for starting phases of the game)
@@ -71,11 +74,14 @@ public class GameState {
      * Thread that manages pings
      */
     private final Thread pingThread;
+    /**
+     * Flag for executing pingThread
+     */
     private boolean pingRunning;
     /**
      * Thread list that manages all the players, one for each player
      */
-    private ArrayList<Thread> playerThreads = new ArrayList<>();
+    private ArrayList<Thread> playerThreads;
     /**
      * Thread that manages timeout for curent player
      */
@@ -89,10 +95,17 @@ public class GameState {
      * Number of turns left to play
      */
     private int turnToPlay;
+    /**
+     * List of all UpdateBoardEvent sent to all the clients in the game, it is used by restoreView
+     */
     private ArrayList<UpdateBoardEvent> placedEventList;
-
+    /**
+     * List of threads, one for each player, that execute all the events for that player
+     */
     private ArrayList<Thread> executingThreads;
-
+    /**
+     * List of queues, one for each player, that contains all the events for that player
+     */
     private ArrayList<ArrayDeque<Event>> allEventQueues ;
     /**
      * GameState Constructor
@@ -260,7 +273,7 @@ public class GameState {
     }
 
     /**
-     * Run the event queue listener
+     * Run the event queue of events
      */
     private void executeEventsRunnable()  {
         while (executeEventRunning) {
@@ -302,21 +315,15 @@ public class GameState {
                 }
 
             }
-            //System.out.println(event);
-            /*if (event instanceof PingEvent){
-                new Thread(event::execute).start();
-            } else {
-                event.execute();
-            }*/
-
 
             Populate.saveState(this);
-            //event.execute();
-
-
         }
     }
 
+    /**
+     * Run the event queue of events for the specific player
+     * @param index index of the player
+     */
     public void executingThreadsRunnable(int index){
         while (true){
             Event event = null;
@@ -597,6 +604,7 @@ public class GameState {
 
     /**
      * Set and verify the disconnection of a player, and manage the thread call
+     * @param index index of the player to be reconnected
      */
     public synchronized void playerDisconnected(int index) {
         if (currentGamePhase.equals(GamePhase.NICKNAMEPHASE)) {
@@ -710,12 +718,10 @@ public class GameState {
             eventQueue.add(new UpdateCurrentPlayerEvent(this, allConnectedClients(), currentPlayerIndex));
             eventQueue.notifyAll();
         }
-        //TODO: capire se va bene decrementare di 1 in ogni caso
         if (currentGamePhase.equals(GamePhase.ENDPHASE)) {
             if (turnToPlay <= 0) checkGameEnded();
             turnToPlay--;
         }
-        //playerDisconnected();
     }
     /**
      * Send the ping to verify connection
@@ -855,6 +861,10 @@ public class GameState {
         }
     }
 
+    /**
+     * Add a player to the list of players
+     * @param player player to be added
+     */
     public void addPlayer(Player player){
         players.add(player);
     }
@@ -909,6 +919,9 @@ public class GameState {
         this.currentGamePhase.changePhase(this);
     }
 
+    /**
+     * Add events to the queue for updating mainBoard in the views
+     */
     public void updateMainBoard(){
         synchronized (eventQueue) {
             eventQueue.add(new UpdateMainBoardEvent(this, allConnectedClients(), mainBoard));
@@ -1308,10 +1321,6 @@ public class GameState {
         if (turnToPlay == 0) {
             currentGamePhase.changePhase(this);
 
-//            synchronized (eventQueue){
-//                this.getEventQueue().notifyAll();
-//            }
-
             calculateFinalPoints();
             ArrayList<Integer> winners;
             winners = getWinnerPlayerIndex();
@@ -1349,9 +1358,6 @@ public class GameState {
         ArrayList<Integer> winnerPlayerIndeces = new ArrayList<>();
         boolean playerReachedPoints = false;
         for (int i = 0; i < this.players.size(); i++) {
-            /*if (this.players.get(i).getPoints() >= Config.POINTSTOENDPHASE) {
-                playerReachedPoints = true;
-            }*/
             if (this.players.get(i).getPoints() > maxPoints) {
                 winnerPlayerIndeces = new ArrayList<>();
                 winnerPlayerIndeces.add(i);
@@ -1360,9 +1366,6 @@ public class GameState {
                 winnerPlayerIndeces.add(i);
             }
         }
-        /*if (!playerReachedPoints) {
-            throw new GameIsNotEndedException("You called getWinnerPlayerIndex even if the game is not ended, no one is at 20 points");
-        }*/
 
         // now winnerPlayerIndeces contains who has the maximum number of points
         // decide the real winner if there is a draw
@@ -1393,20 +1396,7 @@ public class GameState {
             eventQueue.add(new GameEndedEvent(this, allConnectedClients(), winners));
             eventQueue.notifyAll();
         }
-        //executeEventRunning = false;
         executeEvents.interrupt();
-
-
-        /*synchronized (eventQueue){
-            if (eventQueue.isEmpty()){
-                executeEvents.interrupt();
-            } else {
-                synchronized (eventQueue) {
-                    executeEventRunning = false;
-                    eventQueue.notifyAll();
-                }
-            }
-        }*/
 
         System.out.println(executeEvents.getState());
         System.out.println(pingThread.getState());
@@ -1446,15 +1436,4 @@ public class GameState {
         }
     }
 
-
-//------------ others --------------------
-
-    // !!! to implement !!!
-    public void saveGameState() {
-    }
-
-    // !!! optional !!!
-    public int getTurnTime() {
-        return 0;
-    }
 }
