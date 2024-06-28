@@ -3,7 +3,7 @@
 
 ![Rmi Flow](../img/rmi-protocol2.svg)
 
-Integrazione tra RMI e Socket
+## Integrazione tra RMI e Socket
 
 Per poter facilitare lo sviluppo della parte `Server`, le chiamate di metodi al `Controller` vengono *unificate*, sia che siano provenienti dal socket, sia che siano provenienti da RMI.  
 Questo comportamento viene realizzato chiamando direttamente i metodi del `Server` dall'`RMIClient` nel caso di RMI e dal `ClientHandler` nel caso di socket, che, una volta ricevuto un nuovo comando nel suo buffer di ricezione, se nota che è un comando disponibile, chiamerà lo stesso identico metodo chiamato da RMI.
