@@ -89,7 +89,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.server.Server</mainClass>
+              <mainClass>it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.network.client.Client</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -102,7 +102,7 @@
           <execution>
             <id>default-cli</id>
             <configuration>
-              <mainClass>it.polimi.ingsw2024polellipozziquartieritessera.network.server.Server</mainClass>
+              <mainClass>it.polimi.ingsw2024polellipozziquartieritessera.network.client.Client</mainClass>
               <launcher>app</launcher>
               <jlinkZipName>app</jlinkZipName>
               <jlinkImageName>app</jlinkImageName>
