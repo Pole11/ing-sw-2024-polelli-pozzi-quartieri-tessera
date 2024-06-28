@@ -49,6 +49,7 @@ java -jar client.jar [rmi/socket] [porta] [ip macchina corrente]
 ```
 
 All'inizio, verrà chiesto all'utente di inserire la propria preferenza sull'utilizzo della GUI o meno.
+Per inviare un messaggio in chat ad un utente specifico, mettere come "prefisso" del messaggio, cioè come prima parola, il nome dell'utente destinatario.
 
 #### GUI
 
