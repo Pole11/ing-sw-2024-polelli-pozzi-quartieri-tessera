@@ -538,7 +538,7 @@ public class GUIControllerGame extends GUIController {
     @FXML
     public void setCurrentPhase() {
         Platform.runLater(() -> {
-            currentPhase.setText("The current phase is " + (getViewModel().getTurnPhase() != null ? getViewModel().getTurnPhase() : "BOH") + " and is the turn of " + getViewModel().getNickname(getViewModel().getCurrentPlayer()));
+            //currentPhase.setText("The current phase is " + (getViewModel().getTurnPhase() != null ? getViewModel().getTurnPhase() : "BOH") + " and is the turn of " + getViewModel().getNickname(getViewModel().getCurrentPlayer()));
         });
     }
 

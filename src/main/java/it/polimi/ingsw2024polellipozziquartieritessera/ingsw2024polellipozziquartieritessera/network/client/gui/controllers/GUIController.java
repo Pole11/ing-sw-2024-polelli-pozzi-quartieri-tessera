@@ -533,6 +533,9 @@ abstract public class GUIController {
                 Message m = messages.get(i);
                 if (m == null) continue;
 
+
+                //Private talking
+                /*
                 if (m.getAuthor() != getViewModel().getPlayerIndex()) {
                     for (int j = 0; j < getViewModel().getPlayersSize(); j++) {
                         if (j != getViewModel().getPlayerIndex()) {
@@ -542,6 +545,8 @@ abstract public class GUIController {
                         }
                     }
                 }
+
+                 */
 
                 Text tempText = new Text(getViewModel().getNickname(m.getAuthor()) + ": " + m.getContent());
                 chatListView.getItems().add(tempText);

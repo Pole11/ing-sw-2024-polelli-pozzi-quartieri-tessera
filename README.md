@@ -1,64 +1,60 @@
-# Codex Naturalis GC10
-
+# Codex Naturalis
 Polelli, Pozzi, Quartieri, Tessera
 
-## Implementazione
-
+## Implementation
 - TUI + GUI
 - RMI + Socket
-- Regole complete
-- Funzionalità aggiuntive:
-    - [x] chat 
-    - [x] resilienza alle disconnessioni
-    - [x] persistenza
+- Complete rules
+- Additional features:
+  - [x] chat
+  - [x] resilience to disconnections
+  - [x] persistence
 
-## Come giocare
 
-Per prima cosa scaricare i `.jar` nella cartella `deliverables`, poi procedere nelle istruzioni di ogni componente.
+## How to play
+First, download the `.jar` files from the `deliverables` folder, then follow the instructions for each component.
 
-### Server
-
-Una volta scaricato il `.jar` del server, per farlo partire:
+## Server
+Once you've downloaded the server `.jar`, start it with the following command:
 
 ```bash
-java -jar server.jar [ip del server] [porta socket] [porta rmi] [restart-rescue]
+java -jar server.jar [server IP] [socket port] [RMI port] [restart-rescue]
 ```
 
-Visto che vogliamo migliorare la consapevolezza del server nel caso di un deploy su server connesso a internet, è abilitata la funzione di "am i down right now", che cerca di capire se è connesso a internet o meno, grazie ad un ping a `8.8.8.8`.
+To improve server awareness when deployed on an internet-connected server, the "am I down right now" feature is enabled, which checks internet connectivity by pinging 8.8.8.8.
 
-Ogni partita genera, ogni volta che viene inviato un evento alle view, un file, chiamato `rescue.json` che contiene lo stato della partita. Nel caso si sposti il server da un computer a un altro o si spenga il server è possibile riprendere la partita dove si era lasciata.
+Each match generates a rescue.json file whenever an event is sent to the views, which contains the game's state. If the server is moved to another machine or shut down, the match can be resumed from where it left off.
 
-Di default `restart-rescue` è false, si può decidere, mettendolo a true, di ripulire il rescue per iniziare una nuova partita, in ogni caso quando una partita termina, il rescue viene ripulito automaticamente
+By default, `restart-rescue` is set to false. You can set it to true to clear the rescue file and start a new game. In any case, when a game ends, the rescue file is automatically cleared.
 
 ### Client
-
-Una volta scaricato il `.jar` del client, per farlo partire:
-
-```bash
-java -jar client.jar [rmi/socket] [ip del server] [porta]
-```
-
-Da notare che con `porta` si intende la porta corrispondente del server, quindi cambia nel caso di RMI o Socket.
-
-Questa è la configurazione "base", da usare in qualsiasi contesto. Sia creando una propria LAN, che deployando il server su un server con ip pubblico statico. 
-
-Nel caso di RMI, se si riscontrano problemi, potrebbe essere necessario per il client specificare il proprio indirizzo ip. In tal caso basta procedere come segue:
+Once you've downloaded the client `.jar`, start it with the following command:
 
 ```bash
-java -jar client.jar [rmi/socket] [ip del server] [porta] [ip macchina corrente]
+java -jar client.jar [rmi/socket] [server IP] [port]
+```
+Note that `port` refers to the corresponding port on the server, so it changes depending on whether you're using RMI or Socket.
+
+This is the "base" configuration, suitable for any context, whether you're setting up a LAN or deploying the server on a public static IP.
+
+In the case of RMI, if issues arise, the client may need to specify its own IP address. In this case, use the following command:
+
+```bash
+java -jar client.jar [rmi/socket] [server IP] [port] [current machine IP]
 ```
 
-All'inizio, verrà chiesto all'utente di inserire la propria preferenza sull'utilizzo della GUI o meno.
-Per inviare un messaggio in chat ad un utente specifico, mettere come "prefisso" del messaggio, cioè come prima parola, il nome dell'utente destinatario.
+At the start, the user will be prompted to choose whether to use the GUI or not.
+To send a chat message to a specific user, prefix the message with the recipient's name as the first word.
 
-#### GUI
+### GUI
+The GUI is designed to be responsive and works on both low and high resolutions. This responsiveness is implemented based on the window's height and the screen resolution. The optimal layout is the square window that opens when the game starts, but the user can resize the window at any time.
 
-La GUI è stato progettata in modo responsive e funziona sia su risoluzioni basse che alte. Questa responsivness viene implementata facendo riferimento all'altezza della finestra e alla risoluzione dello schermo. La schermata ottimale è quella quadrata che si apre all'avvio del gioco, ma l'utente può decidere di cambiarne le dimensioni in ogni momento.  
-
-#### CLI
-
-Per la CLI abbiamo ripreso lo stile di una shell del terminale. Infatti richiederà all'utente di usare dei comandi testuali e di premere invio una volta completato il comando. Le istruzioni per muoversi all'interno del gioco vengono fornite automaticamente. Nel caso ci si senta persi, si può sempre fare riferimento al comando `help`. Se non si capisce come usare un comando, si possono ottenere più informazioni con l'immancabile flag `-h` preceduto dal comando, in questo modo: `COMANDO -h`.
+### CLI
+The CLI is inspired by a terminal shell, where users type commands and press enter to execute them. Instructions for navigating within the game are provided automatically. If you ever feel lost, you can always refer to the help command. If you're unsure how to use a command, you can get more information by using the -h flag after the command, like so: COMMAND -h.
 
 ### Bot
+You can also find the `.jar` for playing against a bot, moreover in src/test/bots there is the file configuration
 
-Nella fase di testing ci è sembrato necessario creare dei bot che potessero giocare da soli, questi hanno reso la fase di sviluppo molto più veloce.  
+---
+
+NOTE: Codex Naturalis is a board game developed and published by Cranio Creations Srl. The graphic content of this project related to the board game is used with the prior approval of Cranio Creations Srl solely for educational purposes. Distribution, copying, or reproduction of the content and images in any form outside the project is prohibited, as is the redistribution and publication of the content and images for purposes other than those mentioned above. The commercial use of the aforementioned content is also prohibited.

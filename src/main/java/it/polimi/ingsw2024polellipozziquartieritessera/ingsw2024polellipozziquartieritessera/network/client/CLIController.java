@@ -1098,6 +1098,10 @@ public class CLIController {
         System.out.println("-------- GAME CHAT --------");
         for (Message message : chat.getMessages()){
             toBePrinted = true;
+
+
+            //Private talking
+            /*
             if (message.getAuthor() != viewModel.getPlayerIndex()) {
                 for (int j = 0; j < viewModel.getPlayersSize(); j++) {
                     if (j != viewModel.getPlayerIndex()) {
@@ -1107,6 +1111,8 @@ public class CLIController {
                     }
                 }
             }
+
+             */
             if(toBePrinted) {
                 String playerName = viewModel.getNickname(message.getAuthor());
                 System.out.println("[" + playerName + "] " + message.getContent());

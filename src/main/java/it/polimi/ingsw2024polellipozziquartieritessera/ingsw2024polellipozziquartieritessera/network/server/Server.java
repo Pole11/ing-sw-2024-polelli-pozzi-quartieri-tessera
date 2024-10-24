@@ -82,7 +82,7 @@ public class Server implements VirtualServer {
      * @param rmiport the port number for the RMI registry
      * @throws IOException if an I/O error occurs when opening the socket or registry
      */
-    public static void startServer(String host, int socketport, int rmiport) throws IOException{
+    public static void startServer(String host, int socketport, int rmiport) throws IOException, CardNotPlacedException, PlacingOnHiddenCornerException, CardNotOnBoardException {
         // listen to socket
         ServerSocket listenSocket = new ServerSocket(socketport);
 

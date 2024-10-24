@@ -7,9 +7,7 @@ import com.google.gson.ToNumberPolicy;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Config;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.Global;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.enums.*;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerColorException;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.NotUniquePlayerNicknameException;
-import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.WrongStructureConfigurationSizeException;
+import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.exceptions.*;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Board;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.GameState;
 import it.polimi.ingsw2024polellipozziquartieritessera.ingsw2024polellipozziquartieritessera.model.Player;
@@ -340,7 +338,7 @@ public class Populate {
      * @param gameState the GameState object to restore the state into
      * @throws IOException if an I/O error occurs while reading the saved state file
      */
-    public static void restoreState(GameState gameState) throws IOException {
+    public static void restoreState(GameState gameState) throws IOException, CardNotPlacedException, PlacingOnHiddenCornerException, CardNotOnBoardException {
         ObjectMapper mapper = new ObjectMapper();
 
         String filePath = new File("").getAbsolutePath();
@@ -502,6 +500,13 @@ public class Populate {
             int index = (int) event.get("playerIndex");
             Player player = gameState.getPlayer(index);
             UpdateBoardEvent backupEvent = new UpdateBoardEvent(gameState, new ArrayList<>(), player, (int) event.get("placingCardId"), (int) event.get("tableCardId") , CornerPos.valueOf((String) event.get("existingCornerPos")), Side.valueOf((String) event.get("side")));
+            CornerPos placingCornerPos = switch (CornerPos.valueOf((String) event.get("existingCornerPos"))) {
+                case CornerPos.UPLEFT -> CornerPos.DOWNRIGHT;
+                case CornerPos.UPRIGHT -> CornerPos.DOWNLEFT;
+                case CornerPos.DOWNLEFT -> CornerPos.UPRIGHT;
+                case CornerPos.DOWNRIGHT -> CornerPos.UPLEFT;
+            };
+            gameState.placeCard(player, (int) event.get("placingCardId"), (int) event.get("tableCardId"), CornerPos.valueOf((String) event.get("existingCornerPos")), placingCornerPos, Side.valueOf((String) event.get("side")), false);
             gameState.addPlacedEvent(backupEvent);
         }
         System.out.println(gameState.getPlacedEventList());
